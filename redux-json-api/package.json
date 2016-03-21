@@ -1,0 +1,25 @@
+{
+  "name": "redux-json-api",
+  "version": "0.0.1",
+  "description": "Action creators, reducers and middleware for simple handling of normalized json api data",
+  "main": "index.js",
+  "scripts": {
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/5minutes/js-libs.git"
+  },
+  "keywords": [
+    "redux",
+    "json-api",
+    "normalize",
+    "simple"
+  ],
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/5minutes/js-libs/issues"
+  },
+  "homepage": "https://github.com/5minutes/js-libs#readme"
+}
