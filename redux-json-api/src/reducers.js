@@ -58,7 +58,6 @@ export function collection(type, name) {
   };
 }
 
-//noinspection Eslint
 export function find(endpoint, headers, type, collName = '') {
   return {
     [CALL_API]: {

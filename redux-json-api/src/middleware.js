@@ -4,7 +4,7 @@ export const LOAD_ERROR = Symbol('LOAD_ERROR');
 export const COLLECTION_FETCHED = Symbol('COLLECTION_FETCHED');
 export const OBJECT_FETCHED = Symbol('OBJECT_FETCHED');
 
-export default jsonApiMiddleware = store => next => action => {
+export default store => next => action => {
   if (action.meta === undefined) {
     return next(action);
   }
@@ -20,7 +20,7 @@ export default jsonApiMiddleware = store => next => action => {
     ? action.payload.data
     : [action.payload.data];
 
-  const makeCollAction = () => ({
+  const makeCollectionAction = () => ({
     type: COLLECTION_FETCHED,
     payload: data,
     meta: {
@@ -37,7 +37,7 @@ export default jsonApiMiddleware = store => next => action => {
 
   const chainDispatch = () => {
     data.map(item => dispatch(makeObjectAction(item)));
-    dispatch(makeCollAction());
+    dispatch(makeCollectionAction());
   };
 
   return dispatch(chainDispatch());
