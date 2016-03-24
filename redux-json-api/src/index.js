@@ -1,4 +1,4 @@
-import { storage, collection, find } from './reducers';
+import { storage, collection, find, nestedReducer } from './reducers';
 import jsonApiMiddleware, {
   LOAD_REQUEST,
   LOAD_SUCCESS,
@@ -10,6 +10,7 @@ import jsonApiMiddleware, {
 export {
   storage,
   collection,
+  nestedReducer,
   find,
   jsonApiMiddleware,
   LOAD_REQUEST,
