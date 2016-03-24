@@ -13,32 +13,33 @@ export default store => next => action => {
     return next(action);
   }
 
-  const type = meta.type;
-  const collection = meta.collection;
   const dispatch = store.dispatch;
-  const data = Array.isArray(action.payload.data)
-    ? action.payload.data
-    : [action.payload.data];
 
-  const makeCollectionAction = () => ({
-    type: COLLECTION_FETCHED,
-    payload: data,
-    meta: {
-      type,
-      collection,
-    },
-  });
+  if (action.type === LOAD_SUCCESS) {
+    const type = meta.type;
+    const collection = meta.collection;
+    const data = Array.isArray(action.payload.data)
+      ? action.payload.data
+      : [action.payload.data];
 
-  const makeObjectAction = (item) => ({
-    type: OBJECT_FETCHED,
-    payload: item,
-    meta: { type },
-  });
+    const makeCollectionAction = () => ({
+      type: COLLECTION_FETCHED,
+      payload: data,
+      meta: {
+        type,
+        collection,
+      },
+    });
 
-  const chainDispatch = () => {
+    const makeObjectAction = (item) => ({
+      type: OBJECT_FETCHED,
+      payload: item,
+      meta: {type},
+    });
+
     data.map(item => dispatch(makeObjectAction(item)));
     dispatch(makeCollectionAction());
-  };
+  }
 
-  return dispatch(chainDispatch());
+  return next(action);
 };

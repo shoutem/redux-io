@@ -12,15 +12,8 @@
     "flow-vars"
   ],
   "env"     : {
-    "browser" : true
-  },
-  "globals" : {
-    "Action"       : false,
-    "__DEV__"      : false,
-    "__PROD__"     : false,
-    "__DEBUG__"    : false,
-    "__DEBUG_NEW_WINDOW__" : false,
-    "__BASENAME__" : false
+    "browser" : true,
+    "mocha": true,
   },
   "rules": {
     "no-empty-label": 0,

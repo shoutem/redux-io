@@ -1,7 +1,5 @@
 {
-  "stage": 0,
-  "loose": "all",
-  "optional": [
-    "runtime"
-  ]
+  presets: ["es2015"],
+  plugins: ["transform-object-rest-spread"],
+  sourceMaps: true
 }

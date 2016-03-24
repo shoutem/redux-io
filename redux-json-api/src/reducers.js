@@ -29,7 +29,6 @@ export function storage(type, initialState = new Immutable.Map()) {
     if (!_.has(action, 'meta.type') || action.meta.type !== type) {
       return state;
     }
-
     const item = action.payload;
     switch (action.type) {
       case OBJECT_FETCHED:
@@ -40,8 +39,8 @@ export function storage(type, initialState = new Immutable.Map()) {
   };
 }
 
-export function collection(type, name) {
-  return (state = new Immutable.List(), action) => {
+export function collection(type, name, initialState = new Immutable.List()) {
+  return (state = initialState, action) => {
     if (!_.has(action, 'meta.type') || action.meta.type !== type) {
       return state;
     }
@@ -51,14 +50,14 @@ export function collection(type, name) {
 
     switch (action.type) {
       case COLLECTION_FETCHED:
-        return new Immutable.Seq(action.payload).map(item => item.id);
+        return new Immutable.List(action.payload.map(item => item.id));
       default:
         return state;
     }
   };
 }
 
-export function find(endpoint, headers, type, collName = '') {
+export function find(endpoint, headers, type, collectionName = '') {
   return {
     [CALL_API]: {
       headers,
@@ -71,7 +70,7 @@ export function find(endpoint, headers, type, collName = '') {
           meta: {
             source: 'json_api',
             type,
-            collection: collName,
+            collection: collectionName,
           },
         },
         LOAD_ERROR,
