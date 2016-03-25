@@ -1,5 +1,8 @@
-import { storage, collection, find, nestedReducer } from './reducers';
-import jsonApiMiddleware, {
+import jsonApiMiddleware from './middleware';
+
+export { jsonApiMiddleware };
+export { storage, storageImmutable, collection, find, nestedReducer } from './reducers';
+export {
   LOAD_REQUEST,
   LOAD_SUCCESS,
   LOAD_ERROR,
@@ -7,15 +10,3 @@ import jsonApiMiddleware, {
   COLLECTION_FETCHED,
 } from './middleware';
 
-export {
-  storage,
-  collection,
-  nestedReducer,
-  find,
-  jsonApiMiddleware,
-  LOAD_REQUEST,
-  LOAD_SUCCESS,
-  LOAD_ERROR,
-  OBJECT_FETCHED,
-  COLLECTION_FETCHED,
-};

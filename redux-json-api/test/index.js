@@ -7,6 +7,7 @@ import configureMockStore from 'redux-mock-store';
 import thunk from 'redux-thunk';
 import {
   storage,
+  storageImmutable,
   collection,
   find,
   LOAD_REQUEST,
@@ -19,9 +20,106 @@ import {
 
 chai.use(chaiImmutable);
 
-describe('Storage reducer', () => {
+describe('Mutable Storage reducer', () => {
   it('should have a valid initial state', () => {
     const testReducer = storage('test');
+    expect(testReducer(undefined, {})).to.eql({});
+  });
+
+  it('should be able to add item', () => {
+    const initialState = {};
+    const item = { id: 1 };
+    const action = {
+      type: OBJECT_FETCHED,
+      meta: {
+        type: 'test',
+      },
+      payload: item,
+    };
+    const reducer = storage('test', initialState);
+
+    const nextState = reducer(initialState, action);
+    const expectedState = { [item.id]: item };
+
+    expect(nextState).to.eql(expectedState);
+  });
+
+  it('should be able to ignore action with different schema type', () => {
+    const initialState = {};
+    const item = { id: 1 };
+    const action = {
+      type: OBJECT_FETCHED,
+      meta: {
+        type: 'test2',
+      },
+      payload: item,
+    };
+
+    const reducer = storage('test', initialState);
+    const nextState = reducer(initialState, action);
+
+    expect(nextState).to.eql(initialState);
+  });
+
+  it('should be able to ignore action with different action type', () => {
+    const initialState = {};
+    const item = { id: 1 };
+    const action = {
+      type: 'OBJECT_FETCHED',
+      meta: {
+        type: 'test',
+      },
+      payload: item,
+    };
+
+    const reducer = storage('test', initialState);
+    const nextState = reducer(initialState, action);
+
+    expect(nextState).to.eql(initialState);
+  });
+
+  it('should be able to overwrite object with same id in storage', () => {
+    const item = { id: 1, value: 'a' };
+    const initialState = { [item.id]: item };
+    const reducer = storage('test', initialState);
+
+    const itemNew = { id: 1, value: 'b' };
+    const action = {
+      type: OBJECT_FETCHED,
+      meta: {
+        type: 'test',
+      },
+      payload: itemNew,
+    };
+
+    const nextState = reducer(initialState, action);
+    const expectedState = { [itemNew.id]: itemNew };
+    expect(nextState).to.eql(expectedState);
+  });
+
+  it('should be able to keep object with different id in storage', () => {
+    const item1 = { id: 1, value: 'a' };
+    const initialState = { [item1.id]: item1 };
+    const reducer = storage('test', initialState);
+
+    const item2 = { id: 2, value: 'b' };
+    const action = {
+      type: OBJECT_FETCHED,
+      meta: {
+        type: 'test',
+      },
+      payload: item2,
+    };
+
+    const nextState = reducer(initialState, action);
+    const expectedState = { [item1.id]: item1, [item2.id]: item2 };
+    expect(nextState).to.eql(expectedState);
+  });
+});
+
+describe('Immutable Storage reducer', () => {
+  it('should have a valid initial state', () => {
+    const testReducer = storageImmutable('test');
     expect(testReducer(undefined, {})).to.equal(new Immutable.Map());
   });
 
@@ -35,7 +133,7 @@ describe('Storage reducer', () => {
       },
       payload: item,
     };
-    const reducer = storage('test', initialState);
+    const reducer = storageImmutable('test', initialState);
 
     const nextState = reducer(initialState, action);
     const expectedState = new Immutable.Map()
@@ -55,7 +153,7 @@ describe('Storage reducer', () => {
       payload: item,
     };
 
-    const reducer = storage('test', initialState);
+    const reducer = storageImmutable('test', initialState);
     const nextState = reducer(initialState, action);
 
     expect(nextState).to.equal(initialState);
@@ -72,7 +170,7 @@ describe('Storage reducer', () => {
       payload: item,
     };
 
-    const reducer = storage('test', initialState);
+    const reducer = storageImmutable('test', initialState);
     const nextState = reducer(initialState, action);
 
     expect(nextState).to.equal(initialState);
@@ -82,7 +180,7 @@ describe('Storage reducer', () => {
     const item = { id: 1, value: 'a' };
     const initialState = new Immutable.Map()
       .set(item.id, Immutable.fromJS(item));
-    const reducer = storage('test', initialState);
+    const reducer = storageImmutable('test', initialState);
 
     const itemNew = { id: 1, value: 'b' };
     const action = {
@@ -103,7 +201,7 @@ describe('Storage reducer', () => {
     const item1 = { id: 1, value: 'a' };
     const initialState = new Immutable.Map()
       .set(item1.id, Immutable.fromJS(item1));
-    const reducer = storage('test', initialState);
+    const reducer = storageImmutable('test', initialState);
 
     const item2 = { id: 2, value: 'b' };
     const action = {

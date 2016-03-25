@@ -24,6 +24,84 @@ export function nestedReducer(selectorReducer, reducers) {
   );
 }
 
+const set = (state, id, item) => ({ ...state, [id]: item });
+const setImmutable = (state, id, item) =>
+  state.set(item.id, Immutable.fromJS(item));
+
+const config = {
+  mutable: {
+    set,
+    initialState: () => ({}),
+  },
+  immutable: {
+    set: setImmutable,
+    initialState: () => new Immutable.Map(),
+  },
+};
+
+
+const storageCreator = (cx) =>
+  (type, initialState = cx.initialState()) =>
+    (state = initialState, action) => {
+      if (!_.has(action, 'meta.type') || action.meta.type !== type) {
+        return state;
+      }
+      const item = action.payload;
+      switch (action.type) {
+        case OBJECT_FETCHED:
+          return cx.set(state, item.id, item);
+        default:
+          return state;
+      }
+    };
+
+export const storage = storageCreator(config.mutable);
+export const storageImmutable = storageCreator(config.immutable);
+
+/*
+const storageCreator = (isImmutable = false) =>
+  (type, initialState = isImmutable ? new Immutable.Map() : {}) =>
+    (state = initialState, action) => {
+      if (!_.has(action, 'meta.type') || action.meta.type !== type) {
+        return state;
+      }
+      const item = action.payload;
+      switch (action.type) {
+        case OBJECT_FETCHED:
+          if (isImmutable) {
+            return state.set(item.id, Immutable.fromJS(item));
+          }
+          return { ...state, [item.id]: item };
+        default:
+          return state;
+      }
+    };
+
+export const storage = () => storageCreator();
+export const storageImmutable = () => storageCreator(true);
+*/
+
+/*
+export function storageMutable(type, initialState = {}) {
+  return (state = initialState, action) => {
+    if (!_.has(action, 'meta.type') || action.meta.type !== type) {
+      return state;
+    }
+    const item = action.payload;
+    switch (action.type) {
+      case OBJECT_FETCHED:
+        //return Object.assign({}, state, {
+        //  [item.id]: item,
+        //});
+        return { ...state, [item.id]: item };
+      default:
+        return state;
+    }
+  };
+}
+*/
+
+/*
 export function storage(type, initialState = new Immutable.Map()) {
   return (state = initialState, action) => {
     if (!_.has(action, 'meta.type') || action.meta.type !== type) {
@@ -38,6 +116,7 @@ export function storage(type, initialState = new Immutable.Map()) {
     }
   };
 }
+*/
 
 export function collection(type, name, initialState = new Immutable.List()) {
   return (state = initialState, action) => {
