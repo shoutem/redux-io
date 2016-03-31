@@ -11,7 +11,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/5minutes/js-libs.git"
+    "url": "git+https://vivanac@bitbucket.org/fiveminutes/redux-json-api.git"
   },
   "keywords": [
     "redux",
@@ -22,9 +22,9 @@
   "author": "",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/5minutes/js-libs/issues"
+    "url": "https://vivanac@bitbucket.org/fiveminutes/redux-json-api.git/issues"
   },
-  "homepage": "https://github.com/5minutes/js-libs#readme",
+  "homepage": "https://vivanac@bitbucket.org/fiveminutes/redux-json-api.git#readme",
   "devDependencies": {
     "babel-cli": "^6.6.5",
     "babel-core": "^6.7.4",
@@ -34,6 +34,7 @@
     "babel-register": "^6.7.2",
     "chai": "^3.5.0",
     "chai-immutable": "^1.5.3",
+    "deep-freeze": "0.0.1",
     "eslint": "^2.4.0",
     "eslint-config-airbnb": "^6.2.0",
     "eslint-plugin-flow-vars": "^0.2.1",
