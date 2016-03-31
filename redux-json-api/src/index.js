@@ -8,7 +8,6 @@ export {
   collection,
   collectionImmutable,
   find,
-  nestedReducer,
 } from './reducers';
 
 export {
