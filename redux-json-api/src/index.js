@@ -6,6 +6,7 @@ export {
   storage,
   storageImmutable,
   collection,
+  collectionImmutable,
   find,
   nestedReducer,
 } from './reducers';

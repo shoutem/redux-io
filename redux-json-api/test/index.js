@@ -10,6 +10,7 @@ import {
   storage,
   storageImmutable,
   collection,
+  collectionImmutable,
   find,
   LOAD_REQUEST,
   LOAD_SUCCESS,
@@ -37,6 +38,7 @@ describe('Plain Storage reducer', () => {
       },
       payload: item,
     };
+    deepFreeze(initialState);
     const reducer = storage('test', initialState);
 
     const nextState = reducer(initialState, action);
@@ -55,7 +57,7 @@ describe('Plain Storage reducer', () => {
       },
       payload: item,
     };
-
+    deepFreeze(initialState);
     const reducer = storage('test', initialState);
     const nextState = reducer(initialState, action);
 
@@ -72,7 +74,7 @@ describe('Plain Storage reducer', () => {
       },
       payload: item,
     };
-
+    deepFreeze(initialState);
     const reducer = storage('test', initialState);
     const nextState = reducer(initialState, action);
 
@@ -82,6 +84,7 @@ describe('Plain Storage reducer', () => {
   it('able to replace object with same id in storage', () => {
     const item = { id: 1, value: 'a' };
     const initialState = { [item.id]: item };
+    deepFreeze(initialState);
     const reducer = storage('test', initialState);
 
     const itemNew = { id: 1, value: 'b' };
@@ -101,6 +104,7 @@ describe('Plain Storage reducer', () => {
   it('able to keep object with different id in storage', () => {
     const item1 = { id: 1, value: 'a' };
     const initialState = { [item1.id]: item1 };
+    deepFreeze(initialState);
     const reducer = storage('test', initialState);
 
     const item2 = { id: 2, value: 'b' };
@@ -114,26 +118,6 @@ describe('Plain Storage reducer', () => {
 
     const nextState = reducer(initialState, action);
     const expectedState = { [item1.id]: item1, [item2.id]: item2 };
-    expect(nextState).to.deep.equal(expectedState);
-  });
-
-  it('keep immutable state', () => {
-    const item = { id: 1, value: 'a' };
-    const initialState = { [item.id]: item };
-    deepFreeze(initialState);
-    const reducer = storage('test', initialState);
-
-    const itemNew = { id: 1, value: 'b' };
-    const action = {
-      type: OBJECT_FETCHED,
-      meta: {
-        type: 'test',
-      },
-      payload: itemNew,
-    };
-
-    const nextState = reducer(initialState, action);
-    const expectedState = { [itemNew.id]: itemNew };
     expect(nextState).to.deep.equal(expectedState);
   });
 });
@@ -241,9 +225,133 @@ describe('Immutable Storage reducer', () => {
   });
 });
 
-describe('Collection reducer', () => {
+describe('Plain Collection reducer', () => {
   it('have a valid initial state', () => {
-    const testReducer = collection('test');
+    const testReducer = collection('test', 'test');
+    expect(testReducer(undefined, {})).to.eql([]);
+  });
+
+  it('able to add collection of indices', () => {
+    const initialState = [];
+    const items = [
+      { id: 1 },
+      { id: 2 },
+    ];
+    deepFreeze(initialState);
+    const reducer = collection('test', 'collection', initialState);
+
+    const action = {
+      type: COLLECTION_FETCHED,
+      meta: {
+        type: 'test',
+        collection: 'collection',
+      },
+      payload: items,
+    };
+
+    const nextState = reducer(initialState, action);
+    const expectedState = items.map(item => item.id);
+
+    expect(nextState).to.eql(expectedState);
+  });
+
+  it('able to ignore action with different schema type', () => {
+    const initialState = [];
+    const items = [
+      { id: 1 },
+      { id: 2 },
+    ];
+    deepFreeze(initialState);
+    const reducer = collection('test', 'collection', initialState);
+
+    const action = {
+      type: COLLECTION_FETCHED,
+      meta: {
+        type: 'test2',
+        collection: 'collection',
+      },
+      payload: items,
+    };
+
+    const nextState = reducer(initialState, action);
+    expect(nextState).to.equal(initialState);
+  });
+
+  it('able to ignore action with different action type', () => {
+    const initialState = [];
+    const items = [
+      { id: 1 },
+      { id: 2 },
+    ];
+    deepFreeze(initialState);
+    const reducer = collection('test', 'collection', initialState);
+
+    const action = {
+      type: 'COLLECTION_FETCHED',
+      meta: {
+        type: 'test',
+        collection: 'collection',
+      },
+      payload: items,
+    };
+
+    const nextState = reducer(initialState, action);
+    expect(nextState).to.equal(initialState);
+  });
+
+  it('able to ignore action with different collection type', () => {
+    const initialState = [];
+    const items = [
+      { id: 1 },
+      { id: 2 },
+    ];
+    deepFreeze(initialState);
+    const reducer = collection('test', 'collection', initialState);
+
+    const action = {
+      type: COLLECTION_FETCHED,
+      meta: {
+        type: 'test',
+        collection: 'collection2',
+      },
+      payload: items,
+    };
+
+    const nextState = reducer(initialState, action);
+    expect(nextState).to.equal(initialState);
+  });
+
+  it('able to overwrite list of indicies on collection fetched action', () => {
+    const items = [
+      { id: 1 },
+      { id: 2 },
+    ];
+    const initialState = items;
+    deepFreeze(initialState);
+    const reducer = collection('test', 'collection', initialState);
+
+    const itemsNew = [
+      { id: 3 },
+      { id: 4 },
+    ];
+    const action = {
+      type: COLLECTION_FETCHED,
+      meta: {
+        type: 'test',
+        collection: 'collection',
+      },
+      payload: itemsNew,
+    };
+
+    const nextState = reducer(initialState, action);
+    const expectedState = itemsNew.map(item => item.id);
+    expect(nextState).to.eql(expectedState);
+  });
+});
+
+describe('Immutable Collection reducer', () => {
+  it('have a valid initial state', () => {
+    const testReducer = collectionImmutable('test', 'test');
     expect(testReducer(undefined, {})).to.equal(new Immutable.List());
   });
 
@@ -253,7 +361,7 @@ describe('Collection reducer', () => {
       { id: 1 },
       { id: 2 },
     ];
-    const reducer = collection('test', 'collection', initialState);
+    const reducer = collectionImmutable('test', 'collection', initialState);
 
     const action = {
       type: COLLECTION_FETCHED,
@@ -276,7 +384,7 @@ describe('Collection reducer', () => {
       { id: 1 },
       { id: 2 },
     ];
-    const reducer = collection('test', 'collection', initialState);
+    const reducer = collectionImmutable('test', 'collection', initialState);
 
     const action = {
       type: COLLECTION_FETCHED,
@@ -297,7 +405,7 @@ describe('Collection reducer', () => {
       { id: 1 },
       { id: 2 },
     ];
-    const reducer = collection('test', 'collection', initialState);
+    const reducer = collectionImmutable('test', 'collection', initialState);
 
     const action = {
       type: 'COLLECTION_FETCHED',
@@ -318,7 +426,7 @@ describe('Collection reducer', () => {
       { id: 1 },
       { id: 2 },
     ];
-    const reducer = collection('test', 'collection', initialState);
+    const reducer = collectionImmutable('test', 'collection', initialState);
 
     const action = {
       type: COLLECTION_FETCHED,
@@ -334,12 +442,12 @@ describe('Collection reducer', () => {
   });
 
   it('able to overwrite list of indicies on collection fetched action', () => {
-    const initialState = new Immutable.List();
     const items = [
       { id: 1 },
       { id: 2 },
     ];
-    const reducer = collection('test', 'collection', initialState);
+    const initialState = Immutable.fromJS(items);
+    const reducer = collectionImmutable('test', 'collection', initialState);
 
     const itemsNew = [
       { id: 3 },
@@ -454,7 +562,6 @@ describe('Find action creator', () => {
         expect(successAction.payload).to.deep.equal(expectedPayload);
       }).then(done).catch(done);
   });
-
 });
 
 describe('Json api middleware', () => {

@@ -13,21 +13,23 @@ import {
 const stateOperations = {
   plain: {
     set: (state, id, item) => ({ ...state, [id]: item }),
-    initialState: () => ({}),
+    createMap: () => ({}),
+    createList: (list = []) => (list),
   },
   immutable: {
     set: (state, id, item) =>
       state.set(item.id, Immutable.fromJS(item)),
-    initialState: () => new Immutable.Map(),
+    createMap: () => new Immutable.Map(),
+    createList: (list = []) => (Immutable.fromJS(list)),
   },
 };
 
-// Create storage is responsible for creating plain or
+// createStorage is responsible for creating plain or
 // immutable version of generic storage reducer. Generic storage
-// reducer enables creating typed storage reducer that handles
-// specific OBJECT type actions.
+// reducer enables creating typed storage reducers that are
+// handling specific OBJECT type actions.
 function createStorage(ops) {
-  return (type, initialState = ops.initialState()) =>
+  return (type, initialState = ops.createMap()) =>
     (state = initialState, action) => {
       if (!_.has(action, 'meta.type') || action.meta.type !== type) {
         return state;
@@ -45,24 +47,32 @@ function createStorage(ops) {
 export const storage = createStorage(stateOperations.plain);
 export const storageImmutable = createStorage(stateOperations.immutable);
 
-
-export function collection(type, name, initialState = new Immutable.List()) {
-  return (state = initialState, action) => {
-    if (!_.has(action, 'meta.type') || action.meta.type !== type) {
-      return state;
-    }
-    if (!_.has(action, 'meta.collection') || action.meta.collection !== name) {
-      return state;
-    }
-
-    switch (action.type) {
-      case COLLECTION_FETCHED:
-        return new Immutable.List(action.payload.map(item => item.id));
-      default:
+// createCollection is responsible for creating plain or
+// immutable version of generic collection reducer. Generic collection
+// reducer enables creating typed & named collection reducers that are
+// handling specific COLLECTION type actions with specific collection
+// name.
+function createCollection(ops) {
+  return (type, name, initialState = ops.createList()) =>
+    (state = initialState, action) => {
+      if (!_.has(action, 'meta.type') || action.meta.type !== type) {
         return state;
-    }
-  };
+      }
+      if (!_.has(action, 'meta.collection') || action.meta.collection !== name) {
+        return state;
+      }
+
+      switch (action.type) {
+        case COLLECTION_FETCHED:
+          return ops.createList(action.payload.map(item => item.id));
+        default:
+          return state;
+      }
+    };
 }
+
+export const collection = createCollection(stateOperations.plain);
+export const collectionImmutable = createCollection(stateOperations.immutable);
 
 export function find(endpoint, headers, type, collectionName = '') {
   return {
