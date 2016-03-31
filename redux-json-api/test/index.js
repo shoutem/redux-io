@@ -2,6 +2,7 @@ import chai, { expect } from 'chai';
 import chaiImmutable from 'chai-immutable';
 import nock from 'nock';
 import Immutable from 'immutable';
+import deepFreeze from 'deep-freeze';
 import { CALL_API, apiMiddleware } from 'redux-api-middleware';
 import configureMockStore from 'redux-mock-store';
 import thunk from 'redux-thunk';
@@ -20,13 +21,13 @@ import {
 
 chai.use(chaiImmutable);
 
-describe('Mutable Storage reducer', () => {
-  it('should have a valid initial state', () => {
+describe('Plain Storage reducer', () => {
+  it('have a valid initial state', () => {
     const testReducer = storage('test');
-    expect(testReducer(undefined, {})).to.eql({});
+    expect(testReducer(undefined, {})).to.deep.equal({});
   });
 
-  it('should be able to add item', () => {
+  it('able to add item', () => {
     const initialState = {};
     const item = { id: 1 };
     const action = {
@@ -41,10 +42,10 @@ describe('Mutable Storage reducer', () => {
     const nextState = reducer(initialState, action);
     const expectedState = { [item.id]: item };
 
-    expect(nextState).to.eql(expectedState);
+    expect(nextState).to.deep.equal(expectedState);
   });
 
-  it('should be able to ignore action with different schema type', () => {
+  it('able to ignore action with different schema type', () => {
     const initialState = {};
     const item = { id: 1 };
     const action = {
@@ -58,10 +59,10 @@ describe('Mutable Storage reducer', () => {
     const reducer = storage('test', initialState);
     const nextState = reducer(initialState, action);
 
-    expect(nextState).to.eql(initialState);
+    expect(nextState).to.deep.equal(initialState);
   });
 
-  it('should be able to ignore action with different action type', () => {
+  it('able to ignore action with different action type', () => {
     const initialState = {};
     const item = { id: 1 };
     const action = {
@@ -75,10 +76,10 @@ describe('Mutable Storage reducer', () => {
     const reducer = storage('test', initialState);
     const nextState = reducer(initialState, action);
 
-    expect(nextState).to.eql(initialState);
+    expect(nextState).to.deep.equal(initialState);
   });
 
-  it('should be able to overwrite object with same id in storage', () => {
+  it('able to replace object with same id in storage', () => {
     const item = { id: 1, value: 'a' };
     const initialState = { [item.id]: item };
     const reducer = storage('test', initialState);
@@ -94,10 +95,10 @@ describe('Mutable Storage reducer', () => {
 
     const nextState = reducer(initialState, action);
     const expectedState = { [itemNew.id]: itemNew };
-    expect(nextState).to.eql(expectedState);
+    expect(nextState).to.deep.equal(expectedState);
   });
 
-  it('should be able to keep object with different id in storage', () => {
+  it('able to keep object with different id in storage', () => {
     const item1 = { id: 1, value: 'a' };
     const initialState = { [item1.id]: item1 };
     const reducer = storage('test', initialState);
@@ -113,17 +114,37 @@ describe('Mutable Storage reducer', () => {
 
     const nextState = reducer(initialState, action);
     const expectedState = { [item1.id]: item1, [item2.id]: item2 };
-    expect(nextState).to.eql(expectedState);
+    expect(nextState).to.deep.equal(expectedState);
+  });
+
+  it('keep immutable state', () => {
+    const item = { id: 1, value: 'a' };
+    const initialState = { [item.id]: item };
+    deepFreeze(initialState);
+    const reducer = storage('test', initialState);
+
+    const itemNew = { id: 1, value: 'b' };
+    const action = {
+      type: OBJECT_FETCHED,
+      meta: {
+        type: 'test',
+      },
+      payload: itemNew,
+    };
+
+    const nextState = reducer(initialState, action);
+    const expectedState = { [itemNew.id]: itemNew };
+    expect(nextState).to.deep.equal(expectedState);
   });
 });
 
 describe('Immutable Storage reducer', () => {
-  it('should have a valid initial state', () => {
+  it('have a valid initial state', () => {
     const testReducer = storageImmutable('test');
     expect(testReducer(undefined, {})).to.equal(new Immutable.Map());
   });
 
-  it('should be able to add item', () => {
+  it('able to add item', () => {
     const initialState = new Immutable.Map();
     const item = { id: 1 };
     const action = {
@@ -142,7 +163,7 @@ describe('Immutable Storage reducer', () => {
     expect(nextState).to.equal(expectedState);
   });
 
-  it('should be able to ignore action with different schema type', () => {
+  it('able to ignore action with different schema type', () => {
     const initialState = new Immutable.Map();
     const item = { id: 1 };
     const action = {
@@ -159,7 +180,7 @@ describe('Immutable Storage reducer', () => {
     expect(nextState).to.equal(initialState);
   });
 
-  it('should be able to ignore action with different action type', () => {
+  it('able to ignore action with different action type', () => {
     const initialState = new Immutable.Map();
     const item = { id: 1 };
     const action = {
@@ -176,7 +197,7 @@ describe('Immutable Storage reducer', () => {
     expect(nextState).to.equal(initialState);
   });
 
-  it('should be able to overwrite object with same id in storage', () => {
+  it('able to overwrite object with same id in storage', () => {
     const item = { id: 1, value: 'a' };
     const initialState = new Immutable.Map()
       .set(item.id, Immutable.fromJS(item));
@@ -197,7 +218,7 @@ describe('Immutable Storage reducer', () => {
     expect(nextState).to.equal(expectedState);
   });
 
-  it('should be able to keep object with different id in storage', () => {
+  it('able to keep object with different id in storage', () => {
     const item1 = { id: 1, value: 'a' };
     const initialState = new Immutable.Map()
       .set(item1.id, Immutable.fromJS(item1));
@@ -221,12 +242,12 @@ describe('Immutable Storage reducer', () => {
 });
 
 describe('Collection reducer', () => {
-  it('should have a valid initial state', () => {
+  it('have a valid initial state', () => {
     const testReducer = collection('test');
     expect(testReducer(undefined, {})).to.equal(new Immutable.List());
   });
 
-  it('should be able to add collection of indices', () => {
+  it('able to add collection of indices', () => {
     const initialState = new Immutable.List();
     const items = [
       { id: 1 },
@@ -249,7 +270,7 @@ describe('Collection reducer', () => {
     expect(nextState).to.equal(expectedState);
   });
 
-  it('should be able to ignore action with different schema type', () => {
+  it('able to ignore action with different schema type', () => {
     const initialState = new Immutable.List();
     const items = [
       { id: 1 },
@@ -270,7 +291,7 @@ describe('Collection reducer', () => {
     expect(nextState).to.equal(initialState);
   });
 
-  it('should be able to ignore action with different action type', () => {
+  it('able to ignore action with different action type', () => {
     const initialState = new Immutable.List();
     const items = [
       { id: 1 },
@@ -291,7 +312,7 @@ describe('Collection reducer', () => {
     expect(nextState).to.equal(initialState);
   });
 
-  it('should be able to ignore action with different collection type', () => {
+  it('able to ignore action with different collection type', () => {
     const initialState = new Immutable.List();
     const items = [
       { id: 1 },
@@ -312,7 +333,7 @@ describe('Collection reducer', () => {
     expect(nextState).to.equal(initialState);
   });
 
-  it('should be able to overwrite list of indicies on collection fetched action', () => {
+  it('able to overwrite list of indicies on collection fetched action', () => {
     const initialState = new Immutable.List();
     const items = [
       { id: 1 },
@@ -349,7 +370,7 @@ describe('Find action creator', () => {
     mockStore = configureMockStore(middlewares);
   })
 
-  it('should create a valid action', () => {
+  it('create a valid action', () => {
     const headers = {
       'Content-Type': 'application/vnd.api+json',
     };
@@ -372,11 +393,11 @@ describe('Find action creator', () => {
       type,
       collection: collectionName,
     };
-    expect(types[1].meta).to.eql(expectedMeta);
+    expect(types[1].meta).to.deep.equal(expectedMeta);
     expect(types[2]).to.equal(LOAD_ERROR);
   });
 
-  it('should produce valid storage and collection actions', done => {
+  it('produce valid storage and collection actions', done => {
     const expectedPayload =  {
       data: [{
         type: 'type_test',
@@ -414,13 +435,13 @@ describe('Find action creator', () => {
 
         const actionObjFetched = performedActions[1];
         expect(actionObjFetched.type).to.equal(OBJECT_FETCHED);
-        expect(actionObjFetched.meta).to.eql({ type });
-        expect(actionObjFetched.payload).to.eql(expectedPayload.data[0]);
+        expect(actionObjFetched.meta).to.deep.equal({ type });
+        expect(actionObjFetched.payload).to.deep.equal(expectedPayload.data[0]);
 
         const actionCollFetched = performedActions[3];
         expect(actionCollFetched.type).to.equal(COLLECTION_FETCHED);
-        expect(actionCollFetched.meta).to.eql({ type, collection: collectionName });
-        expect(actionCollFetched.payload).to.eql(expectedPayload.data);
+        expect(actionCollFetched.meta).to.deep.equal({ type, collection: collectionName });
+        expect(actionCollFetched.payload).to.deep.equal(expectedPayload.data);
 
         const successAction = performedActions[4];
         expect(successAction.type).to.equal(LOAD_SUCCESS);
@@ -429,8 +450,8 @@ describe('Find action creator', () => {
           type,
           collection: collectionName,
         };
-        expect(successAction.meta).to.eql(expectedMeta);
-        expect(successAction.payload).to.eql(expectedPayload);
+        expect(successAction.meta).to.deep.equal(expectedMeta);
+        expect(successAction.payload).to.deep.equal(expectedPayload);
       }).then(done).catch(done);
   });
 
@@ -448,7 +469,7 @@ describe('Json api middleware', () => {
     mockStore = configureMockStore([thunk, jsonApiMiddleware]);
   });
 
-  it('should produce valid storage and collection actions', done => {
+  it('produce valid storage and collection actions', done => {
     const type = 'type_test';
     const collectionName = 'collection_test';
     const expectedPayload =  {
@@ -486,23 +507,23 @@ describe('Json api middleware', () => {
 
         const actionObjFetched = performedActions[0];
         expect(actionObjFetched.type).to.equal(OBJECT_FETCHED);
-        expect(actionObjFetched.meta).to.eql({ type });
-        expect(actionObjFetched.payload).to.eql(expectedPayload.data[0]);
+        expect(actionObjFetched.meta).to.deep.equal({ type });
+        expect(actionObjFetched.payload).to.deep.equal(expectedPayload.data[0]);
 
         const actionCollFetched = performedActions[2];
         expect(actionCollFetched.type).to.equal(COLLECTION_FETCHED);
-        expect(actionCollFetched.meta).to.eql({ type, collection: collectionName });
-        expect(actionCollFetched.payload).to.eql(expectedPayload.data);
+        expect(actionCollFetched.meta).to.deep.equal({ type, collection: collectionName });
+        expect(actionCollFetched.payload).to.deep.equal(expectedPayload.data);
 
         const successAction = performedActions[3];
         expect(successAction.type).to.equal(LOAD_SUCCESS);
 
-        expect(successAction.meta).to.eql(expectedMeta);
-        expect(successAction.payload).to.eql(expectedPayload);
+        expect(successAction.meta).to.deep.equal(expectedMeta);
+        expect(successAction.payload).to.deep.equal(expectedPayload);
       }).then(done).catch(done);
   });
 
-  it('should be able to ignore other actions', done => {
+  it('able to ignore other actions', done => {
     const type = 'type_test';
     const collectionName = 'collection_test';
     const expectedPayload =  {

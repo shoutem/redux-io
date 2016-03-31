@@ -10,38 +10,24 @@ import {
   COLLECTION_FETCHED,
 } from './middleware';
 
-
-export function nestedReducer(selectorReducer, reducers) {
-  const combination = combineReducers(reducers);
-  return (state = new Immutable.Map(), action) => (
-    state.withMutations(s => {
-      s.set('current', selectorReducer(state.get('current'), action));
-      if (s.hasIn(['current', 0])) {
-        const id = state.getIn(['current', 0]);
-        s.set(id, combination(s.get(id), action));
-      }
-    })
-  );
-}
-
-const set = (state, id, item) => ({ ...state, [id]: item });
-const setImmutable = (state, id, item) =>
-  state.set(item.id, Immutable.fromJS(item));
-
-const config = {
-  mutable: {
-    set,
+const stateOperations = {
+  plain: {
+    set: (state, id, item) => ({ ...state, [id]: item }),
     initialState: () => ({}),
   },
   immutable: {
-    set: setImmutable,
+    set: (state, id, item) =>
+      state.set(item.id, Immutable.fromJS(item)),
     initialState: () => new Immutable.Map(),
   },
 };
 
-
-const storageCreator = (cx) =>
-  (type, initialState = cx.initialState()) =>
+// Create storage is responsible for creating plain or
+// immutable version of generic storage reducer. Generic storage
+// reducer enables creating typed storage reducer that handles
+// specific OBJECT type actions.
+function createStorage(ops) {
+  return (type, initialState = ops.initialState()) =>
     (state = initialState, action) => {
       if (!_.has(action, 'meta.type') || action.meta.type !== type) {
         return state;
@@ -49,14 +35,15 @@ const storageCreator = (cx) =>
       const item = action.payload;
       switch (action.type) {
         case OBJECT_FETCHED:
-          return cx.set(state, item.id, item);
+          return ops.set(state, item.id, item);
         default:
           return state;
       }
     };
+}
 
-export const storage = storageCreator(config.mutable);
-export const storageImmutable = storageCreator(config.immutable);
+export const storage = createStorage(stateOperations.plain);
+export const storageImmutable = createStorage(stateOperations.immutable);
 
 
 export function collection(type, name, initialState = new Immutable.List()) {
