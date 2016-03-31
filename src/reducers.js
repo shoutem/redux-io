@@ -1,6 +1,5 @@
 import _ from 'lodash';
 import Immutable from 'immutable';
-import { combineReducers } from 'redux-immutable';
 import { CALL_API } from 'redux-api-middleware';
 import {
   LOAD_REQUEST,
@@ -8,6 +7,11 @@ import {
   LOAD_ERROR,
   OBJECT_FETCHED,
   COLLECTION_FETCHED,
+  CREATE_REQUEST,
+  CREATE_SUCCESS,
+  CREATE_ERROR,
+  OBJECT_CREATED,
+  COLLECTION_INVALIDATE,
 } from './middleware';
 
 const stateOperations = {
@@ -74,23 +78,43 @@ function createCollection(ops) {
 export const collection = createCollection(stateOperations.plain);
 export const collectionImmutable = createCollection(stateOperations.immutable);
 
-export function find(endpoint, headers, type, collectionName = '') {
+export function find(config, collectionName = '') {
   return {
     [CALL_API]: {
-      headers,
-      endpoint,
       method: 'GET',
+      ...config,
       types: [
         LOAD_REQUEST,
         {
           type: LOAD_SUCCESS,
           meta: {
             source: 'json_api',
-            type,
             collection: collectionName,
           },
         },
         LOAD_ERROR,
+      ],
+    },
+  };
+}
+
+export function create(item, config) {
+  return {
+    [CALL_API]: {
+      method: 'POST',
+      ...config,
+      body: JSON.stringify({
+        data: item,
+      }),
+      types: [
+        CREATE_REQUEST,
+        {
+          type: CREATE_SUCCESS,
+          meta: {
+            source: 'json_api',
+          },
+        },
+        CREATE_ERROR,
       ],
     },
   };

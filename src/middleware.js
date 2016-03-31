@@ -4,6 +4,29 @@ export const LOAD_ERROR = Symbol('LOAD_ERROR');
 export const COLLECTION_FETCHED = Symbol('COLLECTION_FETCHED');
 export const OBJECT_FETCHED = Symbol('OBJECT_FETCHED');
 
+export const CREATE_REQUEST = Symbol('CREATE_REQUEST');
+export const CREATE_SUCCESS = Symbol('CREATE_SUCCESS');
+export const CREATE_ERROR = Symbol('CREATE_ERROR');
+export const COLLECTION_INVALIDATE = Symbol('COLLECTION_INVALIDATE');
+export const OBJECT_CREATED = Symbol('OBJECT_CREATED');
+
+const makeCollectionAction = (type, payload, collection = '') => ({
+  type,
+  payload,
+  meta: {
+    type: payload[0].type,
+    collection,
+  },
+});
+
+const makeObjectAction = (type, item) => ({
+  type,
+  payload: item,
+  meta: {
+    type: item.type,
+  },
+});
+
 export default store => next => action => {
   if (action.meta === undefined) {
     return next(action);
@@ -13,32 +36,21 @@ export default store => next => action => {
     return next(action);
   }
 
+  const data = [].concat(action.payload.data);
+  if (data.length === 0) {
+    return next(action);
+  }
+
   const dispatch = store.dispatch;
-
   if (action.type === LOAD_SUCCESS) {
-    const type = meta.type;
+    data.map(item => dispatch(makeObjectAction(OBJECT_FETCHED, item)));
     const collection = meta.collection;
-    const data = Array.isArray(action.payload.data)
-      ? action.payload.data
-      : [action.payload.data];
+    dispatch(makeCollectionAction(COLLECTION_FETCHED, data, collection));
+  }
 
-    const makeCollectionAction = () => ({
-      type: COLLECTION_FETCHED,
-      payload: data,
-      meta: {
-        type,
-        collection,
-      },
-    });
-
-    const makeObjectAction = (item) => ({
-      type: OBJECT_FETCHED,
-      payload: item,
-      meta: {type},
-    });
-
-    data.map(item => dispatch(makeObjectAction(item)));
-    dispatch(makeCollectionAction());
+  if (action.type === CREATE_SUCCESS) {
+    data.map(item => dispatch(makeObjectAction(OBJECT_CREATED, item)));
+    dispatch(makeCollectionAction(COLLECTION_INVALIDATE, data));
   }
 
   return next(action);

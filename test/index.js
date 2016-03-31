@@ -479,18 +479,20 @@ describe('Find action creator', () => {
   })
 
   it('create a valid action', () => {
-    const headers = {
-      'Content-Type': 'application/vnd.api+json',
+    const config = {
+      headers: {
+        'Content-Type': 'application/vnd.api+json',
+      },
+      endpoint: 'api.test',
     };
-    const endpoint = 'api.test';
-    const type = 'type_test';
+
     const collectionName = 'collection_test';
-    const action = find(endpoint, headers, type, collectionName);
+    const action = find(config, collectionName);
 
     expect(action[CALL_API]).to.not.be.undefined;
     expect(action[CALL_API].method).to.equal('GET');
-    expect(action[CALL_API].endpoint).to.equal(endpoint);
-    expect(action[CALL_API].headers).to.equal(headers);
+    expect(action[CALL_API].endpoint).to.equal(config.endpoint);
+    expect(action[CALL_API].headers).to.equal(config.headers);
     expect(action[CALL_API].types).to.not.be.undefined;
 
     const types = action[CALL_API].types;
@@ -498,7 +500,6 @@ describe('Find action creator', () => {
     expect(types[1].type).to.equal(LOAD_SUCCESS);
     const expectedMeta = {
       source: 'json_api',
-      type,
       collection: collectionName,
     };
     expect(types[1].meta).to.deep.equal(expectedMeta);
@@ -506,15 +507,16 @@ describe('Find action creator', () => {
   });
 
   it('produce valid storage and collection actions', done => {
-    const expectedPayload =  {
+    const type = 'type_test';
+    const expectedPayload = {
       data: [{
-        type: 'type_test',
+        type,
         id: '1',
         attributes: {
           name: 'Test1',
         },
       }, {
-        type: 'type_test',
+        type,
         id: '2',
         attributes: {
           name: 'Test2',
@@ -526,13 +528,15 @@ describe('Find action creator', () => {
       .get('/apps')
       .reply(200, expectedPayload, { 'Content-Type': 'vnd.api+json' });
 
-    const headers = {
-      'Content-Type': 'application/vnd.api+json',
+    const config = {
+      headers: {
+        'Content-Type': 'application/vnd.api+json',
+      },
+      endpoint: 'http://api.server.local/apps',
     };
-    const endpoint = 'http://api.server.local/apps';
-    const type = 'type_test';
+
     const collectionName = 'collection_test';
-    const action = find(endpoint, headers, type, collectionName);
+    const action = find(config, collectionName);
 
     const store = mockStore({});
     store.dispatch(action)
@@ -555,7 +559,6 @@ describe('Find action creator', () => {
         expect(successAction.type).to.equal(LOAD_SUCCESS);
         const expectedMeta = {
           source: 'json_api',
-          type,
           collection: collectionName,
         };
         expect(successAction.meta).to.deep.equal(expectedMeta);
