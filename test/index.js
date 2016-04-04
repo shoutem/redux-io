@@ -25,6 +25,7 @@ import {
   COLLECTION_INVALIDATE,
   jsonApiMiddleware,
 } from '../src';
+import { middlewareJsonApiSource } from '../src/middleware';
 
 chai.use(chaiImmutable);
 
@@ -37,15 +38,16 @@ describe('Plain Storage reducer', () => {
   it('add item in state on Fetch', () => {
     const initialState = {};
     const item = { id: 1 };
+    const schema = 'schema_test';
     const action = {
       type: OBJECT_FETCHED,
       meta: {
-        type: 'test',
+        schema,
       },
       payload: item,
     };
     deepFreeze(initialState);
-    const reducer = storage('test', initialState);
+    const reducer = storage(schema, initialState);
 
     const nextState = reducer(initialState, action);
     const expectedState = { [item.id]: item };
@@ -56,15 +58,16 @@ describe('Plain Storage reducer', () => {
   it('add item in state on Create', () => {
     const initialState = {};
     const item = { id: 1 };
+    const schema = 'schema_test';
     const action = {
       type: OBJECT_CREATED,
       meta: {
-        type: 'test',
+        schema,
       },
       payload: item,
     };
     deepFreeze(initialState);
-    const reducer = storage('test', initialState);
+    const reducer = storage(schema, initialState);
 
     const nextState = reducer(initialState, action);
     const expectedState = { [item.id]: item };
@@ -75,15 +78,16 @@ describe('Plain Storage reducer', () => {
   it('ignore action with different schema type', () => {
     const initialState = {};
     const item = { id: 1 };
+    const schema = 'schema_test';
     const action = {
       type: OBJECT_FETCHED,
       meta: {
-        type: 'test2',
+        schema: 'test2',
       },
       payload: item,
     };
     deepFreeze(initialState);
-    const reducer = storage('test', initialState);
+    const reducer = storage(schema, initialState);
     const nextState = reducer(initialState, action);
 
     expect(nextState).to.deep.equal(initialState);
@@ -92,15 +96,16 @@ describe('Plain Storage reducer', () => {
   it('ignore action with different action type', () => {
     const initialState = {};
     const item = { id: 1 };
+    const schema = 'schema_test';
     const action = {
       type: 'OBJECT_FETCHED',
       meta: {
-        type: 'test',
+        schema,
       },
       payload: item,
     };
     deepFreeze(initialState);
-    const reducer = storage('test', initialState);
+    const reducer = storage(schema, initialState);
     const nextState = reducer(initialState, action);
 
     expect(nextState).to.deep.equal(initialState);
@@ -110,13 +115,14 @@ describe('Plain Storage reducer', () => {
     const item = { id: 1, value: 'a' };
     const initialState = { [item.id]: item };
     deepFreeze(initialState);
-    const reducer = storage('test', initialState);
+    const schema = 'schema_test';
+    const reducer = storage(schema, initialState);
 
     const itemNew = { id: 1, value: 'b' };
     const action = {
       type: OBJECT_FETCHED,
       meta: {
-        type: 'test',
+        schema,
       },
       payload: itemNew,
     };
@@ -130,13 +136,14 @@ describe('Plain Storage reducer', () => {
     const item1 = { id: 1, value: 'a' };
     const initialState = { [item1.id]: item1 };
     deepFreeze(initialState);
-    const reducer = storage('test', initialState);
+    const schema = 'schema_test';
+    const reducer = storage(schema, initialState);
 
     const item2 = { id: 2, value: 'b' };
     const action = {
       type: OBJECT_FETCHED,
       meta: {
-        type: 'test',
+        schema,
       },
       payload: item2,
     };
@@ -156,14 +163,15 @@ describe('Immutable Storage reducer', () => {
   it('add item in state on Fetch', () => {
     const initialState = new Immutable.Map();
     const item = { id: 1 };
+    const schema = 'schema_test';
     const action = {
       type: OBJECT_FETCHED,
       meta: {
-        type: 'test',
+        schema,
       },
       payload: item,
     };
-    const reducer = storageImmutable('test', initialState);
+    const reducer = storageImmutable(schema, initialState);
 
     const nextState = reducer(initialState, action);
     const expectedState = new Immutable.Map()
@@ -175,14 +183,15 @@ describe('Immutable Storage reducer', () => {
   it('add item in state on Create', () => {
     const initialState = new Immutable.Map();
     const item = { id: 1 };
+    const schema = 'schema_test';
     const action = {
       type: OBJECT_CREATED,
       meta: {
-        type: 'test',
+        schema,
       },
       payload: item,
     };
-    const reducer = storageImmutable('test', initialState);
+    const reducer = storageImmutable(schema, initialState);
 
     const nextState = reducer(initialState, action);
     const expectedState = new Immutable.Map()
@@ -191,18 +200,19 @@ describe('Immutable Storage reducer', () => {
     expect(nextState).to.equal(expectedState);
   });
 
-  it('ignore action with different schema type', () => {
+  it('ignore action with different schema', () => {
     const initialState = new Immutable.Map();
     const item = { id: 1 };
+    const schema = 'schema_test';
     const action = {
       type: OBJECT_FETCHED,
       meta: {
-        type: 'test2',
+        schema: 'test2',
       },
       payload: item,
     };
 
-    const reducer = storageImmutable('test', initialState);
+    const reducer = storageImmutable(schema, initialState);
     const nextState = reducer(initialState, action);
 
     expect(nextState).to.equal(initialState);
@@ -211,15 +221,16 @@ describe('Immutable Storage reducer', () => {
   it('ignore action with different action type', () => {
     const initialState = new Immutable.Map();
     const item = { id: 1 };
+    const schema = 'schema_test';
     const action = {
       type: 'OBJECT_FETCHED',
       meta: {
-        type: 'test',
+        schema,
       },
       payload: item,
     };
 
-    const reducer = storageImmutable('test', initialState);
+    const reducer = storageImmutable(schema, initialState);
     const nextState = reducer(initialState, action);
 
     expect(nextState).to.equal(initialState);
@@ -229,13 +240,14 @@ describe('Immutable Storage reducer', () => {
     const item = { id: 1, value: 'a' };
     const initialState = new Immutable.Map()
       .set(item.id, Immutable.fromJS(item));
-    const reducer = storageImmutable('test', initialState);
+    const schema = 'schema_test';
+    const reducer = storageImmutable(schema, initialState);
 
     const itemNew = { id: 1, value: 'b' };
     const action = {
       type: OBJECT_FETCHED,
       meta: {
-        type: 'test',
+        schema,
       },
       payload: itemNew,
     };
@@ -250,13 +262,14 @@ describe('Immutable Storage reducer', () => {
     const item1 = { id: 1, value: 'a' };
     const initialState = new Immutable.Map()
       .set(item1.id, Immutable.fromJS(item1));
-    const reducer = storageImmutable('test', initialState);
+    const schema = 'schema_test';
+    const reducer = storageImmutable(schema, initialState);
 
     const item2 = { id: 2, value: 'b' };
     const action = {
       type: OBJECT_FETCHED,
       meta: {
-        type: 'test',
+        schema,
       },
       payload: item2,
     };
@@ -282,13 +295,15 @@ describe('Plain Collection reducer', () => {
       { id: 2 },
     ];
     deepFreeze(initialState);
-    const reducer = collection('test', 'collection', initialState);
+    const schema = 'schema_test';
+    const tag = 'tag_test';
+    const reducer = collection(schema, tag, initialState);
 
     const action = {
       type: COLLECTION_FETCHED,
       meta: {
-        type: 'test',
-        collection: 'collection',
+        schema,
+        tag,
       },
       payload: items,
     };
@@ -299,20 +314,22 @@ describe('Plain Collection reducer', () => {
     expect(nextState).to.eql(expectedState);
   });
 
-  it('ignore action with different schema type', () => {
+  it('ignore action with different schema', () => {
     const initialState = [];
     const items = [
       { id: 1 },
       { id: 2 },
     ];
     deepFreeze(initialState);
-    const reducer = collection('test', 'collection', initialState);
+    const schema = 'schema_test';
+    const tag = 'tag_test';
+    const reducer = collection(schema, tag, initialState);
 
     const action = {
       type: COLLECTION_FETCHED,
       meta: {
-        type: 'test2',
-        collection: 'collection',
+        schema: 'test2',
+        tag,
       },
       payload: items,
     };
@@ -328,13 +345,15 @@ describe('Plain Collection reducer', () => {
       { id: 2 },
     ];
     deepFreeze(initialState);
-    const reducer = collection('test', 'collection', initialState);
+    const schema = 'schema_test';
+    const tag = 'tag_test';
+    const reducer = collection(schema, tag, initialState);
 
     const action = {
       type: 'COLLECTION_FETCHED',
       meta: {
-        type: 'test',
-        collection: 'collection',
+        schema,
+        tag,
       },
       payload: items,
     };
@@ -350,13 +369,15 @@ describe('Plain Collection reducer', () => {
       { id: 2 },
     ];
     deepFreeze(initialState);
-    const reducer = collection('test', 'collection', initialState);
+    const schema = 'schema_test';
+    const tag = 'tag_test';
+    const reducer = collection(schema, tag, initialState);
 
     const action = {
       type: COLLECTION_FETCHED,
       meta: {
-        type: 'test',
-        collection: 'collection2',
+        schema,
+        tag: 'collection2',
       },
       payload: items,
     };
@@ -372,7 +393,9 @@ describe('Plain Collection reducer', () => {
     ];
     const initialState = items;
     deepFreeze(initialState);
-    const reducer = collection('test', 'collection', initialState);
+    const schema = 'schema_test';
+    const tag = 'tag_test';
+    const reducer = collection(schema, tag, initialState);
 
     const itemsNew = [
       { id: 3 },
@@ -381,8 +404,8 @@ describe('Plain Collection reducer', () => {
     const action = {
       type: COLLECTION_FETCHED,
       meta: {
-        type: 'test',
-        collection: 'collection',
+        schema,
+        tag,
       },
       payload: itemsNew,
     };
@@ -399,12 +422,15 @@ describe('Plain Collection reducer', () => {
     ];
     const initialState = items;
     deepFreeze(initialState);
-    const reducer = collection('test', 'collection', initialState);
+    const schema = 'schema_test';
+    const tag = 'tag_test';
+    const reducer = collection(schema, tag, initialState);
 
     const action = {
       type: COLLECTION_INVALIDATE,
       meta: {
-        type: 'test',
+        schema,
+        tag: '',
       },
     };
 
@@ -426,13 +452,15 @@ describe('Immutable Collection reducer', () => {
       { id: 1 },
       { id: 2 },
     ];
-    const reducer = collectionImmutable('test', 'collection', initialState);
+    const schema = 'schema_test';
+    const tag = 'tag_test';
+    const reducer = collectionImmutable(schema, tag, initialState);
 
     const action = {
       type: COLLECTION_FETCHED,
       meta: {
-        type: 'test',
-        collection: 'collection',
+        schema,
+        tag,
       },
       payload: items,
     };
@@ -443,19 +471,21 @@ describe('Immutable Collection reducer', () => {
     expect(nextState).to.equal(expectedState);
   });
 
-  it('ignore action with different schema type', () => {
+  it('ignore action with different schema', () => {
     const initialState = new Immutable.List();
     const items = [
       { id: 1 },
       { id: 2 },
     ];
-    const reducer = collectionImmutable('test', 'collection', initialState);
+    const schema = 'schema_test';
+    const tag = 'tag_test';
+    const reducer = collectionImmutable(schema, tag, initialState);
 
     const action = {
       type: COLLECTION_FETCHED,
       meta: {
-        type: 'test2',
-        collection: 'collection',
+        schema: 'test2',
+        tag,
       },
       payload: items,
     };
@@ -470,13 +500,15 @@ describe('Immutable Collection reducer', () => {
       { id: 1 },
       { id: 2 },
     ];
-    const reducer = collectionImmutable('test', 'collection', initialState);
+    const schema = 'schema_test';
+    const tag = 'tag_test';
+    const reducer = collectionImmutable(schema, tag, initialState);
 
     const action = {
       type: 'COLLECTION_FETCHED',
       meta: {
-        type: 'test',
-        collection: 'collection',
+        schema,
+        tag,
       },
       payload: items,
     };
@@ -491,13 +523,15 @@ describe('Immutable Collection reducer', () => {
       { id: 1 },
       { id: 2 },
     ];
-    const reducer = collectionImmutable('test', 'collection', initialState);
+    const schema = 'schema_test';
+    const tag = 'tag_test';
+    const reducer = collectionImmutable(schema, tag, initialState);
 
     const action = {
       type: COLLECTION_FETCHED,
       meta: {
-        type: 'test',
-        collection: 'collection2',
+        schema,
+        tag: 'tag2',
       },
       payload: items,
     };
@@ -512,7 +546,9 @@ describe('Immutable Collection reducer', () => {
       { id: 2 },
     ];
     const initialState = Immutable.fromJS(items);
-    const reducer = collectionImmutable('test', 'collection', initialState);
+    const schema = 'schema_test';
+    const tag = 'tag_test';
+    const reducer = collectionImmutable(schema, tag, initialState);
 
     const itemsNew = [
       { id: 3 },
@@ -521,8 +557,8 @@ describe('Immutable Collection reducer', () => {
     const action = {
       type: COLLECTION_FETCHED,
       meta: {
-        type: 'test',
-        collection: 'collection',
+        schema,
+        tag,
       },
       payload: itemsNew,
     };
@@ -539,13 +575,14 @@ describe('Immutable Collection reducer', () => {
       { id: 2 },
     ];
     const initialState = items;
-    deepFreeze(initialState);
-    const reducer = collectionImmutable('test', 'collection', Immutable.fromJS(initialState));
+    const schema = 'schema_test';
+    const reducer = collectionImmutable(schema, 'collection', Immutable.fromJS(initialState));
 
     const action = {
       type: COLLECTION_INVALIDATE,
       meta: {
-        type: 'test',
+        schema,
+        tag: '',
       },
     };
 
@@ -572,8 +609,9 @@ describe('Find action creator', () => {
       endpoint: 'api.test',
     };
 
-    const collectionName = 'collection_test';
-    const action = find(config, collectionName);
+    const schema = 'app.builder';
+    const tag = 'collection_test';
+    const action = find(config, schema, tag);
 
     expect(action[CALL_API]).to.not.be.undefined;
     expect(action[CALL_API].method).to.equal('GET');
@@ -585,24 +623,25 @@ describe('Find action creator', () => {
     expect(types[0]).to.equal(LOAD_REQUEST);
     expect(types[1].type).to.equal(LOAD_SUCCESS);
     const expectedMeta = {
-      source: 'json_api',
-      collection: collectionName,
+      source: middlewareJsonApiSource,
+      schema,
+      tag,
     };
     expect(types[1].meta).to.deep.equal(expectedMeta);
     expect(types[2]).to.equal(LOAD_ERROR);
   });
 
   it('produce valid storage and collection actions', done => {
-    const type = 'type_test';
+    const schema = 'schema_test';
     const expectedPayload = {
       data: [{
-        type,
+        schema,
         id: '1',
         attributes: {
           name: 'Test1',
         },
       }, {
-        type,
+        schema,
         id: '2',
         attributes: {
           name: 'Test2',
@@ -621,8 +660,8 @@ describe('Find action creator', () => {
       endpoint: 'http://api.server.local/apps',
     };
 
-    const collectionName = 'collection_test';
-    const action = find(config, collectionName);
+    const tag = 'collection_test';
+    const action = find(config, schema, tag);
 
     const store = mockStore({});
     store.dispatch(action)
@@ -633,19 +672,20 @@ describe('Find action creator', () => {
 
         const actionObjFetched = performedActions[1];
         expect(actionObjFetched.type).to.equal(OBJECT_FETCHED);
-        expect(actionObjFetched.meta).to.deep.equal({ type });
+        expect(actionObjFetched.meta).to.deep.equal({ schema });
         expect(actionObjFetched.payload).to.deep.equal(expectedPayload.data[0]);
 
         const actionCollFetched = performedActions[3];
         expect(actionCollFetched.type).to.equal(COLLECTION_FETCHED);
-        expect(actionCollFetched.meta).to.deep.equal({ type, collection: collectionName });
+        expect(actionCollFetched.meta).to.deep.equal({ schema, tag });
         expect(actionCollFetched.payload).to.deep.equal(expectedPayload.data);
 
         const successAction = performedActions[4];
         expect(successAction.type).to.equal(LOAD_SUCCESS);
         const expectedMeta = {
-          source: 'json_api',
-          collection: collectionName,
+          source: middlewareJsonApiSource,
+          schema,
+          tag,
         };
         expect(successAction.meta).to.deep.equal(expectedMeta);
         expect(successAction.payload).to.deep.equal(expectedPayload);
@@ -670,15 +710,15 @@ describe('Create action creator', () => {
       endpoint: 'api.test',
     };
 
-    const type = 'type_test';
+    const schema = 'schema_test';
     const item = {
-      type,
+      schema,
       id: '1',
       attributes: {
         name: 'Test1',
       },
     };
-    const action = create(item, config);
+    const action = create(config, schema, item);
 
     expect(action[CALL_API]).to.not.be.undefined;
     expect(action[CALL_API].method).to.equal('POST');
@@ -694,17 +734,18 @@ describe('Create action creator', () => {
     expect(types[0]).to.equal(CREATE_REQUEST);
     expect(types[1].type).to.equal(CREATE_SUCCESS);
     const expectedMeta = {
-      source: 'json_api',
+      source: middlewareJsonApiSource,
+      schema,
     };
     expect(types[1].meta).to.deep.equal(expectedMeta);
     expect(types[2]).to.equal(CREATE_ERROR);
   });
 
   it('produce valid storage and collection actions', done => {
-    const type = 'type_test';
+    const schema = 'schema_test';
     const expectedPayload = {
       data: {
-        type,
+        schema,
         id: '1',
         attributes: {
           name: 'Test1',
@@ -713,7 +754,7 @@ describe('Create action creator', () => {
     };
 
     const item = {
-      type,
+      schema,
       attributes: {
         name: 'Test1',
       },
@@ -729,31 +770,29 @@ describe('Create action creator', () => {
       endpoint: 'http://api.server.local/apps',
     };
 
-    const action = create(item, config);
-    //action[CALL_API].types.map(m => console.log(String(m)));
-
+    const action = create(config, schema, item);
     const store = mockStore({});
     store.dispatch(action)
       .then(() => {
         const performedActions = store.getActions();
-        performedActions.map(a => console.log(String(a.type)));
         expect(performedActions).to.have.length(4);
         expect(performedActions[0].type).to.equal(CREATE_REQUEST);
 
         const actionObjFetched = performedActions[1];
         expect(actionObjFetched.type).to.equal(OBJECT_CREATED);
-        expect(actionObjFetched.meta).to.deep.equal({ type });
+        expect(actionObjFetched.meta).to.deep.equal({ schema });
         expect(actionObjFetched.payload).to.deep.equal(expectedPayload.data);
 
         const actionCollFetched = performedActions[2];
         expect(actionCollFetched.type).to.equal(COLLECTION_INVALIDATE);
-        expect(actionCollFetched.meta).to.deep.equal({ type, collection: '' });
+        expect(actionCollFetched.meta).to.deep.equal({ schema, tag: '' });
         expect(actionCollFetched.payload).to.deep.equal([expectedPayload.data]);
 
         const successAction = performedActions[3];
         expect(successAction.type).to.equal(CREATE_SUCCESS);
         const expectedMeta = {
-          source: 'json_api',
+          source: middlewareJsonApiSource,
+          schema,
         };
         expect(successAction.meta).to.deep.equal(expectedMeta);
         expect(successAction.payload).to.deep.equal(expectedPayload);
@@ -774,17 +813,17 @@ describe('Json api middleware', () => {
   });
 
   it('produce valid actions for fetch', done => {
-    const type = 'type_test';
-    const collectionName = 'collection_test';
-    const expectedPayload =  {
+    const schema = 'schema_test';
+    const tag = 'tag_test';
+    const expectedPayload = {
       data: [{
-        type: 'type_test',
+        type: schema,
         id: '1',
         attributes: {
           name: 'Test1',
         },
       }, {
-        type: 'type_test',
+        type: schema,
         id: '2',
         attributes: {
           name: 'Test2',
@@ -792,31 +831,31 @@ describe('Json api middleware', () => {
       }],
     };
     const expectedMeta = {
-      source: 'json_api',
-      type,
-      collection: collectionName,
+      source: middlewareJsonApiSource,
+      schema,
+      tag,
     };
 
-    const successAction = {
+    const mockSuccessAction = {
       type: LOAD_SUCCESS,
       meta: expectedMeta,
       payload: expectedPayload,
     };
 
     const store = mockStore({});
-    store.dispatch(actionPromise(successAction))
+    store.dispatch(actionPromise(mockSuccessAction))
       .then(() => {
         const performedActions = store.getActions();
         expect(performedActions).to.have.length(4);
 
         const actionObjFetched = performedActions[0];
         expect(actionObjFetched.type).to.equal(OBJECT_FETCHED);
-        expect(actionObjFetched.meta).to.deep.equal({ type });
+        expect(actionObjFetched.meta).to.deep.equal({ schema });
         expect(actionObjFetched.payload).to.deep.equal(expectedPayload.data[0]);
 
         const actionCollFetched = performedActions[2];
         expect(actionCollFetched.type).to.equal(COLLECTION_FETCHED);
-        expect(actionCollFetched.meta).to.deep.equal({ type, collection: collectionName });
+        expect(actionCollFetched.meta).to.deep.equal({ schema, tag });
         expect(actionCollFetched.payload).to.deep.equal(expectedPayload.data);
 
         const successAction = performedActions[3];
@@ -828,11 +867,11 @@ describe('Json api middleware', () => {
   });
 
   it('produce valid actions for create', done => {
-    const type = 'type_test';
-    const collectionName = 'collection_test';
-    const expectedPayload =  {
+    const schema = 'schema_test';
+    const tag = 'tag_test';
+    const expectedPayload = {
       data: [{
-        type: 'type_test',
+        type: schema,
         id: '1',
         attributes: {
           name: 'Test1',
@@ -840,31 +879,31 @@ describe('Json api middleware', () => {
       }],
     };
     const expectedMeta = {
-      source: 'json_api',
-      type,
-      collection: collectionName,
+      source: middlewareJsonApiSource,
+      schema,
+      tag,
     };
 
-    const successAction = {
+    const mockSuccessAction = {
       type: CREATE_SUCCESS,
       meta: expectedMeta,
       payload: expectedPayload,
     };
 
     const store = mockStore({});
-    store.dispatch(actionPromise(successAction))
+    store.dispatch(actionPromise(mockSuccessAction))
       .then(() => {
         const performedActions = store.getActions();
         expect(performedActions).to.have.length(3);
 
         const actionObjCreated = performedActions[0];
         expect(actionObjCreated.type).to.equal(OBJECT_CREATED);
-        expect(actionObjCreated.meta).to.deep.equal({ type });
+        expect(actionObjCreated.meta).to.deep.equal({ schema });
         expect(actionObjCreated.payload).to.deep.equal(expectedPayload.data[0]);
 
         const actionCollInvalidate = performedActions[1];
         expect(actionCollInvalidate.type).to.equal(COLLECTION_INVALIDATE);
-        expect(actionCollInvalidate.meta).to.deep.equal({ type, collection: '' });
+        expect(actionCollInvalidate.meta).to.deep.equal({ schema, tag: '' });
         expect(actionCollInvalidate.payload).to.deep.equal(expectedPayload.data);
 
         const successAction = performedActions[2];
@@ -876,17 +915,17 @@ describe('Json api middleware', () => {
   });
 
   it('able to ignore other actions', done => {
-    const type = 'type_test';
-    const collectionName = 'collection_test';
-    const expectedPayload =  {
+    const schema = 'schema_test';
+    const tag = 'tag_test';
+    const expectedPayload = {
       data: [{
-        type: 'type_test',
+        type: schema,
         id: '1',
         attributes: {
           name: 'Test1',
         },
       }, {
-        type: 'type_test',
+        type: schema,
         id: '2',
         attributes: {
           name: 'Test2',
@@ -894,19 +933,19 @@ describe('Json api middleware', () => {
       }],
     };
     const expectedMeta = {
-      source: 'json_api',
-      type,
-      collection: collectionName,
+      source: middlewareJsonApiSource,
+      schema,
+      tag,
     };
 
-    const successAction = {
+    const mockSuccessAction = {
       type: 'LOAD_SUCCESS',
       meta: expectedMeta,
       payload: expectedPayload,
     };
 
     const store = mockStore({});
-    store.dispatch(actionPromise(successAction))
+    store.dispatch(actionPromise(mockSuccessAction))
       .then(() => {
         const performedActions = store.getActions();
         expect(performedActions).to.have.length(1);

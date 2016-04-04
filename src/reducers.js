@@ -12,6 +12,7 @@ import {
   CREATE_ERROR,
   OBJECT_CREATED,
   COLLECTION_INVALIDATE,
+  middlewareJsonApiSource,
 } from './middleware';
 
 const stateOperations = {
@@ -33,9 +34,9 @@ const stateOperations = {
 // reducer enables creating typed storage reducers that are
 // handling specific OBJECT type actions.
 function createStorage(ops) {
-  return (type, initialState = ops.createMap()) =>
+  return (schema, initialState = ops.createMap()) =>
     (state = initialState, action) => {
-      if (_.get(action, 'meta.type') !== type) {
+      if (_.get(action, 'meta.schema') !== schema) {
         return state;
       }
       const item = action.payload;
@@ -58,9 +59,9 @@ export const storageImmutable = createStorage(stateOperations.immutable);
 // handling specific COLLECTION type actions with specific collection
 // name.
 function createCollection(ops) {
-  return (type, name, initialState = ops.createList()) =>
+  return (schema, tag, initialState = ops.createList()) =>
     (state = initialState, action) => {
-      if (_.get(action, 'meta.type') !== type) {
+      if (_.get(action, 'meta.schema') !== schema) {
         return state;
       }
 
@@ -70,8 +71,8 @@ function createCollection(ops) {
         return ops.createList();
       }
 
-      // Only if collection name in action is same as for collection
-      if (_.get(action, 'meta.collection') !== name) {
+      // Only if tag in action is same as for collection
+      if (_.get(action, 'meta.tag') !== tag) {
         return state;
       }
 
@@ -87,7 +88,7 @@ function createCollection(ops) {
 export const collection = createCollection(stateOperations.plain);
 export const collectionImmutable = createCollection(stateOperations.immutable);
 
-export function find(config, collectionName = '') {
+export function find(config, schema, tag = '') {
   return {
     [CALL_API]: {
       method: 'GET',
@@ -97,8 +98,9 @@ export function find(config, collectionName = '') {
         {
           type: LOAD_SUCCESS,
           meta: {
-            source: 'json_api',
-            collection: collectionName,
+            source: middlewareJsonApiSource,
+            schema,
+            tag,
           },
         },
         LOAD_ERROR,
@@ -107,7 +109,7 @@ export function find(config, collectionName = '') {
   };
 }
 
-export function create(item, config) {
+export function create(config, schema, item) {
   return {
     [CALL_API]: {
       method: 'POST',
@@ -120,7 +122,8 @@ export function create(item, config) {
         {
           type: CREATE_SUCCESS,
           meta: {
-            source: 'json_api',
+            source: middlewareJsonApiSource,
+            schema,
           },
         },
         CREATE_ERROR,
