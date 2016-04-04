@@ -7,8 +7,7 @@
   "scripts": {
     "lint": "eslint src test",
     "test": "mocha --compilers js:babel-core/register --reporter spec test/*.js",
-    "build": "babel src --out-dir lib",
-    "postinstall": "babel src --out-dir lib"
+    "build": "babel src --out-dir lib"
   },
   "repository": {
     "type": "git",
