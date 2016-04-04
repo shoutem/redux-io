@@ -8,6 +8,7 @@ export {
   collection,
   collectionImmutable,
   find,
+  create,
 } from './reducers';
 
 export {
@@ -16,4 +17,9 @@ export {
   LOAD_ERROR,
   OBJECT_FETCHED,
   COLLECTION_FETCHED,
+  CREATE_REQUEST,
+  CREATE_SUCCESS,
+  CREATE_ERROR,
+  OBJECT_CREATED,
+  COLLECTION_INVALIDATE,
 } from './middleware';

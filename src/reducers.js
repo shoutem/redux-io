@@ -35,12 +35,13 @@ const stateOperations = {
 function createStorage(ops) {
   return (type, initialState = ops.createMap()) =>
     (state = initialState, action) => {
-      if (!_.has(action, 'meta.type') || action.meta.type !== type) {
+      if (_.get(action, 'meta.type') !== type) {
         return state;
       }
       const item = action.payload;
       switch (action.type) {
         case OBJECT_FETCHED:
+        case OBJECT_CREATED:
           return ops.set(state, item.id, item);
         default:
           return state;
@@ -59,10 +60,18 @@ export const storageImmutable = createStorage(stateOperations.immutable);
 function createCollection(ops) {
   return (type, name, initialState = ops.createList()) =>
     (state = initialState, action) => {
-      if (!_.has(action, 'meta.type') || action.meta.type !== type) {
+      if (_.get(action, 'meta.type') !== type) {
         return state;
       }
-      if (!_.has(action, 'meta.collection') || action.meta.collection !== name) {
+
+      // Every collection should invalidate state no matter the name
+      // of collection and return initial state.
+      if (action.type === COLLECTION_INVALIDATE) {
+        return ops.createList();
+      }
+
+      // Only if collection name in action is same as for collection
+      if (_.get(action, 'meta.collection') !== name) {
         return state;
       }
 
