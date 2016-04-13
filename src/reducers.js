@@ -31,7 +31,7 @@ const stateOperations = {
 
 // createStorage is responsible for creating plain or
 // immutable version of generic storage reducer. Generic storage
-// reducer enables creating typed storage reducers that are
+// reducer enables creation of typed storage reducers that are
 // handling specific OBJECT type actions.
 function createStorage(ops) {
   return (schema, initialState = ops.createMap()) =>
@@ -71,7 +71,7 @@ function createCollection(ops) {
         return ops.createList();
       }
 
-      // Only if tag in action is same as for collection
+      // Only if the tag in the action is the same as the one on the collection reducer
       if (_.get(action, 'meta.tag') !== tag) {
         return state;
       }
@@ -88,6 +88,12 @@ function createCollection(ops) {
 export const collection = createCollection(stateOperations.plain);
 export const collectionImmutable = createCollection(stateOperations.immutable);
 
+// Action creator used to fetch data from api (GET). Config arg is based on CALL_API
+// configuration from redux-api-middleware, allowing full customization expect types
+// part of configuration. Find function expects schema name of data which correspond
+// with storage reducer with same schema value to listen for received data. Tag arg
+// is optional, but when used allows your collections with same tag value to respond
+// on received data.
 export function find(config, schema, tag = '') {
   return {
     [CALL_API]: {
@@ -109,6 +115,13 @@ export function find(config, schema, tag = '') {
   };
 }
 
+// Action creator used to create item on api (POST). Config arg is based on CALL_API
+// configuration from redux-api-middleware, allowing full customization expect types
+// part of configuration. Create function expects schema name of data which correspond
+// with storage reducer with same schema value to listen for created data. Item arg
+// holds object that you want to pass to api. Tag is not needed because all collection
+// with configured schema value as in argument of create will be invalidated upon successful
+// action of creating item on api.
 export function create(config, schema, item) {
   return {
     [CALL_API]: {

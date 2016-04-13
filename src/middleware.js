@@ -12,66 +12,106 @@ export const CREATE_ERROR = Symbol('CREATE_ERROR');
 export const COLLECTION_INVALIDATE = Symbol('COLLECTION_INVALIDATE');
 export const OBJECT_CREATED = Symbol('OBJECT_CREATED');
 
-export const middlewareJsonApiSource = 'json_api';
+export const middlewareJsonApiSource = Symbol('json_api');
 
-const makeCollectionAction = (actionType, data, schema, tag = '') => ({
-  type: actionType,
-  payload: data,
-  meta: {
-    schema,
-    tag,
-  },
-});
-
-const makeObjectAction = (actionType, item, schema) => ({
-  type: actionType,
-  payload: item,
-  meta: {
-    schema,
-  },
-});
-
-export default store => next => action => {
-  // Check for meta object in action
-  if (action.meta === undefined) {
-    return next(action);
+const makeCollectionAction = (actionType, data, schema, tag = '') => {
+  if (!actionType) {
+    throw new Error('Action type is not valid.');
+  }
+  if (!data) {
+    throw new Error('Data is not valid.');
+  }
+  if (!schema) {
+    throw new Error('Schema is not valid.');
+  }
+  if (tag === undefined || tag === null) {
+    throw new Error('Tag is not valid.');
   }
 
+  return {
+    type: actionType,
+    payload: data,
+    meta: {
+      schema,
+      tag,
+    },
+  };
+};
+
+const makeObjectAction = (actionType, item, schema) => {
+  if (!actionType) {
+    throw new Error('Action type is not valid.');
+  }
+  if (!item) {
+    throw new Error('Data is not valid.');
+  }
+  if (!schema) {
+    throw new Error('Schema is not valid.');
+  }
+
+  return {
+    type: actionType,
+    payload: item,
+    meta: {
+      schema,
+    },
+  };
+};
+
+const actionHandlers = {
+  [LOAD_SUCCESS]: (action, data, dispatch) => {
+    const { schema, tag } = action.meta;
+    // Validate action meta has a tag value
+    if (tag === undefined || tag === null) {
+      return;
+    }
+    data.map(item => dispatch(makeObjectAction(OBJECT_FETCHED, item, schema)));
+    dispatch(makeCollectionAction(COLLECTION_FETCHED, data, schema, tag));
+  },
+  [CREATE_SUCCESS]: (action, data, dispatch) => {
+    const schema = action.meta.schema;
+    data.map(item => dispatch(makeObjectAction(OBJECT_CREATED, item, schema)));
+    dispatch(makeCollectionAction(COLLECTION_INVALIDATE, data, schema));
+  },
+};
+
+const isValidAction = action => {
+  if (!actionHandlers[action.type]) {
+    return false;
+  }
+  // Check for meta object in action
+  if (action.meta === undefined) {
+    return false;
+  }
   const meta = action.meta;
-  // Check for source, this middleware only understand json_api source
+  // Check for source, because middleware only understands json_api source
   if (meta.source === undefined || meta.source !== middlewareJsonApiSource) {
-    return next(action);
+    return false;
   }
   // Check that schema is defined
   if (meta.schema === undefined) {
-    return next(action);
+    return false;
   }
-
   // Validate payload
   if (!_.has(action, 'payload.data')) {
+    return false;
+  }
+
+  return true;
+};
+
+export default store => next => action => {
+  // Validate action, if not valid pass
+  if (!isValidAction(action)) {
     return next(action);
   }
 
   // Always work with arrays
   const data = [].concat(action.payload.data);
-  const schema = meta.schema;
-
   const dispatch = store.dispatch;
-  if (action.type === LOAD_SUCCESS) {
-    // Validate action meta has tag value
-    const tag = meta.tag;
-    if (tag === undefined) {
-      return next(action);
-    }
+  // Find handler for supported action type to make appropriate logic
+  actionHandlers[action.type](action, data, dispatch);
 
-    data.map(item => dispatch(makeObjectAction(OBJECT_FETCHED, item, schema)));
-    dispatch(makeCollectionAction(COLLECTION_FETCHED, data, schema, tag));
-  }
-
-  if (action.type === CREATE_SUCCESS) {
-    data.map(item => dispatch(makeObjectAction(OBJECT_CREATED, item, schema)));
-    dispatch(makeCollectionAction(COLLECTION_INVALIDATE, data, schema));
-  }
-
+  // After middleware handled action pass input action to next
   return next(action);
 };

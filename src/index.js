@@ -22,4 +22,5 @@ export {
   CREATE_ERROR,
   OBJECT_CREATED,
   COLLECTION_INVALIDATE,
+  middlewareJsonApiSource,
 } from './middleware';
