@@ -1,15 +1,17 @@
-import jsonApiMiddleware from './middleware';
+import apiStateMiddleware from './middleware';
+export { apiStateMiddleware };
 
-export { jsonApiMiddleware };
+import storage from './storage';
+export { storage };
 
-export {
-  storage,
-  storageImmutable,
-  collection,
-  collectionImmutable,
-  find,
-  create,
-} from './reducers';
+import collection from './collection';
+export { collection };
+
+import find from './find';
+export { find };
+
+import create from './create';
+export { create };
 
 export {
   LOAD_REQUEST,

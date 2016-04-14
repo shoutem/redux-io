@@ -81,20 +81,25 @@ const isValidAction = action => {
   }
   // Check for meta object in action
   if (action.meta === undefined) {
-    return false;
+    throw new Error('Meta is undefined.');
   }
   const meta = action.meta;
-  // Check for source, because middleware only understands json_api source
-  if (meta.source === undefined || meta.source !== middlewareJsonApiSource) {
+  // Check if source exists
+  if (meta.source === undefined) {
+    throw new Error('Source is undefined.');
+  }
+  // Source exists but this middleware is not responsible for other source variants
+  // only for json_api
+  if (meta.source !== middlewareJsonApiSource) {
     return false;
   }
   // Check that schema is defined
-  if (meta.schema === undefined) {
-    return false;
+  if (!meta.schema) {
+    throw new Error('Schema is invalid.');
   }
   // Validate payload
   if (!_.has(action, 'payload.data')) {
-    return false;
+    throw new Error('Payload Data is invalid, expecting payload.data.');
   }
 
   return true;
