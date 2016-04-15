@@ -3,7 +3,10 @@
   "version": "0.0.1",
   "description": "Action creators, reducers and middleware for simple handling of normalized json api data in state",
   "main": "lib/index.js",
-  "private": true,
+  "files": [
+    "lib"
+  ],
+  "private": false,
   "scripts": {
     "lint": "eslint src test",
     "test": "mocha --compilers js:babel-core/register --reporter spec test/*.spec.js",
