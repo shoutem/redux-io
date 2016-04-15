@@ -14,6 +14,7 @@ Library for easy data managing between api and redux store. Comes with action cr
 5. [History](#history)
 6. [Tests](#tests)
 7. [License](License)
+8. [Acknowledgements](Acknowledgements)
 
 ## Introduction
 
@@ -221,7 +222,7 @@ Write your custom api calls...
 
 The following objects are exported by `redux-api-state`.
 
-#### `apiMiddleware`
+#### `apiStateMiddleware`
 
 The Redux api state middleware itself.
 
@@ -250,3 +251,7 @@ $ npm install && npm test
 ## License
 
 MIT
+
+## Acknowledgements
+
+The package is based on ideas from [Željko Rumenjak](https://github.com/zrumenjak).
