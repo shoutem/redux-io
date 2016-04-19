@@ -97,6 +97,7 @@ describe('Find action creator', () => {
 
   it('produces valid storage and collection actions', done => {
     const schema = 'schema_test';
+    const tag = 'collection_test';
     const expectedPayload = {
       data: [{
         schema,
@@ -112,6 +113,11 @@ describe('Find action creator', () => {
         },
       }],
     };
+    const expectedMeta = {
+      source: middlewareJsonApiSource,
+      schema,
+      tag,
+    };
 
     nock('http://api.server.local')
       .get('/apps')
@@ -124,7 +130,6 @@ describe('Find action creator', () => {
       endpoint: 'http://api.server.local/apps',
     };
 
-    const tag = 'collection_test';
     const action = find(config, schema, tag);
 
     const store = mockStore({});
@@ -136,21 +141,16 @@ describe('Find action creator', () => {
 
         const actionObjFetched = performedActions[1];
         expect(actionObjFetched.type).to.equal(OBJECT_FETCHED);
-        expect(actionObjFetched.meta).to.deep.equal({ schema });
+        expect(actionObjFetched.meta).to.deep.equal(expectedMeta);
         expect(actionObjFetched.payload).to.deep.equal(expectedPayload.data[0]);
 
         const actionCollFetched = performedActions[3];
         expect(actionCollFetched.type).to.equal(COLLECTION_FETCHED);
-        expect(actionCollFetched.meta).to.deep.equal({ schema, tag });
+        expect(actionCollFetched.meta).to.deep.equal(expectedMeta);
         expect(actionCollFetched.payload).to.deep.equal(expectedPayload.data);
 
         const successAction = performedActions[4];
         expect(successAction.type).to.equal(LOAD_SUCCESS);
-        const expectedMeta = {
-          source: middlewareJsonApiSource,
-          schema,
-          tag,
-        };
         expect(successAction.meta).to.deep.equal(expectedMeta);
         expect(successAction.payload).to.deep.equal(expectedPayload);
       }).then(done).catch(done);

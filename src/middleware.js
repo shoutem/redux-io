@@ -14,7 +14,7 @@ export const OBJECT_CREATED = Symbol('OBJECT_CREATED');
 
 export const middlewareJsonApiSource = Symbol('json_api');
 
-const makeCollectionAction = (actionType, data, schema, tag = '') => {
+const makeCollectionAction = (sourceAction, actionType, data, schema, tag = '') => {
   if (!actionType) {
     throw new Error('Action type is not valid.');
   }
@@ -32,13 +32,14 @@ const makeCollectionAction = (actionType, data, schema, tag = '') => {
     type: actionType,
     payload: data,
     meta: {
+      ...sourceAction.meta,
       schema,
       tag,
     },
   };
 };
 
-const makeObjectAction = (actionType, item, schema = '') => {
+const makeObjectAction = (sourceAction, actionType, item, schema = '') => {
   if (!actionType) {
     throw new Error('Action type is not valid.');
   }
@@ -53,6 +54,7 @@ const makeObjectAction = (actionType, item, schema = '') => {
     type: actionType,
     payload: item,
     meta: {
+      ...sourceAction.meta,
       schema: _.isEmpty(schema) ? _.get(item, 'type') : schema,
     },
   };
@@ -65,13 +67,13 @@ const actionHandlers = {
     if (tag === undefined || tag === null) {
       return;
     }
-    data.map(item => dispatch(makeObjectAction(OBJECT_FETCHED, item, schema)));
-    dispatch(makeCollectionAction(COLLECTION_FETCHED, data, schema, tag));
+    data.map(item => dispatch(makeObjectAction(action, OBJECT_FETCHED, item, schema)));
+    dispatch(makeCollectionAction(action, COLLECTION_FETCHED, data, schema, tag));
   },
   [CREATE_SUCCESS]: (action, data, included, dispatch) => {
     const schema = action.meta.schema;
-    data.map(item => dispatch(makeObjectAction(OBJECT_CREATED, item, schema)));
-    dispatch(makeCollectionAction(COLLECTION_INVALIDATE, data, schema));
+    data.map(item => dispatch(makeObjectAction(action, OBJECT_CREATED, item, schema)));
+    dispatch(makeCollectionAction(action, COLLECTION_INVALIDATE, data, schema));
   },
 };
 
@@ -106,7 +108,7 @@ const isValidAction = action => {
 };
 
 const getData = payload => [].concat(payload.data);
-const getIncluded = payload => { _.has(payload, 'included') ? payload.included : []; };
+const getIncluded = payload => { return _.has(payload, 'included') ? payload.included : []; };
 
 export default store => next => action => {
   // Validate action, if not valid pass
@@ -118,7 +120,7 @@ export default store => next => action => {
 
   // First dispatch included objects
   const included = getIncluded(action.payload);
-  included.map(item => dispatch(makeObjectAction(OBJECT_FETCHED, item)));
+  included.map(item => dispatch(makeObjectAction(action, OBJECT_FETCHED, item)));
 
   // Find handler for supported action type to make appropriate logic
   const data = getData(action.payload);

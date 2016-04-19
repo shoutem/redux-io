@@ -62,12 +62,12 @@ describe('Json api middleware', () => {
 
         const actionObjFetched = performedActions[0];
         expect(actionObjFetched.type).to.equal(OBJECT_FETCHED);
-        expect(actionObjFetched.meta).to.deep.equal({ schema });
+        expect(actionObjFetched.meta).to.deep.equal(expectedMeta);
         expect(actionObjFetched.payload).to.deep.equal(expectedPayload.data[0]);
 
         const actionCollFetched = performedActions[2];
         expect(actionCollFetched.type).to.equal(COLLECTION_FETCHED);
-        expect(actionCollFetched.meta).to.deep.equal({ schema, tag });
+        expect(actionCollFetched.meta).to.deep.equal(expectedMeta);
         expect(actionCollFetched.payload).to.deep.equal(expectedPayload.data);
 
         const successAction = performedActions[3];
@@ -110,12 +110,12 @@ describe('Json api middleware', () => {
 
         const actionObjCreated = performedActions[0];
         expect(actionObjCreated.type).to.equal(OBJECT_CREATED);
-        expect(actionObjCreated.meta).to.deep.equal({ schema });
+        expect(actionObjCreated.meta).to.deep.equal(expectedMeta);
         expect(actionObjCreated.payload).to.deep.equal(expectedPayload.data[0]);
 
         const actionCollInvalidate = performedActions[1];
         expect(actionCollInvalidate.type).to.equal(COLLECTION_INVALIDATE);
-        expect(actionCollInvalidate.meta).to.deep.equal({ schema, tag: '' });
+        expect(actionCollInvalidate.meta).to.deep.equal({ ...expectedMeta, tag: '' });
         expect(actionCollInvalidate.payload).to.deep.equal(expectedPayload.data);
 
         const successAction = performedActions[2];
@@ -182,17 +182,17 @@ describe('Json api middleware', () => {
 
         const actionObjIncludedFetched = performedActions[0];
         expect(actionObjIncludedFetched.type).to.equal(OBJECT_FETCHED);
-        expect(actionObjIncludedFetched.meta).to.deep.equal({ schema: includedSchema });
+        expect(actionObjIncludedFetched.meta).to.deep.equal({ ...expectedMeta, schema: includedSchema });
         expect(actionObjIncludedFetched.payload).to.deep.equal(expectedPayload.included[0]);
 
         const actionObjFetched = performedActions[2];
         expect(actionObjFetched.type).to.equal(OBJECT_FETCHED);
-        expect(actionObjFetched.meta).to.deep.equal({ schema });
+        expect(actionObjFetched.meta).to.deep.equal(expectedMeta);
         expect(actionObjFetched.payload).to.deep.equal(expectedPayload.data[0]);
 
         const actionCollFetched = performedActions[4];
         expect(actionCollFetched.type).to.equal(COLLECTION_FETCHED);
-        expect(actionCollFetched.meta).to.deep.equal({ schema, tag });
+        expect(actionCollFetched.meta).to.deep.equal(expectedMeta);
         expect(actionCollFetched.payload).to.deep.equal(expectedPayload.data);
 
         const successAction = performedActions[5];

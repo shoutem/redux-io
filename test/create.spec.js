@@ -119,6 +119,10 @@ describe('Create action creator', () => {
         },
       },
     };
+    const expectedMeta = {
+      source: middlewareJsonApiSource,
+      schema,
+    };
 
     const item = {
       schema,
@@ -147,19 +151,15 @@ describe('Create action creator', () => {
 
         const actionObjCreated = performedActions[1];
         expect(actionObjCreated.type).to.equal(OBJECT_CREATED);
-        expect(actionObjCreated.meta).to.deep.equal({ schema });
+        expect(actionObjCreated.meta).to.deep.equal(expectedMeta);
         expect(actionObjCreated.payload).to.deep.equal(expectedPayload.data);
 
         const actionCollInvalidate = performedActions[2];
         expect(actionCollInvalidate.type).to.equal(COLLECTION_INVALIDATE);
-        expect(actionCollInvalidate.meta).to.deep.equal({ schema, tag: '' });
+        expect(actionCollInvalidate.meta).to.deep.equal({ ...expectedMeta, tag: '' });
         expect(actionCollInvalidate.payload).to.deep.equal([expectedPayload.data]);
         const successAction = performedActions[3];
         expect(successAction.type).to.equal(CREATE_SUCCESS);
-        const expectedMeta = {
-          source: middlewareJsonApiSource,
-          schema,
-        };
         expect(successAction.meta).to.deep.equal(expectedMeta);
         expect(successAction.payload).to.deep.equal(expectedPayload);
       }).then(done).catch(done);
