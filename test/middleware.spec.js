@@ -126,6 +126,83 @@ describe('Json api middleware', () => {
       }).then(done).catch(done);
   });
 
+  it('produces valid actions for included data in payload', done => {
+    const schema = 'schema_test';
+    const includedSchema = 'included_schema';
+    const tag = 'tag_test';
+    const expectedPayload = {
+      data: [
+        {
+          type: schema,
+          id: '1',
+          attributes: {
+            name: 'Test1',
+          },
+        }, {
+          type: schema,
+          id: '2',
+          attributes: {
+            name: 'Test2',
+          },
+        },
+      ],
+      included: [
+        {
+          type: includedSchema,
+          id: '100',
+          attributes: {
+            name: 'Test100',
+          },
+        }, {
+          type: includedSchema,
+          id: '101',
+          attributes: {
+            name: 'Test101',
+          },
+        },
+      ],
+    };
+    const expectedMeta = {
+      source: middlewareJsonApiSource,
+      schema,
+      tag,
+    };
+
+    const mockSuccessAction = {
+      type: LOAD_SUCCESS,
+      meta: expectedMeta,
+      payload: expectedPayload,
+    };
+
+    const store = mockStore({});
+    store.dispatch(actionPromise(mockSuccessAction))
+      .then(() => {
+        const performedActions = store.getActions();
+        expect(performedActions).to.have.length(6);
+
+        const actionObjIncludedFetched = performedActions[0];
+        expect(actionObjIncludedFetched.type).to.equal(OBJECT_FETCHED);
+        expect(actionObjIncludedFetched.meta).to.deep.equal({ schema: includedSchema });
+        expect(actionObjIncludedFetched.payload).to.deep.equal(expectedPayload.included[0]);
+
+        const actionObjFetched = performedActions[2];
+        expect(actionObjFetched.type).to.equal(OBJECT_FETCHED);
+        expect(actionObjFetched.meta).to.deep.equal({ schema });
+        expect(actionObjFetched.payload).to.deep.equal(expectedPayload.data[0]);
+
+        const actionCollFetched = performedActions[4];
+        expect(actionCollFetched.type).to.equal(COLLECTION_FETCHED);
+        expect(actionCollFetched.meta).to.deep.equal({ schema, tag });
+        expect(actionCollFetched.payload).to.deep.equal(expectedPayload.data);
+
+        const successAction = performedActions[5];
+        expect(successAction.type).to.equal(LOAD_SUCCESS);
+
+        expect(successAction.meta).to.deep.equal(expectedMeta);
+        expect(successAction.payload).to.deep.equal(expectedPayload);
+      }).then(done).catch(done);
+  });
+
   it('ignores other actions', done => {
     const schema = 'schema_test';
     const tag = 'tag_test';

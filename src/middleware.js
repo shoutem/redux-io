@@ -38,14 +38,14 @@ const makeCollectionAction = (actionType, data, schema, tag = '') => {
   };
 };
 
-const makeObjectAction = (actionType, item, schema) => {
+const makeObjectAction = (actionType, item, schema = '') => {
   if (!actionType) {
     throw new Error('Action type is not valid.');
   }
   if (!item) {
     throw new Error('Data is not valid.');
   }
-  if (!schema) {
+  if (_.isEmpty(schema) && !_.get(item, 'type')) {
     throw new Error('Schema is not valid.');
   }
 
@@ -53,13 +53,13 @@ const makeObjectAction = (actionType, item, schema) => {
     type: actionType,
     payload: item,
     meta: {
-      schema,
+      schema: _.isEmpty(schema) ? _.get(item, 'type') : schema,
     },
   };
 };
 
 const actionHandlers = {
-  [LOAD_SUCCESS]: (action, data, dispatch) => {
+  [LOAD_SUCCESS]: (action, data, included, dispatch) => {
     const { schema, tag } = action.meta;
     // Validate action meta has a tag value
     if (tag === undefined || tag === null) {
@@ -68,7 +68,7 @@ const actionHandlers = {
     data.map(item => dispatch(makeObjectAction(OBJECT_FETCHED, item, schema)));
     dispatch(makeCollectionAction(COLLECTION_FETCHED, data, schema, tag));
   },
-  [CREATE_SUCCESS]: (action, data, dispatch) => {
+  [CREATE_SUCCESS]: (action, data, included, dispatch) => {
     const schema = action.meta.schema;
     data.map(item => dispatch(makeObjectAction(OBJECT_CREATED, item, schema)));
     dispatch(makeCollectionAction(COLLECTION_INVALIDATE, data, schema));
@@ -105,17 +105,24 @@ const isValidAction = action => {
   return true;
 };
 
+const getData = payload => [].concat(payload.data);
+const getIncluded = payload => { _.has(payload, 'included') ? payload.included : []; };
+
 export default store => next => action => {
   // Validate action, if not valid pass
   if (!isValidAction(action)) {
     return next(action);
   }
 
-  // Always work with arrays
-  const data = [].concat(action.payload.data);
   const dispatch = store.dispatch;
+
+  // First dispatch included objects
+  const included = getIncluded(action.payload);
+  included.map(item => dispatch(makeObjectAction(OBJECT_FETCHED, item)));
+
   // Find handler for supported action type to make appropriate logic
-  actionHandlers[action.type](action, data, dispatch);
+  const data = getData(action.payload);
+  actionHandlers[action.type](action, data, included, dispatch);
 
   // After middleware handled action pass input action to next
   return next(action);
