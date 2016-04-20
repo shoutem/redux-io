@@ -100,13 +100,13 @@ describe('Find action creator', () => {
     const tag = 'collection_test';
     const expectedPayload = {
       data: [{
-        schema,
+        type: schema,
         id: '1',
         attributes: {
           name: 'Test1',
         },
       }, {
-        schema,
+        type: schema,
         id: '2',
         attributes: {
           name: 'Test2',

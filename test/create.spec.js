@@ -114,6 +114,7 @@ describe('Create action creator', () => {
       data: {
         schema,
         id: '1',
+        type: schema,
         attributes: {
           name: 'Test1',
         },
