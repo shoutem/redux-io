@@ -19,7 +19,7 @@ Library for easy data managing between api and redux store. Comes with action cr
 ## Introduction
 
 Library consists of middleware, reducers and action creators that enable simple handling of data in CRUD operations
-with API. Library use [redux-api-middleware](http://www.test.com) for async api calls. Action creators and middleware
+with API. Library uses [redux-api-middleware](http://www.test.com) for async api calls. Action creators and middleware
 are wrapping redux-api-middleware, allowing you to have same experience as with using redux-api-middleware. Read more
 about using [redux-api-middleware](http://www.test.com).
 
@@ -53,11 +53,11 @@ You want to get most popular items, so endpoint `http://api.test.com/items?sort=
 }
 ```
 
-First you wnat to configure where fetched data will be placed in your state. Use `storage` as a normal reducer to define
+First you want to configure where fetched data will be placed in your state. Use `storage` as a normal reducer to define
 where in your state are instances of objects , and 'collection' reducer to set place in the state for list holding ids
-of items that are popular. You probably asking why do you need those two reducers, but idea is to keep data in redux
-state normalized. Because of normalization instances need to be in one place in state, but you can reference it from
-mutliple parts in state.
+of items that are popular. You are probably asking why do you need those two reducers, but idea is to keep data in redux
+state normalized. Normalization instances needs to be in one place in the state. However, you can reference it from
+mutliple parts in the state.
 
 ```js
 import { storage, collection } from `redux-api-state`;
@@ -102,7 +102,7 @@ SUCCESS action and will act as:
 6. Collection reducer will listen for COLLECTION_FETCHED and add items id into list
 7. Call next(action) for success action from redux-api-middleware
 
-Storage reducer only adds an item if action is valid and schema value is equal with action's schema. Collection
+Storage reducer only adds an item if action is valid and schema value is equal to the action's schema. Collection
 reducer performs the same, but checks also `tag` value. That enable us to have multiple collections of objects, but only
 one storage with instances of objects. Here is the state after app finished fetching:
 
@@ -156,29 +156,29 @@ applyMiddleware(apiMiddleware, apiStateMiddleware)(store);
 Action creator used to fetch data from api (GET). Config argument is based on CALL_API configuration from
 redux-api-middleware, allowing full customization expect types part of the configuration. Find function expects
 schema name of data which correspond with storage reducer with same schema value. Tag argument is optional, but when
-used allows your collection with same tag value to respond to received data.
+used allows your collection with same tag value to respond to the received data.
 ##### `config`
 An object that is based on redux-api-middleware [CALL_API] configuration. You can configure it as you like, but `types`
 will be overwritten by `find`.
 ##### `schema`
-Type of data you are fetching must be defined in api endpoint json-api as a data type. Must correspond with `storage`
+Type of data you are fetching must be defined in api endpoint json-api as a data type. It must correspond with `storage`
 `schema` argument so `redux-api-state` can place fetched data into the right location in the redux state.
 ##### `tag`
-Use it to connect action with `collection` reducer. Ids of fetched data will be placed in collections with same `tag`
-value. The tag should be unique per `collection`. The tag is the optional argument, for cases when you don't need
+Use it to connect action with `collection` reducer. Ids of fetched data will be placed in collections with the same `tag`
+value. The tag should be unique per `collection`. The tag is an optional argument, for cases when you don't need
 collection in the state.
 
 #### `create(config, schema, item)`
 Action creator used to create an item on api (POST). Config argument is based on CALL_API configuration from
 redux-api-middleware, allowing full customization expect types part of the configuration. Create function expects
-schema name of data which correspond with storage reducer with same schema value. Item argument holds the object that
+schema name of data which correspond with storage reducer with the same schema value. Item argument holds the object that
 you want to create on api. The tag is not needed because all collections with the same schema will be invalidated upon
-the successful action of creating the item on api.
+the successful action of creating an item on api.
 ##### `config`
 An object that is based on redux-api-middleware [CALL_API] configuration. You can configure it as you like, but `types`
 will be overwritten by `find`.
 ##### `schema`
-Type of data you are fetching must be defined in api endpoint json-api as a data type. Must correspond with `storage`
+Type of data you are fetching must be defined in the api endpoint json-api as a data type. Must correspond with `storage`
 `schema` argument so `redux-api-state` can place fetched data into the right location in the redux state.
 ##### `item`
 Plain JS object you wish to create on API endpoint.
@@ -207,7 +207,7 @@ Type of data which ids are stored in the list. Based on schema `collection` will
 dispatched actions from `redux-api-state`.
 ##### `tag`
 The tag is a custom string that defines `collection` responsibility of handling action dispatched from
-`redux-api-state`. Only if schema and tag are equal as in dispatched action, `collection` will process action.
+`redux-api-state`. Only if schema and tag are equal as in the dispatched action, `collection` will process action.
 Tag value pairs action creators like `find` with `collection`.
 ##### `initialState`
 If you are passing custom initial state, you should create list holding ids of objects.
