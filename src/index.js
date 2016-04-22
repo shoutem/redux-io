@@ -13,6 +13,9 @@ export { find };
 import create from './create';
 export { create };
 
+import loaded from './loaded';
+export { loaded };
+
 export {
   LOAD_REQUEST,
   LOAD_SUCCESS,
