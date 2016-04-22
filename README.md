@@ -168,6 +168,18 @@ Use it to connect action with `collection` reducer. Ids of fetched data will be 
 value. The tag should be unique per `collection`. The tag is an optional argument, for cases when you don't need
 collection in the state.
 
+### `loaded(payload, tag = '')`
+Action creator used to store payload not fetched with `find` action creator. Loaded expects payload to be the json-api data type.
+Its `data.type` is later used as `schema` in corespondention with storage and/or collection reducers. 
+Tag argument is optional, but when used allows your collection with same tag value to respond to the received data.
+#### `payload`
+Required argument which is an object of the json-api type where its type would be used as `schema` meta parameter in
+LOAD_SUCCESS and OBJECT_FETCHED action types.
+##### `tag`
+Use it to connect action with `collection` reducer. Ids of fetched data will be placed in collections with the same `tag`
+value. The tag should be unique per `collection`. The tag is an optional argument, for cases when you don't need
+collection in the state.
+
 #### `create(config, schema, item)`
 Action creator used to create an item on api (POST). Config argument is based on CALL_API configuration from
 redux-api-middleware, allowing full customization expect types part of the configuration. Create function expects
