@@ -1,5 +1,4 @@
 import { expect } from 'chai';
-import _ from 'lodash';
 import {
   LOAD_SUCCESS,
   loaded,
@@ -24,10 +23,31 @@ describe('Loaded action creator', () => {
       meta: {
         schema: 'schema_test',
         source: middlewareJsonApiSource,
+        tag: 'all',
       },
     };
-    const loadSuccessAction = loaded(item);
+    const loadSuccessAction = loaded(item, 'all');
 
     expect(loadSuccessAction).to.deep.equal(action);
+  });
+
+  it('creates a invalid action with invalid schema', () => {
+    const item = {
+      data: {
+        type: '',
+      },
+    };
+    const tag = 'collection_test';
+    expect(() => loaded(item, tag)).to.throw('Schema is invalid.');
+  });
+
+  it('creates a invalid action with invalid tag', () => {
+    const item = {
+      data: {
+        type: 'schema_test',
+      },
+    };
+    const tag = {};
+    expect(() => loaded(item, tag)).to.throw('Tag isn\'t string.');
   });
 });
