@@ -1,6 +1,6 @@
 {
   "name": "redux-api-state",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "Action creators, reducers and middleware for simple handling of normalized json api data in state",
   "main": "lib/index.js",
   "files": [
