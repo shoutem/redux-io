@@ -76,6 +76,28 @@ describe('Storage reducer', () => {
     expect(nextState).to.deep.equal(expectedState);
   });
 
+  it('removing non existing item from state does not produce error', () => {
+    const initialState = {
+      '1': { id: 1 },
+    };
+    const schema = 'schema_test';
+    const action = {
+      type: OBJECT_REMOVED,
+      payload: { id: 5 },
+      meta: {
+        schema,
+      },
+    };
+    deepFreeze(initialState);
+    const reducer = storage(schema, initialState);
+    const nextState = reducer(initialState, action);
+    const expectedState = {
+      '1': { id: 1 },
+    };
+
+    expect(nextState).to.deep.equal(expectedState);
+  });
+
   it('ignores action with different schema type', () => {
     const initialState = {};
     const item = { id: 1 };

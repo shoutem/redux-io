@@ -27,7 +27,7 @@ export default (config, schema, item) => {
 
   return {
     [CALL_API]: {
-      method: 'POST',
+      method: 'PATCH',
       ...config,
       body: JSON.stringify({
         data: item,

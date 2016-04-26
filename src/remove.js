@@ -7,7 +7,7 @@ import {
   middlewareJsonApiSource,
 } from './middleware';
 
-// Action creator used to delete item on api (POST). Config arg is based on CALL_API
+// Action creator used to delete item on api (DELETE). Config arg is based on CALL_API
 // configuration from redux-api-middleware, allowing full customization expect types
 // part of configuration. Delete function expects schema name of data which correspond
 // with storage reducer with same schema value to listen for deleted data. Item arg

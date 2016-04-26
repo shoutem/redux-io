@@ -1,5 +1,9 @@
 import _ from 'lodash';
 
+export const CREATE_REQUEST = '@@redux_api_state/CREATE_REQUEST';
+export const CREATE_SUCCESS = '@@redux_api_state/CREATE_SUCCESS';
+export const CREATE_ERROR = '@@redux_api_state/CREATE_ERROR';
+
 export const LOAD_REQUEST = '@@redux_api_state/LOAD_REQUEST';
 export const LOAD_SUCCESS = '@@redux_api_state/LOAD_SUCCESS';
 export const LOAD_ERROR = '@@redux_api_state/LOAD_ERROR';
@@ -7,21 +11,18 @@ export const LOAD_ERROR = '@@redux_api_state/LOAD_ERROR';
 export const UPDATE_REQUEST = '@@redux_api_state/UPDATE_REQUEST';
 export const UPDATE_SUCCESS = '@@redux_api_state/UPDATE_SUCCESS';
 export const UPDATE_ERROR = '@@redux_api_state/UPDATE_ERROR';
-export const OBJECT_UPDATED = '@@redux_api_state/OBJECT_UPDATED';
 
 export const REMOVE_REQUEST = '@@redux_api_state/REMOVE_REQUEST';
 export const REMOVE_SUCCESS = '@@redux_api_state/REMOVE_SUCCESS';
 export const REMOVE_ERROR = '@@redux_api_state/REMOVE_ERROR';
-export const OBJECT_REMOVED = '@@redux_api_state/OBJECT_REMOVED';
 
 export const COLLECTION_FETCHED = '@@redux_api_state/COLLECTION_FETCHED';
-export const OBJECT_FETCHED = '@@redux_api_state/OBJECT_FETCHED';
-
-export const CREATE_REQUEST = '@@redux_api_state/CREATE_REQUEST';
-export const CREATE_SUCCESS = '@@redux_api_state/CREATE_SUCCESS';
-export const CREATE_ERROR = '@@redux_api_state/CREATE_ERROR';
 export const COLLECTION_INVALIDATE = '@@redux_api_state/COLLECTION_INVALIDATE';
+
+export const OBJECT_FETCHED = '@@redux_api_state/OBJECT_FETCHED';
+export const OBJECT_UPDATED = '@@redux_api_state/OBJECT_UPDATED';
 export const OBJECT_CREATED = '@@redux_api_state/OBJECT_CREATED';
+export const OBJECT_REMOVED = '@@redux_api_state/OBJECT_REMOVED';
 
 export const middlewareJsonApiSource = '@@redux_api_state/json_api';
 
