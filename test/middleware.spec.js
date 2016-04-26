@@ -4,8 +4,10 @@ import thunk from 'redux-thunk';
 import {
   LOAD_SUCCESS,
   CREATE_SUCCESS,
+  UPDATE_SUCCESS,
   OBJECT_CREATED,
   OBJECT_FETCHED,
+  OBJECT_UPDATED,
   COLLECTION_FETCHED,
   COLLECTION_INVALIDATE,
   apiStateMiddleware,
@@ -124,6 +126,55 @@ describe('Json api middleware', () => {
         expect(successAction.meta).to.deep.equal(expectedMeta);
         expect(successAction.payload).to.deep.equal(expectedPayload);
       }).then(done).catch(done);
+  });
+
+  it('produces valid actions for update', done => {
+    const schema = 'schema_test';
+    const tag = 'tag_test';
+    const expectedPayload = {
+      data: [{
+        type: schema,
+        id: '1',
+        attributes: {
+          name: 'Test1',
+        },
+      }],
+    };
+    const expectedMeta = {
+      source: middlewareJsonApiSource,
+      schema,
+      tag,
+    };
+
+    const mockSuccessAction = {
+      type: UPDATE_SUCCESS,
+      meta: expectedMeta,
+      payload: expectedPayload,
+    };
+
+    const store = mockStore({});
+    store.dispatch(actionPromise(mockSuccessAction))
+      .then(() => {
+        const performedActions = store.getActions();
+console.log(performedActions);
+        expect(performedActions).to.have.length(3);
+
+        const actionObjUpdated = performedActions[0];
+        expect(actionObjUpdated.type).to.equal(OBJECT_UPDATED);
+        expect(actionObjUpdated.meta).to.deep.equal(expectedMeta);
+        expect(actionObjUpdated.payload).to.deep.equal(expectedPayload.data[0]);
+
+        const actionCollInvalidate = performedActions[1];
+        expect(actionCollInvalidate.type).to.equal(COLLECTION_INVALIDATE);
+        expect(actionCollInvalidate.meta).to.deep.equal({ ...expectedMeta, tag: '' });
+        expect(actionCollInvalidate.payload).to.deep.equal(expectedPayload.data);
+
+        const successAction = performedActions[2];
+        expect(successAction.type).to.equal(UPDATE_SUCCESS);
+
+        expect(successAction.meta).to.deep.equal(expectedMeta);
+        expect(successAction.payload).to.deep.equal(expectedPayload);
+    }).then(done).catch(done);
   });
 
   it('produces valid actions for included data in payload', done => {

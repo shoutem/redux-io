@@ -3,6 +3,12 @@ import _ from 'lodash';
 export const LOAD_REQUEST = '@@redux_api_state/LOAD_REQUEST';
 export const LOAD_SUCCESS = '@@redux_api_state/LOAD_SUCCESS';
 export const LOAD_ERROR = '@@redux_api_state/LOAD_ERROR';
+
+export const UPDATE_REQUEST = '@@redux_api_state/UPDATE_REQUEST';
+export const UPDATE_SUCCESS = '@@redux_api_state/UPDATE_SUCCESS';
+export const UPDATE_ERROR = '@@redux_api_state/UPDATE_ERROR';
+export const OBJECT_UPDATED = '@@redux_api_state/OBJECT_UPDATED';
+
 export const COLLECTION_FETCHED = '@@redux_api_state/COLLECTION_FETCHED';
 export const OBJECT_FETCHED = '@@redux_api_state/OBJECT_FETCHED';
 
@@ -74,6 +80,11 @@ const actionHandlers = {
   },
   [CREATE_SUCCESS]: (action, data, dispatch) => {
     data.map(item => dispatch(makeObjectAction(action, OBJECT_CREATED, item)));
+    const schema = action.meta.schema;
+    dispatch(makeCollectionAction(action, COLLECTION_INVALIDATE, data, schema));
+  },
+  [UPDATE_SUCCESS]: (action, data, dispatch) => {
+    data.map(item => dispatch(makeObjectAction(action, OBJECT_UPDATED, item)));
     const schema = action.meta.schema;
     dispatch(makeCollectionAction(action, COLLECTION_INVALIDATE, data, schema));
   },

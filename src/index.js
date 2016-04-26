@@ -16,10 +16,17 @@ export { create };
 import loaded from './loaded';
 export { loaded };
 
+import update from './update';
+export { update };
+
 export {
   LOAD_REQUEST,
   LOAD_SUCCESS,
   LOAD_ERROR,
+  UPDATE_REQUEST,
+  UPDATE_SUCCESS,
+  UPDATE_ERROR,
+  OBJECT_UPDATED,
   OBJECT_FETCHED,
   COLLECTION_FETCHED,
   CREATE_REQUEST,
