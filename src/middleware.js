@@ -9,6 +9,11 @@ export const UPDATE_SUCCESS = '@@redux_api_state/UPDATE_SUCCESS';
 export const UPDATE_ERROR = '@@redux_api_state/UPDATE_ERROR';
 export const OBJECT_UPDATED = '@@redux_api_state/OBJECT_UPDATED';
 
+export const REMOVE_REQUEST = '@@redux_api_state/REMOVE_REQUEST';
+export const REMOVE_SUCCESS = '@@redux_api_state/REMOVE_SUCCESS';
+export const REMOVE_ERROR = '@@redux_api_state/REMOVE_ERROR';
+export const OBJECT_REMOVED = '@@redux_api_state/OBJECT_REMOVED';
+
 export const COLLECTION_FETCHED = '@@redux_api_state/COLLECTION_FETCHED';
 export const OBJECT_FETCHED = '@@redux_api_state/OBJECT_FETCHED';
 
@@ -88,6 +93,11 @@ const actionHandlers = {
     const schema = action.meta.schema;
     dispatch(makeCollectionAction(action, COLLECTION_INVALIDATE, data, schema));
   },
+  [REMOVE_SUCCESS]: (action, data, dispatch) => {
+    dispatch(makeObjectAction(action, OBJECT_REMOVED, action.meta.item));
+    const schema = action.meta.schema;
+    dispatch(makeCollectionAction(action, COLLECTION_INVALIDATE, data, schema));
+  },
 };
 
 const isValidAction = action => {
@@ -113,14 +123,17 @@ const isValidAction = action => {
     throw new Error('Schema is invalid.');
   }
   // Validate payload
-  if (!_.has(action, 'payload.data')) {
+  if (action.type !== REMOVE_SUCCESS && !_.has(action, 'payload.data')) {
     throw new Error('Payload Data is invalid, expecting payload.data.');
   }
 
   return true;
 };
 
-const getData = payload => [].concat(payload.data);
+const getData = payload =>  {
+  const data = payload && payload.data || [];
+  return [].concat(data);
+};
 const getIncluded = payload => (
   _.has(payload, 'included') ? payload.included : []
 );

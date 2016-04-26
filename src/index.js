@@ -13,6 +13,9 @@ export { find };
 import create from './create';
 export { create };
 
+import remove from './remove';
+export { remove };
+
 import loaded from './loaded';
 export { loaded };
 
@@ -28,6 +31,10 @@ export {
   UPDATE_ERROR,
   OBJECT_UPDATED,
   OBJECT_FETCHED,
+  REMOVE_REQUEST,
+  REMOVE_SUCCESS,
+  REMOVE_ERROR,
+  OBJECT_REMOVED,
   COLLECTION_FETCHED,
   CREATE_REQUEST,
   CREATE_SUCCESS,

@@ -2,7 +2,8 @@ import _ from 'lodash';
 import {
   OBJECT_FETCHED,
   OBJECT_CREATED,
-  OBJECT_UPDATED
+  OBJECT_UPDATED,
+  OBJECT_REMOVED,
 } from './middleware';
 
 // storage is generic storage reducer that enables creation
@@ -19,6 +20,11 @@ export default (schema, initialState = {}) =>
       case OBJECT_CREATED:
       case OBJECT_UPDATED:
         return { ...state, [item.id]: item };
+      case OBJECT_REMOVED: {
+        const newState = { ...state };
+        delete newState[item.id];
+        return newState;
+      }
       default:
         return state;
     }

@@ -4,6 +4,7 @@ import {
   storage,
   OBJECT_CREATED,
   OBJECT_FETCHED,
+  OBJECT_REMOVED,
 } from '../src';
 
 describe('Storage reducer', () => {
@@ -48,6 +49,29 @@ describe('Storage reducer', () => {
 
     const nextState = reducer(initialState, action);
     const expectedState = { [item.id]: item };
+
+    expect(nextState).to.deep.equal(expectedState);
+  });
+
+  it('removes item from state on Delete', () => {
+    const initialState = {
+      '1': { id: 1 },
+      '2': { id: 2 },
+    };
+    const schema = 'schema_test';
+    const action = {
+      type: OBJECT_REMOVED,
+      payload: { id: 1 },
+      meta: {
+        schema,
+      },
+    };
+    deepFreeze(initialState);
+    const reducer = storage(schema, initialState);
+    const nextState = reducer(initialState, action);
+    const expectedState = {
+      '2': { id: 2 },
+    };
 
     expect(nextState).to.deep.equal(expectedState);
   });

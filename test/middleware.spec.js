@@ -5,9 +5,11 @@ import {
   LOAD_SUCCESS,
   CREATE_SUCCESS,
   UPDATE_SUCCESS,
+  REMOVE_SUCCESS,
   OBJECT_CREATED,
   OBJECT_FETCHED,
   OBJECT_UPDATED,
+  OBJECT_REMOVED,
   COLLECTION_FETCHED,
   COLLECTION_INVALIDATE,
   apiStateMiddleware,
@@ -156,7 +158,6 @@ describe('Json api middleware', () => {
     store.dispatch(actionPromise(mockSuccessAction))
       .then(() => {
         const performedActions = store.getActions();
-console.log(performedActions);
         expect(performedActions).to.have.length(3);
 
         const actionObjUpdated = performedActions[0];
@@ -174,6 +175,42 @@ console.log(performedActions);
 
         expect(successAction.meta).to.deep.equal(expectedMeta);
         expect(successAction.payload).to.deep.equal(expectedPayload);
+    }).then(done).catch(done);
+  });
+
+  it('produces valid actions for delete', done => {
+    const schema = 'schema_test';
+    const deletedItem = {
+      type: schema,
+      id: '1',
+    };
+    const expectedMeta = {
+      source: middlewareJsonApiSource,
+      schema,
+      item: deletedItem,
+    };
+    const mockSuccessAction = {
+      type: REMOVE_SUCCESS,
+      meta: expectedMeta,
+    };
+
+    const store = mockStore({});
+    store.dispatch(actionPromise(mockSuccessAction))
+      .then(() => {
+        const performedActions = store.getActions();
+        expect(performedActions).to.have.length(3);
+
+        const actionObjDeleted = performedActions[0];
+        expect(actionObjDeleted.type).to.equal(OBJECT_REMOVED);
+        expect(actionObjDeleted.meta).to.deep.equal(expectedMeta);
+
+        const actionCollInvalidate = performedActions[1];
+        expect(actionCollInvalidate.type).to.equal(COLLECTION_INVALIDATE);
+        expect(actionCollInvalidate.meta).to.deep.equal({ ...expectedMeta, tag: '' });
+
+        const successAction = performedActions[2];
+        expect(successAction.type).to.equal(REMOVE_SUCCESS);
+        expect(successAction.meta).to.deep.equal(expectedMeta);
     }).then(done).catch(done);
   });
 
