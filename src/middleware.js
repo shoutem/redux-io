@@ -1,18 +1,18 @@
 import _ from 'lodash';
 
-export const LOAD_REQUEST = Symbol('LOAD_REQUEST');
-export const LOAD_SUCCESS = Symbol('LOAD_SUCCESS');
-export const LOAD_ERROR = Symbol('LOAD_ERROR');
-export const COLLECTION_FETCHED = Symbol('COLLECTION_FETCHED');
-export const OBJECT_FETCHED = Symbol('OBJECT_FETCHED');
+export const LOAD_REQUEST = '@@redux_api_state/LOAD_REQUEST';
+export const LOAD_SUCCESS = '@@redux_api_state/LOAD_SUCCESS';
+export const LOAD_ERROR = '@@redux_api_state/LOAD_ERROR';
+export const COLLECTION_FETCHED = '@@redux_api_state/COLLECTION_FETCHED';
+export const OBJECT_FETCHED = '@@redux_api_state/OBJECT_FETCHED';
 
-export const CREATE_REQUEST = Symbol('CREATE_REQUEST');
-export const CREATE_SUCCESS = Symbol('CREATE_SUCCESS');
-export const CREATE_ERROR = Symbol('CREATE_ERROR');
-export const COLLECTION_INVALIDATE = Symbol('COLLECTION_INVALIDATE');
-export const OBJECT_CREATED = Symbol('OBJECT_CREATED');
+export const CREATE_REQUEST = '@@redux_api_state/CREATE_REQUEST';
+export const CREATE_SUCCESS = '@@redux_api_state/CREATE_SUCCESS';
+export const CREATE_ERROR = '@@redux_api_state/CREATE_ERROR';
+export const COLLECTION_INVALIDATE = '@@redux_api_state/COLLECTION_INVALIDATE';
+export const OBJECT_CREATED = '@@redux_api_state/OBJECT_CREATED';
 
-export const middlewareJsonApiSource = Symbol('json_api');
+export const middlewareJsonApiSource = '@@redux_api_state/json_api';
 
 const makeCollectionAction = (sourceAction, actionType, data, schema, tag = '') => {
   if (!actionType) {
