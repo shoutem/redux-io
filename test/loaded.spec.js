@@ -34,19 +34,28 @@ describe('Loaded action creator', () => {
   });
 
   it('creates a invalid action with invalid schema', () => {
-    const item = {
+    const payload = {
       data: {
       },
     };
-    expect(() => loaded(item)).to.throw('Schema is invalid.');
+    expect(() => loaded(payload)).to.throw('Schema is invalid.');
+  });
+
+  it('creates a invalid action with invalid payload', () => {
+    const payload = {
+    };
+    expect(() => loaded(payload)).to.throw('Missing payload data property.');
+
+    const textPayload = 'Wrong';
+    expect(() => loaded(textPayload)).to.throw('Invalid payload type.');
   });
 
   it('creates a invalid action with invalid tag', () => {
-    const item = {
+    const payload = {
       data: {
       },
     };
     const tag = {};
-    expect(() => loaded(item, 'schema_test', tag)).to.throw('Tag isn\'t string.');
+    expect(() => loaded(payload, 'schema_test', tag)).to.throw('Tag isn\'t string.');
   });
 });
