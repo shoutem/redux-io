@@ -4,9 +4,8 @@ import {
   middlewareJsonApiSource,
 } from './middleware';
 
-export default (payload, tag = '') => {
-  const schema = _.get(payload, 'data.type');
-  if (!_.isString(schema) || _.isEmpty(schema)) {
+export default (data, schema, tag = '') => {
+  if (!_.isString(schema)) {
     throw new Error('Schema is invalid.');
   }
   if (!_.isString(tag)) {
@@ -15,7 +14,7 @@ export default (payload, tag = '') => {
 
   return {
     type: LOAD_SUCCESS,
-    payload,
+    payload: data,
     meta: {
       source: middlewareJsonApiSource,
       schema,

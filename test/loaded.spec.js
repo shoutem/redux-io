@@ -7,6 +7,8 @@ import {
 
 describe('Loaded action creator', () => {
   it('creates valid action', () => {
+    const schema = 'schema_test';
+    const tag = 'all';
     const item = {
       data: {
         id: 1,
@@ -21,12 +23,12 @@ describe('Loaded action creator', () => {
       type: LOAD_SUCCESS,
       payload: item,
       meta: {
-        schema: 'schema_test',
+        schema,
         source: middlewareJsonApiSource,
-        tag: 'all',
+        tag,
       },
     };
-    const loadSuccessAction = loaded(item, 'all');
+    const loadSuccessAction = loaded(item, schema, tag);
 
     expect(loadSuccessAction).to.deep.equal(action);
   });
@@ -34,20 +36,17 @@ describe('Loaded action creator', () => {
   it('creates a invalid action with invalid schema', () => {
     const item = {
       data: {
-        type: '',
       },
     };
-    const tag = 'collection_test';
-    expect(() => loaded(item, tag)).to.throw('Schema is invalid.');
+    expect(() => loaded(item)).to.throw('Schema is invalid.');
   });
 
   it('creates a invalid action with invalid tag', () => {
     const item = {
       data: {
-        type: 'schema_test',
       },
     };
     const tag = {};
-    expect(() => loaded(item, tag)).to.throw('Tag isn\'t string.');
+    expect(() => loaded(item, 'schema_test', tag)).to.throw('Tag isn\'t string.');
   });
 });
