@@ -4,8 +4,8 @@ export { apiStateMiddleware };
 import storage from './storage';
 export { storage };
 
-import collection, { COLLECTION_CLEARED } from './collection';
-export { collection, COLLECTION_CLEARED };
+import collection, { COLLECTION_CLEAR } from './collection';
+export { collection, COLLECTION_CLEAR };
 
 import find from './find';
 export { find };

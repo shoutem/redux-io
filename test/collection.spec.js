@@ -2,8 +2,10 @@ import { expect } from 'chai';
 import deepFreeze from 'deep-freeze';
 import {
   collection,
+  clear,
   COLLECTION_FETCHED,
   COLLECTION_INVALIDATE,
+  COLLECTION_CLEAR,
 } from '../src';
 
 describe('Collection reducer', () => {
@@ -161,5 +163,29 @@ describe('Collection reducer', () => {
     const nextState = reducer(initialState, action);
     const expectedState = [];
     expect(nextState).to.eql(expectedState);
+  });
+
+  it('clears collection', () => {
+    const items = [
+      { id: 1 },
+      { id: 2 },
+    ];
+    const action = {
+      type: COLLECTION_CLEAR,
+      meta: {
+        schema: 'schema_test',
+        tag: 'all',
+      },
+    };
+    const initialState = items;
+    deepFreeze(initialState);
+    const schema = 'schema_test';
+    const tag = 'tag_test';
+    const clearAction = clear(schema, tag);
+
+    const reducer = collection(schema, tag, initialState);
+    const nextState = reducer(undefined, clearAction);
+
+    expect(nextState).to.deep.equal([]);
   });
 });
