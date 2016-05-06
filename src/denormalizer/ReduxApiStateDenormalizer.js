@@ -59,15 +59,15 @@ export default class ReduxApiStateDenormalizer extends ReduxDenormalizer {
   }
 
   /**
-   * Denormalize idsList for given schema
+   * Denormalize collection for given schema
    * Storage is needed in ProvideStorage mode.
    *
-   * @param idsList
+   * @param collection
    * @param schema
    * @param storage
    * @returns {{}}
    */
-  denormalizeCollection(idsList, schema, storage) {
-    return idsList.map(id => (this.denormalizeItem(id, schema, storage)));
+  denormalizeCollection(collection, schema, storage) {
+    return collection.map(id => (this.denormalizeItem(id, schema, storage)));
   }
 }
