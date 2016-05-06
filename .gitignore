@@ -2,7 +2,6 @@
 .idea
 
 node_modules
-lib
 
 *.log
 *.tgz
