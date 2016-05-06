@@ -22,6 +22,9 @@ export { loaded };
 import update from './update';
 export { update };
 
+import ReduxApiStateDenormalizer from './ReduxApiStateDenormalizer';
+export { ReduxApiStateDenormalizer };
+
 export {
   LOAD_REQUEST,
   LOAD_SUCCESS,
