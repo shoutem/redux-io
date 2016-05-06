@@ -4,6 +4,8 @@ import {
   COLLECTION_INVALIDATE,
 } from './middleware';
 
+export const COLLECTION_CLEAR = '@@redux_api_state/COLLECTION_CLEAR';
+
 // collection is generic collection reducer that enables creating
 // typed & named collection reducers that are handling specific
 // COLLECTION_ type actions with specific collection name.
@@ -27,6 +29,8 @@ export default (schema, tag, initialState = []) =>
     switch (action.type) {
       case COLLECTION_FETCHED:
         return action.payload.map(item => item.id);
+      case COLLECTION_CLEAR:
+        return [];
       default:
         return state;
     }
