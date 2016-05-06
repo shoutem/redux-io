@@ -1,5 +1,5 @@
 import { assert } from 'chai';
-import ReduxDenormalizer from '../src/denormalizer/ReduxDenormalizer';
+import ReduxDenormalizer from '../../src/denormalizer/ReduxDenormalizer';
 
 function createTargetDescriptor(id, type) {
   return {

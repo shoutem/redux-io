@@ -1,6 +1,6 @@
 import { assert } from 'chai';
-import ReduxApiStateDenormalizer from '../src/denormalizer/ReduxApiStateDenormalizer';
-import { createSchemasMap } from '../src/denormalizer/ReduxApiStateDenormalizer';
+import { ReduxApiStateDenormalizer } from '../../src/index';
+import { createSchemasMap } from '../../src/denormalizer/ReduxApiStateDenormalizer';
 
 function createStorageMap() {
   return {
