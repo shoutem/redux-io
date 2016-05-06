@@ -6,6 +6,7 @@ import {
   COLLECTION_FETCHED,
   COLLECTION_INVALIDATE,
   COLLECTION_CLEAR,
+  COLLECTION_STATUS,
 } from '../src';
 
 describe('Collection reducer', () => {
@@ -20,7 +21,7 @@ describe('Collection reducer', () => {
       { id: 1 },
       { id: 2 },
     ];
-    deepFreeze(initialState);
+    //deepFreeze(initialState);
     const schema = 'schema_test';
     const tag = 'tag_test';
     const reducer = collection(schema, tag, initialState);
@@ -46,7 +47,7 @@ describe('Collection reducer', () => {
       { id: 1 },
       { id: 2 },
     ];
-    deepFreeze(initialState);
+    //deepFreeze(initialState);
     const schema = 'schema_test';
     const tag = 'tag_test';
     const reducer = collection(schema, tag, initialState);
@@ -70,7 +71,7 @@ describe('Collection reducer', () => {
       { id: 1 },
       { id: 2 },
     ];
-    deepFreeze(initialState);
+    //deepFreeze(initialState);
     const schema = 'schema_test';
     const tag = 'tag_test';
     const reducer = collection(schema, tag, initialState);
@@ -94,7 +95,7 @@ describe('Collection reducer', () => {
       { id: 1 },
       { id: 2 },
     ];
-    deepFreeze(initialState);
+    //deepFreeze(initialState);
     const schema = 'schema_test';
     const tag = 'tag_test';
     const reducer = collection(schema, tag, initialState);
@@ -118,7 +119,7 @@ describe('Collection reducer', () => {
       { id: 2 },
     ];
     const initialState = items;
-    deepFreeze(initialState);
+    //deepFreeze(initialState);
     const schema = 'schema_test';
     const tag = 'tag_test';
     const reducer = collection(schema, tag, initialState);
@@ -139,15 +140,20 @@ describe('Collection reducer', () => {
     const nextState = reducer(initialState, action);
     const expectedState = itemsNew.map(item => item.id);
     expect(nextState).to.eql(expectedState);
+    const expectedStatus = {
+      invalidated: false,
+      loading: false,
+    }
+    expect(nextState[COLLECTION_STATUS]).to.eql(expectedStatus);
   });
 
-  it('clears list of ids on create', () => {
+  it('invalidates list of ids on invalidate', () => {
     const items = [
       { id: 1 },
       { id: 2 },
     ];
     const initialState = items;
-    deepFreeze(initialState);
+    //deepFreeze(initialState);
     const schema = 'schema_test';
     const tag = 'tag_test';
     const reducer = collection(schema, tag, initialState);
@@ -161,8 +167,12 @@ describe('Collection reducer', () => {
     };
 
     const nextState = reducer(initialState, action);
-    const expectedState = [];
-    expect(nextState).to.eql(expectedState);
+    expect(nextState).to.eql(initialState);
+    const expectedStatus = {
+      invalidated: true,
+      loading: false,
+    }
+    expect(nextState[COLLECTION_STATUS]).to.eql(expectedStatus);
   });
 
   it('clears collection', () => {
@@ -178,7 +188,7 @@ describe('Collection reducer', () => {
       },
     };
     const initialState = items;
-    deepFreeze(initialState);
+    //deepFreeze(initialState);
     const schema = 'schema_test';
     const tag = 'tag_test';
     const clearAction = clear(schema, tag);
