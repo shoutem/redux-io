@@ -5,7 +5,7 @@ import { createSchemasMap } from '../../src/denormalizer/ReduxApiStateDenormaliz
 function createStorageMap() {
   return {
     'type1': 'storage.type1',
-    'type2': 'storage.type2',
+    'type2.test': 'storage["type2.test"]',
   }
 }
 
@@ -24,9 +24,9 @@ function getStore() {
                 { id: 'type1Id3', type: 'type1' },
               ]
             },
-            type2: {
+            'type2.test': {
               data: {
-                id: 'type2Id1', type: 'type2'
+                id: 'type2Id1', type: 'type2.test'
               }
             }
           }
@@ -45,7 +45,7 @@ function getStore() {
           }
         },
       },
-      type2: {
+      'type2.test': {
         type2Id1: {
           attributes: {
             name: 'type2Id1',
@@ -66,12 +66,12 @@ describe('ReduxApiStateDenormalizer', () => {
       );
     });
   });
-  describe('denormalizeStorageItem', () => {
+  describe('denormalizeItem', () => {
     it('denormalizes valid object relationships data', () => {
       const denormalizer = new ReduxApiStateDenormalizer();
       const expectedData = {
         name: 'type1Id1',
-        type2: {
+        'type2.test': {
           name: 'type2Id1'
         },
         type1: [
@@ -90,13 +90,13 @@ describe('ReduxApiStateDenormalizer', () => {
       );
     });
   });
-  describe('denormalizeStorageCollection', () => {
+  describe('denormalizeCollection', () => {
     it('denormalizes valid object collection', () => {
       const denormalizer = new ReduxApiStateDenormalizer(getStore, createStorageMap());
       const expectedData = [
         {
           name: 'type1Id1',
-          type2: {
+          'type2.test': {
             name: 'type2Id1'
           },
           type1: [
