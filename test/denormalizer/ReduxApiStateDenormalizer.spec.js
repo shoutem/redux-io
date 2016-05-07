@@ -14,6 +14,8 @@ function getStore() {
     storage: {
       type1: {
         type1Id1: {
+          id: 'type1Id1',
+          type: 'type1',
           attributes: {
             name: 'type1Id1'
           },
@@ -32,9 +34,13 @@ function getStore() {
           }
         },
         type1Id2: {
+          id: 'type1Id2',
+          type: 'type1',
           attributes: { name: 'type1Id2' },
         },
         type1Id3: {
+          id: 'type1Id3',
+          type: 'type1',
           attributes: { name: 'type1Id3' },
           relationships: {
             type1: {
@@ -47,6 +53,8 @@ function getStore() {
       },
       'type2.test': {
         type2Id1: {
+          id: 'type2Id1',
+          type: 'type2.test',
           attributes: {
             name: 'type2Id1',
           },
@@ -70,13 +78,22 @@ describe('ReduxApiStateDenormalizer', () => {
     it('denormalizes valid object relationships data', () => {
       const denormalizer = new ReduxApiStateDenormalizer();
       const expectedData = {
+        id: 'type1Id1',
+        type: 'type1',
         name: 'type1Id1',
         'type2.test': {
+          id: 'type2Id1',
+          type: 'type2.test',
           name: 'type2Id1'
         },
         type1: [
-          { name: 'type1Id2' },
-          { name: 'type1Id3', type1: [{ name: 'type1Id2' }] },
+          { id: 'type1Id2', type: 'type1', name: 'type1Id2' },
+          {
+            id: 'type1Id3',
+            type: 'type1',
+            name: 'type1Id3',
+            type1: [{ id: 'type1Id2', type: 'type1', name: 'type1Id2' }]
+          },
         ]
       };
       const storage = createSchemasMap(getStore(), createStorageMap());
@@ -95,18 +112,27 @@ describe('ReduxApiStateDenormalizer', () => {
       const denormalizer = new ReduxApiStateDenormalizer(getStore, createStorageMap());
       const expectedData = [
         {
+          id: 'type1Id1',
+          type: 'type1',
           name: 'type1Id1',
           'type2.test': {
+            id: 'type2Id1',
+            type: 'type2.test',
             name: 'type2Id1'
           },
           type1: [
-            { name: 'type1Id2' },
-            { name: 'type1Id3', type1: [{ name: 'type1Id2' }] },
+            { id: 'type1Id2', type: 'type1', name: 'type1Id2' },
+            {
+              id: 'type1Id3',
+              type: 'type1',
+              name: 'type1Id3',
+              type1: [{  id: 'type1Id2', type: 'type1', name: 'type1Id2' }]
+            },
           ]
         }
       ];
       const denormalizedData =
-        denormalizer.denormalizeCollection(['type1Id1'], 'type1') ;
+        denormalizer.denormalizeCollection(['type1Id1'], 'type1');
       assert.deepEqual(
         denormalizedData,
         expectedData,
