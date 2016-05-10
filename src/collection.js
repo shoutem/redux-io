@@ -1,33 +1,37 @@
 import _ from 'lodash';
 import {
   COLLECTION_FETCHED,
-  COLLECTION_INVALIDATE,
+  COLLECTION_STATUS,
 } from './middleware';
-
+import {
+  STATUS,
+  validationStatus,
+  busyStatus,
+  createStatus,
+  updateStatus,
+} from './status';
 
 export const COLLECTION_CLEAR = '@@redux_api_state/COLLECTION_CLEAR';
-export const COLLECTION_STATUS = Symbol('collection_status');
-const status = {
-  invalidated: false,
-  loading: false,
-};
 
 // collection is generic collection reducer that enables creating
 // typed & named collection reducers that are handling specific
 // COLLECTION_ type actions with specific collection name.
 export default (schema, tag, initialState = []) => {
   // eslint-disable-next-line no-param-reassign
-  initialState[COLLECTION_STATUS] = status;
+  initialState[STATUS] = createStatus();
   return (state = initialState, action) => {
     if (_.get(action, 'meta.schema') !== schema) {
       return state;
     }
 
-    // Every collection should invalidate state no matter the name
-    // of collection and return initial state.
-    if (action.type === COLLECTION_INVALIDATE) {
+    // Every collection should change status if action is type of COLLECTION_STATUS
+    // and action meta is broadcast
+    if (action.type === COLLECTION_STATUS && _.get(action, 'meta.broadcast')) {
       const newState = [...state];
-      newState[COLLECTION_STATUS] = { ...status, invalidated: true };
+      newState[STATUS] = updateStatus(
+        state[STATUS],
+        action.payload
+      );
       return newState;
     }
 
@@ -39,12 +43,26 @@ export default (schema, tag, initialState = []) => {
     switch (action.type) {
       case COLLECTION_FETCHED: {
         const newState = action.payload.map(item => item.id);
-        newState[COLLECTION_STATUS] = { ... status };
+        newState[STATUS] = updateStatus(
+          state[STATUS],
+          { validationStatus: validationStatus.VALID, busyStatus: busyStatus.IDLE }
+        );
         return newState;
       }
       case COLLECTION_CLEAR: {
         const newState = [];
-        newState[COLLECTION_STATUS] = { ...status };
+        newState[STATUS] = updateStatus(
+          state[STATUS],
+          { validationStatus: validationStatus.VALID, busyStatus: busyStatus.IDLE }
+        );
+        return newState;
+      }
+      case COLLECTION_STATUS: {
+        const newState = [...state];
+        newState[STATUS] = updateStatus(
+          state[STATUS],
+          action.payload
+        );
         return newState;
       }
       default:

@@ -24,22 +24,29 @@ export default (config, schema, item) => {
   if (!_.isObject(item)) {
     throw new Error('Item isn\'t object.');
   }
+
+  const meta = {
+    source: middlewareJsonApiSource,
+    schema,
+  };
+
   return {
     [CALL_API]: {
       method: 'DELETE',
       ...config,
       types: [
-        REMOVE_REQUEST,
+        {
+          type: REMOVE_REQUEST,
+          meta,
+          payload: { data: item },
+        },
         {
           type: REMOVE_SUCCESS,
-          meta: {
-            source: middlewareJsonApiSource,
-            schema,
-            item,
-          },
+          meta,
+          payload: () => ({ data: item }),
         },
         REMOVE_ERROR,
       ],
-    }
+    },
   };
 };

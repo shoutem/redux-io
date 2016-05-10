@@ -4,10 +4,9 @@ export { apiStateMiddleware };
 import storage from './storage';
 export { storage };
 
-import collection, { COLLECTION_STATUS, COLLECTION_CLEAR } from './collection';
+import collection, { COLLECTION_CLEAR } from './collection';
 export {
   collection,
-  COLLECTION_STATUS,
   COLLECTION_CLEAR,
 };
 
@@ -36,17 +35,23 @@ export {
   UPDATE_REQUEST,
   UPDATE_SUCCESS,
   UPDATE_ERROR,
+  OBJECT_UPDATING,
   OBJECT_UPDATED,
   OBJECT_FETCHED,
   REMOVE_REQUEST,
   REMOVE_SUCCESS,
   REMOVE_ERROR,
   OBJECT_REMOVED,
-  COLLECTION_FETCHED,
+  OBJECT_REMOVING,
   CREATE_REQUEST,
   CREATE_SUCCESS,
   CREATE_ERROR,
   OBJECT_CREATED,
-  COLLECTION_INVALIDATE,
+  COLLECTION_FETCHED,
+  COLLECTION_STATUS,
   middlewareJsonApiSource,
 } from './middleware';
+
+
+import { isValid, isBusy } from './status';
+export { isValid, isBusy };

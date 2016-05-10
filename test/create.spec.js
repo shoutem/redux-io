@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-expressions */
 import { expect } from 'chai';
 import nock from 'nock';
 import { CALL_API, apiMiddleware } from 'redux-api-middleware';
@@ -9,19 +10,23 @@ import {
   CREATE_SUCCESS,
   CREATE_ERROR,
   OBJECT_CREATED,
-  COLLECTION_INVALIDATE,
+  COLLECTION_STATUS,
   apiStateMiddleware,
 } from '../src';
 import { middlewareJsonApiSource } from '../src/middleware';
+import {
+  validationStatus,
+  busyStatus,
+} from '../src/status';
 
 describe('Create action creator', () => {
-  const middlewares = [thunk, apiMiddleware,apiStateMiddleware];
+  const middlewares = [thunk, apiMiddleware, apiStateMiddleware];
   let mockStore = configureMockStore(middlewares);
 
   beforeEach(() => {
     nock.cleanAll();
     mockStore = configureMockStore(middlewares);
-  })
+  });
 
   it('creates a valid action', () => {
     const config = {
@@ -51,18 +56,19 @@ describe('Create action creator', () => {
     expect(action[CALL_API].body).to.equal(expectedBody);
     expect(action[CALL_API].types).to.not.be.undefined;
 
-    const types = action[CALL_API].types;
-    expect(types[0]).to.equal(CREATE_REQUEST);
-    expect(types[1].type).to.equal(CREATE_SUCCESS);
     const expectedMeta = {
       source: middlewareJsonApiSource,
       schema,
     };
+    const types = action[CALL_API].types;
+    expect(types[0].type).to.equal(CREATE_REQUEST);
+    expect(types[0].meta).to.deep.equal(expectedMeta);
+    expect(types[1].type).to.equal(CREATE_SUCCESS);
     expect(types[1].meta).to.deep.equal(expectedMeta);
     expect(types[2]).to.equal(CREATE_ERROR);
   });
 
-  it('creates a invalid action with undefined config', () => {
+  it('exception on invalid action with undefined config', () => {
     const config = undefined;
 
     const schema = 'schema_test';
@@ -76,7 +82,7 @@ describe('Create action creator', () => {
     expect(() => create(config, schema, item)).to.throw('Config isn\'t object.');
   });
 
-  it('creates a invalid action with invalid schema', () => {
+  it('exception on invalid action with invalid schema', () => {
     const config = {
       headers: {
         'Content-Type': 'application/vnd.api+json',
@@ -95,7 +101,7 @@ describe('Create action creator', () => {
     expect(() => create(config, schema, item)).to.throw('Schema is invalid.');
   });
 
-  it('creates a invalid action with invalid item', () => {
+  it('exception on invalid action with invalid item', () => {
     const config = {
       headers: {
         'Content-Type': 'application/vnd.api+json',
@@ -155,10 +161,15 @@ describe('Create action creator', () => {
         expect(actionObjCreated.meta).to.deep.equal(expectedMeta);
         expect(actionObjCreated.payload).to.deep.equal(expectedPayload.data);
 
-        const actionCollInvalidate = performedActions[2];
-        expect(actionCollInvalidate.type).to.equal(COLLECTION_INVALIDATE);
-        expect(actionCollInvalidate.meta).to.deep.equal({ ...expectedMeta, tag: '' });
-        expect(actionCollInvalidate.payload).to.deep.equal([expectedPayload.data]);
+        const actionCollStatus = performedActions[2];
+        expect(actionCollStatus.type).to.equal(COLLECTION_STATUS);
+        expect(actionCollStatus.meta).to.deep.equal({ ...expectedMeta, tag: '', broadcast: true });
+        const expectedCollStatusPayload = {
+          validationStatus: validationStatus.INVALID,
+          busyStatus: busyStatus.IDLE,
+        };
+        expect(actionCollStatus.payload).to.deep.equal(expectedCollStatusPayload);
+
         const successAction = performedActions[3];
         expect(successAction.type).to.equal(CREATE_SUCCESS);
         expect(successAction.meta).to.deep.equal(expectedMeta);
