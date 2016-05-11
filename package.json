@@ -52,6 +52,6 @@
     "redux": "^3.3.1",
     "redux-api-middleware": "^1.0.0",
     "redux-thunk": "^2.0.0",
-    "denormalizer": "git+ssh://git@bitbucket.com/fiveminutes/denormalizer.git#v2.3.0"
+    "@shoutem/json-api-denormalizer": "^0.2.3"
   }
 }

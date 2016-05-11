@@ -1,4 +1,4 @@
-import { ObjectDenormalizer } from 'denormalizer';
+import { ObjectDenormalizer } from '@shoutem/json-api-denormalizer';
 import _ from 'lodash';
 
 function getStorage(getStore, storagePath) {
