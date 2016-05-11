@@ -247,4 +247,68 @@ describe('Storage reducer', () => {
 
     expect(nextState).to.deep.equal(expectedState);
   });
+
+  it('ignores custom action with correct meta schema but invalid item', () => {
+    const initialState = {};
+    const item = { name: 1 };
+    const schema = 'schema_test';
+    const action = {
+      type: 'CUSTOM_ACTION',
+      meta: {
+        schema,
+        tag: 'custom tag',
+      },
+      payload: item,
+    };
+    deepFreeze(initialState);
+    const reducer = storage(schema, initialState);
+
+    const nextState = reducer(initialState, action);
+    const expectedState = {};
+    const nextStateItem = nextState[item.id];
+
+    expect(nextState).to.deep.equal(expectedState);
+    expect(nextStateItem).to.be.undefined;
+  });
+
+  it('ignores correct action with correct meta schema but invalid item', () => {
+    const initialState = {};
+    const item = { name: 1 };
+    const schema = 'schema_test';
+    const action = {
+      type: OBJECT_FETCHED,
+      meta: {
+        schema,
+      },
+      payload: item,
+    };
+    deepFreeze(initialState);
+    const reducer = storage(schema, initialState);
+
+    const nextState = reducer(initialState, action);
+    const expectedState = {};
+    const nextStateItem = nextState[item.id];
+
+    expect(nextState).to.deep.equal(expectedState);
+    expect(nextStateItem).to.be.undefined;
+  });
+
+  it('ignores correct action with correct meta schema but undefined item', () => {
+    const initialState = {};
+    const schema = 'schema_test';
+    const action = {
+      type: OBJECT_FETCHED,
+      meta: {
+        schema,
+      },
+      payload: undefined,
+    };
+    deepFreeze(initialState);
+    const reducer = storage(schema, initialState);
+
+    const nextState = reducer(initialState, action);
+    const expectedState = {};
+
+    expect(nextState).to.deep.equal(expectedState);
+  });
 });

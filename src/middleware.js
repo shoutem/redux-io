@@ -75,6 +75,9 @@ function makeObjectAction(sourceAction, actionType, item) {
   if (!_.get(item, 'type')) {
     throw new Error('Schema is not valid.');
   }
+  if (!_.get(item, 'id')) {
+    throw new Error('Id is not valid.');
+  }
 
   return {
     type: actionType,
@@ -84,37 +87,6 @@ function makeObjectAction(sourceAction, actionType, item) {
       schema: _.get(item, 'type'),
     },
   };
-}
-
-function isValidAction(action) {
-  if (!actionHandlers[action.type]) {
-    return false;
-  }
-  // Check for meta object in action
-  if (action.meta === undefined) {
-    throw new Error('Meta is undefined.');
-  }
-  const meta = action.meta;
-  // Check if source exists
-  if (meta.source === undefined) {
-    throw new Error('Source is undefined.');
-  }
-  // Source exists but this middleware is not responsible for other source variants
-  // only for json_api
-  if (meta.source !== middlewareJsonApiSource) {
-    return false;
-  }
-  // Check that schema is defined
-  if (!meta.schema) {
-    throw new Error('Schema is invalid.');
-  }
-  // Validate payload for payload-specific action, ignore others
-  if (!actionsWithoutPayload.has(action.type)
-    && !_.has(action, 'payload.data')) {
-    throw new Error('Payload Data is invalid, expecting payload.data.');
-  }
-
-  return true;
 }
 
 const actionHandlers = {
@@ -213,6 +185,37 @@ const actionHandlers = {
     ));
   },
 };
+
+function isValidAction(action) {
+  if (!actionHandlers[action.type]) {
+    return false;
+  }
+  // Check for meta object in action
+  if (action.meta === undefined) {
+    throw new Error('Meta is undefined.');
+  }
+  const meta = action.meta;
+  // Check if source exists
+  if (meta.source === undefined) {
+    throw new Error('Source is undefined.');
+  }
+  // Source exists but this middleware is not responsible for other source variants
+  // only for json_api
+  if (meta.source !== middlewareJsonApiSource) {
+    return false;
+  }
+  // Check that schema is defined
+  if (!meta.schema) {
+    throw new Error('Schema is invalid.');
+  }
+  // Validate payload for payload-specific action, ignore others
+  if (!actionsWithoutPayload.has(action.type)
+    && !_.has(action, 'payload.data')) {
+    throw new Error('Payload Data is invalid, expecting payload.data.');
+  }
+
+  return true;
+}
 
 const getData = payload => {
   const data = payload && payload.data || [];

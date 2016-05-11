@@ -24,6 +24,13 @@ export default function storage(schema, initialState = {}) {
       return state;
     }
     const item = action.payload;
+    if (!_.isObject(item)) {
+      return state;
+    }
+    if (!_.has(item, 'id')) {
+      return state;
+    }
+
     const status = state[item.id] ? state[item.id][STATUS] : createStatus();
     switch (action.type) {
       case OBJECT_UPDATING: {
