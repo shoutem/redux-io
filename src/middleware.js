@@ -40,7 +40,7 @@ const actionsWithoutPayload = new Set([
   CREATE_REQUEST,
 ]);
 
-function makeCollectionAction(sourceAction, actionType, data, schema, broadcast = true, tag = '') {
+function makeCollectionAction(sourceAction, actionType, data, schema, tag = '*') {
   if (!actionType) {
     throw new Error('Action type is not valid.');
   }
@@ -61,7 +61,6 @@ function makeCollectionAction(sourceAction, actionType, data, schema, broadcast 
       ...sourceAction.meta,
       schema,
       tag,
-      broadcast,
     },
   };
 }
@@ -131,7 +130,6 @@ const actionHandlers = {
       COLLECTION_STATUS,
       { busyStatus: busyStatus.BUSY },
       schema,
-      false,
       tag
     ));
   },
@@ -145,7 +143,7 @@ const actionHandlers = {
     data.map(item => dispatch(makeObjectAction(action, OBJECT_FETCHED, item)));
     // TODO: once when we support findOne action and single reducer, COLLECTION_FETCHED
     // should trigger only for collections
-    dispatch(makeCollectionAction(action, COLLECTION_FETCHED, data, schema, false, tag));
+    dispatch(makeCollectionAction(action, COLLECTION_FETCHED, data, schema, tag));
   },
   [CREATE_REQUEST]: (action, data, dispatch) => {
     // Change collection status to busy and invalid to prevent fetching.

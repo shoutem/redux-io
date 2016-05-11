@@ -131,7 +131,7 @@ describe('Update action creator', () => {
         const actionCollStatusBusy = performedActions[0];
         expect(actionCollStatusBusy.type).to.equal(COLLECTION_STATUS);
         expect(actionCollStatusBusy.meta)
-          .to.deep.equal({ ...expectedMeta, tag: '', broadcast: true });
+          .to.deep.equal({ ...expectedMeta, tag: '*' });
         const expectedCollStatusBusyPayload = {
           busyStatus: busyStatus.BUSY,
           validationStatus: validationStatus.INVALID,
@@ -156,7 +156,7 @@ describe('Update action creator', () => {
         const actionCollStatusIdle = performedActions[4];
         expect(actionCollStatusIdle.type).to.equal(COLLECTION_STATUS);
         expect(actionCollStatusIdle.meta)
-          .to.deep.equal({ ...expectedMeta, tag: '', broadcast: true });
+          .to.deep.equal({ ...expectedMeta, tag: '*' });
         const expectedCollStatusIdlePayload = {
           busyStatus: busyStatus.IDLE,
           validationStatus: validationStatus.INVALID,

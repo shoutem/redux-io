@@ -146,7 +146,7 @@ describe('Find action creator', () => {
 
         const actionCollStatus = performedActions[0];
         expect(actionCollStatus.type).to.equal(COLLECTION_STATUS);
-        expect(actionCollStatus.meta).to.deep.equal({ ...expectedMeta, broadcast: false });
+        expect(actionCollStatus.meta).to.deep.equal({ ...expectedMeta });
         const expectedCollStatusPayload = { busyStatus: busyStatus.BUSY };
         expect(actionCollStatus.payload).to.deep.equal(expectedCollStatusPayload);
 
@@ -159,7 +159,7 @@ describe('Find action creator', () => {
 
         const actionCollFetched = performedActions[4];
         expect(actionCollFetched.type).to.equal(COLLECTION_FETCHED);
-        expect(actionCollFetched.meta).to.deep.equal({ ...expectedMeta, broadcast: false });
+        expect(actionCollFetched.meta).to.deep.equal({ ...expectedMeta });
         expect(actionCollFetched.payload).to.deep.equal(expectedPayload.data);
 
         const successAction = performedActions[5];

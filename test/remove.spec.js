@@ -125,7 +125,7 @@ describe('Delete action creator', () => {
         const actionCollBusyRequest = performedActions[0];
         expect(actionCollBusyRequest.type).to.equal(COLLECTION_STATUS);
         expect(actionCollBusyRequest.meta)
-          .to.deep.equal({ ...expectedMeta, tag: '', broadcast: true });
+          .to.deep.equal({ ...expectedMeta, tag: '*' });
         const expectedCollBusyStatusPayload = {
           validationStatus: validationStatus.INVALID,
           busyStatus: busyStatus.BUSY,
@@ -144,7 +144,7 @@ describe('Delete action creator', () => {
 
         const actionCollStatus = performedActions[4];
         expect(actionCollStatus.type).to.equal(COLLECTION_STATUS);
-        expect(actionCollStatus.meta).to.deep.equal({ ...expectedMeta, tag: '', broadcast: true });
+        expect(actionCollStatus.meta).to.deep.equal({ ...expectedMeta, tag: '*' });
         const expectedCollStatusPayload = {
           validationStatus: validationStatus.INVALID,
           busyStatus: busyStatus.IDLE,

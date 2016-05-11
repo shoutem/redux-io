@@ -46,7 +46,6 @@ describe('Json api middleware', () => {
       source: middlewareJsonApiSource,
       schema,
       tag,
-      broadcast: false,
     };
 
     const mockSuccessAction = {
@@ -62,7 +61,7 @@ describe('Json api middleware', () => {
 
         const actionCollStatus = performedActions[0];
         expect(actionCollStatus.type).to.equal(COLLECTION_STATUS);
-        expect(actionCollStatus.meta).to.deep.equal({ ...expectedMeta, broadcast: false });
+        expect(actionCollStatus.meta).to.deep.equal({ ...expectedMeta });
         const expectedCollStatusPayload = { busyStatus: busyStatus.BUSY };
         expect(actionCollStatus.payload).to.deep.equal(expectedCollStatusPayload);
 
@@ -93,8 +92,7 @@ describe('Json api middleware', () => {
     const expectedMeta = {
       source: middlewareJsonApiSource,
       schema,
-      tag,
-      broadcast: false,
+      tag
     };
 
     const mockSuccessAction = {
@@ -163,7 +161,7 @@ describe('Json api middleware', () => {
 
         const actionCollStatus = performedActions[1];
         expect(actionCollStatus.type).to.equal(COLLECTION_STATUS);
-        expect(actionCollStatus.meta).to.deep.equal({ ...expectedMeta, broadcast: true });
+        expect(actionCollStatus.meta).to.deep.equal({ ...expectedMeta, tag: '*' });
         const expectedCollStatusPayload = {
           validationStatus: validationStatus.INVALID,
           busyStatus: busyStatus.IDLE,
@@ -210,7 +208,7 @@ describe('Json api middleware', () => {
         const actionCollStatusBusy = performedActions[0];
         expect(actionCollStatusBusy.type).to.equal(COLLECTION_STATUS);
         expect(actionCollStatusBusy.meta)
-          .to.deep.equal({ ...expectedMeta, tag: '', broadcast: true });
+          .to.deep.equal({ ...expectedMeta, tag: '*' });
         const expectedCollStatusBusyPayload = {
           busyStatus: busyStatus.BUSY,
           validationStatus: validationStatus.INVALID,
@@ -265,7 +263,7 @@ describe('Json api middleware', () => {
 
         const actionCollStatus = performedActions[1];
         expect(actionCollStatus.type).to.equal(COLLECTION_STATUS);
-        expect(actionCollStatus.meta).to.deep.equal({ ...expectedMeta, broadcast: true });
+        expect(actionCollStatus.meta).to.deep.equal({ ...expectedMeta, tag: '*' });
         const expectedCollStatusPayload = {
           busyStatus: busyStatus.IDLE,
           validationStatus: validationStatus.INVALID,
@@ -308,7 +306,7 @@ describe('Json api middleware', () => {
 
         const actionCollRequest = performedActions[0];
         expect(actionCollRequest.type).to.equal(COLLECTION_STATUS);
-        expect(actionCollRequest.meta).to.deep.equal({ ...expectedMeta, broadcast: true });
+        expect(actionCollRequest.meta).to.deep.equal({ ...expectedMeta, tag: '*' });
         const expectedCollStatusPayload = {
           validationStatus: validationStatus.INVALID,
           busyStatus: busyStatus.BUSY,
@@ -357,7 +355,7 @@ describe('Json api middleware', () => {
 
         const actionCollStatus = performedActions[1];
         expect(actionCollStatus.type).to.equal(COLLECTION_STATUS);
-        expect(actionCollStatus.meta).to.deep.equal({ ...expectedMeta, broadcast: true });
+        expect(actionCollStatus.meta).to.deep.equal({ ...expectedMeta, tag: '*' });
         const expectedCollStatusPayload = {
           validationStatus: validationStatus.INVALID,
           busyStatus: busyStatus.IDLE,
@@ -437,7 +435,7 @@ describe('Json api middleware', () => {
 
         const actionCollFetched = performedActions[4];
         expect(actionCollFetched.type).to.equal(COLLECTION_FETCHED);
-        expect(actionCollFetched.meta).to.deep.equal({ ...expectedMeta, broadcast: false });
+        expect(actionCollFetched.meta).to.deep.equal({ ...expectedMeta });
         expect(actionCollFetched.payload).to.deep.equal(expectedPayload.data);
 
         const successAction = performedActions[5];

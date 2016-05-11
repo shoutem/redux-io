@@ -168,7 +168,7 @@ describe('Collection reducer', () => {
     ];
     const initialState = items;
     const schema = 'schema_test';
-    const tag = 'tag_test';
+    const tag = 'tag_value';
     const reducer = collection(schema, tag, initialState);
     deepFreeze(initialState);
 
@@ -177,8 +177,7 @@ describe('Collection reducer', () => {
       payload: { validationStatus: validationStatus.INVALID, busyStatus: busyStatus.IDLE },
       meta: {
         schema,
-        tag: '',
-        broadcast: true,
+        tag: '*',
       },
     };
 
@@ -219,6 +218,18 @@ describe('Collection reducer', () => {
     expect(nextOtherState).to.eql(initialState);
     expect(nextOtherState[STATUS].validationStatus).to.eql(validationStatus.NONE);
     expect(nextOtherState[STATUS].busyStatus).to.eql(busyStatus.IDLE);
+  });
+
+  it('throws exception on reserved tag value', () => {
+    const items = [
+      { id: 1 },
+      { id: 2 },
+    ];
+    const initialState = items;
+    const schema = 'schema_test';
+    const tag = '*';
+    expect(() => collection(schema, tag, initialState))
+      .to.throw('Tag value \'*\' is reserved for redux-api-state and cannot be used.');
   });
 
   it('clears collection', () => {
