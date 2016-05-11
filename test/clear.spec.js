@@ -19,7 +19,7 @@ describe('Clear action creator', () => {
     expect(clearAction).to.deep.equal(action);
   });
 
-  it('exception on action with invalid schema', () => {
+  it('throws exception on action with invalid schema', () => {
     expect(() => clear(undefined, 'collection_test')).to.throw('Schema is invalid.');
   });
 
@@ -34,7 +34,7 @@ describe('Clear action creator', () => {
     });
   });
 
-  it('exceptio on action with invalid tag', () => {
+  it('throws exception on action with invalid tag', () => {
     const schema = 'schema_test';
     expect(() => clear(schema, {})).to.throw('Tag isn\'t string.');
   });

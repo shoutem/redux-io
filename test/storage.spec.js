@@ -32,7 +32,7 @@ describe('Storage reducer', () => {
       },
       payload: item,
     };
-    //deepFreeze(initialState);
+    deepFreeze(initialState);
     const reducer = storage(schema, initialState);
 
     const nextState = reducer(initialState, action);
@@ -56,7 +56,7 @@ describe('Storage reducer', () => {
       },
       payload: item,
     };
-    //deepFreeze(initialState);
+    deepFreeze(initialState);
     const reducer = storage(schema, initialState);
 
     const nextState = reducer(initialState, action);
@@ -82,7 +82,7 @@ describe('Storage reducer', () => {
         schema,
       },
     };
-    //deepFreeze(initialState);
+    deepFreeze(initialState);
     const reducer = storage(schema, initialState);
     const nextState = reducer(initialState, action);
     const expectedState = {
@@ -104,7 +104,7 @@ describe('Storage reducer', () => {
         schema,
       },
     };
-    //deepFreeze(initialState);
+    deepFreeze(initialState);
     const reducer = storage(schema, initialState);
     const nextState = reducer(initialState, action);
     const expectedState = {
@@ -125,7 +125,7 @@ describe('Storage reducer', () => {
       },
       payload: item,
     };
-    //deepFreeze(initialState);
+    deepFreeze(initialState);
     const reducer = storage(schema, initialState);
     const nextState = reducer(initialState, action);
 
@@ -144,7 +144,7 @@ describe('Storage reducer', () => {
       },
       payload: item,
     };
-    //deepFreeze(initialState);
+    deepFreeze(initialState);
     const reducer = storage(schema, initialState);
     const nextState = reducer(initialState, action);
 
@@ -155,7 +155,7 @@ describe('Storage reducer', () => {
   it('replaces object with same id in storage', () => {
     const item = { id: 1, value: 'a' };
     const initialState = { [item.id]: item };
-    //deepFreeze(initialState);
+    deepFreeze(initialState);
     const schema = 'schema_test';
     const reducer = storage(schema, initialState);
 
@@ -181,7 +181,7 @@ describe('Storage reducer', () => {
   it('keeps object with different id in storage', () => {
     const item1 = { id: 1, value: 'a' };
     const initialState = { [item1.id]: item1 };
-    //deepFreeze(initialState);
+    deepFreeze(initialState);
     const schema = 'schema_test';
     const reducer = storage(schema, initialState);
 
@@ -202,7 +202,7 @@ describe('Storage reducer', () => {
   it('updates item and it\'s status in state on object updating', () => {
     const item = { id: 1, value: 'a' };
     const initialState = { [item.id]: item };
-    //deepFreeze(initialState);
+    deepFreeze(initialState);
     const schema = 'schema_test';
     const reducer = storage(schema, initialState);
 
@@ -238,7 +238,7 @@ describe('Storage reducer', () => {
         schema,
       },
     };
-    //deepFreeze(initialState);
+    deepFreeze(initialState);
     const reducer = storage(schema, initialState);
     const nextState = reducer(initialState, action);
     const expectedState = {

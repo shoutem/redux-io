@@ -57,21 +57,21 @@ describe('Delete action creator', () => {
     expect(types[1].meta).to.deep.equal(expectedMeta);
   });
 
-  it('exception on invalid action with null config', () => {
+  it('throws exception on invalid action with null config', () => {
     const config = null;
     const schema = 'app.builder';
     const item = {};
     expect(() => remove(config, schema, item)).to.throw('Config isn\'t object.');
   });
 
-  it('exception on invalid action with string config', () => {
+  it('throws exception on invalid action with string config', () => {
     const config = '';
     const schema = 'app.builder';
     const item = {};
     expect(() => remove(config, schema, item)).to.throw('Config isn\'t object.');
   });
 
-  it('exception on invalid action with invalid schema', () => {
+  it('throws exception on invalid action with invalid schema', () => {
     const config = {
       headers: {
         'Content-Type': 'application/vnd.api+json',
@@ -83,7 +83,7 @@ describe('Delete action creator', () => {
     expect(() => remove(config, schema, item)).to.throw('Schema is invalid.');
   });
 
-  it('exception on invalid action with invalid item', () => {
+  it('throws exception on invalid action with invalid item', () => {
     const config = {
       headers: {
         'Content-Type': 'application/vnd.api+json',

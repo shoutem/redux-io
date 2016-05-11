@@ -68,7 +68,7 @@ describe('Create action creator', () => {
     expect(types[2]).to.equal(CREATE_ERROR);
   });
 
-  it('exception on invalid action with undefined config', () => {
+  it('throws exception on invalid action with undefined config', () => {
     const config = undefined;
 
     const schema = 'schema_test';
@@ -82,7 +82,7 @@ describe('Create action creator', () => {
     expect(() => create(config, schema, item)).to.throw('Config isn\'t object.');
   });
 
-  it('exception on invalid action with invalid schema', () => {
+  it('throws exception on invalid action with invalid schema', () => {
     const config = {
       headers: {
         'Content-Type': 'application/vnd.api+json',
@@ -101,7 +101,7 @@ describe('Create action creator', () => {
     expect(() => create(config, schema, item)).to.throw('Schema is invalid.');
   });
 
-  it('exception on invalid action with invalid item', () => {
+  it('throws exception on invalid action with invalid item', () => {
     const config = {
       headers: {
         'Content-Type': 'application/vnd.api+json',
@@ -153,15 +153,26 @@ describe('Create action creator', () => {
     store.dispatch(action)
       .then(() => {
         const performedActions = store.getActions();
-        expect(performedActions).to.have.length(4);
-        expect(performedActions[0].type).to.equal(CREATE_REQUEST);
+        expect(performedActions).to.have.length(5);
 
-        const actionObjCreated = performedActions[1];
+        const actionCollStatusBusy = performedActions[0];
+        expect(actionCollStatusBusy.type).to.equal(COLLECTION_STATUS);
+        expect(actionCollStatusBusy.meta)
+          .to.deep.equal({ ...expectedMeta, tag: '', broadcast: true });
+        const expectedCollStatusBusyPayload = {
+          busyStatus: busyStatus.BUSY,
+          validationStatus: validationStatus.INVALID,
+        };
+        expect(actionCollStatusBusy.payload).to.deep.equal(expectedCollStatusBusyPayload);
+
+        expect(performedActions[1].type).to.equal(CREATE_REQUEST);
+
+        const actionObjCreated = performedActions[2];
         expect(actionObjCreated.type).to.equal(OBJECT_CREATED);
         expect(actionObjCreated.meta).to.deep.equal(expectedMeta);
         expect(actionObjCreated.payload).to.deep.equal(expectedPayload.data);
 
-        const actionCollStatus = performedActions[2];
+        const actionCollStatus = performedActions[3];
         expect(actionCollStatus.type).to.equal(COLLECTION_STATUS);
         expect(actionCollStatus.meta).to.deep.equal({ ...expectedMeta, tag: '', broadcast: true });
         const expectedCollStatusPayload = {
@@ -170,7 +181,7 @@ describe('Create action creator', () => {
         };
         expect(actionCollStatus.payload).to.deep.equal(expectedCollStatusPayload);
 
-        const successAction = performedActions[3];
+        const successAction = performedActions[4];
         expect(successAction.type).to.equal(CREATE_SUCCESS);
         expect(successAction.meta).to.deep.equal(expectedMeta);
         expect(successAction.payload).to.deep.equal(expectedPayload);

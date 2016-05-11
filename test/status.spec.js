@@ -19,7 +19,7 @@ describe('Status metadata', () => {
     expect(isBusy(obj)).to.be.false;
   });
 
-  it('isValid returns correct boolean value', () => {
+  it('isValid returns correct value on valid', () => {
     const status = updateStatus(
       createStatus(),
       { validationStatus: validationStatus.VALID }
@@ -28,23 +28,31 @@ describe('Status metadata', () => {
     obj[STATUS] = status;
 
     expect(isValid(obj)).to.be.true;
+  });
 
-    obj[STATUS] = updateStatus(
-      status,
+  it('isValid returns correct value on invalid', () => {
+    const status = updateStatus(
+      createStatus(),
       { validationStatus: validationStatus.INVALID }
     );
-
-    expect(isValid(obj)).to.be.false;
-
-    obj[STATUS] = updateStatus(
-      status,
-      { validationStatus: validationStatus.NONE }
-    );
+    const obj = {};
+    obj[STATUS] = status;
 
     expect(isValid(obj)).to.be.false;
   });
 
-  it('isBusy returns correct boolean value', () => {
+  it('isValid returns correct value on none', () => {
+    const status = updateStatus(
+      createStatus(),
+      { validationStatus: validationStatus.NONE }
+    );
+    const obj = {};
+    obj[STATUS] = status;
+
+    expect(isValid(obj)).to.be.false;
+  });
+
+  it('isBusy returns correct value on busy', () => {
     const status = updateStatus(
       createStatus(),
       { busyStatus: busyStatus.BUSY }
@@ -53,23 +61,30 @@ describe('Status metadata', () => {
     obj[STATUS] = status;
 
     expect(isBusy(obj)).to.be.true;
+  });
 
-    obj[STATUS] = updateStatus(
-      status,
+  it('isBusy returns correct value on idle', () => {
+    const status = updateStatus(
+      createStatus(),
       { busyStatus: busyStatus.IDLE }
     );
+    const obj = {};
+    obj[STATUS] = status;
 
     expect(isBusy(obj)).to.be.false;
   });
 
-  it('update status updates timestamp to newer', () => {
+  it('update status updates timestamp to newer', (done) => {
     const obj = {};
     obj[STATUS] = createStatus();
     const initModifiedTimestamp = obj[STATUS].modifiedTimestamp;
 
-    obj[STATUS] = updateStatus(obj[STATUS], {});
-    const updatedModifiedTimestamp = obj[STATUS].modifiedTimestamp;
+    setTimeout(() => {
+      obj[STATUS] = updateStatus(obj[STATUS], {});
+      const updatedModifiedTimestamp = obj[STATUS].modifiedTimestamp;
 
-    expect(updatedModifiedTimestamp).to.be.least(initModifiedTimestamp);
+      expect(updatedModifiedTimestamp).to.be.above(initModifiedTimestamp);
+      done();
+    }, 100);
   });
 });

@@ -1,15 +1,15 @@
 export const STATUS = Symbol('status');
 
-export const validationStatus = {
-  NONE: 0,
-  INVALID: 1,
-  VALID: 2,
-};
+export const validationStatus = Object.freeze({
+  NONE: 'none',
+  INVALID: 'invalid',
+  VALID: 'valid',
+});
 
-export const busyStatus = {
-  IDLE: 0,
-  BUSY: 1,
-};
+export const busyStatus = Object.freeze({
+  IDLE: 'idle',
+  BUSY: 'busy',
+});
 
 export const createStatus = () => (
   {
@@ -27,16 +27,8 @@ export const updateStatus = (status, update) => (
   }
 );
 
-export const isValid = obj => {
-  if (obj[STATUS] && obj[STATUS].validationStatus === validationStatus.VALID) {
-    return true;
-  }
-  return false;
-};
+export const isValid = obj =>
+  obj[STATUS] && obj[STATUS].validationStatus === validationStatus.VALID;
 
-export const isBusy = obj => {
-  if (obj[STATUS] && obj[STATUS].busyStatus === busyStatus.BUSY) {
-    return true;
-  }
-  return false;
-};
+export const isBusy = obj =>
+  !!(obj[STATUS] && obj[STATUS].busyStatus === busyStatus.BUSY);

@@ -16,7 +16,7 @@ export const COLLECTION_CLEAR = '@@redux_api_state/COLLECTION_CLEAR';
 // collection is generic collection reducer that enables creating
 // typed & named collection reducers that are handling specific
 // COLLECTION_ type actions with specific collection name.
-export default (schema, tag, initialState = []) => {
+export default function collection(schema, tag, initialState = []) {
   // eslint-disable-next-line no-param-reassign
   initialState[STATUS] = createStatus();
   return (state = initialState, action) => {
@@ -65,8 +65,14 @@ export default (schema, tag, initialState = []) => {
         );
         return newState;
       }
-      default:
-        return state;
+      default: {
+        if (state[STATUS]) {
+          return state;
+        }
+        const newState = [...state];
+        newState[STATUS] = createStatus();
+        return newState;
+      }
     }
   };
-};
+}

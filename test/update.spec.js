@@ -59,21 +59,21 @@ describe('Update action creator', () => {
     expect(types[2]).to.equal(UPDATE_ERROR);
   });
 
-  it('exception on invalid action with null config', () => {
+  it('throws exception on invalid action with null config', () => {
     const config = null;
     const schema = 'app.builder';
     const item = {};
     expect(() => update(config, schema, item)).to.throw('Config isn\'t object.');
   });
 
-  it('exception on invalid action with string config', () => {
+  it('throws exception on invalid action with string config', () => {
     const config = '';
     const schema = 'app.builder';
     const item = {};
     expect(() => update(config, schema, item)).to.throw('Config isn\'t object.');
   });
 
-  it('exception on invalid action with invalid schema', () => {
+  it('throws exception on invalid action with invalid schema', () => {
     const config = {
       headers: {
         'Content-Type': 'application/vnd.api+json',
@@ -85,7 +85,7 @@ describe('Update action creator', () => {
     expect(() => update(config, schema, item)).to.throw('Schema is invalid.');
   });
 
-  it('exception on invalid action with invalid item', () => {
+  it('throws exception on invalid action with invalid item', () => {
     const config = {
       headers: {
         'Content-Type': 'application/vnd.api+json',
@@ -159,6 +159,7 @@ describe('Update action creator', () => {
           .to.deep.equal({ ...expectedMeta, tag: '', broadcast: true });
         const expectedCollStatusIdlePayload = {
           busyStatus: busyStatus.IDLE,
+          validationStatus: validationStatus.INVALID,
         };
         expect(actionCollStatusIdle.payload).to.deep.equal(expectedCollStatusIdlePayload);
 

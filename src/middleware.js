@@ -34,34 +34,39 @@ export const OBJECT_REMOVED = '@@redux_api_state/OBJECT_REMOVED';
 
 export const middlewareJsonApiSource = '@@redux_api_state/json_api';
 
-export const makeCollectionAction =
-  (sourceAction, actionType, data, schema, broadcast = true, tag = '') => {
-    if (!actionType) {
-      throw new Error('Action type is not valid.');
-    }
-    if (!data) {
-      throw new Error('Data is not valid.');
-    }
-    if (!schema) {
-      throw new Error('Schema is not valid.');
-    }
-    if (tag === undefined || tag === null) {
-      throw new Error('Tag is not valid.');
-    }
+const actionsWithoutPayload = new Set([
+  REMOVE_SUCCESS,
+  LOAD_REQUEST,
+  CREATE_REQUEST,
+]);
 
-    return {
-      type: actionType,
-      payload: data,
-      meta: {
-        ...sourceAction.meta,
-        schema,
-        tag,
-        broadcast,
-      },
-    };
+function makeCollectionAction(sourceAction, actionType, data, schema, broadcast = true, tag = '') {
+  if (!actionType) {
+    throw new Error('Action type is not valid.');
+  }
+  if (!data) {
+    throw new Error('Data is not valid.');
+  }
+  if (!schema) {
+    throw new Error('Schema is not valid.');
+  }
+  if (tag === undefined || tag === null) {
+    throw new Error('Tag is not valid.');
+  }
+
+  return {
+    type: actionType,
+    payload: data,
+    meta: {
+      ...sourceAction.meta,
+      schema,
+      tag,
+      broadcast,
+    },
   };
+}
 
-export const makeObjectAction = (sourceAction, actionType, item) => {
+function makeObjectAction(sourceAction, actionType, item) {
   if (!actionType) {
     throw new Error('Action type is not valid.');
   }
@@ -80,7 +85,38 @@ export const makeObjectAction = (sourceAction, actionType, item) => {
       schema: _.get(item, 'type'),
     },
   };
-};
+}
+
+function isValidAction(action) {
+  if (!actionHandlers[action.type]) {
+    return false;
+  }
+  // Check for meta object in action
+  if (action.meta === undefined) {
+    throw new Error('Meta is undefined.');
+  }
+  const meta = action.meta;
+  // Check if source exists
+  if (meta.source === undefined) {
+    throw new Error('Source is undefined.');
+  }
+  // Source exists but this middleware is not responsible for other source variants
+  // only for json_api
+  if (meta.source !== middlewareJsonApiSource) {
+    return false;
+  }
+  // Check that schema is defined
+  if (!meta.schema) {
+    throw new Error('Schema is invalid.');
+  }
+  // Validate payload for payload-specific action, ignore others
+  if (!actionsWithoutPayload.has(action.type)
+    && !_.has(action, 'payload.data')) {
+    throw new Error('Payload Data is invalid, expecting payload.data.');
+  }
+
+  return true;
+}
 
 const actionHandlers = {
   [LOAD_REQUEST]: (action, data, dispatch) => {
@@ -111,8 +147,15 @@ const actionHandlers = {
     // should trigger only for collections
     dispatch(makeCollectionAction(action, COLLECTION_FETCHED, data, schema, false, tag));
   },
-  [CREATE_REQUEST]: () => {
-    // nothing to do on create_request for now
+  [CREATE_REQUEST]: (action, data, dispatch) => {
+    // Change collection status to busy and invalid to prevent fetching.
+    const schema = action.meta.schema;
+    dispatch(makeCollectionAction(
+      action,
+      COLLECTION_STATUS,
+      { validationStatus: validationStatus.INVALID, busyStatus: busyStatus.BUSY },
+      schema
+    ));
   },
   [CREATE_SUCCESS]: (action, data, dispatch) => {
     // Dispatch created objects to storage and change collection status to invalid, idle
@@ -138,13 +181,13 @@ const actionHandlers = {
     data.map(item => dispatch(makeObjectAction(action, OBJECT_UPDATING, item)));
   },
   [UPDATE_SUCCESS]: (action, data, dispatch) => {
-    // Dispatch updated objects from and change collections status to idle
+    // Dispatch updated objects from and change collections status to idle & invalid
     data.map(item => dispatch(makeObjectAction(action, OBJECT_UPDATED, item)));
     const schema = action.meta.schema;
     dispatch(makeCollectionAction(
       action,
       COLLECTION_STATUS,
-      { busyStatus: busyStatus.IDLE },
+      { validationStatus: validationStatus.INVALID, busyStatus: busyStatus.IDLE },
       schema
     ));
   },
@@ -171,39 +214,6 @@ const actionHandlers = {
       schema
     ));
   },
-};
-
-const isValidAction = action => {
-  if (!actionHandlers[action.type]) {
-    return false;
-  }
-  // Check for meta object in action
-  if (action.meta === undefined) {
-    throw new Error('Meta is undefined.');
-  }
-  const meta = action.meta;
-  // Check if source exists
-  if (meta.source === undefined) {
-    throw new Error('Source is undefined.');
-  }
-  // Source exists but this middleware is not responsible for other source variants
-  // only for json_api
-  if (meta.source !== middlewareJsonApiSource) {
-    return false;
-  }
-  // Check that schema is defined
-  if (!meta.schema) {
-    throw new Error('Schema is invalid.');
-  }
-  // Validate payload for payload-specific action, ignore others
-  if (action.type !== REMOVE_SUCCESS
-    && action.type !== LOAD_REQUEST
-    && action.type !== CREATE_REQUEST
-    && !_.has(action, 'payload.data')) {
-    throw new Error('Payload Data is invalid, expecting payload.data.');
-  }
-
-  return true;
 };
 
 const getData = payload => {
