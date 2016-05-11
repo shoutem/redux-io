@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-expressions */
 import { expect } from 'chai';
 import nock from 'nock';
 import { CALL_API, apiMiddleware } from 'redux-api-middleware';
@@ -10,9 +11,13 @@ import {
   LOAD_ERROR,
   OBJECT_FETCHED,
   COLLECTION_FETCHED,
+  COLLECTION_STATUS,
   apiStateMiddleware,
 } from '../src';
 import { middlewareJsonApiSource } from '../src/middleware';
+import {
+  busyStatus,
+} from '../src/status';
 
 describe('Find action creator', () => {
   const middlewares = [thunk, apiMiddleware, apiStateMiddleware];
@@ -21,7 +26,7 @@ describe('Find action creator', () => {
   afterEach(() => {
     nock.cleanAll();
     mockStore = configureMockStore(middlewares);
-  })
+  });
 
   it('creates a valid action', () => {
     const config = {
@@ -42,13 +47,14 @@ describe('Find action creator', () => {
     expect(action[CALL_API].types).to.not.be.undefined;
 
     const types = action[CALL_API].types;
-    expect(types[0]).to.equal(LOAD_REQUEST);
-    expect(types[1].type).to.equal(LOAD_SUCCESS);
     const expectedMeta = {
       source: middlewareJsonApiSource,
       schema,
       tag,
     };
+    expect(types[0].type).to.equal(LOAD_REQUEST);
+    expect(types[0].meta).to.deep.equal(expectedMeta);
+    expect(types[1].type).to.equal(LOAD_SUCCESS);
     expect(types[1].meta).to.deep.equal(expectedMeta);
     expect(types[2]).to.equal(LOAD_ERROR);
   });
@@ -136,20 +142,27 @@ describe('Find action creator', () => {
     store.dispatch(action)
       .then(() => {
         const performedActions = store.getActions();
-        expect(performedActions).to.have.length(5);
-        expect(performedActions[0].type).to.equal(LOAD_REQUEST);
+        expect(performedActions).to.have.length(6);
 
-        const actionObjFetched = performedActions[1];
+        const actionCollStatus = performedActions[0];
+        expect(actionCollStatus.type).to.equal(COLLECTION_STATUS);
+        expect(actionCollStatus.meta).to.deep.equal({ ...expectedMeta });
+        const expectedCollStatusPayload = { busyStatus: busyStatus.BUSY };
+        expect(actionCollStatus.payload).to.deep.equal(expectedCollStatusPayload);
+
+        expect(performedActions[1].type).to.equal(LOAD_REQUEST);
+
+        const actionObjFetched = performedActions[2];
         expect(actionObjFetched.type).to.equal(OBJECT_FETCHED);
         expect(actionObjFetched.meta).to.deep.equal(expectedMeta);
         expect(actionObjFetched.payload).to.deep.equal(expectedPayload.data[0]);
 
-        const actionCollFetched = performedActions[3];
+        const actionCollFetched = performedActions[4];
         expect(actionCollFetched.type).to.equal(COLLECTION_FETCHED);
-        expect(actionCollFetched.meta).to.deep.equal(expectedMeta);
+        expect(actionCollFetched.meta).to.deep.equal({ ...expectedMeta });
         expect(actionCollFetched.payload).to.deep.equal(expectedPayload.data);
 
-        const successAction = performedActions[4];
+        const successAction = performedActions[5];
         expect(successAction.type).to.equal(LOAD_SUCCESS);
         expect(successAction.meta).to.deep.equal(expectedMeta);
         expect(successAction.payload).to.deep.equal(expectedPayload);

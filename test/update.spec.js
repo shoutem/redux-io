@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-expressions */
 import { expect } from 'chai';
 import nock from 'nock';
 import { CALL_API, apiMiddleware } from 'redux-api-middleware';
@@ -8,11 +9,16 @@ import {
   UPDATE_REQUEST,
   UPDATE_SUCCESS,
   UPDATE_ERROR,
+  OBJECT_UPDATING,
   OBJECT_UPDATED,
-  COLLECTION_INVALIDATE,
+  COLLECTION_STATUS,
   apiStateMiddleware,
 } from '../src';
 import { middlewareJsonApiSource } from '../src/middleware';
+import {
+  validationStatus,
+  busyStatus,
+} from '../src/status';
 
 describe('Update action creator', () => {
   const middlewares = [thunk, apiMiddleware, apiStateMiddleware];
@@ -21,7 +27,7 @@ describe('Update action creator', () => {
   afterEach(() => {
     nock.cleanAll();
     mockStore = configureMockStore(middlewares);
-  })
+  });
 
   it('creates a valid action', () => {
     const config = {
@@ -41,31 +47,33 @@ describe('Update action creator', () => {
     expect(action[CALL_API].types).to.not.be.undefined;
 
     const types = action[CALL_API].types;
-    expect(types[0]).to.equal(UPDATE_REQUEST);
-    expect(types[1].type).to.equal(UPDATE_SUCCESS);
     const expectedMeta = {
       source: middlewareJsonApiSource,
       schema,
     };
+    expect(types[0].type).to.equal(UPDATE_REQUEST);
+    expect(types[0].meta).to.deep.equal(expectedMeta);
+    expect(types[0].payload).to.deep.equal({ data: item });
+    expect(types[1].type).to.equal(UPDATE_SUCCESS);
     expect(types[1].meta).to.deep.equal(expectedMeta);
     expect(types[2]).to.equal(UPDATE_ERROR);
   });
 
-  it('creates an invalid action with null config', () => {
+  it('throws exception on invalid action with null config', () => {
     const config = null;
     const schema = 'app.builder';
     const item = {};
     expect(() => update(config, schema, item)).to.throw('Config isn\'t object.');
   });
 
-  it('creates an invalid action with string config', () => {
+  it('throws exception on invalid action with string config', () => {
     const config = '';
     const schema = 'app.builder';
     const item = {};
     expect(() => update(config, schema, item)).to.throw('Config isn\'t object.');
   });
 
-  it('creates an invalid action with invalid schema', () => {
+  it('throws exception on invalid action with invalid schema', () => {
     const config = {
       headers: {
         'Content-Type': 'application/vnd.api+json',
@@ -77,17 +85,32 @@ describe('Update action creator', () => {
     expect(() => update(config, schema, item)).to.throw('Schema is invalid.');
   });
 
+  it('throws exception on invalid action with invalid item', () => {
+    const config = {
+      headers: {
+        'Content-Type': 'application/vnd.api+json',
+      },
+      endpoint: 'api.test',
+    };
+    const schema = 'app.builder';
+    const item = 0;
+    expect(() => update(config, schema, item)).to.throw('Item isn\'t object.');
+  });
+
   it('produces valid storage and collection actions', done => {
     const schema = 'schema_test';
-    const item = { id: 1, type: schema };
+    const item = { id: 2, type: schema };
     const expectedMeta = {
       source: middlewareJsonApiSource,
       schema,
     };
+    const expectedPayload = {
+      data: item,
+    };
 
     nock('http://api.server.local')
       .patch('/apps/1')
-      .reply(200, { data: { id: 2, type: schema } }, { 'Content-Type': 'vnd.api+json' });
+      .reply(200, expectedPayload, { 'Content-Type': 'vnd.api+json' });
 
     const config = {
       headers: {
@@ -102,22 +125,48 @@ describe('Update action creator', () => {
     store.dispatch(action)
       .then(() => {
         const performedActions = store.getActions();
-        expect(performedActions).to.have.length(4);
-        expect(performedActions[0].type).to.equal(UPDATE_REQUEST);
 
-        const actionObjFetched = performedActions[1];
-        expect(actionObjFetched.type).to.equal(OBJECT_UPDATED);
-        expect(actionObjFetched.meta).to.deep.equal(expectedMeta);
-        expect(actionObjFetched.payload).to.deep.equal({ id: 2, type: schema });
+        expect(performedActions).to.have.length(6);
 
-        const actionCollFetched = performedActions[2];
-        expect(actionCollFetched.type).to.equal(COLLECTION_INVALIDATE);
-        expect(actionCollFetched.meta).to.deep.equal({...expectedMeta, tag: ''});
+        const actionCollStatusBusy = performedActions[0];
+        expect(actionCollStatusBusy.type).to.equal(COLLECTION_STATUS);
+        expect(actionCollStatusBusy.meta)
+          .to.deep.equal({ ...expectedMeta, tag: '*' });
+        const expectedCollStatusBusyPayload = {
+          busyStatus: busyStatus.BUSY,
+          validationStatus: validationStatus.INVALID,
+        };
+        expect(actionCollStatusBusy.payload).to.deep.equal(expectedCollStatusBusyPayload);
 
-        const successAction = performedActions[3];
+        const actionObjUpdating = performedActions[1];
+        expect(actionObjUpdating.type).to.equal(OBJECT_UPDATING);
+        expect(actionObjUpdating.meta).to.deep.equal(expectedMeta);
+        expect(actionObjUpdating.payload).to.deep.equal(item);
+
+        const actionUpdateRequest = performedActions[2];
+        expect(actionUpdateRequest.type).to.equal(UPDATE_REQUEST);
+        expect(actionUpdateRequest.meta).to.deep.equal(expectedMeta);
+        expect(actionUpdateRequest.payload).to.deep.equal(expectedPayload);
+
+        const actionObjUpdated = performedActions[3];
+        expect(actionObjUpdated.type).to.equal(OBJECT_UPDATED);
+        expect(actionObjUpdated.meta).to.deep.equal(expectedMeta);
+        expect(actionObjUpdated.payload).to.deep.equal(expectedPayload.data);
+
+        const actionCollStatusIdle = performedActions[4];
+        expect(actionCollStatusIdle.type).to.equal(COLLECTION_STATUS);
+        expect(actionCollStatusIdle.meta)
+          .to.deep.equal({ ...expectedMeta, tag: '*' });
+        const expectedCollStatusIdlePayload = {
+          busyStatus: busyStatus.IDLE,
+          validationStatus: validationStatus.INVALID,
+        };
+        expect(actionCollStatusIdle.payload).to.deep.equal(expectedCollStatusIdlePayload);
+
+        const successAction = performedActions[5];
         expect(successAction.type).to.equal(UPDATE_SUCCESS);
         expect(successAction.meta).to.deep.equal(expectedMeta);
-        expect(actionObjFetched.payload).to.deep.equal({ id: 2, type: schema });
+        expect(successAction.payload).to.deep.equal(expectedPayload);
       }).then(done).catch(done);
   });
 });

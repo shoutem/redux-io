@@ -25,6 +25,11 @@ export default (config, schema, item) => {
     throw new Error('Item isn\'t object.');
   }
 
+  const meta = {
+    source: middlewareJsonApiSource,
+    schema,
+  };
+
   return {
     [CALL_API]: {
       method: 'POST',
@@ -33,16 +38,16 @@ export default (config, schema, item) => {
         data: item,
       }),
       types: [
-        CREATE_REQUEST,
+        {
+          type: CREATE_REQUEST,
+          meta,
+        },
         {
           type: CREATE_SUCCESS,
-          meta: {
-            source: middlewareJsonApiSource,
-            schema,
-          },
+          meta,
         },
         CREATE_ERROR,
       ],
-    }
+    },
   };
 };

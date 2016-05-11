@@ -24,19 +24,24 @@ export default (config, schema, tag = '') => {
     throw new Error('Tag isn\'t string.');
   }
 
+  const meta = {
+    source: middlewareJsonApiSource,
+    schema,
+    tag,
+  };
+
   return {
     [CALL_API]: {
       method: 'GET',
       ...config,
       types: [
-        LOAD_REQUEST,
+        {
+          type: LOAD_REQUEST,
+          meta,
+        },
         {
           type: LOAD_SUCCESS,
-          meta: {
-            source: middlewareJsonApiSource,
-            schema,
-            tag,
-          },
+          meta,
         },
         LOAD_ERROR,
       ],

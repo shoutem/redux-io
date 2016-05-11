@@ -25,6 +25,11 @@ export default (config, schema, item) => {
     throw new Error('Item isn\'t object.');
   }
 
+  const meta = {
+    source: middlewareJsonApiSource,
+    schema,
+  };
+
   return {
     [CALL_API]: {
       method: 'PATCH',
@@ -33,16 +38,17 @@ export default (config, schema, item) => {
         data: item,
       }),
       types: [
-        UPDATE_REQUEST,
+        {
+          type: UPDATE_REQUEST,
+          meta,
+          payload: { data: item },
+        },
         {
           type: UPDATE_SUCCESS,
-          meta: {
-            source: middlewareJsonApiSource,
-            schema,
-          },
+          meta,
         },
         UPDATE_ERROR,
       ],
-    }
+    },
   };
 };

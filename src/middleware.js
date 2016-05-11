@@ -1,4 +1,10 @@
+/* eslint-disable no-unused-expressions */
 import _ from 'lodash';
+
+import {
+  validationStatus,
+  busyStatus,
+} from './status';
 
 export const CREATE_REQUEST = '@@redux_api_state/CREATE_REQUEST';
 export const CREATE_SUCCESS = '@@redux_api_state/CREATE_SUCCESS';
@@ -17,16 +23,24 @@ export const REMOVE_SUCCESS = '@@redux_api_state/REMOVE_SUCCESS';
 export const REMOVE_ERROR = '@@redux_api_state/REMOVE_ERROR';
 
 export const COLLECTION_FETCHED = '@@redux_api_state/COLLECTION_FETCHED';
-export const COLLECTION_INVALIDATE = '@@redux_api_state/COLLECTION_INVALIDATE';
+export const COLLECTION_STATUS = '@@redux_api_state/COLLECTION_STATUS';
 
 export const OBJECT_FETCHED = '@@redux_api_state/OBJECT_FETCHED';
+export const OBJECT_UPDATING = '@@redux_api_state/OBJECT_UPDATING';
 export const OBJECT_UPDATED = '@@redux_api_state/OBJECT_UPDATED';
 export const OBJECT_CREATED = '@@redux_api_state/OBJECT_CREATED';
+export const OBJECT_REMOVING = '@@redux_api_state/OBJECT_REMOVING';
 export const OBJECT_REMOVED = '@@redux_api_state/OBJECT_REMOVED';
 
 export const middlewareJsonApiSource = '@@redux_api_state/json_api';
 
-const makeCollectionAction = (sourceAction, actionType, data, schema, tag = '') => {
+const actionsWithoutPayload = new Set([
+  REMOVE_SUCCESS,
+  LOAD_REQUEST,
+  CREATE_REQUEST,
+]);
+
+function makeCollectionAction(sourceAction, actionType, data, schema, tag = '*') {
   if (!actionType) {
     throw new Error('Action type is not valid.');
   }
@@ -49,9 +63,9 @@ const makeCollectionAction = (sourceAction, actionType, data, schema, tag = '') 
       tag,
     },
   };
-};
+}
 
-const makeObjectAction = (sourceAction, actionType, item) => {
+function makeObjectAction(sourceAction, actionType, item) {
   if (!actionType) {
     throw new Error('Action type is not valid.');
   }
@@ -60,6 +74,9 @@ const makeObjectAction = (sourceAction, actionType, item) => {
   }
   if (!_.get(item, 'type')) {
     throw new Error('Schema is not valid.');
+  }
+  if (!_.get(item, 'id')) {
+    throw new Error('Id is not valid.');
   }
 
   return {
@@ -70,13 +87,29 @@ const makeObjectAction = (sourceAction, actionType, item) => {
       schema: _.get(item, 'type'),
     },
   };
-};
+}
 
 const actionHandlers = {
-  [LOAD_SUCCESS]: (action, data, dispatch) => {
+  [LOAD_REQUEST]: (action, data, dispatch) => {
+    // Make collection busy to prevent multiple requests
     const { schema, tag } = action.meta;
     // Validate action meta has a tag value
-    if (tag === undefined || tag === null) {
+    if (!_.isString(tag)) {
+      return;
+    }
+    dispatch(makeCollectionAction(
+      action,
+      COLLECTION_STATUS,
+      { busyStatus: busyStatus.BUSY },
+      schema,
+      tag
+    ));
+  },
+  [LOAD_SUCCESS]: (action, data, dispatch) => {
+    // Dispatch objects to storages and collection with specific tag
+    const { schema, tag } = action.meta;
+    // Validate action meta has a tag value
+    if (!_.isString(tag)) {
       return;
     }
     data.map(item => dispatch(makeObjectAction(action, OBJECT_FETCHED, item)));
@@ -84,24 +117,76 @@ const actionHandlers = {
     // should trigger only for collections
     dispatch(makeCollectionAction(action, COLLECTION_FETCHED, data, schema, tag));
   },
+  [CREATE_REQUEST]: (action, data, dispatch) => {
+    // Change collection status to busy and invalid to prevent fetching.
+    const schema = action.meta.schema;
+    dispatch(makeCollectionAction(
+      action,
+      COLLECTION_STATUS,
+      { validationStatus: validationStatus.INVALID, busyStatus: busyStatus.BUSY },
+      schema
+    ));
+  },
   [CREATE_SUCCESS]: (action, data, dispatch) => {
+    // Dispatch created objects to storage and change collection status to invalid, idle
     data.map(item => dispatch(makeObjectAction(action, OBJECT_CREATED, item)));
     const schema = action.meta.schema;
-    dispatch(makeCollectionAction(action, COLLECTION_INVALIDATE, data, schema));
+    dispatch(makeCollectionAction(
+      action,
+      COLLECTION_STATUS,
+      { validationStatus: validationStatus.INVALID, busyStatus: busyStatus.IDLE },
+      schema
+    ));
+  },
+  [UPDATE_REQUEST]: (action, data, dispatch) => {
+    // Change collection status to busy and invalid to prevent fetching and because of
+    // local changes in storage state with updated item.
+    const schema = action.meta.schema;
+    dispatch(makeCollectionAction(
+      action,
+      COLLECTION_STATUS,
+      { validationStatus: validationStatus.INVALID, busyStatus: busyStatus.BUSY },
+      schema
+    ));
+    data.map(item => dispatch(makeObjectAction(action, OBJECT_UPDATING, item)));
   },
   [UPDATE_SUCCESS]: (action, data, dispatch) => {
+    // Dispatch updated objects from and change collections status to idle & invalid
     data.map(item => dispatch(makeObjectAction(action, OBJECT_UPDATED, item)));
     const schema = action.meta.schema;
-    dispatch(makeCollectionAction(action, COLLECTION_INVALIDATE, data, schema));
+    dispatch(makeCollectionAction(
+      action,
+      COLLECTION_STATUS,
+      { validationStatus: validationStatus.INVALID, busyStatus: busyStatus.IDLE },
+      schema
+    ));
+  },
+  [REMOVE_REQUEST]: (action, data, dispatch) => {
+    // Change collections status to busy and invalid because of removing item in
+    // local storage state
+    const schema = action.meta.schema;
+    dispatch(makeCollectionAction(
+      action,
+      COLLECTION_STATUS,
+      { validationStatus: validationStatus.INVALID, busyStatus: busyStatus.BUSY },
+      schema
+    ));
+    data.map(item => dispatch(makeObjectAction(action, OBJECT_REMOVING, item)));
   },
   [REMOVE_SUCCESS]: (action, data, dispatch) => {
-    dispatch(makeObjectAction(action, OBJECT_REMOVED, action.meta.item));
+    // Remove object if already not removed during request
+    data.map(item => dispatch(makeObjectAction(action, OBJECT_REMOVED, item)));
     const schema = action.meta.schema;
-    dispatch(makeCollectionAction(action, COLLECTION_INVALIDATE, data, schema));
+    dispatch(makeCollectionAction(
+      action,
+      COLLECTION_STATUS,
+      { validationStatus: validationStatus.INVALID, busyStatus: busyStatus.IDLE },
+      schema
+    ));
   },
 };
 
-const isValidAction = action => {
+function isValidAction(action) {
   if (!actionHandlers[action.type]) {
     return false;
   }
@@ -123,15 +208,16 @@ const isValidAction = action => {
   if (!meta.schema) {
     throw new Error('Schema is invalid.');
   }
-  // Validate payload
-  if (action.type !== REMOVE_SUCCESS && !_.has(action, 'payload.data')) {
+  // Validate payload for payload-specific action, ignore others
+  if (!actionsWithoutPayload.has(action.type)
+    && !_.has(action, 'payload.data')) {
     throw new Error('Payload Data is invalid, expecting payload.data.');
   }
 
   return true;
-};
+}
 
-const getData = payload =>  {
+const getData = payload => {
   const data = payload && payload.data || [];
   return [].concat(data);
 };

@@ -1,8 +1,10 @@
 .DS_STORE
 .idea
 
+coverage
 node_modules
 lib
 
 *.log
 *.tgz
+
