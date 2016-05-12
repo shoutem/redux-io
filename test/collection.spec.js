@@ -12,6 +12,7 @@ import {
   busyStatus,
   createStatus,
  } from '../src/status';
+import { CONTEXT } from '../src/context';
 
 describe('Collection reducer', () => {
   it('has a valid initial state', () => {
@@ -19,8 +20,8 @@ describe('Collection reducer', () => {
     const state = testReducer(undefined, {});
     const expectedStatus = createStatus();
     expect(state).to.eql([]);
-    expect(state[STATUS].validationStatus).to.eql(expectedStatus.validationStatus);
-    expect(state[STATUS].busyStatus).to.eql(expectedStatus.busyStatus);
+    expect(state[CONTEXT][STATUS].validationStatus).to.eql(expectedStatus.validationStatus);
+    expect(state[CONTEXT][STATUS].busyStatus).to.eql(expectedStatus.busyStatus);
   });
 
   it('adds collection of indices on Fetch', () => {
@@ -48,8 +49,8 @@ describe('Collection reducer', () => {
     const expectedState = items.map(item => item.id);
 
     expect(nextState).to.eql(expectedState);
-    expect(nextState[STATUS].validationStatus).to.eql(validationStatus.VALID);
-    expect(nextState[STATUS].busyStatus).to.eql(busyStatus.IDLE);
+    expect(nextState[CONTEXT][STATUS].validationStatus).to.eql(validationStatus.VALID);
+    expect(nextState[CONTEXT][STATUS].busyStatus).to.eql(busyStatus.IDLE);
   });
 
   it('ignores action with different schema', () => {
@@ -74,8 +75,8 @@ describe('Collection reducer', () => {
 
     const nextState = reducer(undefined, action);
     expect(nextState).to.equal(initialState);
-    expect(nextState[STATUS].validationStatus).to.eql(validationStatus.NONE);
-    expect(nextState[STATUS].busyStatus).to.eql(busyStatus.IDLE);
+    expect(nextState[CONTEXT][STATUS].validationStatus).to.eql(validationStatus.NONE);
+    expect(nextState[CONTEXT][STATUS].busyStatus).to.eql(busyStatus.IDLE);
   });
 
   it('ignores action with different action type', () => {
@@ -100,8 +101,8 @@ describe('Collection reducer', () => {
 
     const nextState = reducer(undefined, action);
     expect(nextState).to.equal(initialState);
-    expect(nextState[STATUS].validationStatus).to.eql(validationStatus.NONE);
-    expect(nextState[STATUS].busyStatus).to.eql(busyStatus.IDLE);
+    expect(nextState[CONTEXT][STATUS].validationStatus).to.eql(validationStatus.NONE);
+    expect(nextState[CONTEXT][STATUS].busyStatus).to.eql(busyStatus.IDLE);
   });
 
   it('ignores action with different collection type', () => {
@@ -126,8 +127,8 @@ describe('Collection reducer', () => {
 
     const nextState = reducer(undefined, action);
     expect(nextState).to.equal(initialState);
-    expect(nextState[STATUS].validationStatus).to.eql(validationStatus.NONE);
-    expect(nextState[STATUS].busyStatus).to.eql(busyStatus.IDLE);
+    expect(nextState[CONTEXT][STATUS].validationStatus).to.eql(validationStatus.NONE);
+    expect(nextState[CONTEXT][STATUS].busyStatus).to.eql(busyStatus.IDLE);
   });
 
   it('re-populates list of indicies on fetch', () => {
@@ -157,8 +158,8 @@ describe('Collection reducer', () => {
     const nextState = reducer(undefined, action);
     const expectedState = itemsNew.map(item => item.id);
     expect(nextState).to.eql(expectedState);
-    expect(nextState[STATUS].validationStatus).to.eql(validationStatus.VALID);
-    expect(nextState[STATUS].busyStatus).to.eql(busyStatus.IDLE);
+    expect(nextState[CONTEXT][STATUS].validationStatus).to.eql(validationStatus.VALID);
+    expect(nextState[CONTEXT][STATUS].busyStatus).to.eql(busyStatus.IDLE);
   });
 
   it('invalidates collection with broadcast status', () => {
@@ -183,8 +184,8 @@ describe('Collection reducer', () => {
 
     const nextState = reducer(undefined, action);
     expect(nextState).to.eql(initialState);
-    expect(nextState[STATUS].validationStatus).to.eql(validationStatus.INVALID);
-    expect(nextState[STATUS].busyStatus).to.eql(busyStatus.IDLE);
+    expect(nextState[CONTEXT][STATUS].validationStatus).to.eql(validationStatus.INVALID);
+    expect(nextState[CONTEXT][STATUS].busyStatus).to.eql(busyStatus.IDLE);
   });
 
   it('change collection status to busy with non-broadcast status', () => {
@@ -211,13 +212,13 @@ describe('Collection reducer', () => {
 
     const nextState = reducer(undefined, action);
     expect(nextState).to.eql(initialState);
-    expect(nextState[STATUS].validationStatus).to.eql(validationStatus.NONE);
-    expect(nextState[STATUS].busyStatus).to.eql(busyStatus.BUSY);
+    expect(nextState[CONTEXT][STATUS].validationStatus).to.eql(validationStatus.NONE);
+    expect(nextState[CONTEXT][STATUS].busyStatus).to.eql(busyStatus.BUSY);
 
     const nextOtherState = otherReducer(undefined, action);
     expect(nextOtherState).to.eql(initialState);
-    expect(nextOtherState[STATUS].validationStatus).to.eql(validationStatus.NONE);
-    expect(nextOtherState[STATUS].busyStatus).to.eql(busyStatus.IDLE);
+    expect(nextOtherState[CONTEXT][STATUS].validationStatus).to.eql(validationStatus.NONE);
+    expect(nextOtherState[CONTEXT][STATUS].busyStatus).to.eql(busyStatus.IDLE);
   });
 
   it('throws exception on reserved tag value', () => {
@@ -254,8 +255,8 @@ describe('Collection reducer', () => {
     const nextState = reducer(undefined, action);
 
     expect(nextState).to.deep.equal([]);
-    expect(nextState[STATUS].validationStatus).to.eql(validationStatus.VALID);
-    expect(nextState[STATUS].busyStatus).to.eql(busyStatus.IDLE);
+    expect(nextState[CONTEXT][STATUS].validationStatus).to.eql(validationStatus.VALID);
+    expect(nextState[CONTEXT][STATUS].busyStatus).to.eql(busyStatus.IDLE);
   });
 
   it('adds status to collection state without status', () => {
@@ -279,9 +280,10 @@ describe('Collection reducer', () => {
     };
 
     const customState = [];
+    customState[CONTEXT] = {};
     const nextState = reducer(customState, action);
     expect(nextState).to.deep.equal(customState);
-    expect(nextState[STATUS].validationStatus).to.eql(validationStatus.NONE);
-    expect(nextState[STATUS].busyStatus).to.eql(busyStatus.IDLE);
+    expect(nextState[CONTEXT][STATUS].validationStatus).to.eql(validationStatus.NONE);
+    expect(nextState[CONTEXT][STATUS].busyStatus).to.eql(busyStatus.IDLE);
   });
 });

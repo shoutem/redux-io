@@ -10,8 +10,14 @@ import {
   createStatus,
   updateStatus,
 } from './status';
+import {
+  CONTEXT,
+  Context,
+  stateContextPropExists
+} from './context';
 
 export const COLLECTION_CLEAR = '@@redux_api_state/COLLECTION_CLEAR';
+export const COLLECTION_EXTENDED = '@@redux_api_state/COLLECTION_EXTENDED';
 
 function isValid(action, schema, tag) {
   if (_.get(action, 'meta.schema') !== schema) {
@@ -39,15 +45,26 @@ export default function collection(schema, tag, initialState = []) {
     throw new Error('Tag value \'*\' is reserved for redux-api-state and cannot be used.');
   }
   // eslint-disable-next-line no-param-reassign
-  initialState[STATUS] = createStatus();
+  initialState[CONTEXT] = {
+    [STATUS]: createStatus(),
+  };
   return (state = initialState, action) => {
     if (!isValid(action, schema, tag)) {
       return state;
     }
+    const context = new Context(state);
 
     switch (action.type) {
       case COLLECTION_FETCHED: {
         const newState = action.payload.map(item => item.id);
+        return context.updateStateContextProp(
+          newState,
+          STATUS,
+          { validationStatus: validationStatus.VALID, busyStatus: busyStatus.IDLE }
+        );
+      }
+      case COLLECTION_EXTENDED: {
+        const newState = [...state, ...action.payload];
         newState[STATUS] = updateStatus(
           state[STATUS],
           { validationStatus: validationStatus.VALID, busyStatus: busyStatus.IDLE }
@@ -56,27 +73,26 @@ export default function collection(schema, tag, initialState = []) {
       }
       case COLLECTION_CLEAR: {
         const newState = [];
-        newState[STATUS] = updateStatus(
-          state[STATUS],
+        return context.updateStateContextProp(
+          newState,
+          STATUS,
           { validationStatus: validationStatus.VALID, busyStatus: busyStatus.IDLE }
         );
-        return newState;
       }
       case COLLECTION_STATUS: {
         const newState = [...state];
-        newState[STATUS] = updateStatus(
-          state[STATUS],
+        return context.updateStateContextProp(
+          newState,
+          STATUS,
           action.payload
         );
-        return newState;
       }
       default: {
-        if (state[STATUS]) {
+        if (stateContextPropExists(state, STATUS)) {
           return state;
         }
         const newState = [...state];
-        newState[STATUS] = createStatus();
-        return newState;
+        return context.createStateContextProp(newState, STATUS, createStatus());
       }
     }
   };
