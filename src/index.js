@@ -22,6 +22,9 @@ export { remove };
 import loaded from './loaded';
 export { loaded };
 
+import created from './created';
+export { created };
+
 import clear from './clear';
 export { clear };
 
