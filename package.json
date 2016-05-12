@@ -1,16 +1,15 @@
 {
-  "name": "redux-api-state",
-  "version": "0.0.8",
+  "name": "@shoutem/redux-api-state",
+  "version": "0.0.9",
   "description": "Action creators, reducers and middleware for simple handling of normalized json api data in state",
   "main": "lib/index.js",
   "files": [
     "lib"
   ],
-  "private": false,
   "scripts": {
     "lint": "eslint src test",
-    "test": "mocha --compilers js:babel-core/register --reporter spec './test/**/*.spec.js'",
-    "coverage": "babel-node node_modules/isparta/bin/isparta cover --report text --report html node_modules/mocha/bin/_mocha -- -R spec test/*.spec.js",
+    "test": "mocha --compilers js:babel-core/register --reporter spec --recursive test",
+    "coverage": "babel-node node_modules/isparta/bin/isparta cover --report text --report html node_modules/mocha/bin/_mocha -- -R spec --recursive test",
     "build": "babel src --out-dir lib"
   },
   "repository": {
@@ -21,7 +20,9 @@
     "redux",
     "json-api",
     "normalize",
-    "simple"
+    "denormalize",
+    "simple",
+    "crud"
   ],
   "author": "Shoutem",
   "license": "MIT",
