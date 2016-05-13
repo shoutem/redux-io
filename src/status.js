@@ -32,3 +32,6 @@ export const isValid = obj =>
 
 export const isBusy = obj =>
   !!(obj[STATUS] && obj[STATUS].busyStatus === busyStatus.BUSY);
+
+export const shouldRefresh = obj =>
+  !isValid(obj) && !isBusy(obj);

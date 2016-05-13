@@ -5,6 +5,7 @@ import {
   updateStatus,
   isValid,
   isBusy,
+  shouldRefresh,
   validationStatus,
   busyStatus,
   STATUS,
@@ -72,6 +73,34 @@ describe('Status metadata', () => {
     obj[STATUS] = status;
 
     expect(isBusy(obj)).to.be.false;
+  });
+
+  it('shouldRefresh returns correct value on idle,invalid', () => {
+    const status = updateStatus(
+      createStatus(),
+      {
+        busyStatus: busyStatus.IDLE,
+        validationStatus: validationStatus.INVALID,
+      }
+    );
+    const obj = {};
+    obj[STATUS] = status;
+
+    expect(shouldRefresh(obj)).to.be.true;
+  });
+
+  it('shouldRefresh returns correct value on busy,invalid', () => {
+    const status = updateStatus(
+      createStatus(),
+      {
+        busyStatus: busyStatus.BUSY,
+        validationStatus: validationStatus.INVALID,
+      }
+    );
+    const obj = {};
+    obj[STATUS] = status;
+
+    expect(shouldRefresh(obj)).to.be.false;
   });
 
   it('update status updates timestamp to newer', (done) => {
