@@ -14,15 +14,15 @@ import {
 // holds object that you want to pass to api. Tag is not needed because all collection
 // with configured schema value as in argument of create will be invalidated upon successful
 // action of creating item on api.
-export default (config, schema, item) => {
+export default (config, schema, item = null) => {
   if (!_.isObject(config)) {
     throw new TypeError('Config isn\'t object.');
   }
   if (!_.isString(schema) || _.isEmpty(schema)) {
     throw new Error('Schema is invalid.');
   }
-  if (!_.isObject(item)) {
-    throw new Error('Item isn\'t object.');
+  if (!_.has(config, 'body') && !_.isObject(item)) {
+    throw new Error('Item is missing as argument or in config');
   }
 
   const meta = {
@@ -33,10 +33,10 @@ export default (config, schema, item) => {
   return {
     [CALL_API]: {
       method: 'POST',
-      ...config,
       body: JSON.stringify({
         data: item,
       }),
+      ...config,
       types: [
         {
           type: CREATE_REQUEST,

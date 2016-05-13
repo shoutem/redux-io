@@ -65,10 +65,83 @@ describe('Create action creator', () => {
     expect(types[0].meta).to.deep.equal(expectedMeta);
     expect(types[1].type).to.equal(CREATE_SUCCESS);
     expect(types[1].meta).to.deep.equal(expectedMeta);
-    expect(types[2]).to.equal(CREATE_ERROR);
   });
 
-  it('throws exception on invalid action with undefined config', () => {
+  it('creates a valid action with item in config', () => {
+    const item = {
+      schema,
+      id: '1',
+      attributes: {
+        name: 'Test1',
+      },
+    };
+    const config = {
+      headers: {
+        'Content-Type': 'application/vnd.api+json',
+      },
+      endpoint: 'api.test',
+      body: item,
+    };
+
+    const schema = 'schema_test';
+    const action = create(config, schema);
+
+    expect(action[CALL_API]).to.not.be.undefined;
+    expect(action[CALL_API].method).to.equal('POST');
+    expect(action[CALL_API].endpoint).to.equal(config.endpoint);
+    expect(action[CALL_API].headers).to.equal(config.headers);
+    expect(action[CALL_API].body).to.equal(item);
+    expect(action[CALL_API].types).to.not.be.undefined;
+
+    const expectedMeta = {
+      source: middlewareJsonApiSource,
+      schema,
+    };
+    const types = action[CALL_API].types;
+    expect(types[0].type).to.equal(CREATE_REQUEST);
+    expect(types[0].meta).to.deep.equal(expectedMeta);
+    expect(types[1].type).to.equal(CREATE_SUCCESS);
+    expect(types[1].meta).to.deep.equal(expectedMeta);
+  });
+
+  it('creates a valid action with item in config has priority over item in argument', () => {
+    const item = {
+      schema,
+      id: '1',
+      attributes: {
+        name: 'Test1',
+      },
+    };
+    const config = {
+      headers: {
+        'Content-Type': 'application/vnd.api+json',
+      },
+      endpoint: 'api.test',
+      body: item,
+    };
+
+    const schema = 'schema_test';
+    const action = create(config, schema, item);
+
+    expect(action[CALL_API]).to.not.be.undefined;
+    expect(action[CALL_API].method).to.equal('POST');
+    expect(action[CALL_API].endpoint).to.equal(config.endpoint);
+    expect(action[CALL_API].headers).to.equal(config.headers);
+    expect(action[CALL_API].body).to.equal(item);
+    expect(action[CALL_API].types).to.not.be.undefined;
+
+    const expectedMeta = {
+      source: middlewareJsonApiSource,
+      schema,
+    };
+    const types = action[CALL_API].types;
+    expect(types[0].type).to.equal(CREATE_REQUEST);
+    expect(types[0].meta).to.deep.equal(expectedMeta);
+    expect(types[1].type).to.equal(CREATE_SUCCESS);
+    expect(types[1].meta).to.deep.equal(expectedMeta);
+  });
+
+  it('throws exception on action with undefined config', () => {
     const config = undefined;
 
     const schema = 'schema_test';
@@ -82,7 +155,7 @@ describe('Create action creator', () => {
     expect(() => create(config, schema, item)).to.throw('Config isn\'t object.');
   });
 
-  it('throws exception on invalid action with invalid schema', () => {
+  it('throws exception on action with invalid schema', () => {
     const config = {
       headers: {
         'Content-Type': 'application/vnd.api+json',
@@ -101,7 +174,7 @@ describe('Create action creator', () => {
     expect(() => create(config, schema, item)).to.throw('Schema is invalid.');
   });
 
-  it('throws exception on invalid action with invalid item', () => {
+  it('throws exception on action with undefined item', () => {
     const config = {
       headers: {
         'Content-Type': 'application/vnd.api+json',
@@ -111,7 +184,21 @@ describe('Create action creator', () => {
 
     const schema = 'app.builder';
     const item = undefined;
-    expect(() => create(config, schema, item)).to.throw('Item isn\'t object.');
+    expect(() => create(config, schema, item))
+      .to.throw('Item is missing as argument or in config');
+  });
+
+  it('throws exception on action with missing item', () => {
+    const config = {
+      headers: {
+        'Content-Type': 'application/vnd.api+json',
+      },
+      endpoint: 'api.test',
+    };
+
+    const schema = 'app.builder';
+    expect(() => create(config, schema))
+      .to.throw('Item is missing as argument or in config');
   });
 
   it('produces valid storage and collection actions', done => {
