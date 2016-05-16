@@ -21,11 +21,19 @@ export default (config, schema, item = null) => {
   if (!_.isString(schema) || _.isEmpty(schema)) {
     throw new Error('Schema is invalid.');
   }
-  if (item !== null && !_.isObject(item)) {
-    throw new Error('Item is not valid in method argument');
-  }
-  if (!_.isObject(item) && !_.has(config, 'body')) {
-    throw new Error('Item is missing in method argument and in config.body');
+
+  let body = null;
+  if (item !== null) {
+    if (!_.isObject(item)) {
+      throw new Error('Item is not valid in method argument');
+    }
+    body = JSON.stringify({ data: item });
+  } else {
+    // we expect a body property in the config if the item is not supplied
+    if (!config.body) {
+      throw new Error('Item is missing in method argument and in config.body');
+    }
+    body = config.body;
   }
 
   const meta = {
@@ -37,7 +45,7 @@ export default (config, schema, item = null) => {
     [CALL_API]: {
       method: 'POST',
       ...config,
-      body: _.isObject(item) ? JSON.stringify({ data: item }) : config.body,
+      body,
       types: [
         {
           type: CREATE_REQUEST,
