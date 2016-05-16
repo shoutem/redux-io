@@ -21,8 +21,11 @@ export default (config, schema, item = null) => {
   if (!_.isString(schema) || _.isEmpty(schema)) {
     throw new Error('Schema is invalid.');
   }
+  if (item !== null && !_.isObject(item)) {
+    throw new Error('Item is not valid in method argument');
+  }
   if (!_.isObject(item) && !_.has(config, 'body')) {
-    throw new Error('Item is missing as an item argument or as config.body');
+    throw new Error('Item is missing in method argument and in config.body');
   }
 
   const meta = {

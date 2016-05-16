@@ -174,7 +174,7 @@ describe('Create action creator', () => {
     expect(() => create(config, schema, item)).to.throw('Schema is invalid.');
   });
 
-  it('throws exception on action with undefined item', () => {
+  it('throws exception on action with invalid item', () => {
     const config = {
       headers: {
         'Content-Type': 'application/vnd.api+json',
@@ -183,9 +183,9 @@ describe('Create action creator', () => {
     };
 
     const schema = 'app.builder';
-    const item = undefined;
+    const item = 2;
     expect(() => create(config, schema, item))
-      .to.throw('Item is missing as an item argument or as config.body');
+      .to.throw('Item is not valid in method argument');
   });
 
   it('throws exception on action with missing item', () => {
@@ -198,7 +198,7 @@ describe('Create action creator', () => {
 
     const schema = 'app.builder';
     expect(() => create(config, schema))
-      .to.throw('Item is missing as an item argument or as config.body');
+      .to.throw('Item is missing in method argument and in config.body');
   });
 
   it('produces valid storage and collection actions', done => {
