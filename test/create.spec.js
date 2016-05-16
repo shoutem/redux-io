@@ -104,7 +104,8 @@ describe('Create action creator', () => {
     expect(types[1].meta).to.deep.equal(expectedMeta);
   });
 
-  it('creates a valid action with item in config has priority over item in argument', () => {
+  it('creates a valid action with item in argument has priority over item in config.body', () => {
+    const schema = 'schema_test';
     const item = {
       schema,
       id: '1',
@@ -120,14 +121,13 @@ describe('Create action creator', () => {
       body: item,
     };
 
-    const schema = 'schema_test';
     const action = create(config, schema, item);
 
     expect(action[CALL_API]).to.not.be.undefined;
     expect(action[CALL_API].method).to.equal('POST');
     expect(action[CALL_API].endpoint).to.equal(config.endpoint);
     expect(action[CALL_API].headers).to.equal(config.headers);
-    expect(action[CALL_API].body).to.equal(item);
+    expect(action[CALL_API].body).to.equal(JSON.stringify({ data: item }));
     expect(action[CALL_API].types).to.not.be.undefined;
 
     const expectedMeta = {
@@ -152,7 +152,7 @@ describe('Create action creator', () => {
         name: 'Test1',
       },
     };
-    expect(() => create(config, schema, item)).to.throw('Config isn\'t object.');
+    expect(() => create(config, schema, item)).to.throw('Config isn\'t an object.');
   });
 
   it('throws exception on action with invalid schema', () => {
@@ -185,7 +185,7 @@ describe('Create action creator', () => {
     const schema = 'app.builder';
     const item = undefined;
     expect(() => create(config, schema, item))
-      .to.throw('Item is missing as argument or in config');
+      .to.throw('Item is missing as an item argument or as config.body');
   });
 
   it('throws exception on action with missing item', () => {
@@ -198,7 +198,7 @@ describe('Create action creator', () => {
 
     const schema = 'app.builder';
     expect(() => create(config, schema))
-      .to.throw('Item is missing as argument or in config');
+      .to.throw('Item is missing as an item argument or as config.body');
   });
 
   it('produces valid storage and collection actions', done => {

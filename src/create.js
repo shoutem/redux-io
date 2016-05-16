@@ -16,13 +16,13 @@ import {
 // action of creating item on api.
 export default (config, schema, item = null) => {
   if (!_.isObject(config)) {
-    throw new TypeError('Config isn\'t object.');
+    throw new TypeError('Config isn\'t an object.');
   }
   if (!_.isString(schema) || _.isEmpty(schema)) {
     throw new Error('Schema is invalid.');
   }
-  if (!_.has(config, 'body') && !_.isObject(item)) {
-    throw new Error('Item is missing as argument or in config');
+  if (!_.isObject(item) && !_.has(config, 'body')) {
+    throw new Error('Item is missing as an item argument or as config.body');
   }
 
   const meta = {
@@ -33,10 +33,8 @@ export default (config, schema, item = null) => {
   return {
     [CALL_API]: {
       method: 'POST',
-      body: JSON.stringify({
-        data: item,
-      }),
       ...config,
+      body: _.isObject(item) ? JSON.stringify({ data: item }) : config.body,
       types: [
         {
           type: CREATE_REQUEST,
