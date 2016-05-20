@@ -1,11 +1,11 @@
 import _ from 'lodash';
 import {
-  OBJECT_FETCHED,
-  OBJECT_CREATED,
-  OBJECT_UPDATING,
-  OBJECT_UPDATED,
-  OBJECT_REMOVING,
-  OBJECT_REMOVED,
+  OBJECTS_FETCHED,
+  OBJECTS_CREATED,
+  OBJECTS_UPDATING,
+  OBJECTS_UPDATED,
+  OBJECTS_REMOVING,
+  OBJECTS_REMOVED,
 } from './middleware';
 import {
   STATUS,
@@ -23,36 +23,47 @@ export default function storage(schema, initialState = {}) {
     if (_.get(action, 'meta.schema') !== schema) {
       return state;
     }
-    const item = action.payload;
-    if (!_.isObject(item)) {
+    const items = action.payload;
+    if (!_.isArray(items)) {
+      console.log('failed2');
       return state;
     }
-    if (!_.has(item, 'id')) {
+    if (_.some(items, item => !_.has(item, 'id'))) {
+      console.log('failed');
       return state;
     }
 
-    const status = state[item.id] ? state[item.id][STATUS] : createStatus();
     switch (action.type) {
-      case OBJECT_UPDATING: {
-        item[STATUS] = updateStatus(
-          status,
-          { validationStatus: validationStatus.INVALID, busyStatus: busyStatus.BUSY }
-        );
-        return { ...state, [item.id]: item };
+      case OBJECTS_UPDATING: {
+        const newItems = _.keyBy(items, 'id');
+        _.forEach(newItems, item => {
+          // eslint-disable-next-line no-param-reassign
+          item[STATUS] = updateStatus(
+            state[item.id] ? state[item.id][STATUS] : createStatus(),
+            { validationStatus: validationStatus.INVALID, busyStatus: busyStatus.BUSY }
+          );
+        });
+        return { ...state, ...newItems };
       }
-      case OBJECT_FETCHED:
-      case OBJECT_CREATED:
-      case OBJECT_UPDATED: {
-        item[STATUS] = updateStatus(
-          status,
-          { validationStatus: validationStatus.VALID, busyStatus: busyStatus.IDLE }
-        );
-        return { ...state, [item.id]: item };
+      case OBJECTS_FETCHED:
+      case OBJECTS_CREATED:
+      case OBJECTS_UPDATED: {
+        const newItems = _.keyBy(items, 'id');
+        _.forEach(newItems, item => {
+          // eslint-disable-next-line no-param-reassign
+          item[STATUS] = updateStatus(
+            state[item.id] ? state[item.id][STATUS] : createStatus(),
+            { validationStatus: validationStatus.VALID, busyStatus: busyStatus.IDLE }
+          );
+        });
+        const i = { ...state, ...newItems };
+        console.log(i);
+        return i;
       }
-      case OBJECT_REMOVING:
-      case OBJECT_REMOVED: {
+      case OBJECTS_REMOVING:
+      case OBJECTS_REMOVED: {
         const newState = { ...state };
-        delete newState[item.id];
+        _.forEach(items, item => delete newState[item.id]);
         return newState;
       }
       default:

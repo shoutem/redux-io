@@ -8,8 +8,7 @@ import {
   create,
   CREATE_REQUEST,
   CREATE_SUCCESS,
-  CREATE_ERROR,
-  OBJECT_CREATED,
+  OBJECTS_CREATED,
   COLLECTION_STATUS,
   apiStateMiddleware,
 } from '../src';
@@ -205,7 +204,6 @@ describe('Create action creator', () => {
     const schema = 'schema_test';
     const expectedPayload = {
       data: {
-        schema,
         id: '1',
         type: schema,
         attributes: {
@@ -253,11 +251,12 @@ describe('Create action creator', () => {
         expect(actionCollStatusBusy.payload).to.deep.equal(expectedCollStatusBusyPayload);
 
         expect(performedActions[1].type).to.equal(CREATE_REQUEST);
+        expect(performedActions[1].meta).to.deep.equal({ ...expectedMeta });
 
         const actionObjCreated = performedActions[2];
-        expect(actionObjCreated.type).to.equal(OBJECT_CREATED);
+        expect(actionObjCreated.type).to.equal(OBJECTS_CREATED);
         expect(actionObjCreated.meta).to.deep.equal(expectedMeta);
-        expect(actionObjCreated.payload).to.deep.equal(expectedPayload.data);
+        expect(actionObjCreated.payload).to.deep.equal([expectedPayload.data]);
 
         const actionCollStatus = performedActions[3];
         expect(actionCollStatus.type).to.equal(COLLECTION_STATUS);

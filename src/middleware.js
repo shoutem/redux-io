@@ -25,12 +25,12 @@ export const REMOVE_ERROR = '@@redux_api_state/REMOVE_ERROR';
 export const COLLECTION_FETCHED = '@@redux_api_state/COLLECTION_FETCHED';
 export const COLLECTION_STATUS = '@@redux_api_state/COLLECTION_STATUS';
 
-export const OBJECT_FETCHED = '@@redux_api_state/OBJECT_FETCHED';
-export const OBJECT_UPDATING = '@@redux_api_state/OBJECT_UPDATING';
-export const OBJECT_UPDATED = '@@redux_api_state/OBJECT_UPDATED';
-export const OBJECT_CREATED = '@@redux_api_state/OBJECT_CREATED';
-export const OBJECT_REMOVING = '@@redux_api_state/OBJECT_REMOVING';
-export const OBJECT_REMOVED = '@@redux_api_state/OBJECT_REMOVED';
+export const OBJECTS_FETCHED = '@@redux_api_state/OBJECTS_FETCHED';
+export const OBJECTS_UPDATING = '@@redux_api_state/OBJECTS_UPDATING';
+export const OBJECTS_UPDATED = '@@redux_api_state/OBJECTS_UPDATED';
+export const OBJECTS_CREATED = '@@redux_api_state/OBJECTS_CREATED';
+export const OBJECTS_REMOVING = '@@redux_api_state/OBJECTS_REMOVING';
+export const OBJECTS_REMOVED = '@@redux_api_state/OBJECTS_REMOVED';
 
 export const middlewareJsonApiSource = '@@redux_api_state/json_api';
 
@@ -65,26 +65,23 @@ function makeCollectionAction(sourceAction, actionType, data, schema, tag = '*')
   };
 }
 
-function makeObjectAction(sourceAction, actionType, item) {
+function makeObjectsAction(sourceAction, actionType, items, schema) {
   if (!actionType) {
     throw new Error('Action type is not valid.');
   }
-  if (!item) {
+  if (!items) {
     throw new Error('Data is not valid.');
   }
-  if (!_.get(item, 'type')) {
+  if (!schema) {
     throw new Error('Schema is not valid.');
-  }
-  if (!_.get(item, 'id')) {
-    throw new Error('Id is not valid.');
   }
 
   return {
     type: actionType,
-    payload: item,
+    payload: items,
     meta: {
       ...sourceAction.meta,
-      schema: _.get(item, 'type'),
+      schema,
     },
   };
 }
@@ -112,7 +109,7 @@ const actionHandlers = {
     if (!_.isString(tag)) {
       return;
     }
-    data.map(item => dispatch(makeObjectAction(action, OBJECT_FETCHED, item)));
+    dispatch(makeObjectsAction(action, OBJECTS_FETCHED, data, schema));
     // TODO: once when we support findOne action and single reducer, COLLECTION_FETCHED
     // should trigger only for collections
     dispatch(makeCollectionAction(action, COLLECTION_FETCHED, data, schema, tag));
@@ -129,8 +126,8 @@ const actionHandlers = {
   },
   [CREATE_SUCCESS]: (action, data, dispatch) => {
     // Dispatch created objects to storage and change collection status to invalid, idle
-    data.map(item => dispatch(makeObjectAction(action, OBJECT_CREATED, item)));
     const schema = action.meta.schema;
+    dispatch(makeObjectsAction(action, OBJECTS_CREATED, data, schema))
     dispatch(makeCollectionAction(
       action,
       COLLECTION_STATUS,
@@ -148,12 +145,12 @@ const actionHandlers = {
       { validationStatus: validationStatus.INVALID, busyStatus: busyStatus.BUSY },
       schema
     ));
-    data.map(item => dispatch(makeObjectAction(action, OBJECT_UPDATING, item)));
+    dispatch(makeObjectsAction(action, OBJECTS_UPDATING, data, schema));
   },
   [UPDATE_SUCCESS]: (action, data, dispatch) => {
     // Dispatch updated objects from and change collections status to idle & invalid
-    data.map(item => dispatch(makeObjectAction(action, OBJECT_UPDATED, item)));
     const schema = action.meta.schema;
+    dispatch(makeObjectsAction(action, OBJECTS_UPDATED, data, schema));
     dispatch(makeCollectionAction(
       action,
       COLLECTION_STATUS,
@@ -171,12 +168,12 @@ const actionHandlers = {
       { validationStatus: validationStatus.INVALID, busyStatus: busyStatus.BUSY },
       schema
     ));
-    data.map(item => dispatch(makeObjectAction(action, OBJECT_REMOVING, item)));
+    dispatch(makeObjectsAction(action, OBJECTS_REMOVING, data, schema));
   },
   [REMOVE_SUCCESS]: (action, data, dispatch) => {
     // Remove object if already not removed during request
-    data.map(item => dispatch(makeObjectAction(action, OBJECT_REMOVED, item)));
     const schema = action.meta.schema;
+    dispatch(makeObjectsAction(action, OBJECTS_REMOVED, data, schema));
     dispatch(makeCollectionAction(
       action,
       COLLECTION_STATUS,
@@ -235,7 +232,10 @@ export default store => next => action => {
 
   // First dispatch included objects
   const included = getIncluded(action.payload);
-  included.map(item => dispatch(makeObjectAction(action, OBJECT_FETCHED, item)));
+  const includeSchemasMap = _.groupBy(included, 'type');
+  _.forEach(includeSchemasMap, (items, schema) =>
+    dispatch(makeObjectsAction(action, OBJECTS_FETCHED, items, schema))
+  );
 
   // Find handler for supported action type to make appropriate logic
   const data = getData(action.payload);

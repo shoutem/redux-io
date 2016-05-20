@@ -2,11 +2,11 @@ import { expect } from 'chai';
 import deepFreeze from 'deep-freeze';
 import {
   storage,
-  OBJECT_CREATED,
-  OBJECT_FETCHED,
-  OBJECT_REMOVING,
-  OBJECT_REMOVED,
-  OBJECT_UPDATING,
+  OBJECTS_CREATED,
+  OBJECTS_FETCHED,
+  OBJECTS_REMOVING,
+  OBJECTS_REMOVED,
+  OBJECTS_UPDATING,
 } from '../src';
 import {
   STATUS,
@@ -26,11 +26,11 @@ describe('Storage reducer', () => {
     const item = { id: 1 };
     const schema = 'schema_test';
     const action = {
-      type: OBJECT_FETCHED,
+      type: OBJECTS_FETCHED,
       meta: {
         schema,
       },
-      payload: item,
+      payload: [item],
     };
     deepFreeze(initialState);
     const reducer = storage(schema, initialState);
@@ -50,11 +50,11 @@ describe('Storage reducer', () => {
     const item = { id: 1 };
     const schema = 'schema_test';
     const action = {
-      type: OBJECT_CREATED,
+      type: OBJECTS_CREATED,
       meta: {
         schema,
       },
-      payload: item,
+      payload: [item],
     };
     deepFreeze(initialState);
     const reducer = storage(schema, initialState);
@@ -76,8 +76,8 @@ describe('Storage reducer', () => {
     };
     const schema = 'schema_test';
     const action = {
-      type: OBJECT_REMOVED,
-      payload: { id: 1 },
+      type: OBJECTS_REMOVED,
+      payload: [{ id: 1 }],
       meta: {
         schema,
       },
@@ -98,7 +98,7 @@ describe('Storage reducer', () => {
     };
     const schema = 'schema_test';
     const action = {
-      type: OBJECT_REMOVED,
+      type: OBJECTS_REMOVED,
       payload: { id: 5 },
       meta: {
         schema,
@@ -119,11 +119,11 @@ describe('Storage reducer', () => {
     const item = { id: 1 };
     const schema = 'schema_test';
     const action = {
-      type: OBJECT_FETCHED,
+      type: OBJECTS_FETCHED,
       meta: {
         schema: 'test2',
       },
-      payload: item,
+      payload: [item],
     };
     deepFreeze(initialState);
     const reducer = storage(schema, initialState);
@@ -138,11 +138,11 @@ describe('Storage reducer', () => {
     const item = { id: 1 };
     const schema = 'schema_test';
     const action = {
-      type: 'OBJECT_FETCHED',
+      type: 'OBJECTS_FETCHED',
       meta: {
         schema,
       },
-      payload: item,
+      payload: [item],
     };
     deepFreeze(initialState);
     const reducer = storage(schema, initialState);
@@ -161,11 +161,11 @@ describe('Storage reducer', () => {
 
     const itemNew = { id: 1, value: 'b' };
     const action = {
-      type: OBJECT_FETCHED,
+      type: OBJECTS_FETCHED,
       meta: {
         schema,
       },
-      payload: itemNew,
+      payload: [itemNew],
     };
 
     const nextState = reducer(initialState, action);
@@ -187,11 +187,11 @@ describe('Storage reducer', () => {
 
     const item2 = { id: 2, value: 'b' };
     const action = {
-      type: OBJECT_FETCHED,
+      type: OBJECTS_FETCHED,
       meta: {
         schema,
       },
-      payload: item2,
+      payload: [item2],
     };
 
     const nextState = reducer(initialState, action);
@@ -208,11 +208,11 @@ describe('Storage reducer', () => {
 
     const itemNew = { id: 1, value: 'b' };
     const action = {
-      type: OBJECT_UPDATING,
+      type: OBJECTS_UPDATING,
       meta: {
         schema,
       },
-      payload: itemNew,
+      payload: [itemNew],
     };
 
     const nextState = reducer(initialState, action);
@@ -232,8 +232,8 @@ describe('Storage reducer', () => {
     };
     const schema = 'schema_test';
     const action = {
-      type: OBJECT_REMOVING,
-      payload: { id: 1 },
+      type: OBJECTS_REMOVING,
+      payload: [{ id: 1 }],
       meta: {
         schema,
       },
@@ -258,7 +258,7 @@ describe('Storage reducer', () => {
         schema,
         tag: 'custom tag',
       },
-      payload: item,
+      payload: [item],
     };
     deepFreeze(initialState);
     const reducer = storage(schema, initialState);
@@ -276,11 +276,11 @@ describe('Storage reducer', () => {
     const item = { name: 1 };
     const schema = 'schema_test';
     const action = {
-      type: OBJECT_FETCHED,
+      type: OBJECTS_FETCHED,
       meta: {
         schema,
       },
-      payload: item,
+      payload: [item],
     };
     deepFreeze(initialState);
     const reducer = storage(schema, initialState);
@@ -297,11 +297,11 @@ describe('Storage reducer', () => {
     const initialState = {};
     const schema = 'schema_test';
     const action = {
-      type: OBJECT_FETCHED,
+      type: OBJECTS_FETCHED,
       meta: {
         schema,
       },
-      payload: undefined,
+      payload: [undefined],
     };
     deepFreeze(initialState);
     const reducer = storage(schema, initialState);

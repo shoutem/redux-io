@@ -8,8 +8,8 @@ import {
   remove,
   REMOVE_REQUEST,
   REMOVE_SUCCESS,
-  OBJECT_REMOVING,
-  OBJECT_REMOVED,
+  OBJECTS_REMOVING,
+  OBJECTS_REMOVED,
   COLLECTION_STATUS,
   apiStateMiddleware,
 } from '../src';
@@ -133,13 +133,13 @@ describe('Delete action creator', () => {
         expect(actionCollBusyRequest.payload).to.deep.equal(expectedCollBusyStatusPayload);
 
         const actionObjDeleting = performedActions[1];
-        expect(actionObjDeleting.type).to.equal(OBJECT_REMOVING);
+        expect(actionObjDeleting.type).to.equal(OBJECTS_REMOVING);
         expect(actionObjDeleting.meta).to.deep.equal(expectedMeta);
 
         expect(performedActions[2].type).to.equal(REMOVE_REQUEST);
 
         const actionObjRemoved = performedActions[3];
-        expect(actionObjRemoved.type).to.equal(OBJECT_REMOVED);
+        expect(actionObjRemoved.type).to.equal(OBJECTS_REMOVED);
         expect(actionObjRemoved.meta).to.deep.equal(expectedMeta);
 
         const actionCollStatus = performedActions[4];

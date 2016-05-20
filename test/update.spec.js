@@ -9,8 +9,8 @@ import {
   UPDATE_REQUEST,
   UPDATE_SUCCESS,
   UPDATE_ERROR,
-  OBJECT_UPDATING,
-  OBJECT_UPDATED,
+  OBJECTS_UPDATING,
+  OBJECTS_UPDATED,
   COLLECTION_STATUS,
   apiStateMiddleware,
 } from '../src';
@@ -139,9 +139,9 @@ describe('Update action creator', () => {
         expect(actionCollStatusBusy.payload).to.deep.equal(expectedCollStatusBusyPayload);
 
         const actionObjUpdating = performedActions[1];
-        expect(actionObjUpdating.type).to.equal(OBJECT_UPDATING);
+        expect(actionObjUpdating.type).to.equal(OBJECTS_UPDATING);
         expect(actionObjUpdating.meta).to.deep.equal(expectedMeta);
-        expect(actionObjUpdating.payload).to.deep.equal(item);
+        expect(actionObjUpdating.payload).to.deep.equal([item]);
 
         const actionUpdateRequest = performedActions[2];
         expect(actionUpdateRequest.type).to.equal(UPDATE_REQUEST);
@@ -149,9 +149,9 @@ describe('Update action creator', () => {
         expect(actionUpdateRequest.payload).to.deep.equal(expectedPayload);
 
         const actionObjUpdated = performedActions[3];
-        expect(actionObjUpdated.type).to.equal(OBJECT_UPDATED);
+        expect(actionObjUpdated.type).to.equal(OBJECTS_UPDATED);
         expect(actionObjUpdated.meta).to.deep.equal(expectedMeta);
-        expect(actionObjUpdated.payload).to.deep.equal(expectedPayload.data);
+        expect(actionObjUpdated.payload).to.deep.equal([item]);
 
         const actionCollStatusIdle = performedActions[4];
         expect(actionCollStatusIdle.type).to.equal(COLLECTION_STATUS);

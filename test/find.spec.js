@@ -9,7 +9,7 @@ import {
   LOAD_REQUEST,
   LOAD_SUCCESS,
   LOAD_ERROR,
-  OBJECT_FETCHED,
+  OBJECTS_FETCHED,
   COLLECTION_FETCHED,
   COLLECTION_STATUS,
   apiStateMiddleware,
@@ -142,7 +142,7 @@ describe('Find action creator', () => {
     store.dispatch(action)
       .then(() => {
         const performedActions = store.getActions();
-        expect(performedActions).to.have.length(6);
+        expect(performedActions).to.have.length(5);
 
         const actionCollStatus = performedActions[0];
         expect(actionCollStatus.type).to.equal(COLLECTION_STATUS);
@@ -151,18 +151,19 @@ describe('Find action creator', () => {
         expect(actionCollStatus.payload).to.deep.equal(expectedCollStatusPayload);
 
         expect(performedActions[1].type).to.equal(LOAD_REQUEST);
+        expect(performedActions[1].meta).to.deep.equal({ ...expectedMeta });
 
         const actionObjFetched = performedActions[2];
-        expect(actionObjFetched.type).to.equal(OBJECT_FETCHED);
+        expect(actionObjFetched.type).to.equal(OBJECTS_FETCHED);
         expect(actionObjFetched.meta).to.deep.equal(expectedMeta);
-        expect(actionObjFetched.payload).to.deep.equal(expectedPayload.data[0]);
+        expect(actionObjFetched.payload).to.deep.equal(expectedPayload.data);
 
-        const actionCollFetched = performedActions[4];
+        const actionCollFetched = performedActions[3];
         expect(actionCollFetched.type).to.equal(COLLECTION_FETCHED);
         expect(actionCollFetched.meta).to.deep.equal({ ...expectedMeta });
         expect(actionCollFetched.payload).to.deep.equal(expectedPayload.data);
 
-        const successAction = performedActions[5];
+        const successAction = performedActions[4];
         expect(successAction.type).to.equal(LOAD_SUCCESS);
         expect(successAction.meta).to.deep.equal(expectedMeta);
         expect(successAction.payload).to.deep.equal(expectedPayload);
