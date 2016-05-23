@@ -92,7 +92,7 @@ describe('Json api middleware', () => {
     const expectedMeta = {
       source: middlewareJsonApiSource,
       schema,
-      tag
+      tag,
     };
 
     const mockSuccessAction = {
@@ -424,8 +424,11 @@ describe('Json api middleware', () => {
 
         const actionObjIncludedFetched = performedActions[0];
         expect(actionObjIncludedFetched.type).to.equal(OBJECT_FETCHED);
-        expect(actionObjIncludedFetched.meta)
-          .to.deep.equal({ ...expectedMeta, schema: includedSchema, transformation: {}  });
+        expect(actionObjIncludedFetched.meta).to.deep.equal({
+          ...expectedMeta,
+          schema: includedSchema,
+          transformation: {},
+        });
         expect(actionObjIncludedFetched.payload).to.deep.equal(expectedPayload.included[0]);
 
         const actionObjFetched = performedActions[2];
@@ -514,7 +517,7 @@ describe('Json api middleware', () => {
         const transformationFirstObj = {
           author: 'author',
           places: 'places',
-        }
+        };
         const expectedMetaFirstObject = {
           ...expectedMeta,
           transformation: transformationFirstObj,
@@ -526,14 +529,13 @@ describe('Json api middleware', () => {
         expect(actionSecondObjFetched.type).to.equal(OBJECT_FETCHED);
         const transformationSecondObj = {
           owner: 'owner',
-        }
+        };
         const expectedMetaSecondObject = {
           ...expectedMeta,
           transformation: transformationSecondObj,
         };
         expect(actionSecondObjFetched.meta).to.deep.equal(expectedMetaSecondObject);
         expect(actionSecondObjFetched.payload).to.deep.equal(expectedPayload.data[1]);
-
       }).then(done).catch(done);
   });
 

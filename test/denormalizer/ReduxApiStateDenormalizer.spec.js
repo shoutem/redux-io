@@ -4,65 +4,63 @@ import { createSchemasMap } from '../../src/denormalizer/ReduxApiStateDenormaliz
 
 function createStorageMap() {
   return {
-    'type1': 'storage.type1',
+    type1: 'storage.type1',
     'type2.test': 'storage["type2.test"]',
-  }
+  };
 }
 
-function getStore() {
-  return {
-    storage: {
-      type1: {
-        type1Id1: {
-          id: 'type1Id1',
-          type: 'type1',
-          attributes: {
-            name: 'type1Id1'
+const getStore = () => ({
+  storage: {
+    type1: {
+      type1Id1: {
+        id: 'type1Id1',
+        type: 'type1',
+        attributes: {
+          name: 'type1Id1',
+        },
+        relationships: {
+          type1: {
+            data: [
+              { id: 'type1Id2', type: 'type1' },
+              { id: 'type1Id3', type: 'type1' },
+            ],
           },
-          relationships: {
-            type1: {
-              data: [
-                { id: 'type1Id2', type: 'type1' },
-                { id: 'type1Id3', type: 'type1' },
-              ]
+          'type2.test': {
+            data: {
+              id: 'type2Id1', type: 'type2.test',
             },
-            'type2.test': {
-              data: {
-                id: 'type2Id1', type: 'type2.test'
-              }
-            }
-          }
-        },
-        type1Id2: {
-          id: 'type1Id2',
-          type: 'type1',
-          attributes: { name: 'type1Id2' },
-        },
-        type1Id3: {
-          id: 'type1Id3',
-          type: 'type1',
-          attributes: { name: 'type1Id3' },
-          relationships: {
-            type1: {
-              data: [
-                { id: 'type1Id2', type: 'type1' }
-              ]
-            }
-          }
+          },
         },
       },
-      'type2.test': {
-        type2Id1: {
-          id: 'type2Id1',
-          type: 'type2.test',
-          attributes: {
-            name: 'type2Id1',
+      type1Id2: {
+        id: 'type1Id2',
+        type: 'type1',
+        attributes: { name: 'type1Id2' },
+      },
+      type1Id3: {
+        id: 'type1Id3',
+        type: 'type1',
+        attributes: { name: 'type1Id3' },
+        relationships: {
+          type1: {
+            data: [
+              { id: 'type1Id2', type: 'type1' },
+            ],
           },
-        }
-      }
+        },
+      },
     },
-  }
-}
+    'type2.test': {
+      type2Id1: {
+        id: 'type2Id1',
+        type: 'type2.test',
+        attributes: {
+          name: 'type2Id1',
+        },
+      },
+    },
+  },
+});
 
 describe('ReduxApiStateDenormalizer', () => {
   describe('new instance', () => {
@@ -84,7 +82,7 @@ describe('ReduxApiStateDenormalizer', () => {
         'type2.test': {
           id: 'type2Id1',
           type: 'type2.test',
-          name: 'type2Id1'
+          name: 'type2Id1',
         },
         type1: [
           { id: 'type1Id2', type: 'type1', name: 'type1Id2' },
@@ -92,9 +90,9 @@ describe('ReduxApiStateDenormalizer', () => {
             id: 'type1Id3',
             type: 'type1',
             name: 'type1Id3',
-            type1: [{ id: 'type1Id2', type: 'type1', name: 'type1Id2' }]
+            type1: [{ id: 'type1Id2', type: 'type1', name: 'type1Id2' }],
           },
-        ]
+        ],
       };
       const storage = createSchemasMap(getStore(), createStorageMap());
 
@@ -118,7 +116,7 @@ describe('ReduxApiStateDenormalizer', () => {
           'type2.test': {
             id: 'type2Id1',
             type: 'type2.test',
-            name: 'type2Id1'
+            name: 'type2Id1',
           },
           type1: [
             { id: 'type1Id2', type: 'type1', name: 'type1Id2' },
@@ -126,10 +124,10 @@ describe('ReduxApiStateDenormalizer', () => {
               id: 'type1Id3',
               type: 'type1',
               name: 'type1Id3',
-              type1: [{  id: 'type1Id2', type: 'type1', name: 'type1Id2' }]
+              type1: [{ id: 'type1Id2', type: 'type1', name: 'type1Id2' }],
             },
-          ]
-        }
+          ],
+        },
       ];
       const denormalizedData =
         denormalizer.denormalizeCollection(['type1Id1'], 'type1');

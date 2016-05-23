@@ -5,10 +5,10 @@ function getStorage(getStore, storagePath) {
   const store = getStore();
 
   if (!storagePath) {
-    return store
+    return store;
   }
 
-  return _.get(getStore(), storagePath)
+  return _.get(getStore(), storagePath);
 }
 
 /**

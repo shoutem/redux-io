@@ -55,6 +55,6 @@
     "redux": "^3.3.1",
     "redux-api-middleware": "^1.0.0",
     "redux-thunk": "^2.0.0",
-    "@shoutem/json-api-denormalizer": "^0.2.3"
+    "@shoutem/json-api-denormalizer": "^0.2.7"
   }
 }

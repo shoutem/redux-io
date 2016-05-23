@@ -3,7 +3,6 @@ import {
   COLLECTION_CLEAR,
   clear,
 } from '../src';
-import deepFreeze from 'deep-freeze';
 
 describe('Clear action creator', () => {
   it('creates valid action', () => {

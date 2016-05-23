@@ -8,7 +8,6 @@ import {
   create,
   CREATE_REQUEST,
   CREATE_SUCCESS,
-  CREATE_ERROR,
   OBJECT_CREATED,
   COLLECTION_STATUS,
   apiStateMiddleware,
@@ -68,6 +67,7 @@ describe('Create action creator', () => {
   });
 
   it('creates a valid action with item in config', () => {
+    const schema = 'schema_test';
     const item = {
       schema,
       id: '1',
@@ -82,8 +82,6 @@ describe('Create action creator', () => {
       endpoint: 'api.test',
       body: item,
     };
-
-    const schema = 'schema_test';
     const action = create(config, schema);
 
     expect(action[CALL_API]).to.not.be.undefined;

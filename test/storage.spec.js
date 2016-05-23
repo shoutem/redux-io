@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-expressions */
 import { expect } from 'chai';
 import deepFreeze from 'deep-freeze';
 import {
@@ -434,6 +435,9 @@ describe('Storage reducer', () => {
     expect(nextStateItem).to.deep.equal(expectedItem);
     expect(nextStateItem[STATUS].validationStatus).to.eql(validationStatus.INVALID);
     expect(nextStateItem[STATUS].busyStatus).to.eql(busyStatus.BUSY);
-    expect(nextStateItem[STATUS].transformation).to.eql({ ...transformation, ...transformationNew });
+    expect(nextStateItem[STATUS].transformation).to.eql({
+      ...transformation,
+      ...transformationNew,
+    });
   });
 });

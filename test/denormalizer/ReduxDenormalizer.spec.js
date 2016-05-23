@@ -1,12 +1,6 @@
+/* eslint-disable no-new */
 import { assert } from 'chai';
 import ReduxDenormalizer from '../../src/denormalizer/ReduxDenormalizer';
-
-function createTargetDescriptor(id, type) {
-  return {
-    id,
-    type,
-  }
-}
 
 function getStore() {
   return {
@@ -16,21 +10,21 @@ function getStore() {
           attributes: {
             id: 'type1Id1',
             type: 'type1',
-            name: 'type1Id1'
+            name: 'type1Id1',
           },
           relationships: {
             type1: {
               data: [
                 { id: 'type1Id2', type: 'type1' },
                 { id: 'type1Id3', type: 'type1' },
-              ]
+              ],
             },
             type2: {
               data: {
-                id: 'type2Id1', type: 'type2'
-              }
-            }
-          }
+                id: 'type2Id1', type: 'type2',
+              },
+            },
+          },
         },
         type1Id2: {
           id: 'type1Id2',
@@ -44,10 +38,10 @@ function getStore() {
           relationships: {
             type1: {
               data: [
-                { id: 'type1Id2', type: 'type1' }
-              ]
-            }
-          }
+                { id: 'type1Id2', type: 'type1' },
+              ],
+            },
+          },
         },
       },
       type2: {
@@ -57,10 +51,10 @@ function getStore() {
           attributes: {
             name: 'type2Id1',
           },
-        }
-      }
+        },
+      },
     },
-  }
+  };
 }
 
 describe('ReduxDenormalizer', () => {
@@ -107,7 +101,7 @@ describe('ReduxDenormalizer', () => {
         type2: {
           id: 'type2Id1',
           type: 'type2',
-          name: 'type2Id1'
+          name: 'type2Id1',
         },
         type1: [
           { id: 'type1Id2', type: 'type1', name: 'type1Id2' },
@@ -115,9 +109,9 @@ describe('ReduxDenormalizer', () => {
             id: 'type1Id3',
             type: 'type1',
             name: 'type1Id3',
-            type1: [{ id: 'type1Id2', type: 'type1', name: 'type1Id2' }]
+            type1: [{ id: 'type1Id2', type: 'type1', name: 'type1Id2' }],
           },
-        ]
+        ],
       };
       const denormalizedData =
         denormalizer.denormalizeItem({ id: 'type1Id1', type: 'type1' });
@@ -136,7 +130,7 @@ describe('ReduxDenormalizer', () => {
         type2: {
           id: 'type2Id1',
           type: 'type2',
-          name: 'type2Id1'
+          name: 'type2Id1',
         },
         type1: [
           { id: 'type1Id2', type: 'type1', name: 'type1Id2' },
@@ -144,9 +138,9 @@ describe('ReduxDenormalizer', () => {
             id: 'type1Id3',
             type: 'type1',
             name: 'type1Id3',
-            type1: [{ id: 'type1Id2', type: 'type1', name: 'type1Id2' }]
+            type1: [{ id: 'type1Id2', type: 'type1', name: 'type1Id2' }],
           },
-        ]
+        ],
       };
       const denormalizedData =
         denormalizer.denormalizeItem(
@@ -176,7 +170,7 @@ describe('ReduxDenormalizer', () => {
           type2: {
             id: 'type2Id1',
             type: 'type2',
-            name: 'type2Id1'
+            name: 'type2Id1',
           },
           type1: [
             { id: 'type1Id2', type: 'type1', name: 'type1Id2' },
@@ -184,15 +178,15 @@ describe('ReduxDenormalizer', () => {
               id: 'type1Id3',
               type: 'type1',
               name: 'type1Id3',
-              type1: [{ id: 'type1Id2', type: 'type1', name: 'type1Id2' }]
+              type1: [{ id: 'type1Id2', type: 'type1', name: 'type1Id2' }],
             },
-          ]
+          ],
         },
         {
           id: 'type2Id1',
           type: 'type2',
-          name: 'type2Id1'
-        }
+          name: 'type2Id1',
+        },
       ];
       const denormalizedData =
         denormalizer.denormalizeCollection([
@@ -215,7 +209,7 @@ describe('ReduxDenormalizer', () => {
           type2: {
             id: 'type2Id1',
             type: 'type2',
-            name: 'type2Id1'
+            name: 'type2Id1',
           },
           type1: [
             { id: 'type1Id2', type: 'type1', name: 'type1Id2' },
@@ -223,15 +217,15 @@ describe('ReduxDenormalizer', () => {
               id: 'type1Id3',
               type: 'type1',
               name: 'type1Id3',
-              type1: [{ id: 'type1Id2', type: 'type1', name: 'type1Id2' }]
+              type1: [{ id: 'type1Id2', type: 'type1', name: 'type1Id2' }],
             },
-          ]
+          ],
         },
         {
           id: 'type2Id1',
           type: 'type2',
-          name: 'type2Id1'
-        }
+          name: 'type2Id1',
+        },
       ];
       const denormalizedData =
         denormalizer.denormalizeCollection(
