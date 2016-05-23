@@ -59,5 +59,5 @@ export {
 } from './middleware';
 
 
-import { isValid, isBusy, shouldRefresh } from './status';
-export { isValid, isBusy, shouldRefresh };
+import { isValid, isBusy, shouldRefresh, getTransformation } from './status';
+export { isValid, isBusy, shouldRefresh, getTransformation };

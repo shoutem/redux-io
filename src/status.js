@@ -28,6 +28,8 @@ export const updateStatus = (status, update) => (
   }
 );
 
+export const getTransformation = obj => obj[STATUS] && obj[STATUS].transformation;
+
 export const isValid = obj =>
   obj[STATUS] && obj[STATUS].validationStatus === validationStatus.VALID;
 
