@@ -36,7 +36,7 @@ class JsonNormalizer {
     return _.reduce(item, (normalizedItem, val, property) => {
       const itemTransformation = getTransformation(item);
 
-      if (!itemTransformation) {
+      if (!itemTransformation || isIgnoredProperty(property)) {
         return normalizedItem;
       }
 
@@ -54,7 +54,7 @@ class JsonNormalizer {
 
           normalizedItem.relationships[property].data = null;
         }
-      } else if (!isIgnoredProperty(property)) {
+      } else {
         normalizedItem.attributes[property] = val;
       }
 
