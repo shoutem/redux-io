@@ -140,7 +140,7 @@ describe('Update action creator', () => {
 
         const actionObjUpdating = performedActions[1];
         expect(actionObjUpdating.type).to.equal(OBJECT_UPDATING);
-        expect(actionObjUpdating.meta).to.deep.equal(expectedMeta);
+        expect(actionObjUpdating.meta).to.deep.equal({ ...expectedMeta, transformation: {} });
         expect(actionObjUpdating.payload).to.deep.equal(item);
 
         const actionUpdateRequest = performedActions[2];
@@ -150,7 +150,7 @@ describe('Update action creator', () => {
 
         const actionObjUpdated = performedActions[3];
         expect(actionObjUpdated.type).to.equal(OBJECT_UPDATED);
-        expect(actionObjUpdated.meta).to.deep.equal(expectedMeta);
+        expect(actionObjUpdated.meta).to.deep.equal({ ...expectedMeta, transformation: {} });
         expect(actionObjUpdated.payload).to.deep.equal(expectedPayload.data);
 
         const actionCollStatusIdle = performedActions[4];

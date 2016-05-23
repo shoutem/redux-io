@@ -134,13 +134,13 @@ describe('Delete action creator', () => {
 
         const actionObjDeleting = performedActions[1];
         expect(actionObjDeleting.type).to.equal(OBJECT_REMOVING);
-        expect(actionObjDeleting.meta).to.deep.equal(expectedMeta);
+        expect(actionObjDeleting.meta).to.deep.equal({ ...expectedMeta, transformation: {} });
 
         expect(performedActions[2].type).to.equal(REMOVE_REQUEST);
 
         const actionObjRemoved = performedActions[3];
         expect(actionObjRemoved.type).to.equal(OBJECT_REMOVED);
-        expect(actionObjRemoved.meta).to.deep.equal(expectedMeta);
+        expect(actionObjRemoved.meta).to.deep.equal({ ...expectedMeta, transformation: {} });
 
         const actionCollStatus = performedActions[4];
         expect(actionCollStatus.type).to.equal(COLLECTION_STATUS);

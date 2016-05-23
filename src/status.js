@@ -16,6 +16,7 @@ export const createStatus = () => (
     validationStatus: validationStatus.NONE,
     busyStatus: busyStatus.IDLE,
     modifiedTimestamp: Date.now(),
+    transformation: {},
   }
 );
 

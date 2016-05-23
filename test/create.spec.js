@@ -256,7 +256,7 @@ describe('Create action creator', () => {
 
         const actionObjCreated = performedActions[2];
         expect(actionObjCreated.type).to.equal(OBJECT_CREATED);
-        expect(actionObjCreated.meta).to.deep.equal(expectedMeta);
+        expect(actionObjCreated.meta).to.deep.equal({ ...expectedMeta, transformation: {} });
         expect(actionObjCreated.payload).to.deep.equal(expectedPayload.data);
 
         const actionCollStatus = performedActions[3];

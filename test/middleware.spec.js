@@ -61,7 +61,7 @@ describe('Json api middleware', () => {
 
         const actionCollStatus = performedActions[0];
         expect(actionCollStatus.type).to.equal(COLLECTION_STATUS);
-        expect(actionCollStatus.meta).to.deep.equal({ ...expectedMeta });
+        expect(actionCollStatus.meta).to.deep.equal(expectedMeta);
         const expectedCollStatusPayload = { busyStatus: busyStatus.BUSY };
         expect(actionCollStatus.payload).to.deep.equal(expectedCollStatusPayload);
 
@@ -109,7 +109,7 @@ describe('Json api middleware', () => {
 
         const actionObjFetched = performedActions[0];
         expect(actionObjFetched.type).to.equal(OBJECT_FETCHED);
-        expect(actionObjFetched.meta).to.deep.equal(expectedMeta);
+        expect(actionObjFetched.meta).to.deep.equal({ ...expectedMeta, transformation: {} });
         expect(actionObjFetched.payload).to.deep.equal(expectedPayload.data[0]);
 
         const actionCollFetched = performedActions[2];
@@ -156,7 +156,7 @@ describe('Json api middleware', () => {
 
         const actionObjCreated = performedActions[0];
         expect(actionObjCreated.type).to.equal(OBJECT_CREATED);
-        expect(actionObjCreated.meta).to.deep.equal(expectedMeta);
+        expect(actionObjCreated.meta).to.deep.equal({ ...expectedMeta, transformation: {} });
         expect(actionObjCreated.payload).to.deep.equal(expectedPayload.data[0]);
 
         const actionCollStatus = performedActions[1];
@@ -217,7 +217,7 @@ describe('Json api middleware', () => {
 
         const actionObjUpdating = performedActions[1];
         expect(actionObjUpdating.type).to.equal(OBJECT_UPDATING);
-        expect(actionObjUpdating.meta).to.deep.equal(expectedMeta);
+        expect(actionObjUpdating.meta).to.deep.equal({ ...expectedMeta, transformation: {} });
         expect(actionObjUpdating.payload).to.deep.equal(expectedPayload.data[0]);
 
         const actionUpdateRequest = performedActions[2];
@@ -258,7 +258,7 @@ describe('Json api middleware', () => {
 
         const actionObjUpdated = performedActions[0];
         expect(actionObjUpdated.type).to.equal(OBJECT_UPDATED);
-        expect(actionObjUpdated.meta).to.deep.equal(expectedMeta);
+        expect(actionObjUpdated.meta).to.deep.equal({ ...expectedMeta, transformation: {} });
         expect(actionObjUpdated.payload).to.deep.equal(expectedPayload.data[0]);
 
         const actionCollStatus = performedActions[1];
@@ -315,7 +315,7 @@ describe('Json api middleware', () => {
 
         const actionObjDeleting = performedActions[1];
         expect(actionObjDeleting.type).to.equal(OBJECT_REMOVING);
-        expect(actionObjDeleting.meta).to.deep.equal(expectedMeta);
+        expect(actionObjDeleting.meta).to.deep.equal({ ...expectedMeta, transformation: {} });
 
         const successAction = performedActions[2];
         expect(successAction.type).to.equal(REMOVE_REQUEST);
@@ -351,7 +351,7 @@ describe('Json api middleware', () => {
 
         const actionObjDeleted = performedActions[0];
         expect(actionObjDeleted.type).to.equal(OBJECT_REMOVED);
-        expect(actionObjDeleted.meta).to.deep.equal(expectedMeta);
+        expect(actionObjDeleted.meta).to.deep.equal({ ...expectedMeta, transformation: {} });
 
         const actionCollStatus = performedActions[1];
         expect(actionCollStatus.type).to.equal(COLLECTION_STATUS);
@@ -425,12 +425,12 @@ describe('Json api middleware', () => {
         const actionObjIncludedFetched = performedActions[0];
         expect(actionObjIncludedFetched.type).to.equal(OBJECT_FETCHED);
         expect(actionObjIncludedFetched.meta)
-          .to.deep.equal({ ...expectedMeta, schema: includedSchema });
+          .to.deep.equal({ ...expectedMeta, schema: includedSchema, transformation: {}  });
         expect(actionObjIncludedFetched.payload).to.deep.equal(expectedPayload.included[0]);
 
         const actionObjFetched = performedActions[2];
         expect(actionObjFetched.type).to.equal(OBJECT_FETCHED);
-        expect(actionObjFetched.meta).to.deep.equal(expectedMeta);
+        expect(actionObjFetched.meta).to.deep.equal({ ...expectedMeta, transformation: {} });
         expect(actionObjFetched.payload).to.deep.equal(expectedPayload.data[0]);
 
         const actionCollFetched = performedActions[4];
@@ -443,6 +443,97 @@ describe('Json api middleware', () => {
 
         expect(successAction.meta).to.deep.equal(expectedMeta);
         expect(successAction.payload).to.deep.equal(expectedPayload);
+      }).then(done).catch(done);
+  });
+
+  it('produces valid transformation meta data for fetch success', done => {
+    const schema = 'schema_test';
+    const tag = 'tag_test';
+    const expectedPayload = {
+      data: [{
+        type: schema,
+        id: '1',
+        attributes: {
+          name: 'Test1',
+        },
+        relationships: {
+          author: {
+            data: {
+              id: '42',
+              type: 'people',
+            },
+          },
+          places: {
+            data: [
+              {
+                id: '1',
+                type: 'place',
+              },
+              {
+                id: '2',
+                type: 'place',
+              },
+            ],
+          },
+        },
+      }, {
+        type: schema,
+        id: '2',
+        attributes: {
+          name: 'Test2',
+        },
+        relationships: {
+          owner: {
+            data: {
+              id: 'A',
+              type: 'Mike',
+            },
+          },
+        },
+      }],
+    };
+    const expectedMeta = {
+      source: middlewareJsonApiSource,
+      schema,
+      tag,
+    };
+
+    const mockSuccessAction = {
+      type: LOAD_SUCCESS,
+      meta: expectedMeta,
+      payload: expectedPayload,
+    };
+
+    const store = mockStore({});
+    store.dispatch(actionPromise(mockSuccessAction))
+      .then(() => {
+        const performedActions = store.getActions();
+
+        const actionFirstObjFetched = performedActions[0];
+        expect(actionFirstObjFetched.type).to.equal(OBJECT_FETCHED);
+        const transformationFirstObj = {
+          author: 'author',
+          places: 'places',
+        }
+        const expectedMetaFirstObject = {
+          ...expectedMeta,
+          transformation: transformationFirstObj,
+        };
+        expect(actionFirstObjFetched.meta).to.deep.equal(expectedMetaFirstObject);
+        expect(actionFirstObjFetched.payload).to.deep.equal(expectedPayload.data[0]);
+
+        const actionSecondObjFetched = performedActions[1];
+        expect(actionSecondObjFetched.type).to.equal(OBJECT_FETCHED);
+        const transformationSecondObj = {
+          owner: 'owner',
+        }
+        const expectedMetaSecondObject = {
+          ...expectedMeta,
+          transformation: transformationSecondObj,
+        };
+        expect(actionSecondObjFetched.meta).to.deep.equal(expectedMetaSecondObject);
+        expect(actionSecondObjFetched.payload).to.deep.equal(expectedPayload.data[1]);
+
       }).then(done).catch(done);
   });
 

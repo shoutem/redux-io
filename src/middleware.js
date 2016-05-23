@@ -1,6 +1,6 @@
 /* eslint-disable no-unused-expressions */
 import _ from 'lodash';
-
+import { transform } from './standardizer';
 import {
   validationStatus,
   busyStatus,
@@ -79,12 +79,16 @@ function makeObjectAction(sourceAction, actionType, item) {
     throw new Error('Id is not valid.');
   }
 
+  // create transformation keys
+  const transformResult = transform(item);
+
   return {
     type: actionType,
-    payload: item,
+    payload: transformResult.object,
     meta: {
       ...sourceAction.meta,
       schema: _.get(item, 'type'),
+      transformation: transformResult.transformation,
     },
   };
 }

@@ -31,21 +31,33 @@ export default function storage(schema, initialState = {}) {
       return state;
     }
 
-    const status = state[item.id] ? state[item.id][STATUS] : createStatus();
+    const currentStatus = (state[item.id] && state[item.id][STATUS])
+      ? state[item.id][STATUS] : createStatus();
     switch (action.type) {
       case OBJECT_UPDATING: {
         item[STATUS] = updateStatus(
-          status,
-          { validationStatus: validationStatus.INVALID, busyStatus: busyStatus.BUSY }
+          currentStatus,
+          {
+            validationStatus: validationStatus.INVALID,
+            busyStatus: busyStatus.BUSY,
+          }
         );
-        return { ...state, [item.id]: item };
+        item[STATUS].transformation = {
+          ...currentStatus.transformation,
+          ...action.meta.transformation,
+        };
+        return { ...state, [item.id]: { ...state[item.id], ...item } };
       }
       case OBJECT_FETCHED:
       case OBJECT_CREATED:
       case OBJECT_UPDATED: {
         item[STATUS] = updateStatus(
-          status,
-          { validationStatus: validationStatus.VALID, busyStatus: busyStatus.IDLE }
+          currentStatus,
+          {
+            validationStatus: validationStatus.VALID,
+            busyStatus: busyStatus.IDLE,
+            transformation: action.meta.transformation,
+          }
         );
         return { ...state, [item.id]: item };
       }

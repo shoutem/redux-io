@@ -7,11 +7,14 @@ import {
   OBJECT_REMOVING,
   OBJECT_REMOVED,
   OBJECT_UPDATING,
+  OBJECT_UPDATED,
 } from '../src';
 import {
   STATUS,
   validationStatus,
   busyStatus,
+  createStatus,
+  updateStatus,
 } from '../src/status';
 
 describe('Storage reducer', () => {
@@ -201,6 +204,7 @@ describe('Storage reducer', () => {
 
   it('updates item and it\'s status in state on object updating', () => {
     const item = { id: 1, value: 'a' };
+    item[STATUS] = createStatus();
     const initialState = { [item.id]: item };
     deepFreeze(initialState);
     const schema = 'schema_test';
@@ -221,6 +225,34 @@ describe('Storage reducer', () => {
     const expectedState = { [itemNew.id]: itemNew };
     expect(nextState).to.deep.equal(expectedState);
     expect(nextStateItem).to.deep.equal(itemNew);
+    expect(nextStateItem[STATUS].validationStatus).to.eql(validationStatus.INVALID);
+    expect(nextStateItem[STATUS].busyStatus).to.eql(busyStatus.BUSY);
+  });
+
+  it('partial update item and it\'s status in state on object updating', () => {
+    const item = { id: 1, value: 'a', control: 'c' };
+    item[STATUS] = createStatus();
+    const initialState = { [item.id]: item };
+    deepFreeze(initialState);
+    const schema = 'schema_test';
+    const reducer = storage(schema, initialState);
+
+    const itemNew = { id: 1, value: 'b' };
+    const action = {
+      type: OBJECT_UPDATING,
+      meta: {
+        schema,
+      },
+      payload: itemNew,
+    };
+
+    const nextState = reducer(initialState, action);
+    const nextStateItem = nextState[item.id];
+
+    const expectedItem = { ...item, ...itemNew };
+    const expectedState = { [itemNew.id]: expectedItem };
+    expect(nextState).to.deep.equal(expectedState);
+    expect(nextStateItem).to.deep.equal(expectedItem);
     expect(nextStateItem[STATUS].validationStatus).to.eql(validationStatus.INVALID);
     expect(nextStateItem[STATUS].busyStatus).to.eql(busyStatus.BUSY);
   });
@@ -310,5 +342,98 @@ describe('Storage reducer', () => {
     const expectedState = {};
 
     expect(nextState).to.deep.equal(expectedState);
+  });
+
+  it('applies transformation from action into item in storage on fetched', () => {
+    const initialState = {};
+    const item = { id: 1 };
+    const schema = 'schema_test';
+    const transformation = {
+      a: 'a',
+      b: 'b',
+    };
+    const action = {
+      type: OBJECT_FETCHED,
+      meta: {
+        schema,
+        transformation,
+      },
+      payload: item,
+    };
+    deepFreeze(initialState);
+    const reducer = storage(schema, initialState);
+
+    const nextState = reducer(initialState, action);
+    const expectedState = { [item.id]: item };
+    const nextStateItem = nextState[item.id];
+
+    expect(nextState).to.deep.equal(expectedState);
+    expect(nextStateItem).to.deep.equal(item);
+    expect(nextStateItem[STATUS].validationStatus).to.eql(validationStatus.VALID);
+    expect(nextStateItem[STATUS].busyStatus).to.eql(busyStatus.IDLE);
+    expect(nextStateItem[STATUS].transformation).to.eql(transformation);
+  });
+
+  it('applies transformation from action into item in storage on updated', () => {
+    const item = { id: 1, value: 'a', control: 'c' };
+    const transformation = { a: 'a' };
+    item[STATUS] = updateStatus(createStatus(), transformation);
+    const initialState = { [item.id]: item };
+    deepFreeze(initialState);
+    const schema = 'schema_test';
+    const reducer = storage(schema, initialState);
+
+    const itemNew = { id: 1, value: 'b' };
+    const transformationNew = { b: 'b' };
+    const action = {
+      type: OBJECT_UPDATED,
+      meta: {
+        schema,
+        transformation: transformationNew,
+      },
+      payload: itemNew,
+    };
+
+    const nextState = reducer(initialState, action);
+    const nextStateItem = nextState[item.id];
+
+    const expectedState = { [itemNew.id]: itemNew };
+    expect(nextState).to.deep.equal(expectedState);
+    expect(nextStateItem).to.deep.equal(itemNew);
+    expect(nextStateItem[STATUS].validationStatus).to.eql(validationStatus.VALID);
+    expect(nextStateItem[STATUS].busyStatus).to.eql(busyStatus.IDLE);
+    expect(nextStateItem[STATUS].transformation).to.eql(transformationNew);
+  });
+
+  it('applies transformation from action into item in storage on updating', () => {
+    const item = { id: 1, value: 'a', control: 'c' };
+    const transformation = { a: 'a' };
+    item[STATUS] = updateStatus(createStatus(), { transformation });
+    const initialState = { [item.id]: item };
+    deepFreeze(initialState);
+    const schema = 'schema_test';
+    const reducer = storage(schema, initialState);
+
+    const itemNew = { id: 1, value: 'b' };
+    const transformationNew = { b: 'b' };
+    const action = {
+      type: OBJECT_UPDATING,
+      meta: {
+        schema,
+        transformation: transformationNew,
+      },
+      payload: itemNew,
+    };
+
+    const nextState = reducer(initialState, action);
+    const nextStateItem = nextState[item.id];
+
+    const expectedItem = { ...item, ...itemNew };
+    const expectedState = { [itemNew.id]: expectedItem };
+    expect(nextState).to.deep.equal(expectedState);
+    expect(nextStateItem).to.deep.equal(expectedItem);
+    expect(nextStateItem[STATUS].validationStatus).to.eql(validationStatus.INVALID);
+    expect(nextStateItem[STATUS].busyStatus).to.eql(busyStatus.BUSY);
+    expect(nextStateItem[STATUS].transformation).to.eql({ ...transformation, ...transformationNew });
   });
 });

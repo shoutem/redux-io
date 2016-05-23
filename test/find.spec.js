@@ -154,7 +154,7 @@ describe('Find action creator', () => {
 
         const actionObjFetched = performedActions[2];
         expect(actionObjFetched.type).to.equal(OBJECT_FETCHED);
-        expect(actionObjFetched.meta).to.deep.equal(expectedMeta);
+        expect(actionObjFetched.meta).to.deep.equal({ ...expectedMeta, transformation: {} });
         expect(actionObjFetched.payload).to.deep.equal(expectedPayload.data[0]);
 
         const actionCollFetched = performedActions[4];
