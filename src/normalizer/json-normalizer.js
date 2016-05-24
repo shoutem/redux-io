@@ -14,13 +14,14 @@ function createNormalizedJsonItemDescription(denormalizedItem) {
 }
 
 function createRelationshipItemDescriptor(relationshipItem) {
-  return { id: relationshipItem.id, type: relationshipItem.type};
+  return { id: relationshipItem.id, type: relationshipItem.type };
 }
 
 function normalizeRelationshipArray(relationshipArray) {
-  return _.reduce(relationshipArray, (normalizedRelationshipArray, relationshipItem) => (
-    normalizedRelationshipArray.push(createRelationshipItemDescriptor(relationshipItem))
-  ), []);
+  return _.reduce(relationshipArray, (normalizeRelationshipArray, relationshipItem) => {
+    normalizeRelationshipArray.push(createRelationshipItemDescriptor(relationshipItem));
+    return normalizeRelationshipArray;
+  }, []);
 }
 
 function normalizeRelationshipObject(relationshipItem) {
@@ -31,38 +32,38 @@ function isIgnoredProperty(property, ignoredProperties = DEFAULT_IGNORED_PROPERT
   return !!ignoredProperties[property];
 }
 
-class JsonNormalizer {
-  normalizeItem(item) {
-    return _.reduce(item, (normalizedItem, val, property) => {
-      const itemTransformation = getTransformation(item);
+export function normalizeItem(item) {
+  return _.reduce(item, (normalizedItem, val, property) => {
+    const itemTransformation = getTransformation(item);
 
-      if (!itemTransformation || isIgnoredProperty(property)) {
-        return normalizedItem;
-      }
-
-      const relationshipItem = itemTransformation.relationshipProperties[property] && val;
-      if (relationshipItem) {
-        if (_.isArray(relationshipItem)) {
-          normalizedItem.relationships[property].data =
-            normalizeRelationshipArray(relationshipItem);
-        } else if (_.isPlainObject(relationshipItem)) {
-          normalizedItem.relationships[property].data =
-            normalizeRelationshipObject(relationshipItem);
-        } else {
-          // this should generally be case when relationship does not exists
-          // if relationship is not provided (included) it is little bit tricky NOW..
-
-          normalizedItem.relationships[property].data = null;
-        }
-      } else {
-        normalizedItem.attributes[property] = val;
-      }
-
+    if (!itemTransformation || isIgnoredProperty(property)) {
       return normalizedItem;
-    }, createNormalizedJsonItemDescription(item));
-  }
+    }
 
-  normalizeCollection(collection) {
-    return collection.map(item => this.normalizeItem(item));
-  }
+    const relationshipItem = itemTransformation.relationshipProperties[property] && val;
+    if (relationshipItem) {
+      if (_.isArray(relationshipItem)) {
+        normalizedItem.relationships[property] = {
+          data: normalizeRelationshipArray(relationshipItem),
+        };
+      } else if (_.isPlainObject(relationshipItem)) {
+        normalizedItem.relationships[property] = {
+          data: normalizeRelationshipObject(relationshipItem),
+        };
+      } else {
+        // this should generally be case when relationship does not exists
+        // if relationship is not provided (included) it is little bit tricky NOW..
+        normalizedItem.relationships[property] = { data: null };
+      }
+    } else {
+      normalizedItem.attributes[property] = val;
+    }
+
+    return normalizedItem;
+  }, createNormalizedJsonItemDescription(item));
 }
+
+export function normalizeCollection(collection) {
+  return collection.map(item => normalizeItem(item));
+}
+

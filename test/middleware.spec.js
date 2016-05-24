@@ -515,8 +515,10 @@ describe('Json api middleware', () => {
         const actionFirstObjFetched = performedActions[0];
         expect(actionFirstObjFetched.type).to.equal(OBJECT_FETCHED);
         const transformationFirstObj = {
-          author: 'author',
-          places: 'places',
+          relationshipProperties: {
+            author: 'author',
+            places: 'places',
+          },
         };
         const expectedMetaFirstObject = {
           ...expectedMeta,
@@ -528,7 +530,9 @@ describe('Json api middleware', () => {
         const actionSecondObjFetched = performedActions[1];
         expect(actionSecondObjFetched.type).to.equal(OBJECT_FETCHED);
         const transformationSecondObj = {
-          owner: 'owner',
+          relationshipProperties: {
+            owner: 'owner',
+          },
         };
         const expectedMetaSecondObject = {
           ...expectedMeta,

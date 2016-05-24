@@ -34,6 +34,8 @@ export { update };
 import ReduxApiStateDenormalizer from './denormalizer/ReduxApiStateDenormalizer';
 export { ReduxApiStateDenormalizer };
 
+export { normalizeItem, normalizeCollection } from './normalizer';
+
 export {
   LOAD_REQUEST,
   LOAD_SUCCESS,

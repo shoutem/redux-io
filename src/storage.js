@@ -35,18 +35,16 @@ export default function storage(schema, initialState = {}) {
       ? state[item.id][STATUS] : createStatus();
     switch (action.type) {
       case OBJECT_UPDATING: {
-        item[STATUS] = updateStatus(
+        const newItem = _.merge({}, state[item.id], item);
+        newItem[STATUS] = updateStatus(
           currentStatus,
           {
             validationStatus: validationStatus.INVALID,
             busyStatus: busyStatus.BUSY,
+            transformation: action.meta.transformation,
           }
         );
-        item[STATUS].transformation = {
-          ...currentStatus.transformation,
-          ...action.meta.transformation,
-        };
-        return { ...state, [item.id]: { ...state[item.id], ...item } };
+        return { ...state, [item.id]: newItem};
       }
       case OBJECT_FETCHED:
       case OBJECT_CREATED:

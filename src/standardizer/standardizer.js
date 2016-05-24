@@ -11,7 +11,7 @@ export function transform(object) {
   const keys = _.keys(object.relationships);
   return {
     transformation: {
-     relationshipProperties: _.keyBy(keys),
+      relationshipProperties: _.keyBy(keys),
     },
     object,
   };

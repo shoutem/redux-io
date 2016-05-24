@@ -1,3 +1,5 @@
+import _ from 'lodash';
+
 export const STATUS = Symbol('status');
 
 export const validationStatus = Object.freeze({
@@ -21,11 +23,7 @@ export const createStatus = () => (
 );
 
 export const updateStatus = (status, update) => (
-  {
-    ...status,
-    ...update,
-    modifiedTimestamp: Date.now(),
-  }
+  _.merge({}, status, update, {modifiedTimestamp: Date.now()})
 );
 
 export const getTransformation = obj => obj[STATUS] && obj[STATUS].transformation;

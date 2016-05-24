@@ -1,4 +1,5 @@
 /* eslint-disable no-unused-expressions */
+import _ from 'lodash';
 import { expect } from 'chai';
 import deepFreeze from 'deep-freeze';
 import {
@@ -408,7 +409,13 @@ describe('Storage reducer', () => {
 
   it('applies transformation from action into item in storage on updating', () => {
     const item = { id: 1, value: 'a', control: 'c' };
-    const transformation = { a: 'a' };
+    const transformation = {
+      a: 'a',
+      c: {
+        ff: 1,
+        dd: 2,
+      },
+    };
     item[STATUS] = updateStatus(createStatus(), { transformation });
     const initialState = { [item.id]: item };
     deepFreeze(initialState);
@@ -416,7 +423,13 @@ describe('Storage reducer', () => {
     const reducer = storage(schema, initialState);
 
     const itemNew = { id: 1, value: 'b' };
-    const transformationNew = { b: 'b' };
+    const transformationNew = {
+      b: 'b',
+      c: {
+        ff: 2,
+        cc: 5,
+      },
+    };
     const action = {
       type: OBJECT_UPDATING,
       meta: {
@@ -435,9 +448,9 @@ describe('Storage reducer', () => {
     expect(nextStateItem).to.deep.equal(expectedItem);
     expect(nextStateItem[STATUS].validationStatus).to.eql(validationStatus.INVALID);
     expect(nextStateItem[STATUS].busyStatus).to.eql(busyStatus.BUSY);
-    expect(nextStateItem[STATUS].transformation).to.eql({
-      ...transformation,
-      ...transformationNew,
-    });
+    expect(nextStateItem[STATUS].transformation).to.eql(_.merge({},
+      transformation,
+      transformationNew
+    ));
   });
 });
