@@ -1,6 +1,6 @@
 import ReduxDenormalizer from './ReduxDenormalizer';
 import _ from 'lodash';
-import { STATUS } from './../status';
+import { applyStatus } from './../status';
 
 /**
  * Created getStore for ReduxDenormalizer by using storageMap to find relationships.
@@ -71,7 +71,7 @@ export default class ReduxApiStateDenormalizer extends ReduxDenormalizer {
    */
   mergeDenormalizedItemData(normalizedItem, itemData, relationshipsData) {
     const mergedItem = super.mergeDenormalizedItemData(normalizedItem, itemData, relationshipsData);
-    mergedItem[STATUS] = { ...normalizedItem[STATUS] };
+    applyStatus(normalizedItem, mergedItem);
     return mergedItem;
   }
 

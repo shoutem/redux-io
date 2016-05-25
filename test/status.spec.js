@@ -1,5 +1,6 @@
 /* eslint-disable no-unused-expressions */
 import { expect } from 'chai';
+import deepFreeze from 'deep-freeze';
 import {
   createStatus,
   updateStatus,
@@ -9,6 +10,7 @@ import {
   validationStatus,
   busyStatus,
   STATUS,
+  applyStatus,
 } from '../src/status';
 
 describe('Status metadata', () => {
@@ -101,6 +103,28 @@ describe('Status metadata', () => {
     obj[STATUS] = status;
 
     expect(shouldRefresh(obj)).to.be.false;
+  });
+
+  it('applyStatus applies cloned status on destination object from source object', () => {
+    const status = updateStatus(
+      createStatus(),
+      {
+        busyStatus: busyStatus.BUSY,
+        validationStatus: validationStatus.INVALID,
+        transformation: {
+          a: 'a',
+          b: 'b',
+        },
+      }
+    );
+    deepFreeze(status);
+    const sourceObj = {};
+    sourceObj[STATUS] = status;
+
+    const destObj = {};
+    applyStatus(sourceObj, destObj);
+
+    expect(destObj[STATUS]).to.be.deep.equal(status);
   });
 
   it('update status updates timestamp to newer', (done) => {

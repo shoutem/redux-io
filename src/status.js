@@ -26,6 +26,13 @@ export const updateStatus = (status, update) => (
   _.merge({}, status, update, {modifiedTimestamp: Date.now()})
 );
 
+export const applyStatus = (sourceObject, destinationObject) => {
+  if (!sourceObject[STATUS]) {
+    return;
+  }
+  destinationObject[STATUS] = _.merge({}, sourceObject[STATUS]);
+};
+
 export const getTransformation = obj => obj[STATUS] && obj[STATUS].transformation;
 
 export const isValid = obj =>
