@@ -47,7 +47,10 @@ export default (config, schema, item) => {
           type: UPDATE_SUCCESS,
           meta,
         },
-        UPDATE_ERROR,
+        {
+          type: UPDATE_ERROR,
+          meta,
+        },
       ],
     },
   };

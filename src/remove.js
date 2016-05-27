@@ -45,7 +45,10 @@ export default (config, schema, item) => {
           meta,
           payload: () => ({ data: item }),
         },
-        REMOVE_ERROR,
+        {
+          type: REMOVE_ERROR,
+          meta,
+        },
       ],
     },
   };

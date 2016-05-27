@@ -38,20 +38,28 @@ const actionsWithoutPayload = new Set([
   REMOVE_SUCCESS,
   LOAD_REQUEST,
   CREATE_REQUEST,
+  LOAD_ERROR,
+  CREATE_ERROR,
+  UPDATE_ERROR,
+  REMOVE_ERROR,
 ]);
 
 function makeCollectionAction(sourceAction, actionType, data, schema, tag = '*') {
   if (!actionType) {
-    throw new Error('Action type is not valid.');
+    console.error('Action type is not valid.');
+    return null;
   }
   if (!data) {
-    throw new Error('Data is not valid.');
+    console.error('Data is not valid.');
+    return null;
   }
   if (!schema) {
-    throw new Error('Schema is not valid.');
+    console.error('Schema is not valid.');
+    return null;
   }
   if (tag === undefined || tag === null) {
-    throw new Error('Tag is not valid.');
+    console.error('Tag is not valid.');
+    return null;
   }
 
   return {
@@ -67,16 +75,20 @@ function makeCollectionAction(sourceAction, actionType, data, schema, tag = '*')
 
 function makeObjectAction(sourceAction, actionType, item) {
   if (!actionType) {
-    throw new Error('Action type is not valid.');
+    console.error('Action type is not valid.');
+    return null;
   }
   if (!item) {
-    throw new Error('Data is not valid.');
+    console.error('Data is not valid.');
+    return null;
   }
   if (!_.get(item, 'type')) {
-    throw new Error('Schema is not valid.');
+    console.error('Schema is not valid.');
+    return null;
   }
   if (!_.get(item, 'id')) {
-    throw new Error('Id is not valid.');
+    console.error('Id is not valid.');
+    return null;
   }
 
   // create transformation keys
@@ -121,6 +133,24 @@ const actionHandlers = {
     // should trigger only for collections
     dispatch(makeCollectionAction(action, COLLECTION_FETCHED, data, schema, tag));
   },
+  [LOAD_ERROR]: (action, data, dispatch) => {
+    // Invalidate and idle collection on error
+    const { schema, tag } = action.meta;
+    // Validate action meta has a tag value
+    if (!_.isString(tag)) {
+      return;
+    }
+    dispatch(makeCollectionAction(
+      action,
+      COLLECTION_STATUS,
+      {
+        busyStatus: busyStatus.IDLE,
+        validationStatus: validationStatus.INVALID,
+      },
+      schema,
+      tag
+    ));
+  },
   [CREATE_REQUEST]: (action, data, dispatch) => {
     // Change collection status to busy and invalid to prevent fetching.
     const schema = action.meta.schema;
@@ -139,6 +169,19 @@ const actionHandlers = {
       action,
       COLLECTION_STATUS,
       { validationStatus: validationStatus.INVALID, busyStatus: busyStatus.IDLE },
+      schema
+    ));
+  },
+  [CREATE_ERROR]: (action, data, dispatch) => {
+    // Change collection status to idle and invalid to fetch again.
+    const schema = action.meta.schema;
+    dispatch(makeCollectionAction(
+      action,
+      COLLECTION_STATUS,
+      {
+        validationStatus: validationStatus.INVALID,
+        busyStatus: busyStatus.IDLE,
+      },
       schema
     ));
   },
@@ -165,6 +208,19 @@ const actionHandlers = {
       schema
     ));
   },
+  [UPDATE_ERROR]: (action, data, dispatch) => {
+    // Change collection status to idle and invalid
+    const schema = action.meta.schema;
+    dispatch(makeCollectionAction(
+      action,
+      COLLECTION_STATUS,
+      {
+        validationStatus: validationStatus.INVALID,
+        busyStatus: busyStatus.IDLE,
+      },
+      schema
+    ));
+  },
   [REMOVE_REQUEST]: (action, data, dispatch) => {
     // Change collections status to busy and invalid because of removing item in
     // local storage state
@@ -188,34 +244,50 @@ const actionHandlers = {
       schema
     ));
   },
+  [REMOVE_ERROR]: (action, data, dispatch) => {
+    // Change collections status to idle and invalid
+    const schema = action.meta.schema;
+    dispatch(makeCollectionAction(
+      action,
+      COLLECTION_STATUS,
+      { validationStatus: validationStatus.INVALID, busyStatus: busyStatus.IDLE },
+      schema
+    ));
+  },
 };
 
 function isValidAction(action) {
   if (!actionHandlers[action.type]) {
+    console.error('No action handler found for action.');
     return false;
   }
   // Check for meta object in action
   if (action.meta === undefined) {
-    throw new Error('Meta is undefined.');
+    console.error('Meta is undefined.');
+    return false;
   }
   const meta = action.meta;
   // Check if source exists
   if (meta.source === undefined) {
-    throw new Error('Source is undefined.');
+    console.error('Source is undefined.');
+    return false;
   }
   // Source exists but this middleware is not responsible for other source variants
   // only for json_api
   if (meta.source !== middlewareJsonApiSource) {
+    console.error('api source is unknown');
     return false;
   }
   // Check that schema is defined
   if (!meta.schema) {
-    throw new Error('Schema is invalid.');
+    console.error('Schema is invalid.');
+    return false;
   }
   // Validate payload for payload-specific action, ignore others
   if (!actionsWithoutPayload.has(action.type)
     && !_.has(action, 'payload.data')) {
-    throw new Error('Payload Data is invalid, expecting payload.data.');
+    console.error('Payload Data is invalid, expecting payload.data.');
+    return false;
   }
 
   return true;

@@ -8,6 +8,7 @@ import {
   remove,
   REMOVE_REQUEST,
   REMOVE_SUCCESS,
+  REMOVE_ERROR,
   OBJECT_REMOVING,
   OBJECT_REMOVED,
   COLLECTION_STATUS,
@@ -55,6 +56,8 @@ describe('Delete action creator', () => {
     expect(types[0].meta).to.deep.equal(expectedMeta);
     expect(types[1].type).to.equal(REMOVE_SUCCESS);
     expect(types[1].meta).to.deep.equal(expectedMeta);
+    expect(types[2].type).to.equal(REMOVE_ERROR);
+    expect(types[2].meta).to.deep.equal(expectedMeta);
   });
 
   it('throws exception on invalid action with null config', () => {
