@@ -3,20 +3,21 @@ import _ from 'lodash';
 export function transform(object) {
   if (!_.has(object, 'relationships')) {
     return {
-      transformation: {},
-      object,
+      transformationDescription: {},
+      transformedObject: _.cloneDeep(object),
     };
   }
 
   const keys = _.keys(object.relationships);
   return {
-    transformation: {
+    transformationDescription: {
       relationshipProperties: _.keyBy(keys),
     },
-    object,
+    transformedObject: _.cloneDeep(object),
   };
 }
 
-export function inverse(object) {
-  return object;
+export function inverse(transformedObject, transformationDescription) {
+  // TODO: support inverse transformations based on transformation description
+  return transformedObject;
 }

@@ -80,15 +80,15 @@ function makeObjectAction(sourceAction, actionType, item) {
   }
 
   // create transformation keys
-  const transformResult = transform(item);
+  const transformation = transform(item);
 
   return {
     type: actionType,
-    payload: transformResult.object,
+    payload: transformation.transformedObject,
     meta: {
       ...sourceAction.meta,
       schema: _.get(item, 'type'),
-      transformation: transformResult.transformation,
+      transformation: transformation.transformationDescription,
     },
   };
 }
