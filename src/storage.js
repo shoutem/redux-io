@@ -15,6 +15,40 @@ import {
   updateStatus,
 } from './status';
 
+function mergeItemStatus(currentItem, newStatus) {
+  const currentStatus = (currentItem && currentItem[STATUS])
+    ? currentItem[STATUS] : createStatus();
+
+  return updateStatus(
+    currentStatus,
+    newStatus
+  );
+}
+
+function patchItemInState(currentItem, patch, actionMeta) {
+  const newItem = {
+    id: currentItem.id,
+    type: currentItem.type,
+    attributes: {
+      ...currentItem.attributes,
+      ...patch.attributes,
+    },
+    relationships: {
+      ...currentItem.relationships,
+      ...patch.relationships,
+    },
+  };
+  newItem[STATUS] = mergeItemStatus(
+    currentItem,
+    {
+      validationStatus: validationStatus.INVALID,
+      busyStatus: busyStatus.BUSY,
+      transformation: actionMeta.transformation,
+    }
+  );
+  return newItem;
+}
+
 // storage is generic storage reducer that enables creation
 // of typed storage reducers that are handling specific
 // OBJECT_ type actions.
@@ -31,38 +65,17 @@ export default function storage(schema, initialState = {}) {
       return state;
     }
 
-    const currentStatus = (state[item.id] && state[item.id][STATUS])
-      ? state[item.id][STATUS] : createStatus();
+    const currentItem = state[item.id];
     switch (action.type) {
       case OBJECT_UPDATING: {
-        const currentItem = state[item.id];
-        const newItem = {
-          id: currentItem.id,
-          type: currentItem.type,
-          attributes: {
-            ...currentItem.attributes,
-            ...item.attributes,
-          },
-          relationships: {
-            ...currentItem.relationships,
-            ...item.relationships,
-          },
-        };
-        newItem[STATUS] = updateStatus(
-          currentStatus,
-          {
-            validationStatus: validationStatus.INVALID,
-            busyStatus: busyStatus.BUSY,
-            transformation: action.meta.transformation,
-          }
-        );
-        return { ...state, [item.id]: newItem };
+        const patchedItem = patchItemInState(currentItem, item, action.meta);
+        return { ...state, [item.id]: patchedItem };
       }
       case OBJECT_FETCHED:
       case OBJECT_CREATED:
       case OBJECT_UPDATED: {
-        item[STATUS] = updateStatus(
-          currentStatus,
+        item[STATUS] = mergeItemStatus(
+          currentItem,
           {
             validationStatus: validationStatus.VALID,
             busyStatus: busyStatus.IDLE,
