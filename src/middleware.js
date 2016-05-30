@@ -146,6 +146,7 @@ const actionHandlers = {
       {
         busyStatus: busyStatus.IDLE,
         validationStatus: validationStatus.INVALID,
+        error: true,
       },
       schema,
       tag
@@ -250,7 +251,10 @@ const actionHandlers = {
     dispatch(makeCollectionAction(
       action,
       COLLECTION_STATUS,
-      { validationStatus: validationStatus.INVALID, busyStatus: busyStatus.IDLE },
+      {
+        validationStatus: validationStatus.INVALID,
+        busyStatus: busyStatus.IDLE,
+      },
       schema
     ));
   },

@@ -60,6 +60,10 @@ export {
   middlewareJsonApiSource,
 } from './middleware';
 
-
-import { isValid, isBusy, shouldRefresh, getTransformation } from './status';
-export { isValid, isBusy, shouldRefresh, getTransformation };
+export {
+  isValid,
+  isBusy,
+  isError,
+  shouldRefresh,
+  getTransformation,
+} from './status';

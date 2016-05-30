@@ -161,6 +161,7 @@ describe('Json api middleware', () => {
         const expectedCollStatusPayload = {
           busyStatus: busyStatus.IDLE,
           validationStatus: validationStatus.INVALID,
+          error: true,
         };
         expect(actionCollStatus.payload).to.deep.equal(expectedCollStatusPayload);
 
