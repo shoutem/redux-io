@@ -204,15 +204,133 @@ describe('Storage reducer', () => {
     expect(nextState).to.deep.equal(expectedState);
   });
 
-  it('updates item and it\'s status in state on object updating', () => {
-    const item = { id: 1, value: 'a' };
+  it('partial update item and it\'s status in state on object updating', () => {
+    const item = {
+      id: 2,
+      type: 'a',
+      attributes: {
+        aa: 1,
+        bb: [1, 2, 3],
+      },
+      relationships: {
+        cc: {
+          data: { id: 1, type: 'c' },
+        },
+        dd: {
+          data: [
+            { id: 1, type: 'c' },
+            { id: 2, type: 'd' },
+            { id: 3, type: 'e' },
+          ],
+        },
+      },
+    };
     item[STATUS] = createStatus();
     const initialState = { [item.id]: item };
     deepFreeze(initialState);
     const schema = 'schema_test';
     const reducer = storage(schema, initialState);
 
-    const itemNew = { id: 1, value: 'b' };
+    const itemPatch = {
+      id: 2,
+      type: 'a',
+      attributes: {
+        bb: [2],
+      },
+      relationships: {
+        dd: {
+          data: [
+            { id: 2, type: 'd' },
+          ],
+        },
+      },
+    };
+
+    const action = {
+      type: OBJECT_UPDATING,
+      meta: {
+        schema,
+      },
+      payload: itemPatch,
+    };
+
+    const nextState = reducer(initialState, action);
+    const nextStateItem = nextState[item.id];
+
+    const itemNew = {
+      id: 2,
+      type: 'a',
+      attributes: {
+        aa: 1,
+        bb: [2],
+      },
+      relationships: {
+        cc: {
+          data: { id: 1, type: 'c' },
+        },
+        dd: {
+          data: [
+            { id: 2, type: 'd' },
+          ],
+        },
+      },
+    };
+
+    const expectedState = { [itemNew.id]: itemNew };
+    expect(nextState).to.deep.equal(expectedState);
+    expect(nextStateItem).to.deep.equal(itemNew);
+    expect(nextStateItem[STATUS].validationStatus).to.eql(validationStatus.INVALID);
+    expect(nextStateItem[STATUS].busyStatus).to.eql(busyStatus.BUSY);
+  });
+
+  it('updates item and it\'s status in state on object updating', () => {
+    const item = {
+      id: 2,
+      type: 'a',
+      attributes: {
+        aa: 1,
+        bb: [1, 2, 3],
+      },
+      relationships: {
+        cc: {
+          data: { id: 1, type: 'c' },
+        },
+        dd: {
+          data: [
+            { id: 1, type: 'c' },
+            { id: 2, type: 'd' },
+            { id: 3, type: 'e' },
+          ],
+        },
+      },
+    };
+    item[STATUS] = createStatus();
+    const initialState = { [item.id]: item };
+    deepFreeze(initialState);
+    const schema = 'schema_test';
+    const reducer = storage(schema, initialState);
+
+    const itemNew = {
+      id: 2,
+      type: 'a',
+      attributes: {
+        aa: 2,
+        bb: [3],
+      },
+      relationships: {
+        cc: {
+          data: { id: 5, type: 'c' },
+        },
+        dd: {
+          data: [
+            { id: 4, type: 'f' },
+            { id: 5, type: 'g' },
+            { id: 6, type: 'h' },
+          ],
+        },
+      },
+    };
+
     const action = {
       type: OBJECT_UPDATING,
       meta: {
@@ -227,34 +345,6 @@ describe('Storage reducer', () => {
     const expectedState = { [itemNew.id]: itemNew };
     expect(nextState).to.deep.equal(expectedState);
     expect(nextStateItem).to.deep.equal(itemNew);
-    expect(nextStateItem[STATUS].validationStatus).to.eql(validationStatus.INVALID);
-    expect(nextStateItem[STATUS].busyStatus).to.eql(busyStatus.BUSY);
-  });
-
-  it('partial update item and it\'s status in state on object updating', () => {
-    const item = { id: 1, value: 'a', control: 'c' };
-    item[STATUS] = createStatus();
-    const initialState = { [item.id]: item };
-    deepFreeze(initialState);
-    const schema = 'schema_test';
-    const reducer = storage(schema, initialState);
-
-    const itemNew = { id: 1, value: 'b' };
-    const action = {
-      type: OBJECT_UPDATING,
-      meta: {
-        schema,
-      },
-      payload: itemNew,
-    };
-
-    const nextState = reducer(initialState, action);
-    const nextStateItem = nextState[item.id];
-
-    const expectedItem = { ...item, ...itemNew };
-    const expectedState = { [itemNew.id]: expectedItem };
-    expect(nextState).to.deep.equal(expectedState);
-    expect(nextStateItem).to.deep.equal(expectedItem);
     expect(nextStateItem[STATUS].validationStatus).to.eql(validationStatus.INVALID);
     expect(nextStateItem[STATUS].busyStatus).to.eql(busyStatus.BUSY);
   });
@@ -408,7 +498,26 @@ describe('Storage reducer', () => {
   });
 
   it('applies transformation from action into item in storage on updating', () => {
-    const item = { id: 1, value: 'a', control: 'c' };
+    const item = {
+      id: 2,
+      type: 'a',
+      attributes: {
+        aa: 1,
+        bb: [1, 2, 3],
+      },
+      relationships: {
+        cc: {
+          data: { id: 1, type: 'c' },
+        },
+        dd: {
+          data: [
+            { id: 1, type: 'c' },
+            { id: 2, type: 'd' },
+            { id: 3, type: 'e' },
+          ],
+        },
+      },
+    };
     const transformation = {
       a: 'a',
       c: {
@@ -422,8 +531,21 @@ describe('Storage reducer', () => {
     const schema = 'schema_test';
     const reducer = storage(schema, initialState);
 
-    const itemNew = { id: 1, value: 'b' };
-    const transformationNew = {
+    const itemPatch = {
+      id: 2,
+      type: 'a',
+      attributes: {
+        bb: [2],
+      },
+      relationships: {
+        dd: {
+          data: [
+            { id: 2, type: 'd' },
+          ],
+        },
+      },
+    };
+    const transformationPatch = {
       b: 'b',
       c: {
         ff: 2,
@@ -434,23 +556,40 @@ describe('Storage reducer', () => {
       type: OBJECT_UPDATING,
       meta: {
         schema,
-        transformation: transformationNew,
+        transformation: transformationPatch,
       },
-      payload: itemNew,
+      payload: itemPatch,
     };
 
     const nextState = reducer(initialState, action);
     const nextStateItem = nextState[item.id];
 
-    const expectedItem = { ...item, ...itemNew };
-    const expectedState = { [itemNew.id]: expectedItem };
+    const expectedItem = {
+      id: 2,
+      type: 'a',
+      attributes: {
+        aa: 1,
+        bb: [2],
+      },
+      relationships: {
+        cc: {
+          data: { id: 1, type: 'c' },
+        },
+        dd: {
+          data: [
+            { id: 2, type: 'd' },
+          ],
+        },
+      },
+    };
+    const expectedState = { [expectedItem.id]: expectedItem };
     expect(nextState).to.deep.equal(expectedState);
     expect(nextStateItem).to.deep.equal(expectedItem);
     expect(nextStateItem[STATUS].validationStatus).to.eql(validationStatus.INVALID);
     expect(nextStateItem[STATUS].busyStatus).to.eql(busyStatus.BUSY);
     expect(nextStateItem[STATUS].transformation).to.eql(_.merge({},
       transformation,
-      transformationNew
+      transformationPatch
     ));
   });
 });
