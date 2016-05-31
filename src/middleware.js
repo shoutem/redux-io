@@ -32,6 +32,9 @@ export const OBJECT_CREATED = '@@redux_api_state/OBJECT_CREATED';
 export const OBJECT_REMOVING = '@@redux_api_state/OBJECT_REMOVING';
 export const OBJECT_REMOVED = '@@redux_api_state/OBJECT_REMOVED';
 
+export const OBJECT_ERROR = '@@redux_api_state/OBJECT_ERROR';
+export const COLLECTION_ERROR = '@@redux_api_state/COLLECTION_ERROR';
+
 export const middlewareJsonApiSource = '@@redux_api_state/json_api';
 
 const actionsWithoutPayload = new Set([
@@ -44,22 +47,36 @@ const actionsWithoutPayload = new Set([
   REMOVE_ERROR,
 ]);
 
-function makeCollectionAction(sourceAction, actionType, data, schema, tag = '*') {
+const actionsWithTags = new Set([
+  LOAD_REQUEST,
+  LOAD_SUCCESS,
+  LOAD_ERROR,
+]);
+
+function makeErrorAction(actionType, errorPayload) {
+  return {
+    type: actionType,
+    payload: errorPayload,
+    error: true,
+  };
+}
+
+export function makeCollectionAction(sourceAction, actionType, data, schema, tag = '*') {
   if (!actionType) {
     console.error('Action type is not valid.');
-    return null;
+    return makeErrorAction(COLLECTION_ERROR, 'Action type is not valid.');
   }
   if (!data) {
     console.error('Data is not valid.');
-    return null;
+    return makeErrorAction(COLLECTION_ERROR, 'Data is not valid.');
   }
   if (!schema) {
     console.error('Schema is not valid.');
-    return null;
+    return makeErrorAction(COLLECTION_ERROR, 'Schema is not valid.');
   }
   if (tag === undefined || tag === null) {
     console.error('Tag is not valid.');
-    return null;
+    return makeErrorAction(COLLECTION_ERROR, 'Tag is not valid.');
   }
 
   return {
@@ -73,22 +90,22 @@ function makeCollectionAction(sourceAction, actionType, data, schema, tag = '*')
   };
 }
 
-function makeObjectAction(sourceAction, actionType, item) {
+export function makeObjectAction(sourceAction, actionType, item) {
   if (!actionType) {
     console.error('Action type is not valid.');
-    return null;
+    return makeErrorAction(OBJECT_ERROR, 'Action type is not valid.');
   }
   if (!item) {
     console.error('Data is not valid.');
-    return null;
+    return makeErrorAction(OBJECT_ERROR, 'Data is not valid.');
   }
   if (!_.get(item, 'type')) {
     console.error('Schema is not valid.');
-    return null;
+    return makeErrorAction(OBJECT_ERROR, 'Schema is not valid.');
   }
   if (!_.get(item, 'id')) {
     console.error('Id is not valid.');
-    return null;
+    return makeErrorAction(OBJECT_ERROR, 'Id is not valid.');
   }
 
   // create transformation keys
@@ -109,10 +126,6 @@ const actionHandlers = {
   [LOAD_REQUEST]: (action, data, dispatch) => {
     // Make collection busy to prevent multiple requests
     const { schema, tag } = action.meta;
-    // Validate action meta has a tag value
-    if (!_.isString(tag)) {
-      return;
-    }
     dispatch(makeCollectionAction(
       action,
       COLLECTION_STATUS,
@@ -124,10 +137,6 @@ const actionHandlers = {
   [LOAD_SUCCESS]: (action, data, dispatch) => {
     // Dispatch objects to storages and collection with specific tag
     const { schema, tag } = action.meta;
-    // Validate action meta has a tag value
-    if (!_.isString(tag)) {
-      return;
-    }
     data.map(item => dispatch(makeObjectAction(action, OBJECT_FETCHED, item)));
     // TODO: once when we support findOne action and single reducer, COLLECTION_FETCHED
     // should trigger only for collections
@@ -136,10 +145,6 @@ const actionHandlers = {
   [LOAD_ERROR]: (action, data, dispatch) => {
     // Invalidate and idle collection on error
     const { schema, tag } = action.meta;
-    // Validate action meta has a tag value
-    if (!_.isString(tag)) {
-      return;
-    }
     dispatch(makeCollectionAction(
       action,
       COLLECTION_STATUS,
@@ -262,7 +267,7 @@ const actionHandlers = {
 
 function isValidAction(action) {
   if (!actionHandlers[action.type]) {
-    console.error('No action handler found for action.');
+    // we are not responsible for handling action
     return false;
   }
   // Check for meta object in action
@@ -291,6 +296,12 @@ function isValidAction(action) {
   if (!actionsWithoutPayload.has(action.type)
     && !_.has(action, 'payload.data')) {
     console.error('Payload Data is invalid, expecting payload.data.');
+    return false;
+  }
+  // Validate tag for tag-specific action, ignore others
+  if (actionsWithTags.has(action.type)
+    && !_.isString(_.get(action, 'meta.tag'))) {
+    console.error('Tag is invalid, expecting meta.tag');
     return false;
   }
 
