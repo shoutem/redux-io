@@ -4,6 +4,13 @@ import { getTransformation } from '../status';
 // Ignored properties are passed from store so they can not be Set
 const DEFAULT_IGNORED_PROPERTIES = { id: true, type: true };
 
+function getDefaultJsonItemAttributeNames() {
+  return [
+    'id',
+    'type',
+  ];
+}
+
 function createNormalizedJsonItemDescription(denormalizedItem) {
   return {
     id: denormalizedItem.id,
@@ -32,10 +39,13 @@ function isIgnoredProperty(property, ignoredProperties = DEFAULT_IGNORED_PROPERT
   return !!ignoredProperties[property];
 }
 
-export function normalizeItem(item) {
-  return _.reduce(item, (normalizedItem, val, property) => {
-    const itemTransformation = getTransformation(item);
+export function normalizeItem(item, picks = null) {
+  const itemTransformation = getTransformation(item);
+  if (!_.isNull(picks)) {
+    item = _.pick(item, _.union(getDefaultJsonItemAttributeNames(), picks));
+  }
 
+  return _.reduce(item, (normalizedItem, val, property) => {
     if (!itemTransformation || isIgnoredProperty(property)) {
       return normalizedItem;
     }
@@ -58,12 +68,11 @@ export function normalizeItem(item) {
     } else {
       normalizedItem.attributes[property] = val;
     }
-
     return normalizedItem;
   }, createNormalizedJsonItemDescription(item));
 }
 
-export function normalizeCollection(collection) {
-  return collection.map(item => normalizeItem(item));
+export function normalizeCollection(collection, picks = null) {
+  return collection.map(item => normalizeItem(item, picks));
 }
 
