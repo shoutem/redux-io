@@ -1,6 +1,6 @@
 {
   "name": "@shoutem/redux-api-state",
-  "version": "0.0.10-beta.1",
+  "version": "0.0.10-beta.2",
   "description": "Action creators, reducers and middleware for simple handling of normalized json api data in state",
   "main": "lib/index.js",
   "files": [
