@@ -85,6 +85,10 @@ export default class ReduxApiStateDenormalizer extends ReduxDenormalizer {
    * @returns {{}}
    */
   denormalizeCollection(collection, schema, storage) {
-    return collection.map(id => (this.denormalizeItem(id, schema, storage)));
+    const denormalizedCollection = collection.map(id =>
+      (this.denormalizeItem(id, schema, storage))
+    );
+    applyStatus(collection, denormalizedCollection);
+    return denormalizedCollection;
   }
 }

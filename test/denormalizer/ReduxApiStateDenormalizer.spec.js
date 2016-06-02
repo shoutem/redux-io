@@ -1,6 +1,12 @@
 import { assert } from 'chai';
 import { ReduxApiStateDenormalizer } from '../../src/index';
 import { createSchemasMap } from '../../src/denormalizer/ReduxApiStateDenormalizer';
+import {
+  STATUS,
+  createStatus,
+  updateStatus,
+} from '../../src/status';
+
 
 function createStorageMap() {
   return {
@@ -9,58 +15,63 @@ function createStorageMap() {
   };
 }
 
-const getStore = () => ({
-  storage: {
-    type1: {
-      type1Id1: {
-        id: 'type1Id1',
-        type: 'type1',
-        attributes: {
-          name: 'type1Id1',
-        },
-        relationships: {
-          type1: {
-            data: [
-              { id: 'type1Id2', type: 'type1' },
-              { id: 'type1Id3', type: 'type1' },
-            ],
+const getStore = () => {
+  const store = {
+    storage: {
+      type1: {
+        type1Id1: {
+          id: 'type1Id1',
+          type: 'type1',
+          attributes: {
+            name: 'type1Id1',
           },
-          'type2.test': {
-            data: {
-              id: 'type2Id1', type: 'type2.test',
+          relationships: {
+            type1: {
+              data: [
+                {id: 'type1Id2', type: 'type1'},
+                {id: 'type1Id3', type: 'type1'},
+              ],
+            },
+            'type2.test': {
+              data: {
+                id: 'type2Id1', type: 'type2.test',
+              },
+            },
+          },
+        },
+        type1Id2: {
+          id: 'type1Id2',
+          type: 'type1',
+          attributes: {name: 'type1Id2'},
+        },
+        type1Id3: {
+          id: 'type1Id3',
+          type: 'type1',
+          attributes: {name: 'type1Id3'},
+          relationships: {
+            type1: {
+              data: [
+                {id: 'type1Id2', type: 'type1'},
+              ],
             },
           },
         },
       },
-      type1Id2: {
-        id: 'type1Id2',
-        type: 'type1',
-        attributes: { name: 'type1Id2' },
-      },
-      type1Id3: {
-        id: 'type1Id3',
-        type: 'type1',
-        attributes: { name: 'type1Id3' },
-        relationships: {
-          type1: {
-            data: [
-              { id: 'type1Id2', type: 'type1' },
-            ],
+      'type2.test': {
+        type2Id1: {
+          id: 'type2Id1',
+          type: 'type2.test',
+          attributes: {
+            name: 'type2Id1',
           },
         },
       },
     },
-    'type2.test': {
-      type2Id1: {
-        id: 'type2Id1',
-        type: 'type2.test',
-        attributes: {
-          name: 'type2Id1',
-        },
-      },
-    },
-  },
-});
+  };
+  store.storage.type1.type1Id1[STATUS] = createStatus();
+  store.storage['type2.test'].type2Id1[STATUS] = createStatus();
+  return store;
+};
 
 describe('ReduxApiStateDenormalizer', () => {
   describe('new instance', () => {
@@ -103,6 +114,8 @@ describe('ReduxApiStateDenormalizer', () => {
         expectedData,
         'item not denormalized correctly'
       );
+      assert.isObject(denormalizedData[STATUS]);
+      assert.isObject(denormalizedData['type2.test'][STATUS]);
     });
   });
   describe('denormalizeCollection', () => {
@@ -129,13 +142,16 @@ describe('ReduxApiStateDenormalizer', () => {
           ],
         },
       ];
+      const collection = ['type1Id1'];
+      collection[STATUS] = createStatus();
       const denormalizedData =
-        denormalizer.denormalizeCollection(['type1Id1'], 'type1');
+        denormalizer.denormalizeCollection(collection, 'type1');
       assert.deepEqual(
         denormalizedData,
         expectedData,
         'collection not denormalized correctly'
       );
+      assert.isObject(denormalizedData[STATUS]);
     });
   });
 });

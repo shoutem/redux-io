@@ -111,6 +111,11 @@ describe('Status metadata', () => {
     expect(isInitialized(obj)).to.be.true;
   });
 
+  it('isInitialized returns correct value on object without status', () => {
+    const obj = {};
+    expect(isInitialized(obj)).to.be.false;
+  });
+
   it('shouldRefresh returns correct value on idle,invalid', () => {
     const status = updateStatus(
       createStatus(),
