@@ -6,6 +6,7 @@ import {
   updateStatus,
   isValid,
   isBusy,
+  isInitialized,
   shouldRefresh,
   validationStatus,
   busyStatus,
@@ -75,6 +76,39 @@ describe('Status metadata', () => {
     obj[STATUS] = status;
 
     expect(isBusy(obj)).to.be.false;
+  });
+
+  it('isInitialized returns correct value on none', () => {
+    const status = updateStatus(
+      createStatus(),
+      { validationStatus: validationStatus.NONE }
+    );
+    const obj = {};
+    obj[STATUS] = status;
+
+    expect(isInitialized(obj)).to.be.false;
+  });
+
+  it('isInitialized returns correct value on invalid', () => {
+    const status = updateStatus(
+      createStatus(),
+      { validationStatus: validationStatus.INVALID }
+    );
+    const obj = {};
+    obj[STATUS] = status;
+
+    expect(isInitialized(obj)).to.be.true;
+  });
+
+  it('isInitialized returns correct value on valid', () => {
+    const status = updateStatus(
+      createStatus(),
+      { validationStatus: validationStatus.VALID }
+    );
+    const obj = {};
+    obj[STATUS] = status;
+
+    expect(isInitialized(obj)).to.be.true;
   });
 
   it('shouldRefresh returns correct value on idle,invalid', () => {

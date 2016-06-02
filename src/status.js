@@ -38,6 +38,9 @@ export const getTransformation = obj => obj[STATUS] && obj[STATUS].transformatio
 export const isValid = obj =>
   obj[STATUS] && obj[STATUS].validationStatus === validationStatus.VALID;
 
+export const isInitialized = obj =>
+obj[STATUS] && obj[STATUS].validationStatus !== validationStatus.NONE;
+
 export const isBusy = obj =>
   !!(obj[STATUS] && obj[STATUS].busyStatus === busyStatus.BUSY);
 
