@@ -13,8 +13,9 @@ export const busyStatus = Object.freeze({
   BUSY: 'busy',
 });
 
-export const createStatus = () => (
+export const createStatus = (description = {}) => (
   {
+    ...description,
     validationStatus: validationStatus.NONE,
     busyStatus: busyStatus.IDLE,
     modifiedTimestamp: Date.now(),

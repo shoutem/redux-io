@@ -38,8 +38,9 @@ export default function collection(schema, tag, initialState = []) {
   if (tag === '*') {
     throw new Error('Tag value \'*\' is reserved for redux-api-state and cannot be used.');
   }
+  const collectionDescription = { schema, tag };
   // eslint-disable-next-line no-param-reassign
-  initialState[STATUS] = createStatus();
+  initialState[STATUS] = createStatus(collectionDescription);
   return (state = initialState, action) => {
     if (!isValid(action, schema, tag)) {
       return state;
@@ -75,7 +76,7 @@ export default function collection(schema, tag, initialState = []) {
           return state;
         }
         const newState = [...state];
-        newState[STATUS] = createStatus();
+        newState[STATUS] = createStatus(collectionDescription);
         return newState;
       }
     }
