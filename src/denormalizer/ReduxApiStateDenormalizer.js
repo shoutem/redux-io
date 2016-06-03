@@ -124,6 +124,7 @@ export default class ReduxApiStateDenormalizer extends ReduxDenormalizer {
       if (updatedCollection !== cache.getCollection(collection)) {
         applyStatus(updatedCollection, updatedCollection);
       }
+      return updatedCollection;
     }
 
     const denormalizedCollection = super.denormalizeCollection(descriptorCollection, storage);
