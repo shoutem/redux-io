@@ -60,12 +60,11 @@ export {
   middlewareJsonApiSource,
 } from './middleware';
 
-
 export {
   isValid,
   isBusy,
+  isError,
   isInitialized,
   shouldRefresh,
   getTransformation,
 } from './status';
-

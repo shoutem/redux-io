@@ -55,7 +55,10 @@ export default (config, schema, item = null) => {
           type: CREATE_SUCCESS,
           meta,
         },
-        CREATE_ERROR,
+        {
+          type: CREATE_ERROR,
+          meta,
+        },
       ],
     },
   };

@@ -7,6 +7,7 @@ import {
   isValid,
   isBusy,
   isInitialized,
+  isError,
   shouldRefresh,
   validationStatus,
   busyStatus,
@@ -85,8 +86,17 @@ describe('Status metadata', () => {
     );
     const obj = {};
     obj[STATUS] = status;
-
     expect(isInitialized(obj)).to.be.false;
+  });
+
+  it('isError returns correct value on error', () => {
+    const status = updateStatus(
+      createStatus(),
+      { error: true }
+    );
+    const obj = {};
+    obj[STATUS] = status;
+    expect(isError(obj)).to.be.true;
   });
 
   it('isInitialized returns correct value on invalid', () => {
@@ -96,8 +106,17 @@ describe('Status metadata', () => {
     );
     const obj = {};
     obj[STATUS] = status;
-
     expect(isInitialized(obj)).to.be.true;
+  });
+
+  it('isError returns correct value on not error', () => {
+    const status = updateStatus(
+      createStatus(),
+      { error: false }
+    );
+    const obj = {};
+    obj[STATUS] = status;
+    expect(isError(obj)).to.be.false;
   });
 
   it('isInitialized returns correct value on valid', () => {
@@ -142,6 +161,36 @@ describe('Status metadata', () => {
     obj[STATUS] = status;
 
     expect(shouldRefresh(obj)).to.be.false;
+  });
+
+  it('shouldRefresh returns correct value on error', () => {
+    const status = updateStatus(
+      createStatus(),
+      {
+        busyStatus: busyStatus.IDLE,
+        validationStatus: validationStatus.INVALID,
+        error: true,
+      }
+    );
+    const obj = {};
+    obj[STATUS] = status;
+
+    expect(shouldRefresh(obj)).to.be.false;
+  });
+
+  it('shouldRefresh returns correct value on error with ignoreError flag', () => {
+    const status = updateStatus(
+      createStatus(),
+      {
+        busyStatus: busyStatus.IDLE,
+        validationStatus: validationStatus.INVALID,
+        error: true,
+      }
+    );
+    const obj = {};
+    obj[STATUS] = status;
+
+    expect(shouldRefresh(obj, true)).to.be.true;
   });
 
   it('applyStatus applies cloned status on destination object from source object', () => {

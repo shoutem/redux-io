@@ -43,7 +43,10 @@ export default (config, schema, tag = '') => {
           type: LOAD_SUCCESS,
           meta,
         },
-        LOAD_ERROR,
+        {
+          type: LOAD_ERROR,
+          meta,
+        },
       ],
     },
   };

@@ -56,7 +56,8 @@ describe('Update action creator', () => {
     expect(types[0].payload).to.deep.equal({ data: item });
     expect(types[1].type).to.equal(UPDATE_SUCCESS);
     expect(types[1].meta).to.deep.equal(expectedMeta);
-    expect(types[2]).to.equal(UPDATE_ERROR);
+    expect(types[2].type).to.equal(UPDATE_ERROR);
+    expect(types[2].meta).to.deep.equal(expectedMeta);
   });
 
   it('throws exception on invalid action with null config', () => {

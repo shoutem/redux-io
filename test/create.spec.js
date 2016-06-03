@@ -8,6 +8,7 @@ import {
   create,
   CREATE_REQUEST,
   CREATE_SUCCESS,
+  CREATE_ERROR,
   OBJECT_CREATED,
   COLLECTION_STATUS,
   apiStateMiddleware,
@@ -64,6 +65,8 @@ describe('Create action creator', () => {
     expect(types[0].meta).to.deep.equal(expectedMeta);
     expect(types[1].type).to.equal(CREATE_SUCCESS);
     expect(types[1].meta).to.deep.equal(expectedMeta);
+    expect(types[2].type).to.equal(CREATE_ERROR);
+    expect(types[2].meta).to.deep.equal(expectedMeta);
   });
 
   it('creates a valid action with item in config', () => {

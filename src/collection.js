@@ -50,7 +50,11 @@ export default function collection(schema, tag, initialState = []) {
         const newState = action.payload.map(item => item.id);
         newState[STATUS] = updateStatus(
           state[STATUS],
-          { validationStatus: validationStatus.VALID, busyStatus: busyStatus.IDLE }
+          {
+            validationStatus: validationStatus.VALID,
+            busyStatus: busyStatus.IDLE,
+            error: false,
+          }
         );
         return newState;
       }
@@ -58,7 +62,11 @@ export default function collection(schema, tag, initialState = []) {
         const newState = [];
         newState[STATUS] = updateStatus(
           state[STATUS],
-          { validationStatus: validationStatus.VALID, busyStatus: busyStatus.IDLE }
+          {
+            validationStatus: validationStatus.VALID,
+            busyStatus: busyStatus.IDLE,
+            error: false,
+          }
         );
         return newState;
       }

@@ -17,13 +17,14 @@ export const createStatus = () => (
   {
     validationStatus: validationStatus.NONE,
     busyStatus: busyStatus.IDLE,
+    error: false,
     modifiedTimestamp: Date.now(),
     transformation: {},
   }
 );
 
 export const updateStatus = (status, update) => (
-  _.merge({}, status, update, {modifiedTimestamp: Date.now()})
+  _.merge({}, status, update, { modifiedTimestamp: Date.now() })
 );
 
 export const applyStatus = (sourceObject, destinationObject) => {
@@ -44,5 +45,8 @@ export const isInitialized = obj =>
 export const isBusy = obj =>
   !!(obj[STATUS] && obj[STATUS].busyStatus === busyStatus.BUSY);
 
-export const shouldRefresh = obj =>
-  !isValid(obj) && !isBusy(obj);
+export const isError = obj =>
+  !!(obj[STATUS] && obj[STATUS].error);
+
+export const shouldRefresh = (obj, ignoreError = false) =>
+  !isValid(obj) && !isBusy(obj) && (!isError(obj) || ignoreError);
