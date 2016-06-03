@@ -1,11 +1,13 @@
 /* eslint-disable no-unused-expressions */
 import { expect } from 'chai';
 import nock from 'nock';
+import _ from 'lodash';
 import { CALL_API, apiMiddleware } from 'redux-api-middleware';
 import configureMockStore from 'redux-mock-store';
 import thunk from 'redux-thunk';
 import {
   find,
+  API_STATE,
   LOAD_REQUEST,
   LOAD_SUCCESS,
   LOAD_ERROR,
@@ -18,6 +20,14 @@ import { middlewareJsonApiSource } from '../src/middleware';
 import {
   busyStatus,
 } from '../src/status';
+
+function unwrapAction(action) {
+  return _.reduce(
+    action.payload,
+    (result, schemaActions) => _.concat(result, schemaActions),
+    []
+  );
+}
 
 describe('Find action creator', () => {
   const middlewares = [thunk, apiMiddleware, apiStateMiddleware];
@@ -141,28 +151,40 @@ describe('Find action creator', () => {
     const store = mockStore({});
     store.dispatch(action)
       .then(() => {
-        const performedActions = store.getActions();
-        expect(performedActions).to.have.length(6);
+        const actions = store.getActions();
+        expect(actions).to.have.length(4);
 
-        const actionCollStatus = performedActions[0];
+        const apiStateRequestAction = actions[0];
+        expect(apiStateRequestAction.type).to.equal(API_STATE);
+
+        const performedRequestActions = unwrapAction(actions[0]);
+        expect(performedRequestActions).to.have.length(1);
+
+        const actionCollStatus = performedRequestActions[0];
         expect(actionCollStatus.type).to.equal(COLLECTION_STATUS);
         expect(actionCollStatus.meta).to.deep.equal({ ...expectedMeta });
         const expectedCollStatusPayload = { busyStatus: busyStatus.BUSY };
         expect(actionCollStatus.payload).to.deep.equal(expectedCollStatusPayload);
 
-        expect(performedActions[1].type).to.equal(LOAD_REQUEST);
+        expect(actions[1].type).to.equal(LOAD_REQUEST);
 
-        const actionObjFetched = performedActions[2];
+        const apiStateSuccessAction = actions[2];
+        expect(apiStateSuccessAction.type).to.equal(API_STATE);
+
+        const performedSuccessActions = unwrapAction(apiStateSuccessAction);
+        expect(performedSuccessActions).to.have.length(3);
+
+        const actionObjFetched = performedSuccessActions[0];
         expect(actionObjFetched.type).to.equal(OBJECT_FETCHED);
         expect(actionObjFetched.meta).to.deep.equal({ ...expectedMeta, transformation: {} });
         expect(actionObjFetched.payload).to.deep.equal(expectedPayload.data[0]);
 
-        const actionCollFetched = performedActions[4];
+        const actionCollFetched = performedSuccessActions[2];
         expect(actionCollFetched.type).to.equal(COLLECTION_FETCHED);
         expect(actionCollFetched.meta).to.deep.equal({ ...expectedMeta });
         expect(actionCollFetched.payload).to.deep.equal(expectedPayload.data);
 
-        const successAction = performedActions[5];
+        const successAction = actions[3];
         expect(successAction.type).to.equal(LOAD_SUCCESS);
         expect(successAction.meta).to.deep.equal(expectedMeta);
         expect(successAction.payload).to.deep.equal(expectedPayload);

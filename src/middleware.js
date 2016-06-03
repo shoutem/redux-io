@@ -6,6 +6,8 @@ import {
   busyStatus,
 } from './status';
 
+export const API_STATE = '@@redux_api_state/API_STATE';
+
 export const CREATE_REQUEST = '@@redux_api_state/CREATE_REQUEST';
 export const CREATE_SUCCESS = '@@redux_api_state/CREATE_SUCCESS';
 export const CREATE_ERROR = '@@redux_api_state/CREATE_ERROR';
@@ -94,14 +96,14 @@ function makeObjectAction(sourceAction, actionType, item) {
 }
 
 const actionHandlers = {
-  [LOAD_REQUEST]: (action, data, dispatch) => {
+  [LOAD_REQUEST]: (action, data, actions) => {
     // Make collection busy to prevent multiple requests
     const { schema, tag } = action.meta;
     // Validate action meta has a tag value
     if (!_.isString(tag)) {
       return;
     }
-    dispatch(makeCollectionAction(
+    actions.push(makeCollectionAction(
       action,
       COLLECTION_STATUS,
       { busyStatus: busyStatus.BUSY },
@@ -109,79 +111,79 @@ const actionHandlers = {
       tag
     ));
   },
-  [LOAD_SUCCESS]: (action, data, dispatch) => {
+  [LOAD_SUCCESS]: (action, data, actions) => {
     // Dispatch objects to storages and collection with specific tag
     const { schema, tag } = action.meta;
     // Validate action meta has a tag value
     if (!_.isString(tag)) {
       return;
     }
-    data.map(item => dispatch(makeObjectAction(action, OBJECT_FETCHED, item)));
+    data.map(item => actions.push(makeObjectAction(action, OBJECT_FETCHED, item)));
     // TODO: once when we support findOne action and single reducer, COLLECTION_FETCHED
     // should trigger only for collections
-    dispatch(makeCollectionAction(action, COLLECTION_FETCHED, data, schema, tag));
+    actions.push(makeCollectionAction(action, COLLECTION_FETCHED, data, schema, tag));
   },
-  [CREATE_REQUEST]: (action, data, dispatch) => {
+  [CREATE_REQUEST]: (action, data, actions) => {
     // Change collection status to busy and invalid to prevent fetching.
     const schema = action.meta.schema;
-    dispatch(makeCollectionAction(
+    actions.push(makeCollectionAction(
       action,
       COLLECTION_STATUS,
       { validationStatus: validationStatus.INVALID, busyStatus: busyStatus.BUSY },
       schema
     ));
   },
-  [CREATE_SUCCESS]: (action, data, dispatch) => {
+  [CREATE_SUCCESS]: (action, data, actions) => {
     // Dispatch created objects to storage and change collection status to invalid, idle
-    data.map(item => dispatch(makeObjectAction(action, OBJECT_CREATED, item)));
+    data.map(item => actions.push(makeObjectAction(action, OBJECT_CREATED, item)));
     const schema = action.meta.schema;
-    dispatch(makeCollectionAction(
+    actions.push(makeCollectionAction(
       action,
       COLLECTION_STATUS,
       { validationStatus: validationStatus.INVALID, busyStatus: busyStatus.IDLE },
       schema
     ));
   },
-  [UPDATE_REQUEST]: (action, data, dispatch) => {
+  [UPDATE_REQUEST]: (action, data, actions) => {
     // Change collection status to busy and invalid to prevent fetching and because of
     // local changes in storage state with updated item.
     const schema = action.meta.schema;
-    dispatch(makeCollectionAction(
+    actions.push(makeCollectionAction(
       action,
       COLLECTION_STATUS,
       { validationStatus: validationStatus.INVALID, busyStatus: busyStatus.BUSY },
       schema
     ));
-    data.map(item => dispatch(makeObjectAction(action, OBJECT_UPDATING, item)));
+    data.map(item => actions.push(makeObjectAction(action, OBJECT_UPDATING, item)));
   },
-  [UPDATE_SUCCESS]: (action, data, dispatch) => {
+  [UPDATE_SUCCESS]: (action, data, actions) => {
     // Dispatch updated objects from and change collections status to idle & invalid
-    data.map(item => dispatch(makeObjectAction(action, OBJECT_UPDATED, item)));
+    data.map(item => actions.push(makeObjectAction(action, OBJECT_UPDATED, item)));
     const schema = action.meta.schema;
-    dispatch(makeCollectionAction(
+    actions.push(makeCollectionAction(
       action,
       COLLECTION_STATUS,
       { validationStatus: validationStatus.INVALID, busyStatus: busyStatus.IDLE },
       schema
     ));
   },
-  [REMOVE_REQUEST]: (action, data, dispatch) => {
+  [REMOVE_REQUEST]: (action, data, actions) => {
     // Change collections status to busy and invalid because of removing item in
     // local storage state
     const schema = action.meta.schema;
-    dispatch(makeCollectionAction(
+    actions.push(makeCollectionAction(
       action,
       COLLECTION_STATUS,
       { validationStatus: validationStatus.INVALID, busyStatus: busyStatus.BUSY },
       schema
     ));
-    data.map(item => dispatch(makeObjectAction(action, OBJECT_REMOVING, item)));
+    data.map(item => actions.push(makeObjectAction(action, OBJECT_REMOVING, item)));
   },
-  [REMOVE_SUCCESS]: (action, data, dispatch) => {
+  [REMOVE_SUCCESS]: (action, data, actions) => {
     // Remove object if already not removed during request
-    data.map(item => dispatch(makeObjectAction(action, OBJECT_REMOVED, item)));
+    data.map(item => actions.push(makeObjectAction(action, OBJECT_REMOVED, item)));
     const schema = action.meta.schema;
-    dispatch(makeCollectionAction(
+    actions.push(makeCollectionAction(
       action,
       COLLECTION_STATUS,
       { validationStatus: validationStatus.INVALID, busyStatus: busyStatus.IDLE },
@@ -236,14 +238,27 @@ export default store => next => action => {
   }
 
   const dispatch = store.dispatch;
+  const actions = [];
 
   // First dispatch included objects
   const included = getIncluded(action.payload);
-  included.map(item => dispatch(makeObjectAction(action, OBJECT_FETCHED, item)));
+  included.map(item => actions.push(makeObjectAction(action, OBJECT_FETCHED, item)));
 
   // Find handler for supported action type to make appropriate logic
   const data = getData(action.payload);
-  actionHandlers[action.type](action, data, dispatch);
+  actionHandlers[action.type](action, data, actions);
+
+  if (_.isEmpty(actions)) {
+    return next(action);
+  }
+
+  const schemaActions = _.groupBy(actions, a => a.meta.schema);
+
+  dispatch({
+    type: API_STATE,
+    payload: schemaActions,
+    meta: action.meta,
+  });
 
   // After middleware handled action pass input action to next
   return next(action);

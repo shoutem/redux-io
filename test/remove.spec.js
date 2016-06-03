@@ -1,11 +1,13 @@
 /* eslint-disable no-unused-expressions */
 import { expect } from 'chai';
 import nock from 'nock';
+import _ from 'lodash';
 import { CALL_API, apiMiddleware } from 'redux-api-middleware';
 import configureMockStore from 'redux-mock-store';
 import thunk from 'redux-thunk';
 import {
   remove,
+  API_STATE,
   REMOVE_REQUEST,
   REMOVE_SUCCESS,
   OBJECT_REMOVING,
@@ -19,7 +21,15 @@ import {
   busyStatus,
 } from '../src/status';
 
-describe('Delete action creator', () => {
+function unwrapAction(action) {
+  return _.reduce(
+    action.payload,
+    (result, schemaActions) => _.concat(result, schemaActions),
+    []
+  );
+}
+
+describe('Remove action creator', () => {
   const middlewares = [thunk, apiMiddleware, apiStateMiddleware];
   let mockStore = configureMockStore(middlewares);
 
@@ -119,10 +129,16 @@ describe('Delete action creator', () => {
     const store = mockStore({});
     store.dispatch(action)
       .then(() => {
-        const performedActions = store.getActions();
-        expect(performedActions).to.have.length(6);
+        const actions = store.getActions();
+        expect(actions).to.have.length(4);
 
-        const actionCollBusyRequest = performedActions[0];
+        const apiStateRequestAction = actions[0];
+        expect(apiStateRequestAction.type).to.equal(API_STATE);
+
+        const performedRequestActions = unwrapAction(actions[0]);
+        expect(performedRequestActions).to.have.length(2);
+
+        const actionCollBusyRequest = performedRequestActions[0];
         expect(actionCollBusyRequest.type).to.equal(COLLECTION_STATUS);
         expect(actionCollBusyRequest.meta)
           .to.deep.equal({ ...expectedMeta, tag: '*' });
@@ -132,17 +148,23 @@ describe('Delete action creator', () => {
         };
         expect(actionCollBusyRequest.payload).to.deep.equal(expectedCollBusyStatusPayload);
 
-        const actionObjDeleting = performedActions[1];
+        const actionObjDeleting = performedRequestActions[1];
         expect(actionObjDeleting.type).to.equal(OBJECT_REMOVING);
         expect(actionObjDeleting.meta).to.deep.equal({ ...expectedMeta, transformation: {} });
 
-        expect(performedActions[2].type).to.equal(REMOVE_REQUEST);
+        expect(actions[1].type).to.equal(REMOVE_REQUEST);
 
-        const actionObjRemoved = performedActions[3];
+        const apiStateSuccessAction = actions[2];
+        expect(apiStateSuccessAction.type).to.equal(API_STATE);
+
+        const performedSuccessActions = unwrapAction(apiStateSuccessAction);
+        expect(performedSuccessActions).to.have.length(2);
+
+        const actionObjRemoved = performedSuccessActions[0];
         expect(actionObjRemoved.type).to.equal(OBJECT_REMOVED);
         expect(actionObjRemoved.meta).to.deep.equal({ ...expectedMeta, transformation: {} });
 
-        const actionCollStatus = performedActions[4];
+        const actionCollStatus = performedSuccessActions[1];
         expect(actionCollStatus.type).to.equal(COLLECTION_STATUS);
         expect(actionCollStatus.meta).to.deep.equal({ ...expectedMeta, tag: '*' });
         const expectedCollStatusPayload = {
@@ -151,7 +173,7 @@ describe('Delete action creator', () => {
         };
         expect(actionCollStatus.payload).to.deep.equal(expectedCollStatusPayload);
 
-        const successAction = performedActions[5];
+        const successAction = actions[3];
         expect(successAction.type).to.equal(REMOVE_SUCCESS);
         expect(successAction.meta).to.deep.equal(expectedMeta);
       }).then(done).catch(done);

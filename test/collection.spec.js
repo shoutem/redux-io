@@ -1,10 +1,12 @@
 import { expect } from 'chai';
 import deepFreeze from 'deep-freeze';
+import _ from 'lodash';
 import {
   collection,
   COLLECTION_FETCHED,
   COLLECTION_CLEAR,
   COLLECTION_STATUS,
+  API_STATE,
 } from '../src';
 import {
   STATUS,
@@ -12,6 +14,15 @@ import {
   busyStatus,
   createStatus,
  } from '../src/status';
+
+function wrapActions(actions) {
+  const actionArray = _.concat([], actions);
+  const schemaActions = _.groupBy(actionArray, a => a.meta.schema);
+  return {
+    type: API_STATE,
+    payload: schemaActions,
+  };
+}
 
 describe('Collection reducer', () => {
   it('has a valid initial state', () => {
@@ -35,14 +46,14 @@ describe('Collection reducer', () => {
     const reducer = collection(schema, tag, initialState);
     deepFreeze(initialState);
 
-    const action = {
+    const action = wrapActions({
       type: COLLECTION_FETCHED,
       meta: {
         schema,
         tag,
       },
       payload: items,
-    };
+    });
 
     const nextState = reducer(undefined, action);
     const expectedState = items.map(item => item.id);
@@ -63,14 +74,14 @@ describe('Collection reducer', () => {
     const reducer = collection(schema, tag, initialState);
     deepFreeze(initialState);
 
-    const action = {
+    const action = wrapActions({
       type: COLLECTION_FETCHED,
       meta: {
         schema: 'test2',
         tag,
       },
       payload: items,
-    };
+    });
 
     const nextState = reducer(undefined, action);
     expect(nextState).to.equal(initialState);
@@ -89,14 +100,14 @@ describe('Collection reducer', () => {
     const reducer = collection(schema, tag, initialState);
     deepFreeze(initialState);
 
-    const action = {
+    const action = wrapActions({
       type: 'COLLECTION_FETCHED',
       meta: {
         schema,
         tag,
       },
       payload: items,
-    };
+    });
 
     const nextState = reducer(undefined, action);
     expect(nextState).to.equal(initialState);
@@ -115,14 +126,14 @@ describe('Collection reducer', () => {
     const reducer = collection(schema, tag, initialState);
     deepFreeze(initialState);
 
-    const action = {
+    const action = wrapActions({
       type: COLLECTION_FETCHED,
       meta: {
         schema,
         tag: 'collection2',
       },
       payload: items,
-    };
+    });
 
     const nextState = reducer(undefined, action);
     expect(nextState).to.equal(initialState);
@@ -145,14 +156,14 @@ describe('Collection reducer', () => {
       { id: 3 },
       { id: 4 },
     ];
-    const action = {
+    const action = wrapActions({
       type: COLLECTION_FETCHED,
       meta: {
         schema,
         tag,
       },
       payload: itemsNew,
-    };
+    });
 
     const nextState = reducer(undefined, action);
     const expectedState = itemsNew.map(item => item.id);
@@ -172,14 +183,14 @@ describe('Collection reducer', () => {
     const reducer = collection(schema, tag, initialState);
     deepFreeze(initialState);
 
-    const action = {
+    const action = wrapActions({
       type: COLLECTION_STATUS,
       payload: { validationStatus: validationStatus.INVALID, busyStatus: busyStatus.IDLE },
       meta: {
         schema,
         tag: '*',
       },
-    };
+    });
 
     const nextState = reducer(undefined, action);
     expect(nextState).to.eql(initialState);
@@ -200,14 +211,14 @@ describe('Collection reducer', () => {
     const otherReducer = collection(schema, otherTag, initialState);
     deepFreeze(initialState);
 
-    const action = {
+    const action = wrapActions({
       type: COLLECTION_STATUS,
       payload: { busyStatus: busyStatus.BUSY },
       meta: {
         schema,
         tag,
       },
-    };
+    });
 
     const nextState = reducer(undefined, action);
     expect(nextState).to.eql(initialState);
@@ -255,33 +266,6 @@ describe('Collection reducer', () => {
 
     expect(nextState).to.deep.equal([]);
     expect(nextState[STATUS].validationStatus).to.eql(validationStatus.VALID);
-    expect(nextState[STATUS].busyStatus).to.eql(busyStatus.IDLE);
-  });
-
-  it('adds status to collection state without status', () => {
-    const initialState = [];
-    const items = [
-      { id: 1 },
-      { id: 2 },
-    ];
-    const schema = 'schema_test';
-    const tag = 'tag_test';
-    const reducer = collection(schema, tag, initialState);
-    deepFreeze(initialState);
-
-    const action = {
-      type: 'unknown action',
-      meta: {
-        schema,
-        tag,
-      },
-      payload: items,
-    };
-
-    const customState = [];
-    const nextState = reducer(customState, action);
-    expect(nextState).to.deep.equal(customState);
-    expect(nextState[STATUS].validationStatus).to.eql(validationStatus.NONE);
     expect(nextState[STATUS].busyStatus).to.eql(busyStatus.IDLE);
   });
 });

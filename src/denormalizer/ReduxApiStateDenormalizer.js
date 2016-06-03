@@ -11,7 +11,9 @@ import { applyStatus } from './../status';
 export function createSchemasMap(store, storeSchemasPaths) {
   const storage = {};
 
-  _.forEach(storeSchemasPaths, (path, schema) => storage[schema] = _.get(store, path));
+  _.forEach(storeSchemasPaths, (path, schema) => {
+    storage[schema] = _.get(store, path);
+  });
 
   return storage;
 }

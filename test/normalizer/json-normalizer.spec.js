@@ -1,4 +1,3 @@
-import _ from 'lodash';
 import { expect } from 'chai';
 import { normalizeItem, normalizeCollection } from '../../src';
 import {
@@ -292,6 +291,7 @@ describe('json-normalizer', () => {
     ];
 
     denormalizedList.map(item => (
+      // eslint-disable-next-line no-param-reassign
       item[STATUS] = updateStatus(
         createStatus(),
         {

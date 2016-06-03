@@ -6,6 +6,7 @@ import {
   OBJECT_UPDATED,
   OBJECT_REMOVING,
   OBJECT_REMOVED,
+  API_STATE,
 } from './middleware';
 import {
   STATUS,
@@ -49,49 +50,65 @@ function patchItemInState(currentItem, patch, actionMeta) {
   return newItem;
 }
 
+function reduceAction(state, action, schema) {
+  if (_.get(action, 'meta.schema') !== schema) {
+    return state;
+  }
+  const item = action.payload;
+  if (!_.isObject(item)) {
+    return state;
+  }
+  if (!_.has(item, 'id')) {
+    return state;
+  }
+
+  const currentItem = state[item.id];
+  switch (action.type) {
+    case OBJECT_UPDATING: {
+      const patchedItem = patchItemInState(currentItem, item, action.meta);
+      return { ...state, [item.id]: patchedItem };
+    }
+    case OBJECT_FETCHED:
+    case OBJECT_CREATED:
+    case OBJECT_UPDATED: {
+      item[STATUS] = mergeItemStatus(
+        currentItem,
+        {
+          validationStatus: validationStatus.VALID,
+          busyStatus: busyStatus.IDLE,
+          transformation: action.meta.transformation,
+        }
+      );
+      return { ...state, [item.id]: item };
+    }
+    case OBJECT_REMOVING:
+    case OBJECT_REMOVED: {
+      const newState = { ...state };
+      delete newState[item.id];
+      return newState;
+    }
+    default:
+      return state;
+  }
+}
+
 // storage is generic storage reducer that enables creation
 // of typed storage reducers that are handling specific
 // OBJECT_ type actions.
 export default function storage(schema, initialState = {}) {
   return (state = initialState, action) => {
-    if (_.get(action, 'meta.schema') !== schema) {
+    if (_.get(action, 'type') !== API_STATE) {
       return state;
     }
-    const item = action.payload;
-    if (!_.isObject(item)) {
-      return state;
-    }
-    if (!_.has(item, 'id')) {
+    if (!_.has(action, ['payload', schema])) {
       return state;
     }
 
-    const currentItem = state[item.id];
-    switch (action.type) {
-      case OBJECT_UPDATING: {
-        const patchedItem = patchItemInState(currentItem, item, action.meta);
-        return { ...state, [item.id]: patchedItem };
-      }
-      case OBJECT_FETCHED:
-      case OBJECT_CREATED:
-      case OBJECT_UPDATED: {
-        item[STATUS] = mergeItemStatus(
-          currentItem,
-          {
-            validationStatus: validationStatus.VALID,
-            busyStatus: busyStatus.IDLE,
-            transformation: action.meta.transformation,
-          }
-        );
-        return { ...state, [item.id]: item };
-      }
-      case OBJECT_REMOVING:
-      case OBJECT_REMOVED: {
-        const newState = { ...state };
-        delete newState[item.id];
-        return newState;
-      }
-      default:
-        return state;
-    }
+    const actions = action.payload[schema];
+    return _.reduce(
+      actions,
+      (currentState, currentAction) => reduceAction(currentState, currentAction, schema),
+      state
+    );
   };
 }

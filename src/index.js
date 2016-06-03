@@ -37,6 +37,7 @@ export { ReduxApiStateDenormalizer };
 export { normalizeItem, normalizeCollection } from './normalizer';
 
 export {
+  API_STATE,
   LOAD_REQUEST,
   LOAD_SUCCESS,
   LOAD_ERROR,

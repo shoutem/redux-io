@@ -4,7 +4,6 @@ import { createSchemasMap } from '../../src/denormalizer/ReduxApiStateDenormaliz
 import {
   STATUS,
   createStatus,
-  updateStatus,
 } from '../../src/status';
 
 
@@ -28,8 +27,8 @@ const getStore = () => {
           relationships: {
             type1: {
               data: [
-                {id: 'type1Id2', type: 'type1'},
-                {id: 'type1Id3', type: 'type1'},
+                { id: 'type1Id2', type: 'type1' },
+                { id: 'type1Id3', type: 'type1' },
               ],
             },
             'type2.test': {
@@ -42,16 +41,16 @@ const getStore = () => {
         type1Id2: {
           id: 'type1Id2',
           type: 'type1',
-          attributes: {name: 'type1Id2'},
+          attributes: { name: 'type1Id2' },
         },
         type1Id3: {
           id: 'type1Id3',
           type: 'type1',
-          attributes: {name: 'type1Id3'},
+          attributes: { name: 'type1Id3' },
           relationships: {
             type1: {
               data: [
-                {id: 'type1Id2', type: 'type1'},
+                { id: 'type1Id2', type: 'type1' },
               ],
             },
           },

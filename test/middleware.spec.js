@@ -1,7 +1,9 @@
 import { expect } from 'chai';
+import _ from 'lodash';
 import configureMockStore from 'redux-mock-store';
 import thunk from 'redux-thunk';
 import {
+  API_STATE,
   LOAD_REQUEST,
   LOAD_SUCCESS,
   CREATE_SUCCESS,
@@ -26,6 +28,14 @@ import {
   validationStatus,
   busyStatus,
 } from '../src/status';
+
+function unwrapAction(action) {
+  return _.reduce(
+    action.payload,
+    (result, schemaActions) => _.concat(result, schemaActions),
+    []
+  );
+}
 
 describe('Json api middleware', () => {
   let mockStore = configureMockStore([thunk, apiStateMiddleware]);
@@ -56,8 +66,14 @@ describe('Json api middleware', () => {
     const store = mockStore({});
     store.dispatch(actionPromise(mockSuccessAction))
       .then(() => {
-        const performedActions = store.getActions();
-        expect(performedActions).to.have.length(2);
+        const actions = store.getActions();
+        expect(actions).to.have.length(2);
+
+        const apiStateAction = actions[0];
+        expect(apiStateAction.type).to.equal(API_STATE);
+
+        const performedActions = unwrapAction(actions[0]);
+        expect(performedActions).to.have.length(1);
 
         const actionCollStatus = performedActions[0];
         expect(actionCollStatus.type).to.equal(COLLECTION_STATUS);
@@ -65,7 +81,7 @@ describe('Json api middleware', () => {
         const expectedCollStatusPayload = { busyStatus: busyStatus.BUSY };
         expect(actionCollStatus.payload).to.deep.equal(expectedCollStatusPayload);
 
-        const requestAction = performedActions[1];
+        const requestAction = actions[1];
         expect(requestAction.type).to.equal(LOAD_REQUEST);
         expect(requestAction.meta).to.deep.equal(expectedMeta);
       }).then(done).catch(done);
@@ -104,8 +120,14 @@ describe('Json api middleware', () => {
     const store = mockStore({});
     store.dispatch(actionPromise(mockSuccessAction))
       .then(() => {
-        const performedActions = store.getActions();
-        expect(performedActions).to.have.length(4);
+        const actions = store.getActions();
+        expect(actions).to.have.length(2);
+
+        const apiStateAction = actions[0];
+        expect(apiStateAction.type).to.equal(API_STATE);
+
+        const performedActions = unwrapAction(actions[0]);
+        expect(performedActions).to.have.length(3);
 
         const actionObjFetched = performedActions[0];
         expect(actionObjFetched.type).to.equal(OBJECT_FETCHED);
@@ -117,7 +139,7 @@ describe('Json api middleware', () => {
         expect(actionCollFetched.meta).to.deep.equal(expectedMeta);
         expect(actionCollFetched.payload).to.deep.equal(expectedPayload.data);
 
-        const successAction = performedActions[3];
+        const successAction = actions[1];
         expect(successAction.type).to.equal(LOAD_SUCCESS);
 
         expect(successAction.meta).to.deep.equal(expectedMeta);
@@ -151,8 +173,14 @@ describe('Json api middleware', () => {
     const store = mockStore({});
     store.dispatch(actionPromise(mockSuccessAction))
       .then(() => {
-        const performedActions = store.getActions();
-        expect(performedActions).to.have.length(3);
+        const actions = store.getActions();
+        expect(actions).to.have.length(2);
+
+        const apiStateAction = actions[0];
+        expect(apiStateAction.type).to.equal(API_STATE);
+
+        const performedActions = unwrapAction(actions[0]);
+        expect(performedActions).to.have.length(2);
 
         const actionObjCreated = performedActions[0];
         expect(actionObjCreated.type).to.equal(OBJECT_CREATED);
@@ -168,7 +196,7 @@ describe('Json api middleware', () => {
         };
         expect(actionCollStatus.payload).to.deep.equal(expectedCollStatusPayload);
 
-        const successAction = performedActions[2];
+        const successAction = actions[1];
         expect(successAction.type).to.equal(CREATE_SUCCESS);
 
         expect(successAction.meta).to.deep.equal(expectedMeta);
@@ -202,8 +230,14 @@ describe('Json api middleware', () => {
     const store = mockStore({});
     store.dispatch(actionPromise(mockSuccessAction))
       .then(() => {
-        const performedActions = store.getActions();
-        expect(performedActions).to.have.length(3);
+        const actions = store.getActions();
+        expect(actions).to.have.length(2);
+
+        const apiStateAction = actions[0];
+        expect(apiStateAction.type).to.equal(API_STATE);
+
+        const performedActions = unwrapAction(actions[0]);
+        expect(performedActions).to.have.length(2);
 
         const actionCollStatusBusy = performedActions[0];
         expect(actionCollStatusBusy.type).to.equal(COLLECTION_STATUS);
@@ -220,7 +254,7 @@ describe('Json api middleware', () => {
         expect(actionObjUpdating.meta).to.deep.equal({ ...expectedMeta, transformation: {} });
         expect(actionObjUpdating.payload).to.deep.equal(expectedPayload.data[0]);
 
-        const actionUpdateRequest = performedActions[2];
+        const actionUpdateRequest = actions[1];
         expect(actionUpdateRequest.type).to.equal(UPDATE_REQUEST);
         expect(actionUpdateRequest.meta).to.deep.equal(expectedMeta);
         expect(actionUpdateRequest.payload).to.deep.equal(expectedPayload);
@@ -253,8 +287,14 @@ describe('Json api middleware', () => {
     const store = mockStore({});
     store.dispatch(actionPromise(mockSuccessAction))
       .then(() => {
-        const performedActions = store.getActions();
-        expect(performedActions).to.have.length(3);
+        const actions = store.getActions();
+        expect(actions).to.have.length(2);
+
+        const apiStateAction = actions[0];
+        expect(apiStateAction.type).to.equal(API_STATE);
+
+        const performedActions = unwrapAction(actions[0]);
+        expect(performedActions).to.have.length(2);
 
         const actionObjUpdated = performedActions[0];
         expect(actionObjUpdated.type).to.equal(OBJECT_UPDATED);
@@ -270,7 +310,7 @@ describe('Json api middleware', () => {
         };
         expect(actionCollStatus.payload).to.deep.equal(expectedCollStatusPayload);
 
-        const successAction = performedActions[2];
+        const successAction = actions[1];
         expect(successAction.type).to.equal(UPDATE_SUCCESS);
 
         expect(successAction.meta).to.deep.equal(expectedMeta);
@@ -301,8 +341,14 @@ describe('Json api middleware', () => {
     const store = mockStore({});
     store.dispatch(actionPromise(mockSuccessAction))
       .then(() => {
-        const performedActions = store.getActions();
-        expect(performedActions).to.have.length(3);
+        const actions = store.getActions();
+        expect(actions).to.have.length(2);
+
+        const apiStateAction = actions[0];
+        expect(apiStateAction.type).to.equal(API_STATE);
+
+        const performedActions = unwrapAction(actions[0]);
+        expect(performedActions).to.have.length(2);
 
         const actionCollRequest = performedActions[0];
         expect(actionCollRequest.type).to.equal(COLLECTION_STATUS);
@@ -317,7 +363,7 @@ describe('Json api middleware', () => {
         expect(actionObjDeleting.type).to.equal(OBJECT_REMOVING);
         expect(actionObjDeleting.meta).to.deep.equal({ ...expectedMeta, transformation: {} });
 
-        const successAction = performedActions[2];
+        const successAction = actions[1];
         expect(successAction.type).to.equal(REMOVE_REQUEST);
         expect(successAction.meta).to.deep.equal(expectedMeta);
       }).then(done).catch(done);
@@ -346,8 +392,14 @@ describe('Json api middleware', () => {
     const store = mockStore({});
     store.dispatch(actionPromise(mockSuccessAction))
       .then(() => {
-        const performedActions = store.getActions();
-        expect(performedActions).to.have.length(3);
+        const actions = store.getActions();
+        expect(actions).to.have.length(2);
+
+        const apiStateAction = actions[0];
+        expect(apiStateAction.type).to.equal(API_STATE);
+
+        const performedActions = unwrapAction(actions[0]);
+        expect(performedActions).to.have.length(2);
 
         const actionObjDeleted = performedActions[0];
         expect(actionObjDeleted.type).to.equal(OBJECT_REMOVED);
@@ -362,7 +414,7 @@ describe('Json api middleware', () => {
         };
         expect(actionCollStatus.payload).to.deep.equal(expectedCollStatusPayload);
 
-        const successAction = performedActions[2];
+        const successAction = actions[1];
         expect(successAction.type).to.equal(REMOVE_SUCCESS);
         expect(successAction.meta).to.deep.equal(expectedMeta);
       }).then(done).catch(done);
@@ -419,8 +471,14 @@ describe('Json api middleware', () => {
     const store = mockStore({});
     store.dispatch(actionPromise(mockSuccessAction))
       .then(() => {
-        const performedActions = store.getActions();
-        expect(performedActions).to.have.length(6);
+        const actions = store.getActions();
+        expect(actions).to.have.length(2);
+
+        const apiStateAction = actions[0];
+        expect(apiStateAction.type).to.equal(API_STATE);
+
+        const performedActions = unwrapAction(actions[0]);
+        expect(performedActions).to.have.length(5);
 
         const actionObjIncludedFetched = performedActions[0];
         expect(actionObjIncludedFetched.type).to.equal(OBJECT_FETCHED);
@@ -441,7 +499,7 @@ describe('Json api middleware', () => {
         expect(actionCollFetched.meta).to.deep.equal({ ...expectedMeta });
         expect(actionCollFetched.payload).to.deep.equal(expectedPayload.data);
 
-        const successAction = performedActions[5];
+        const successAction = actions[1];
         expect(successAction.type).to.equal(LOAD_SUCCESS);
 
         expect(successAction.meta).to.deep.equal(expectedMeta);
@@ -510,7 +568,14 @@ describe('Json api middleware', () => {
     const store = mockStore({});
     store.dispatch(actionPromise(mockSuccessAction))
       .then(() => {
-        const performedActions = store.getActions();
+        const actions = store.getActions();
+        expect(actions).to.have.length(2);
+
+        const apiStateAction = actions[0];
+        expect(apiStateAction.type).to.equal(API_STATE);
+
+        const performedActions = unwrapAction(actions[0]);
+        expect(performedActions).to.have.length(3);
 
         const actionFirstObjFetched = performedActions[0];
         expect(actionFirstObjFetched.type).to.equal(OBJECT_FETCHED);

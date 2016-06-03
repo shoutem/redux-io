@@ -2,6 +2,7 @@ import _ from 'lodash';
 import {
   COLLECTION_FETCHED,
   COLLECTION_STATUS,
+  API_STATE,
 } from './middleware';
 import {
   STATUS,
@@ -31,6 +32,33 @@ function isValid(action, schema, tag) {
   return true;
 }
 
+function reduceAction(state, action, schema, tag) {
+  if (!isValid(action, schema, tag)) {
+    return state;
+  }
+
+  switch (action.type) {
+    case COLLECTION_FETCHED: {
+      const newState = action.payload.map(item => item.id);
+      newState[STATUS] = updateStatus(
+        state[STATUS],
+        { validationStatus: validationStatus.VALID, busyStatus: busyStatus.IDLE }
+      );
+      return newState;
+    }
+    case COLLECTION_STATUS: {
+      const newState = [...state];
+      newState[STATUS] = updateStatus(
+        state[STATUS],
+        action.payload
+      );
+      return newState;
+    }
+    default:
+      return state;
+  }
+}
+
 // collection is generic collection reducer that enables creating
 // typed & named collection reducers that are handling specific
 // COLLECTION_ type actions with specific collection name.
@@ -41,19 +69,22 @@ export default function collection(schema, tag, initialState = []) {
   // eslint-disable-next-line no-param-reassign
   initialState[STATUS] = createStatus();
   return (state = initialState, action) => {
+    if (action.type === API_STATE) {
+      if (!_.has(action, ['payload', schema])) {
+        return state;
+      }
+      const actions = action.payload[schema];
+      return _.reduce(
+        actions,
+        (currentState, currentAction) => reduceAction(currentState, currentAction, schema, tag),
+        state
+      );
+    }
+
     if (!isValid(action, schema, tag)) {
       return state;
     }
-
     switch (action.type) {
-      case COLLECTION_FETCHED: {
-        const newState = action.payload.map(item => item.id);
-        newState[STATUS] = updateStatus(
-          state[STATUS],
-          { validationStatus: validationStatus.VALID, busyStatus: busyStatus.IDLE }
-        );
-        return newState;
-      }
       case COLLECTION_CLEAR: {
         const newState = [];
         newState[STATUS] = updateStatus(
@@ -62,21 +93,8 @@ export default function collection(schema, tag, initialState = []) {
         );
         return newState;
       }
-      case COLLECTION_STATUS: {
-        const newState = [...state];
-        newState[STATUS] = updateStatus(
-          state[STATUS],
-          action.payload
-        );
-        return newState;
-      }
       default: {
-        if (state[STATUS]) {
-          return state;
-        }
-        const newState = [...state];
-        newState[STATUS] = createStatus();
-        return newState;
+        return state;
       }
     }
   };

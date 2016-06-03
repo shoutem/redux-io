@@ -1,4 +1,3 @@
-import _ from 'lodash';
 import { expect } from 'chai';
 import { transform, inverse } from '../../src/standardizer';
 

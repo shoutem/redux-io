@@ -4,6 +4,7 @@ import { expect } from 'chai';
 import deepFreeze from 'deep-freeze';
 import {
   storage,
+  API_STATE,
   OBJECT_CREATED,
   OBJECT_FETCHED,
   OBJECT_REMOVING,
@@ -19,6 +20,15 @@ import {
   updateStatus,
 } from '../src/status';
 
+function wrapActions(actions) {
+  const actionArray = _.concat([], actions);
+  const schemaActions = _.groupBy(actionArray, a => a.meta.schema);
+  return {
+    type: API_STATE,
+    payload: schemaActions,
+  };
+}
+
 describe('Storage reducer', () => {
   it('has a valid initial state', () => {
     const testReducer = storage('test');
@@ -30,13 +40,13 @@ describe('Storage reducer', () => {
     const initialState = {};
     const item = { id: 1 };
     const schema = 'schema_test';
-    const action = {
+    const action = wrapActions({
       type: OBJECT_FETCHED,
       meta: {
         schema,
       },
       payload: item,
-    };
+    });
     deepFreeze(initialState);
     const reducer = storage(schema, initialState);
 
@@ -54,13 +64,13 @@ describe('Storage reducer', () => {
     const initialState = {};
     const item = { id: 1 };
     const schema = 'schema_test';
-    const action = {
+    const action = wrapActions({
       type: OBJECT_CREATED,
       meta: {
         schema,
       },
       payload: item,
-    };
+    });
     deepFreeze(initialState);
     const reducer = storage(schema, initialState);
 
@@ -80,13 +90,13 @@ describe('Storage reducer', () => {
       2: { id: 2 },
     };
     const schema = 'schema_test';
-    const action = {
+    const action = wrapActions({
       type: OBJECT_REMOVED,
       payload: { id: 1 },
       meta: {
         schema,
       },
-    };
+    });
     deepFreeze(initialState);
     const reducer = storage(schema, initialState);
     const nextState = reducer(initialState, action);
@@ -102,13 +112,13 @@ describe('Storage reducer', () => {
       1: { id: 1 },
     };
     const schema = 'schema_test';
-    const action = {
+    const action = wrapActions({
       type: OBJECT_REMOVED,
       payload: { id: 5 },
       meta: {
         schema,
       },
-    };
+    });
     deepFreeze(initialState);
     const reducer = storage(schema, initialState);
     const nextState = reducer(initialState, action);
@@ -123,13 +133,13 @@ describe('Storage reducer', () => {
     const initialState = {};
     const item = { id: 1 };
     const schema = 'schema_test';
-    const action = {
+    const action = wrapActions({
       type: OBJECT_FETCHED,
       meta: {
         schema: 'test2',
       },
       payload: item,
-    };
+    });
     deepFreeze(initialState);
     const reducer = storage(schema, initialState);
     const nextState = reducer(initialState, action);
@@ -142,13 +152,13 @@ describe('Storage reducer', () => {
     const initialState = {};
     const item = { id: 1 };
     const schema = 'schema_test';
-    const action = {
+    const action = wrapActions({
       type: 'OBJECT_FETCHED',
       meta: {
         schema,
       },
       payload: item,
-    };
+    });
     deepFreeze(initialState);
     const reducer = storage(schema, initialState);
     const nextState = reducer(initialState, action);
@@ -165,13 +175,13 @@ describe('Storage reducer', () => {
     const reducer = storage(schema, initialState);
 
     const itemNew = { id: 1, value: 'b' };
-    const action = {
+    const action = wrapActions({
       type: OBJECT_FETCHED,
       meta: {
         schema,
       },
       payload: itemNew,
-    };
+    });
 
     const nextState = reducer(initialState, action);
     const nextStateItem = nextState[item.id];
@@ -191,13 +201,13 @@ describe('Storage reducer', () => {
     const reducer = storage(schema, initialState);
 
     const item2 = { id: 2, value: 'b' };
-    const action = {
+    const action = wrapActions({
       type: OBJECT_FETCHED,
       meta: {
         schema,
       },
       payload: item2,
-    };
+    });
 
     const nextState = reducer(initialState, action);
     const expectedState = { [item1.id]: item1, [item2.id]: item2 };
@@ -246,13 +256,13 @@ describe('Storage reducer', () => {
       },
     };
 
-    const action = {
+    const action = wrapActions({
       type: OBJECT_UPDATING,
       meta: {
         schema,
       },
       payload: itemPatch,
-    };
+    });
 
     const nextState = reducer(initialState, action);
     const nextStateItem = nextState[item.id];
@@ -331,13 +341,13 @@ describe('Storage reducer', () => {
       },
     };
 
-    const action = {
+    const action = wrapActions({
       type: OBJECT_UPDATING,
       meta: {
         schema,
       },
       payload: itemNew,
-    };
+    });
 
     const nextState = reducer(initialState, action);
     const nextStateItem = nextState[item.id];
@@ -355,13 +365,13 @@ describe('Storage reducer', () => {
       2: { id: 2 },
     };
     const schema = 'schema_test';
-    const action = {
+    const action = wrapActions({
       type: OBJECT_REMOVING,
       payload: { id: 1 },
       meta: {
         schema,
       },
-    };
+    });
     deepFreeze(initialState);
     const reducer = storage(schema, initialState);
     const nextState = reducer(initialState, action);
@@ -376,14 +386,14 @@ describe('Storage reducer', () => {
     const initialState = {};
     const item = { name: 1 };
     const schema = 'schema_test';
-    const action = {
+    const action = wrapActions({
       type: 'CUSTOM_ACTION',
       meta: {
         schema,
         tag: 'custom tag',
       },
       payload: item,
-    };
+    });
     deepFreeze(initialState);
     const reducer = storage(schema, initialState);
 
@@ -399,13 +409,13 @@ describe('Storage reducer', () => {
     const initialState = {};
     const item = { name: 1 };
     const schema = 'schema_test';
-    const action = {
+    const action = wrapActions({
       type: OBJECT_FETCHED,
       meta: {
         schema,
       },
       payload: item,
-    };
+    });
     deepFreeze(initialState);
     const reducer = storage(schema, initialState);
 
@@ -420,13 +430,13 @@ describe('Storage reducer', () => {
   it('ignores correct action with correct meta schema but undefined item', () => {
     const initialState = {};
     const schema = 'schema_test';
-    const action = {
+    const action = wrapActions({
       type: OBJECT_FETCHED,
       meta: {
         schema,
       },
       payload: undefined,
-    };
+    });
     deepFreeze(initialState);
     const reducer = storage(schema, initialState);
 
@@ -444,14 +454,14 @@ describe('Storage reducer', () => {
       a: 'a',
       b: 'b',
     };
-    const action = {
+    const action = wrapActions({
       type: OBJECT_FETCHED,
       meta: {
         schema,
         transformation,
       },
       payload: item,
-    };
+    });
     deepFreeze(initialState);
     const reducer = storage(schema, initialState);
 
@@ -477,14 +487,14 @@ describe('Storage reducer', () => {
 
     const itemNew = { id: 1, value: 'b' };
     const transformationNew = { b: 'b' };
-    const action = {
+    const action = wrapActions({
       type: OBJECT_UPDATED,
       meta: {
         schema,
         transformation: transformationNew,
       },
       payload: itemNew,
-    };
+    });
 
     const nextState = reducer(initialState, action);
     const nextStateItem = nextState[item.id];
@@ -552,14 +562,14 @@ describe('Storage reducer', () => {
         cc: 5,
       },
     };
-    const action = {
+    const action = wrapActions({
       type: OBJECT_UPDATING,
       meta: {
         schema,
         transformation: transformationPatch,
       },
       payload: itemPatch,
-    };
+    });
 
     const nextState = reducer(initialState, action);
     const nextStateItem = nextState[item.id];

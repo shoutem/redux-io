@@ -17,6 +17,7 @@ export function transform(object) {
   };
 }
 
+// eslint-disable-next-line no-unused-vars
 export function inverse(transformedObject, transformationDescription) {
   // TODO: support inverse transformations based on transformation description
   return transformedObject;

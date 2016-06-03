@@ -25,9 +25,9 @@ function createRelationshipItemDescriptor(relationshipItem) {
 }
 
 function normalizeRelationshipArray(relationshipArray) {
-  return _.reduce(relationshipArray, (normalizeRelationshipArray, relationshipItem) => {
-    normalizeRelationshipArray.push(createRelationshipItemDescriptor(relationshipItem));
-    return normalizeRelationshipArray;
+  return _.reduce(relationshipArray, (result, relationshipItem) => {
+    result.push(createRelationshipItemDescriptor(relationshipItem));
+    return result;
   }, []);
 }
 
@@ -41,11 +41,12 @@ function isIgnoredProperty(property, ignoredProperties = DEFAULT_IGNORED_PROPERT
 
 export function normalizeItem(item, picks = null) {
   const itemTransformation = getTransformation(item);
+  let itemPicks = item;
   if (!_.isNull(picks)) {
-    item = _.pick(item, _.union(getDefaultJsonItemAttributeNames(), picks));
+    itemPicks = _.pick(item, _.union(getDefaultJsonItemAttributeNames(), picks));
   }
 
-  return _.reduce(item, (normalizedItem, val, property) => {
+  return _.reduce(itemPicks, (normalizedItem, val, property) => {
     if (!itemTransformation || isIgnoredProperty(property)) {
       return normalizedItem;
     }
@@ -53,19 +54,23 @@ export function normalizeItem(item, picks = null) {
     const relationshipItem = itemTransformation.relationshipProperties[property] && val;
     if (relationshipItem) {
       if (_.isArray(relationshipItem)) {
+        // eslint-disable-next-line no-param-reassign
         normalizedItem.relationships[property] = {
           data: normalizeRelationshipArray(relationshipItem),
         };
       } else if (_.isPlainObject(relationshipItem)) {
+        // eslint-disable-next-line no-param-reassign
         normalizedItem.relationships[property] = {
           data: normalizeRelationshipObject(relationshipItem),
         };
       } else {
         // this should generally be case when relationship does not exists
         // if relationship is not provided (included) it is little bit tricky NOW..
+        // eslint-disable-next-line no-param-reassign
         normalizedItem.relationships[property] = { data: null };
       }
     } else {
+      // eslint-disable-next-line no-param-reassign
       normalizedItem.attributes[property] = val;
     }
     return normalizedItem;

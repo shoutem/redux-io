@@ -23,13 +23,14 @@ export const createStatus = () => (
 );
 
 export const updateStatus = (status, update) => (
-  _.merge({}, status, update, {modifiedTimestamp: Date.now()})
+  _.merge({}, status, update, { modifiedTimestamp: Date.now() })
 );
 
 export const applyStatus = (sourceObject, destinationObject) => {
   if (!sourceObject[STATUS]) {
     return;
   }
+  // eslint-disable-next-line no-param-reassign
   destinationObject[STATUS] = _.merge({}, sourceObject[STATUS]);
 };
 
