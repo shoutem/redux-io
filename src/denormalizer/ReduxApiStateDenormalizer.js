@@ -1,4 +1,5 @@
 import ReduxDenormalizer from './ReduxDenormalizer';
+import { getCollectionDescription } from '../collection';
 import _ from 'lodash';
 import { applyStatus } from './../status';
 
@@ -55,8 +56,8 @@ export default class ReduxApiStateDenormalizer extends ReduxDenormalizer {
    * @param storage
    * @returns {{}}
    */
-  denormalizeItem(id, schema, storage) {
-    return super.denormalizeItem({ id, type: schema }, storage);
+  denormalizeItem(item, storage) {
+    return super.denormalizeItem(item, storage);
   }
 
   /**
@@ -84,9 +85,10 @@ export default class ReduxApiStateDenormalizer extends ReduxDenormalizer {
    * @param storage
    * @returns {{}}
    */
-  denormalizeCollection(collection, schema, storage) {
+  denormalizeCollection(collection, storage) {
+    const collectionDescription = getCollectionDescription(collection);
     const denormalizedCollection = collection.map(id =>
-      (this.denormalizeItem(id, schema, storage))
+      (this.denormalizeItem({ id, type: collectionDescription.schema }, storage))
     );
     applyStatus(collection, denormalizedCollection);
     return denormalizedCollection;

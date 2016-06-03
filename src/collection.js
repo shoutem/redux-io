@@ -7,6 +7,7 @@ import {
   STATUS,
   validationStatus,
   busyStatus,
+  getStatus,
   createStatus,
   updateStatus,
 } from './status';
@@ -81,4 +82,9 @@ export default function collection(schema, tag, initialState = []) {
       }
     }
   };
+}
+
+export const getCollectionDescription = (collection) => {
+  const collectionStatus = getStatus(collection) || {};
+  return { schema: collectionStatus.schema, tag: collectionStatus.tag };
 }

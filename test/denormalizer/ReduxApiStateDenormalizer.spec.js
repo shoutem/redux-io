@@ -108,7 +108,7 @@ describe('ReduxApiStateDenormalizer', () => {
       const storage = createSchemasMap(getStore(), createStorageMap());
 
       const denormalizedData =
-        denormalizer.denormalizeItem('type1Id1', 'type1', storage);
+        denormalizer.denormalizeItem({id: 'type1Id1', type: 'type1'}, storage);
       assert.deepEqual(
         denormalizedData,
         expectedData,
@@ -143,9 +143,9 @@ describe('ReduxApiStateDenormalizer', () => {
         },
       ];
       const collection = ['type1Id1'];
-      collection[STATUS] = createStatus();
+      collection[STATUS] = createStatus({ schema: 'type1', tag: ''});
       const denormalizedData =
-        denormalizer.denormalizeCollection(collection, 'type1');
+        denormalizer.denormalizeCollection(collection);
       assert.deepEqual(
         denormalizedData,
         expectedData,

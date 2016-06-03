@@ -47,3 +47,5 @@ export const isBusy = obj =>
 
 export const shouldRefresh = obj =>
   !isValid(obj) && !isBusy(obj);
+
+export const getStatus = obj => !!obj[STATUS] && obj[STATUS];
