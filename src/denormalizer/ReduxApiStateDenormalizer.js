@@ -1,7 +1,12 @@
 import ReduxDenormalizer from './ReduxDenormalizer';
+import Cache from './lib/Cache';
 import { getCollectionDescription } from '../collection';
 import _ from 'lodash';
 import { applyStatus } from './../status';
+
+// As redux has only one store, we can create single instance of cache
+// for every denormlizer instance
+const cache = new Cache();
 
 /**
  * Created getStore for ReduxDenormalizer by using storageMap to find relationships.
@@ -44,6 +49,7 @@ export default class ReduxApiStateDenormalizer extends ReduxDenormalizer {
       // ProvideStorage mode
       super();
     }
+    this.denormalizeItem = this.denormalizeItem.bind(this);
   }
 
   /**
@@ -57,7 +63,26 @@ export default class ReduxApiStateDenormalizer extends ReduxDenormalizer {
    * @returns {{}}
    */
   denormalizeItem(item, storage) {
-    return super.denormalizeItem(item, storage);
+    if (!cache.isItemChanged(item)) {
+      const newRelationships = this.denormalizeItemRelationships(item);
+      if (!cache.areRelationshipsChanged(item, newRelationships)) {
+        return cache.getItem(item);
+      }
+      cache.cacheRelationships(newRelationships, item);
+      return this.mergeDenormalizedItemData(
+        item,
+        super.denormalizeItemAttributes(item),
+        newRelationships
+      );
+    }
+    return cache.cacheItem(super.denormalizeItem(item, storage));
+  }
+
+  denormalizeItemRelationships(normalizedItem) {
+    if (cache.hasRelationships(normalizedItem)) {
+      return cache.resolveItemRelationshipsChanges(normalizedItem);
+    }
+    return super.denormalizeItemRelationships(normalizedItem);
   }
 
   /**
@@ -86,10 +111,24 @@ export default class ReduxApiStateDenormalizer extends ReduxDenormalizer {
    * @returns {{}}
    */
   denormalizeCollection(collection, storage) {
+    // Collection description contains { schema, tag }
     const collectionDescription = getCollectionDescription(collection);
-    const descriptorCollection = collection.map(id => ({ id, type: collectionDescription.schema }));
+    const descriptorCollection = collection.map(id => ({
+      id,
+      type: collectionDescription.schema
+    }));
+
+    if (!cache.isCollectionChanged(collection)) {
+      const updatedCollection =
+        cache.resolveCollectionItemsChange(collection, this.denormalizeItem);
+      if (updatedCollection !== cache.getCollection(collection)) {
+        applyStatus(updatedCollection, updatedCollection);
+      }
+    }
+
     const denormalizedCollection = super.denormalizeCollection(descriptorCollection, storage);
     applyStatus(collection, denormalizedCollection);
-    return denormalizedCollection;
+
+    return cache.cacheCollection(denormalizedCollection);
   }
 }
