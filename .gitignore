@@ -3,7 +3,7 @@
 
 coverage
 node_modules
-lib
+./lib
 
 *.log
 *.tgz
