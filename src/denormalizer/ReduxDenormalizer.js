@@ -56,6 +56,11 @@ export default class ReduxDenormalizer extends ObjectDenormalizer {
     return storage || getStorage(this.getStore, this.storagePath);
   }
 
+  updateStorage(storage) {
+    const denormalizationStorage = this.createStorage(storage);
+    super.setNormalizedData(denormalizationStorage);
+  }
+
   /**
    * Returns denormalized item
    * Storage is needed in ProvideStorage mode.
@@ -63,8 +68,7 @@ export default class ReduxDenormalizer extends ObjectDenormalizer {
    * @returns {{}}
    */
   denormalizeItem(item, storage) {
-    const denormalizationStorage = this.createStorage(storage);
-    super.setNormalizedData(denormalizationStorage);
+    this.updateStorage(storage);
     return super.getDenormalizedItem(item);
   }
 
