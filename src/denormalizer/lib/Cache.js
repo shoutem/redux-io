@@ -3,7 +3,7 @@ import { getModificationTime } from '../../status';
 import _ from 'lodash';
 
 function getUniqueTargetKey(item) {
-  createUniqueTargetKey(item);
+  return createUniqueTargetKey(item);
 }
 
 function getUniqueCollectionKey(collection) {
@@ -45,6 +45,10 @@ export default class JsonApiCache {
     return this.cache[itemKey];
   }
 
+  cacheExists(key) {
+    return this.cache.hasOwnProperty(key);
+  }
+
   getItem(item) {
     return this.getCacheByKey(getUniqueTargetKey(item));
   }
@@ -62,15 +66,15 @@ export default class JsonApiCache {
   }
 
   hasItem(item) {
-    return !!this.getItem(item);
+    return this.cacheExists(getUniqueTargetKey(item));
   }
 
   hasCollection(collection) {
-    return !!this.getCollection(collection);
+    return this.cacheExists(getUniqueCollectionKey(collection));
   }
 
-  hasRelationships(item) {
-    return !!this.getItemRelationships(item);
+  hasItemRelationships(item) {
+    return this.cacheExists(getUniqueItemRelationshipsKey(item));
   }
 
   cacheItem(item) {
@@ -119,7 +123,8 @@ export default class JsonApiCache {
   }
 
   areRelationshipsChanged(item, newRelationships) {
-    return this.getItemRelationships(item) === newRelationships;
+    const cachedRelationships = this.getItemRelationships(item);
+    return cachedRelationships !== newRelationships;
   }
 
   resolveCollectionItemsChange(descriptorCollection, denormalizeItem) {
@@ -139,37 +144,49 @@ export default class JsonApiCache {
 
   resolveItemRelationshipsChanges(item, denormalizeItem) {
     let relationshipsChanged = false;
+    const relationships = item.relationships;
 
-    const newRelationships = item.relationships.map((relationship, schema) => {
+    if (!relationships) {
+      return relationships
+    }
+
+    const newRelationships = _.reduce(relationships, (lels, relationship, schema) => {
+      const relationshipData = relationship.data;
       let newRelationship;
       let cachedRelationship;
 
-      if (_.isPlainObject(relationship)) {
+      if (_.isPlainObject(relationshipData)) {
 
-        newRelationship = denormalizeItem(relationship);
+        newRelationship = denormalizeItem(relationshipData);
+        // console.log(relationshipData, newRelationship)
+        // console.log(this.isItemChanged(newRelationship), newRelationship.id);
         if (!relationshipsChanged && this.isItemChanged(newRelationship)) {
           relationshipsChanged = true;
         }
-      } else if (isCollection(relationship)) {
+      } else if (isCollection(relationshipData)) {
 
-        cachedRelationship =this.getItemRelationshipCollection(item, schema);
+        cachedRelationship = this.getItemRelationshipCollection(item, schema);
         let collectionChanged = false;
         let matchedRelationshipsItems = 0;
         const collectionKey = getUniqueRelationshipCollectionKey(item, schema);
 
-        newRelationship = relationship.map(item => {
+        newRelationship = relationshipData.map(item => {
           const relationshipItem = denormalizeItem(item);
-          if (cachedRelationship.find(oldItem => oldItem.id === item.id)) {
+          if (cachedRelationship && cachedRelationship.find(oldItem => oldItem.id === item.id)) {
             matchedRelationshipsItems += 1;
           }
+          // console.log(relationshipItem.id, item.id);
           if (this.isItemChanged(relationshipItem)) {
             collectionChanged = true;
           }
         });
 
         if (
-          cachedRelationship.length !== newRelationship.length ||
-          cachedRelationship.length !== matchedRelationshipsItems
+          (!cachedRelationship && newRelationship) ||
+          (
+            cachedRelationship.length !== newRelationship.length ||
+            cachedRelationship.length !== matchedRelationshipsItems
+          )
         ) {
           cachedRelationship = true;
         }
@@ -178,20 +195,20 @@ export default class JsonApiCache {
           this.cacheRelationshipCollection(newRelationship, collectionKey);
           relationshipsChanged = true;
         }
-      } else if (relationship === null) {
+      } else if (relationshipData === null) {
         // for empty to-one relationships
         newRelationship = null;
-        if (!relationshipsChanged && this.isItemChanged(relationship)) {
+        if (!relationshipsChanged && this.isItemChanged(relationshipData)) {
           relationshipsChanged = true;
         }
       }
-
-    });
+      lels[schema] = newRelationship;
+      return lels;
+    }, {});
 
     if (!relationshipsChanged) {
       return this.getItemRelationships(item);
     }
-
     return newRelationships;
   }
 
