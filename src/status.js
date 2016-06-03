@@ -50,4 +50,4 @@ export const shouldRefresh = obj =>
 
 export const getStatus = obj => !!obj[STATUS] && obj[STATUS];
 
-export const getModificationTime = obj => !!obj[STATUS] && obj.modifiedTimestamp;
+export const getModificationTime = obj => !!obj[STATUS] && obj[STATUS].modifiedTimestamp;
