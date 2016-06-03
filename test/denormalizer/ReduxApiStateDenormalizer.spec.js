@@ -74,7 +74,11 @@ const getStore = () => {
   store.storage['type2.test'].type2Id1[STATUS] = createStatus();
   return store;
 };
-
+function getModifiedStore() {
+  const store = getStore();
+  store.storage.type1.type1Id3[STATUS] = createStatus();
+  return store;
+}
 describe('ReduxApiStateDenormalizer', () => {
   describe('new instance', () => {
     it('creates ReduxApiStateDenormalizer instance', () => {
@@ -121,6 +125,19 @@ describe('ReduxApiStateDenormalizer', () => {
     });
     it('gets object from cache', () => {
       const denormalizer = new ReduxApiStateDenormalizer();
+      const storage = createSchemasMap(getStore(), createStorageMap());
+
+      const denormalizedData =
+        denormalizer.denormalizeItem({id: 'type1Id1', type: 'type1'}, storage);
+      const cachedDenormalizedData =
+        denormalizer.denormalizeItem({id: 'type1Id1', type: 'type1'}, storage);
+      // console.log(cachedDenormalizedData, denormalizedData);
+      assert.isOk(cachedDenormalizedData === denormalizedData, 'didn\'t get cached item');
+      assert.isObject(cachedDenormalizedData[STATUS]);
+      assert.isObject(cachedDenormalizedData['type2.test'][STATUS]);
+    });
+    it('returns new object when relationship changed', () => {
+      const denormalizer = new ReduxApiStateDenormalizer();
       const expectedData = {
         id: 'type1Id1',
         type: 'type1',
@@ -140,15 +157,23 @@ describe('ReduxApiStateDenormalizer', () => {
           },
         ],
       };
-      const storage = createSchemasMap(getStore(), createStorageMap());
+      let storage = createSchemasMap(getStore(), createStorageMap());
 
       const denormalizedData =
         denormalizer.denormalizeItem({id: 'type1Id1', type: 'type1'}, storage);
-      const cachedDenormalizedData =
+
+      storage = createSchemasMap(getModifiedStore(), createStorageMap());
+      const notCachedDenormalizedData =
         denormalizer.denormalizeItem({id: 'type1Id1', type: 'type1'}, storage);
-      assert.isOk(cachedDenormalizedData === denormalizedData, 'didn\'t get cached item');
-      assert.isObject(cachedDenormalizedData[STATUS]);
-      assert.isObject(cachedDenormalizedData['type2.test'][STATUS]);
+
+      assert.isOk(notCachedDenormalizedData !== denormalizedData, 'didn\'t create new object');
+      assert.deepEqual(
+        notCachedDenormalizedData,
+        expectedData,
+        'item not denormalized correctly'
+      );
+      assert.isObject(notCachedDenormalizedData[STATUS]);
+      assert.isObject(notCachedDenormalizedData['type2.test'][STATUS]);
     });
   });
   describe('denormalizeCollection', () => {
@@ -188,27 +213,6 @@ describe('ReduxApiStateDenormalizer', () => {
     });
     it('gets collection from cache', () => {
       const denormalizer = new ReduxApiStateDenormalizer(getStore, createStorageMap());
-      const expectedData = [
-        {
-          id: 'type1Id1',
-          type: 'type1',
-          name: 'type1Id1',
-          'type2.test': {
-            id: 'type2Id1',
-            type: 'type2.test',
-            name: 'type2Id1',
-          },
-          type1: [
-            { id: 'type1Id2', type: 'type1', name: 'type1Id2' },
-            {
-              id: 'type1Id3',
-              type: 'type1',
-              name: 'type1Id3',
-              type1: [{ id: 'type1Id2', type: 'type1', name: 'type1Id2' }],
-            },
-          ],
-        },
-      ];
       const collection = ['type1Id1'];
       collection[STATUS] = createStatus({ schema: 'type1', tag: ''});
       const denormalizedData =

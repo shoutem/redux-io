@@ -50,6 +50,7 @@ export default class ReduxApiStateDenormalizer extends ReduxDenormalizer {
       super();
     }
     this.denormalizeItem = this.denormalizeItem.bind(this);
+    this.denormalizeRelationshipItem = this.denormalizeRelationshipItem.bind(this);
   }
 
   /**
@@ -64,25 +65,59 @@ export default class ReduxApiStateDenormalizer extends ReduxDenormalizer {
    */
   denormalizeItem(item, storage) {
     if (!cache.isItemChanged(item)) {
-      const newRelationships = this.denormalizeItemRelationships(item);
-      if (!cache.areRelationshipsChanged(item, newRelationships)) {
-        return cache.getItem(item);
+      if (storage) {
+        this.updateStorage(storage);
       }
-      cache.cacheRelationships(newRelationships, item);
-      return this.mergeDenormalizedItemData(
-        item,
-        super.denormalizeItemAttributes(item),
-        newRelationships
-      );
+      return this.useCache(item);
     }
     return cache.cacheItem(super.denormalizeItem(item, storage));
   }
 
-  denormalizeItemRelationships(normalizedItem) {
-    if (cache.hasRelationships(normalizedItem)) {
-      return cache.resolveItemRelationshipsChanges(normalizedItem);
+  /**
+   * Resolving relationships use already set storage so data doesn't get mixed
+   *
+   * @param item
+   * @returns {*}
+   */
+  denormalizeRelationshipItem(item) {
+    if (!cache.isItemChanged(item)) {
+      return this.useCache(item);
     }
-    return super.denormalizeItemRelationships(normalizedItem);
+    return cache.cacheItem(super.getDenormalizedItem(item));
+  }
+
+  /**
+   * Reuse cached item or it's relationships
+   *
+   * @param item
+   * @returns {*}
+   */
+  useCache(item) {
+    const normalizedItem = this.getNormalizedItem(item);
+    const newRelationships = this.denormalizeItemRelationships(normalizedItem);
+    // console.log('has cache', item.id, newRelationships);
+    if (!cache.areRelationshipsChanged(normalizedItem, newRelationships)) {
+      // console.log('relationships not changed')
+      return cache.getItem(normalizedItem);
+    }
+    // console.log('relationships changed')
+
+    const attributes = super.denormalizeItemAttributes(normalizedItem);
+    return cache.cacheItem(this.mergeDenormalizedItemData(
+      normalizedItem,
+      attributes,
+      newRelationships
+    ));
+  }
+
+  denormalizeItemRelationships(item, storage) {
+    if (cache.hasItemRelationships(item)) {
+      // if relationships it self nor items haven't changed, relationship will stay the same
+      const relationships =
+        cache.resolveItemRelationshipsChanges(item, this.denormalizeRelationshipItem);
+      return cache.cacheRelationships(relationships, item);
+    }
+    return cache.cacheRelationships(super.denormalizeItemRelationships(item), item);
   }
 
   /**
@@ -120,7 +155,7 @@ export default class ReduxApiStateDenormalizer extends ReduxDenormalizer {
 
     if (!cache.isCollectionChanged(collection)) {
       const updatedCollection =
-        cache.resolveCollectionItemsChange(collection, this.denormalizeItem);
+        cache.resolveCollectionItemsChange(descriptorCollection, this.denormalizeItem);
       if (updatedCollection !== cache.getCollection(collection)) {
         applyStatus(updatedCollection, updatedCollection);
       }
