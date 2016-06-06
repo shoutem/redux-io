@@ -1,6 +1,6 @@
 import _ from 'lodash';
 
-export const STATUS = Symbol('status');
+export const STATUS = '@@redux-api-state/status';
 
 export const validationStatus = Object.freeze({
   NONE: 'none',
