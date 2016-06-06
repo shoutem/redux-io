@@ -143,7 +143,7 @@ describe('ReduxDenormalizer', () => {
         ],
       };
       const denormalizedData =
-        denormalizer.denormalizeItem(
+        denormalizer.denormalizeItemWithStorage(
           { id: 'type1Id1', type: 'type1' },
           getStore().storage
         );
