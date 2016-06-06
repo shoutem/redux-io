@@ -62,7 +62,7 @@ export default class ReduxDenormalizer extends ObjectDenormalizer {
     super.setNormalizedData(denormalizationStorage);
   }
 
-  denormalizeItemWithStorage(item, storage) {
+  denormalizeItemFromStorage(item, storage) {
     this.updateStorage(storage);
     return this.denormalizeItem(item);
   }

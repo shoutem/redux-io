@@ -69,8 +69,9 @@ export default class ReduxApiStateDenormalizer extends ReduxDenormalizer {
     }
     return cache.cacheItem(super.denormalizeItem(item));
   }
-  denormalizeItemWithStorage(item, storage) {
-    return cache.cacheItem(super.denormalizeItemWithStorage(item, storage));
+  
+  denormalizeItemFromStorage(item, storage) {
+    return cache.cacheItem(super.denormalizeItemFromStorage(item, storage));
   }
 
   /**

@@ -114,7 +114,7 @@ describe('ReduxApiStateDenormalizer', () => {
       const storage = createSchemasMap(getStore(), createStorageMap());
 
       const denormalizedData =
-        denormalizer.denormalizeItemWithStorage({id: 'type1Id1', type: 'type1'}, storage);
+        denormalizer.denormalizeItemFromStorage({id: 'type1Id1', type: 'type1'}, storage);
       assert.deepEqual(
         denormalizedData,
         expectedData,
@@ -128,9 +128,9 @@ describe('ReduxApiStateDenormalizer', () => {
       const storage = createSchemasMap(getStore(), createStorageMap());
 
       const denormalizedData =
-        denormalizer.denormalizeItemWithStorage({id: 'type1Id1', type: 'type1'}, storage);
+        denormalizer.denormalizeItemFromStorage({id: 'type1Id1', type: 'type1'}, storage);
       const cachedDenormalizedData =
-        denormalizer.denormalizeItemWithStorage({id: 'type1Id1', type: 'type1'}, storage);
+        denormalizer.denormalizeItemFromStorage({id: 'type1Id1', type: 'type1'}, storage);
       // console.log(cachedDenormalizedData, denormalizedData);
       assert.isOk(cachedDenormalizedData === denormalizedData, 'didn\'t get cached item');
       assert.isObject(cachedDenormalizedData[STATUS]);
@@ -160,11 +160,11 @@ describe('ReduxApiStateDenormalizer', () => {
       let storage = createSchemasMap(getStore(), createStorageMap());
 
       const denormalizedData =
-        denormalizer.denormalizeItemWithStorage({id: 'type1Id1', type: 'type1'}, storage);
+        denormalizer.denormalizeItemFromStorage({id: 'type1Id1', type: 'type1'}, storage);
 
       storage = createSchemasMap(getModifiedStore(), createStorageMap());
       const notCachedDenormalizedData =
-        denormalizer.denormalizeItemWithStorage({id: 'type1Id1', type: 'type1'}, storage);
+        denormalizer.denormalizeItemFromStorage({id: 'type1Id1', type: 'type1'}, storage);
 
       assert.isOk(notCachedDenormalizedData !== denormalizedData, 'didn\'t create new object');
       assert.deepEqual(
