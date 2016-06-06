@@ -73,6 +73,11 @@ export default class ReduxDenormalizer extends ObjectDenormalizer {
    * @returns {{}}
    */
   denormalizeItem(item) {
+    // TODO(Braco) - find a way to be sure that when in ProvideStorageMode,
+    // denormalize is not called directly
+    if (!this.provideStorageMode) {
+      this.updateStorage();
+    }
     return super.denormalizeItem(item);
   }
 

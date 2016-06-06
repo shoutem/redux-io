@@ -155,7 +155,7 @@ describe('ReduxDenormalizer', () => {
     });
     it('throws error if invalid storage in ProvideStorage mode', () => {
       assert.throw(() => {
-        new ReduxDenormalizer().denormalizeItem();
+        new ReduxDenormalizer().denormalizeItemWithStorage();
       }, 'Invalid storage, ProvideStorage mode requires storage object');
     });
   });
