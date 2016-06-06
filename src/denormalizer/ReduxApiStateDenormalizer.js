@@ -63,14 +63,14 @@ export default class ReduxApiStateDenormalizer extends ReduxDenormalizer {
    * @param storage
    * @returns {{}}
    */
-  denormalizeItem(item, storage) {
+  denormalizeItem(item) {
     if (!cache.isItemChanged(item)) {
-      if (storage) {
-        this.updateStorage(storage);
-      }
       return this.useCache(item);
     }
-    return cache.cacheItem(super.denormalizeItem(item, storage));
+    return cache.cacheItem(super.denormalizeItem(item));
+  }
+  denormalizeItemWithStorage(item, storage) {
+    return cache.cacheItem(super.denormalizeItemWithStorage(item, storage));
   }
 
   /**
@@ -83,7 +83,7 @@ export default class ReduxApiStateDenormalizer extends ReduxDenormalizer {
     if (!cache.isItemChanged(item)) {
       return this.useCache(item);
     }
-    return cache.cacheItem(super.getDenormalizedItem(item));
+    return cache.cacheItem(super.denormalizeItem(item));
   }
 
   /**
