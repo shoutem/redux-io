@@ -10,11 +10,17 @@ export {
   COLLECTION_CLEAR,
 };
 
+import single from './single';
+export { single };
+
 import find from './find';
 export { find };
 
 import create from './create';
 export { create };
+
+import update from './update';
+export { update };
 
 import remove from './remove';
 export { remove };
@@ -25,11 +31,11 @@ export { loaded };
 import created from './created';
 export { created };
 
+import updated from './updated';
+export { updated };
+
 import clear from './clear';
 export { clear };
-
-import update from './update';
-export { update };
 
 import ReduxApiStateDenormalizer from './denormalizer/ReduxApiStateDenormalizer';
 export { ReduxApiStateDenormalizer };
