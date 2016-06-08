@@ -10,7 +10,7 @@ import {
   CREATE_SUCCESS,
   CREATE_ERROR,
   OBJECT_CREATED,
-  COLLECTION_STATUS,
+  INDEX_STATUS,
   apiStateMiddleware,
 } from '../src';
 import { middlewareJsonApiSource } from '../src/middleware';
@@ -244,7 +244,7 @@ describe('Create action creator', () => {
         expect(performedActions).to.have.length(5);
 
         const actionCollStatusBusy = performedActions[0];
-        expect(actionCollStatusBusy.type).to.equal(COLLECTION_STATUS);
+        expect(actionCollStatusBusy.type).to.equal(INDEX_STATUS);
         expect(actionCollStatusBusy.meta)
           .to.deep.equal({ ...expectedMeta, tag: '*' });
         const expectedCollStatusBusyPayload = {
@@ -261,7 +261,7 @@ describe('Create action creator', () => {
         expect(actionObjCreated.payload).to.deep.equal(expectedPayload.data);
 
         const actionCollStatus = performedActions[3];
-        expect(actionCollStatus.type).to.equal(COLLECTION_STATUS);
+        expect(actionCollStatus.type).to.equal(INDEX_STATUS);
         expect(actionCollStatus.meta).to.deep.equal({ ...expectedMeta, tag: '*' });
         const expectedCollStatusPayload = {
           validationStatus: validationStatus.INVALID,

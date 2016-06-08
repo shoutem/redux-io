@@ -4,11 +4,8 @@ export { apiStateMiddleware };
 import storage from './storage';
 export { storage };
 
-import collection, { COLLECTION_CLEAR } from './collection';
-export {
-  collection,
-  COLLECTION_CLEAR,
-};
+import collection from './collection';
+export { collection };
 
 import single from './single';
 export { single };
@@ -61,8 +58,9 @@ export {
   CREATE_SUCCESS,
   CREATE_ERROR,
   OBJECT_CREATED,
-  COLLECTION_FETCHED,
-  COLLECTION_STATUS,
+  INDEX_FETCHED,
+  INDEX_STATUS,
+  INDEX_CLEAR,
   middlewareJsonApiSource,
 } from './middleware';
 

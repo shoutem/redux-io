@@ -20,8 +20,8 @@ import {
   OBJECT_UPDATED,
   OBJECT_REMOVING,
   OBJECT_REMOVED,
-  COLLECTION_FETCHED,
-  COLLECTION_STATUS,
+  INDEX_FETCHED,
+  INDEX_STATUS,
   apiStateMiddleware,
 } from '../src';
 import {
@@ -70,7 +70,7 @@ describe('Json api middleware', () => {
         expect(performedActions).to.have.length(2);
 
         const actionCollStatus = performedActions[0];
-        expect(actionCollStatus.type).to.equal(COLLECTION_STATUS);
+        expect(actionCollStatus.type).to.equal(INDEX_STATUS);
         expect(actionCollStatus.meta).to.deep.equal(expectedMeta);
         const expectedCollStatusPayload = { busyStatus: busyStatus.BUSY };
         expect(actionCollStatus.payload).to.deep.equal(expectedCollStatusPayload);
@@ -123,7 +123,7 @@ describe('Json api middleware', () => {
         expect(actionObjFetched.payload).to.deep.equal(expectedPayload.data[0]);
 
         const actionCollFetched = performedActions[2];
-        expect(actionCollFetched.type).to.equal(COLLECTION_FETCHED);
+        expect(actionCollFetched.type).to.equal(INDEX_FETCHED);
         expect(actionCollFetched.meta).to.deep.equal(expectedMeta);
         expect(actionCollFetched.payload).to.deep.equal(expectedPayload.data);
 
@@ -156,7 +156,7 @@ describe('Json api middleware', () => {
         expect(performedActions).to.have.length(2);
 
         const actionCollStatus = performedActions[0];
-        expect(actionCollStatus.type).to.equal(COLLECTION_STATUS);
+        expect(actionCollStatus.type).to.equal(INDEX_STATUS);
         expect(actionCollStatus.meta).to.deep.equal(expectedMeta);
         const expectedCollStatusPayload = {
           busyStatus: busyStatus.IDLE,
@@ -206,7 +206,7 @@ describe('Json api middleware', () => {
         expect(actionObjCreated.payload).to.deep.equal(expectedPayload.data[0]);
 
         const actionCollStatus = performedActions[1];
-        expect(actionCollStatus.type).to.equal(COLLECTION_STATUS);
+        expect(actionCollStatus.type).to.equal(INDEX_STATUS);
         expect(actionCollStatus.meta).to.deep.equal({ ...expectedMeta, tag: '*' });
         const expectedCollStatusPayload = {
           validationStatus: validationStatus.INVALID,
@@ -241,7 +241,7 @@ describe('Json api middleware', () => {
         expect(performedActions).to.have.length(2);
 
         const actionCollStatus = performedActions[0];
-        expect(actionCollStatus.type).to.equal(COLLECTION_STATUS);
+        expect(actionCollStatus.type).to.equal(INDEX_STATUS);
         expect(actionCollStatus.meta).to.deep.equal({ ...expectedMeta, tag: '*' });
         const expectedCollStatusPayload = {
           busyStatus: busyStatus.IDLE,
@@ -285,7 +285,7 @@ describe('Json api middleware', () => {
         expect(performedActions).to.have.length(3);
 
         const actionCollStatusBusy = performedActions[0];
-        expect(actionCollStatusBusy.type).to.equal(COLLECTION_STATUS);
+        expect(actionCollStatusBusy.type).to.equal(INDEX_STATUS);
         expect(actionCollStatusBusy.meta)
           .to.deep.equal({ ...expectedMeta, tag: '*' });
         const expectedCollStatusBusyPayload = {
@@ -341,7 +341,7 @@ describe('Json api middleware', () => {
         expect(actionObjUpdated.payload).to.deep.equal(expectedPayload.data[0]);
 
         const actionCollStatus = performedActions[1];
-        expect(actionCollStatus.type).to.equal(COLLECTION_STATUS);
+        expect(actionCollStatus.type).to.equal(INDEX_STATUS);
         expect(actionCollStatus.meta).to.deep.equal({ ...expectedMeta, tag: '*' });
         const expectedCollStatusPayload = {
           busyStatus: busyStatus.IDLE,
@@ -376,7 +376,7 @@ describe('Json api middleware', () => {
         expect(performedActions).to.have.length(2);
 
         const actionCollStatus = performedActions[0];
-        expect(actionCollStatus.type).to.equal(COLLECTION_STATUS);
+        expect(actionCollStatus.type).to.equal(INDEX_STATUS);
         expect(actionCollStatus.meta).to.deep.equal({ ...expectedMeta, tag: '*' });
         const expectedCollStatusPayload = {
           busyStatus: busyStatus.IDLE,
@@ -417,7 +417,7 @@ describe('Json api middleware', () => {
         expect(performedActions).to.have.length(3);
 
         const actionCollRequest = performedActions[0];
-        expect(actionCollRequest.type).to.equal(COLLECTION_STATUS);
+        expect(actionCollRequest.type).to.equal(INDEX_STATUS);
         expect(actionCollRequest.meta).to.deep.equal({ ...expectedMeta, tag: '*' });
         const expectedCollStatusPayload = {
           validationStatus: validationStatus.INVALID,
@@ -466,7 +466,7 @@ describe('Json api middleware', () => {
         expect(actionObjDeleted.meta).to.deep.equal({ ...expectedMeta, transformation: {} });
 
         const actionCollStatus = performedActions[1];
-        expect(actionCollStatus.type).to.equal(COLLECTION_STATUS);
+        expect(actionCollStatus.type).to.equal(INDEX_STATUS);
         expect(actionCollStatus.meta).to.deep.equal({ ...expectedMeta, tag: '*' });
         const expectedCollStatusPayload = {
           validationStatus: validationStatus.INVALID,
@@ -499,7 +499,7 @@ describe('Json api middleware', () => {
         expect(performedActions).to.have.length(2);
 
         const actionCollStatus = performedActions[0];
-        expect(actionCollStatus.type).to.equal(COLLECTION_STATUS);
+        expect(actionCollStatus.type).to.equal(INDEX_STATUS);
         expect(actionCollStatus.meta).to.deep.equal({ ...expectedMeta, tag: '*' });
         const expectedCollStatusPayload = {
           busyStatus: busyStatus.IDLE,
@@ -582,7 +582,7 @@ describe('Json api middleware', () => {
         expect(actionObjFetched.payload).to.deep.equal(expectedPayload.data[0]);
 
         const actionCollFetched = performedActions[4];
-        expect(actionCollFetched.type).to.equal(COLLECTION_FETCHED);
+        expect(actionCollFetched.type).to.equal(INDEX_FETCHED);
         expect(actionCollFetched.meta).to.deep.equal({ ...expectedMeta });
         expect(actionCollFetched.payload).to.deep.equal(expectedPayload.data);
 

@@ -2,9 +2,9 @@ import { expect } from 'chai';
 import deepFreeze from 'deep-freeze';
 import {
   collection,
-  COLLECTION_FETCHED,
-  COLLECTION_CLEAR,
-  COLLECTION_STATUS,
+  INDEX_FETCHED,
+  INDEX_CLEAR,
+  INDEX_STATUS,
 } from '../src';
 import {
   STATUS,
@@ -36,7 +36,7 @@ describe('Collection reducer', () => {
     deepFreeze(initialState);
 
     const action = {
-      type: COLLECTION_FETCHED,
+      type: INDEX_FETCHED,
       meta: {
         schema,
         tag,
@@ -64,7 +64,7 @@ describe('Collection reducer', () => {
     deepFreeze(initialState);
 
     const action = {
-      type: COLLECTION_FETCHED,
+      type: INDEX_FETCHED,
       meta: {
         schema: 'test2',
         tag,
@@ -90,7 +90,7 @@ describe('Collection reducer', () => {
     deepFreeze(initialState);
 
     const action = {
-      type: 'COLLECTION_FETCHED',
+      type: 'INDEX_FETCHED',
       meta: {
         schema,
         tag,
@@ -116,7 +116,7 @@ describe('Collection reducer', () => {
     deepFreeze(initialState);
 
     const action = {
-      type: COLLECTION_FETCHED,
+      type: INDEX_FETCHED,
       meta: {
         schema,
         tag: 'collection2',
@@ -146,7 +146,7 @@ describe('Collection reducer', () => {
       { id: 4 },
     ];
     const action = {
-      type: COLLECTION_FETCHED,
+      type: INDEX_FETCHED,
       meta: {
         schema,
         tag,
@@ -173,7 +173,7 @@ describe('Collection reducer', () => {
     deepFreeze(initialState);
 
     const action = {
-      type: COLLECTION_STATUS,
+      type: INDEX_STATUS,
       payload: { validationStatus: validationStatus.INVALID, busyStatus: busyStatus.IDLE },
       meta: {
         schema,
@@ -201,7 +201,7 @@ describe('Collection reducer', () => {
     deepFreeze(initialState);
 
     const action = {
-      type: COLLECTION_STATUS,
+      type: INDEX_STATUS,
       payload: { busyStatus: busyStatus.BUSY },
       meta: {
         schema,
@@ -242,7 +242,7 @@ describe('Collection reducer', () => {
     const tag = 'tag_test';
 
     const action = {
-      type: COLLECTION_CLEAR,
+      type: INDEX_CLEAR,
       meta: {
         schema,
         tag,

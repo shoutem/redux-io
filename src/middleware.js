@@ -22,8 +22,9 @@ export const REMOVE_REQUEST = '@@redux_api_state/REMOVE_REQUEST';
 export const REMOVE_SUCCESS = '@@redux_api_state/REMOVE_SUCCESS';
 export const REMOVE_ERROR = '@@redux_api_state/REMOVE_ERROR';
 
-export const COLLECTION_FETCHED = '@@redux_api_state/COLLECTION_FETCHED';
-export const COLLECTION_STATUS = '@@redux_api_state/COLLECTION_STATUS';
+export const INDEX_FETCHED = '@@redux_api_state/INDEX_FETCHED';
+export const INDEX_STATUS = '@@redux_api_state/INDEX_STATUS';
+export const INDEX_CLEAR = '@@redux_api_state/INDEX_CLEAR';
 
 export const OBJECT_FETCHED = '@@redux_api_state/OBJECT_FETCHED';
 export const OBJECT_UPDATING = '@@redux_api_state/OBJECT_UPDATING';
@@ -61,7 +62,7 @@ function makeErrorAction(actionType, errorPayload) {
   };
 }
 
-export function makeCollectionAction(sourceAction, actionType, data, schema, tag = '*') {
+export function makeIndexAction(sourceAction, actionType, data, schema, tag = '*') {
   if (!actionType) {
     console.error('Action type is not valid.');
     return makeErrorAction(COLLECTION_ERROR, 'Action type is not valid.');
@@ -126,9 +127,9 @@ const actionHandlers = {
   [LOAD_REQUEST]: (action, data, dispatch) => {
     // Make collection busy to prevent multiple requests
     const { schema, tag } = action.meta;
-    dispatch(makeCollectionAction(
+    dispatch(makeIndexAction(
       action,
-      COLLECTION_STATUS,
+      INDEX_STATUS,
       { busyStatus: busyStatus.BUSY },
       schema,
       tag
@@ -138,16 +139,16 @@ const actionHandlers = {
     // Dispatch objects to storages and collection with specific tag
     const { schema, tag } = action.meta;
     data.map(item => dispatch(makeObjectAction(action, OBJECT_FETCHED, item)));
-    // TODO: once when we support findOne action and single reducer, COLLECTION_FETCHED
+    // TODO: once when we support findOne action and single reducer, INDEX_FETCHED
     // should trigger only for collections
-    dispatch(makeCollectionAction(action, COLLECTION_FETCHED, data, schema, tag));
+    dispatch(makeIndexAction(action, INDEX_FETCHED, data, schema, tag));
   },
   [LOAD_ERROR]: (action, data, dispatch) => {
     // Invalidate and idle collection on error
     const { schema, tag } = action.meta;
-    dispatch(makeCollectionAction(
+    dispatch(makeIndexAction(
       action,
-      COLLECTION_STATUS,
+      INDEX_STATUS,
       {
         busyStatus: busyStatus.IDLE,
         validationStatus: validationStatus.INVALID,
@@ -160,9 +161,9 @@ const actionHandlers = {
   [CREATE_REQUEST]: (action, data, dispatch) => {
     // Change collection status to busy and invalid to prevent fetching.
     const schema = action.meta.schema;
-    dispatch(makeCollectionAction(
+    dispatch(makeIndexAction(
       action,
-      COLLECTION_STATUS,
+      INDEX_STATUS,
       { validationStatus: validationStatus.INVALID, busyStatus: busyStatus.BUSY },
       schema
     ));
@@ -171,9 +172,9 @@ const actionHandlers = {
     // Dispatch created objects to storage and change collection status to invalid, idle
     data.map(item => dispatch(makeObjectAction(action, OBJECT_CREATED, item)));
     const schema = action.meta.schema;
-    dispatch(makeCollectionAction(
+    dispatch(makeIndexAction(
       action,
-      COLLECTION_STATUS,
+      INDEX_STATUS,
       { validationStatus: validationStatus.INVALID, busyStatus: busyStatus.IDLE },
       schema
     ));
@@ -181,9 +182,9 @@ const actionHandlers = {
   [CREATE_ERROR]: (action, data, dispatch) => {
     // Change collection status to idle and invalid to fetch again.
     const schema = action.meta.schema;
-    dispatch(makeCollectionAction(
+    dispatch(makeIndexAction(
       action,
-      COLLECTION_STATUS,
+      INDEX_STATUS,
       {
         validationStatus: validationStatus.INVALID,
         busyStatus: busyStatus.IDLE,
@@ -195,9 +196,9 @@ const actionHandlers = {
     // Change collection status to busy and invalid to prevent fetching and because of
     // local changes in storage state with updated item.
     const schema = action.meta.schema;
-    dispatch(makeCollectionAction(
+    dispatch(makeIndexAction(
       action,
-      COLLECTION_STATUS,
+      INDEX_STATUS,
       { validationStatus: validationStatus.INVALID, busyStatus: busyStatus.BUSY },
       schema
     ));
@@ -207,9 +208,9 @@ const actionHandlers = {
     // Dispatch updated objects from and change collections status to idle & invalid
     data.map(item => dispatch(makeObjectAction(action, OBJECT_UPDATED, item)));
     const schema = action.meta.schema;
-    dispatch(makeCollectionAction(
+    dispatch(makeIndexAction(
       action,
-      COLLECTION_STATUS,
+      INDEX_STATUS,
       { validationStatus: validationStatus.INVALID, busyStatus: busyStatus.IDLE },
       schema
     ));
@@ -217,9 +218,9 @@ const actionHandlers = {
   [UPDATE_ERROR]: (action, data, dispatch) => {
     // Change collection status to idle and invalid
     const schema = action.meta.schema;
-    dispatch(makeCollectionAction(
+    dispatch(makeIndexAction(
       action,
-      COLLECTION_STATUS,
+      INDEX_STATUS,
       {
         validationStatus: validationStatus.INVALID,
         busyStatus: busyStatus.IDLE,
@@ -231,9 +232,9 @@ const actionHandlers = {
     // Change collections status to busy and invalid because of removing item in
     // local storage state
     const schema = action.meta.schema;
-    dispatch(makeCollectionAction(
+    dispatch(makeIndexAction(
       action,
-      COLLECTION_STATUS,
+      INDEX_STATUS,
       { validationStatus: validationStatus.INVALID, busyStatus: busyStatus.BUSY },
       schema
     ));
@@ -243,9 +244,9 @@ const actionHandlers = {
     // Remove object if already not removed during request
     data.map(item => dispatch(makeObjectAction(action, OBJECT_REMOVED, item)));
     const schema = action.meta.schema;
-    dispatch(makeCollectionAction(
+    dispatch(makeIndexAction(
       action,
-      COLLECTION_STATUS,
+      INDEX_STATUS,
       { validationStatus: validationStatus.INVALID, busyStatus: busyStatus.IDLE },
       schema
     ));
@@ -253,9 +254,9 @@ const actionHandlers = {
   [REMOVE_ERROR]: (action, data, dispatch) => {
     // Change collections status to idle and invalid
     const schema = action.meta.schema;
-    dispatch(makeCollectionAction(
+    dispatch(makeIndexAction(
       action,
-      COLLECTION_STATUS,
+      INDEX_STATUS,
       {
         validationStatus: validationStatus.INVALID,
         busyStatus: busyStatus.IDLE,

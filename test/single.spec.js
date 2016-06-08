@@ -2,9 +2,9 @@ import { expect } from 'chai';
 import deepFreeze from 'deep-freeze';
 import {
   single,
-  COLLECTION_FETCHED,
-  COLLECTION_CLEAR,
-  COLLECTION_STATUS,
+  INDEX_FETCHED,
+  INDEX_CLEAR,
+  INDEX_STATUS,
 } from '../src';
 import {
   STATUS,
@@ -35,7 +35,7 @@ describe('Single reducer', () => {
     deepFreeze(initialValue);
 
     const action = {
-      type: COLLECTION_FETCHED,
+      type: INDEX_FETCHED,
       meta: {
         schema,
         tag,
@@ -62,7 +62,7 @@ describe('Single reducer', () => {
     deepFreeze(initialValue);
 
     const action = {
-      type: COLLECTION_FETCHED,
+      type: INDEX_FETCHED,
       meta: {
         schema: 'test2',
         tag,
@@ -87,7 +87,7 @@ describe('Single reducer', () => {
     deepFreeze(initialValue);
 
     const action = {
-      type: 'COLLECTION_FETCHED',
+      type: 'INDEX_FETCHED',
       meta: {
         schema,
         tag,
@@ -112,7 +112,7 @@ describe('Single reducer', () => {
     deepFreeze(initialValue);
 
     const action = {
-      type: COLLECTION_FETCHED,
+      type: INDEX_FETCHED,
       meta: {
         schema,
         tag: 'collection2',
@@ -137,7 +137,7 @@ describe('Single reducer', () => {
       { id: 3 },
     ];
     const action = {
-      type: COLLECTION_FETCHED,
+      type: INDEX_FETCHED,
       meta: {
         schema,
         tag,
@@ -159,7 +159,7 @@ describe('Single reducer', () => {
     deepFreeze(initialValue);
 
     const action = {
-      type: COLLECTION_STATUS,
+      type: INDEX_STATUS,
       payload: { validationStatus: validationStatus.INVALID, busyStatus: busyStatus.IDLE },
       meta: {
         schema,
@@ -183,7 +183,7 @@ describe('Single reducer', () => {
     deepFreeze(initialValue);
 
     const action = {
-      type: COLLECTION_STATUS,
+      type: INDEX_STATUS,
       payload: { busyStatus: busyStatus.BUSY },
       meta: {
         schema,
@@ -216,7 +216,7 @@ describe('Single reducer', () => {
     const tag = 'tag_test';
 
     const action = {
-      type: COLLECTION_CLEAR,
+      type: INDEX_CLEAR,
       meta: {
         schema,
         tag,

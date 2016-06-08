@@ -1,7 +1,8 @@
 import _ from 'lodash';
 import {
-  COLLECTION_FETCHED,
-  COLLECTION_STATUS,
+  INDEX_FETCHED,
+  INDEX_STATUS,
+  INDEX_CLEAR,
 } from './middleware';
 import {
   STATUS,
@@ -11,8 +12,6 @@ import {
   updateStatus,
 } from './status';
 
-export const COLLECTION_CLEAR = '@@redux_api_state/COLLECTION_CLEAR';
-
 function isValid(action, schema, tag) {
   if (_.get(action, 'meta.schema') !== schema) {
     return false;
@@ -20,9 +19,9 @@ function isValid(action, schema, tag) {
 
   // Only if the tag in the action is the same as the one on the collection reducer
   if (_.get(action, 'meta.tag') !== tag) {
-    // Every collection should change status if action is type of COLLECTION_STATUS
+    // Every collection should change status if action is type of INDEX_STATUS
     // and action meta tag is broadcast
-    if (action.type === COLLECTION_STATUS && _.get(action, 'meta.tag') === '*') {
+    if (action.type === INDEX_STATUS && _.get(action, 'meta.tag') === '*') {
       return true;
     }
     return false;
@@ -49,7 +48,7 @@ export default function single(schema, tag, initialValue = '') {
     }
 
     switch (action.type) {
-      case COLLECTION_FETCHED: {
+      case INDEX_FETCHED: {
         return {
           value: action.payload[0] ? action.payload[0].id : initialValue,
           [STATUS]: updateStatus(
@@ -62,7 +61,7 @@ export default function single(schema, tag, initialValue = '') {
           ),
         };
       }
-      case COLLECTION_CLEAR: {
+      case INDEX_CLEAR: {
         return {
           value: initialValue,
           [STATUS]: updateStatus(
@@ -75,7 +74,7 @@ export default function single(schema, tag, initialValue = '') {
           ),
         };
       }
-      case COLLECTION_STATUS: {
+      case INDEX_STATUS: {
         return {
           value: state.value,
           [STATUS]: updateStatus(
