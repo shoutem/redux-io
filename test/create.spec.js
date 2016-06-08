@@ -1,7 +1,7 @@
 /* eslint-disable no-unused-expressions */
 import { expect } from 'chai';
 import nock from 'nock';
-import { CALL_API, apiMiddleware } from 'redux-api-middleware';
+import { RSAA, apiMiddleware } from 'redux-api-middleware';
 import configureMockStore from 'redux-mock-store';
 import thunk from 'redux-thunk';
 import {
@@ -46,21 +46,21 @@ describe('Create action creator', () => {
     };
     const action = create(config, schema, item);
 
-    expect(action[CALL_API]).to.not.be.undefined;
-    expect(action[CALL_API].method).to.equal('POST');
-    expect(action[CALL_API].endpoint).to.equal(config.endpoint);
-    expect(action[CALL_API].headers).to.equal(config.headers);
+    expect(action[RSAA]).to.not.be.undefined;
+    expect(action[RSAA].method).to.equal('POST');
+    expect(action[RSAA].endpoint).to.equal(config.endpoint);
+    expect(action[RSAA].headers).to.equal(config.headers);
     const expectedBody = JSON.stringify({
       data: item,
     });
-    expect(action[CALL_API].body).to.equal(expectedBody);
-    expect(action[CALL_API].types).to.not.be.undefined;
+    expect(action[RSAA].body).to.equal(expectedBody);
+    expect(action[RSAA].types).to.not.be.undefined;
 
     const expectedMeta = {
       source: middlewareJsonApiSource,
       schema,
     };
-    const types = action[CALL_API].types;
+    const types = action[RSAA].types;
     expect(types[0].type).to.equal(CREATE_REQUEST);
     expect(types[0].meta).to.deep.equal(expectedMeta);
     expect(types[1].type).to.equal(CREATE_SUCCESS);
@@ -87,18 +87,18 @@ describe('Create action creator', () => {
     };
     const action = create(config, schema);
 
-    expect(action[CALL_API]).to.not.be.undefined;
-    expect(action[CALL_API].method).to.equal('POST');
-    expect(action[CALL_API].endpoint).to.equal(config.endpoint);
-    expect(action[CALL_API].headers).to.equal(config.headers);
-    expect(action[CALL_API].body).to.equal(item);
-    expect(action[CALL_API].types).to.not.be.undefined;
+    expect(action[RSAA]).to.not.be.undefined;
+    expect(action[RSAA].method).to.equal('POST');
+    expect(action[RSAA].endpoint).to.equal(config.endpoint);
+    expect(action[RSAA].headers).to.equal(config.headers);
+    expect(action[RSAA].body).to.equal(item);
+    expect(action[RSAA].types).to.not.be.undefined;
 
     const expectedMeta = {
       source: middlewareJsonApiSource,
       schema,
     };
-    const types = action[CALL_API].types;
+    const types = action[RSAA].types;
     expect(types[0].type).to.equal(CREATE_REQUEST);
     expect(types[0].meta).to.deep.equal(expectedMeta);
     expect(types[1].type).to.equal(CREATE_SUCCESS);
@@ -124,18 +124,18 @@ describe('Create action creator', () => {
 
     const action = create(config, schema, item);
 
-    expect(action[CALL_API]).to.not.be.undefined;
-    expect(action[CALL_API].method).to.equal('POST');
-    expect(action[CALL_API].endpoint).to.equal(config.endpoint);
-    expect(action[CALL_API].headers).to.equal(config.headers);
-    expect(action[CALL_API].body).to.equal(JSON.stringify({ data: item }));
-    expect(action[CALL_API].types).to.not.be.undefined;
+    expect(action[RSAA]).to.not.be.undefined;
+    expect(action[RSAA].method).to.equal('POST');
+    expect(action[RSAA].endpoint).to.equal(config.endpoint);
+    expect(action[RSAA].headers).to.equal(config.headers);
+    expect(action[RSAA].body).to.equal(JSON.stringify({ data: item }));
+    expect(action[RSAA].types).to.not.be.undefined;
 
     const expectedMeta = {
       source: middlewareJsonApiSource,
       schema,
     };
-    const types = action[CALL_API].types;
+    const types = action[RSAA].types;
     expect(types[0].type).to.equal(CREATE_REQUEST);
     expect(types[0].meta).to.deep.equal(expectedMeta);
     expect(types[1].type).to.equal(CREATE_SUCCESS);
