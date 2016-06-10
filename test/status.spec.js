@@ -229,7 +229,7 @@ describe('Status metadata', () => {
     }, 100);
   });
 
-  it('doesn\'t interfer with forEach in Array', () => {
+  it('doesn\'t interfere with forEach in Array', () => {
     const obj = [1, 2, 3];
     obj[STATUS] = createStatus();
 
@@ -239,7 +239,7 @@ describe('Status metadata', () => {
     expect(counter).to.be.eql(3);
   });
 
-  it('doesn\'t interfer with map in Array', () => {
+  it('doesn\'t interfere with map in Array', () => {
     const obj = [1, 2, 3];
     obj[STATUS] = createStatus();
 
@@ -249,7 +249,7 @@ describe('Status metadata', () => {
     expect(counter).to.be.eql(3);
   });
 
-  it('does interfer with \'for in\' in Array', () => {
+  it('does interfere with \'for in\' in Array', () => {
     const obj = [1, 2, 3];
     obj[STATUS] = createStatus();
 
@@ -261,7 +261,7 @@ describe('Status metadata', () => {
     expect(counter).to.be.eql(4);
   });
 
-  it('doesn\'t interfer with \'for of\' in Array', () => {
+  it('doesn\'t interfere with \'for of\' in Array', () => {
     const obj = [1, 2, 3];
     obj[STATUS] = createStatus();
 
