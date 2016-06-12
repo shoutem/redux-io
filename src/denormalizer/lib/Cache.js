@@ -31,6 +31,10 @@ function didCollectionChange(cachedCollection, newCollection, matchedItemsLength
     );
 }
 
+function isItemInCollection(collection, item) {
+  return collection && collection.find(collectionItem => collectionItem.id === item.id);
+}
+
 export function isCollection(entity) {
   return _.isArray(entity);
 }
@@ -131,19 +135,20 @@ export default class JsonApiCache {
     let collectionChanged = false;
     let matchedItems = 0;
     const newCollection = descriptorCollection.map(item => {
-      const newItem = denormalizeItem(item);
       const cachedItem = this.getItem(item);
-      if (cachedCollection && cachedCollection.find(i => i === item.id)) {
+      const newItem = denormalizeItem(item);
+      if (isItemInCollection(cachedCollection, item)) {
         matchedItems += 1;
       }
       if (newItem !== cachedItem) {
         collectionChanged = true;
       }
+      return newItem;
     });
     if (collectionChanged || didCollectionChange(cachedCollection, newCollection, matchedItems)) {
       return newCollection;
     }
-    return this.getCollection(descriptorCollection);
+    return cachedCollection;
   }
 
   resolveItemRelationshipsChanges(item, denormalizeItem) {
@@ -178,7 +183,7 @@ export default class JsonApiCache {
           const cachedItem = this.getItem(item);
 
           const relationshipItem = denormalizeItem(item);
-          if (cachedRelationship && cachedRelationship.find(oldItem => oldItem.id === item.id)) {
+          if (isItemInCollection(cachedRelationship, item)) {
             matchedRelationshipsItems += 1;
           }
           if (cachedItem !== relationshipItem) {
