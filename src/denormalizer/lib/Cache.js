@@ -20,7 +20,7 @@ export function getUniqueRelationshipCollectionKey(item, relationshipSchema) {
 }
 
 function isCacheValid(cachedModificationTime, currentModificationTime) {
-  return cachedModificationTime < currentModificationTime;
+  return cachedModificationTime >= currentModificationTime;
 }
 
 function didCollectionChange(cachedCollection, newCollection, matchedItemsLength) {
