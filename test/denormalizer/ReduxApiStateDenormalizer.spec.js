@@ -131,7 +131,7 @@ describe('ReduxApiStateDenormalizer', () => {
         denormalizer.denormalizeItemFromStorage({id: 'type1Id1', type: 'type1'}, storage);
       const cachedDenormalizedData =
         denormalizer.denormalizeItemFromStorage({id: 'type1Id1', type: 'type1'}, storage);
-      // console.log(cachedDenormalizedData, denormalizedData);
+
       assert.isOk(cachedDenormalizedData === denormalizedData, 'didn\'t get cached item');
       assert.isObject(cachedDenormalizedData[STATUS]);
       assert.isObject(cachedDenormalizedData['type2.test'][STATUS]);
