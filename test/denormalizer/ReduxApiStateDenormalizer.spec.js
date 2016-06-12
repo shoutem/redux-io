@@ -224,6 +224,21 @@ describe('ReduxApiStateDenormalizer', () => {
       assert.isObject(cachedDenormalizedData[STATUS]);
 
     });
+    it('gets new collection reference when item changed', () => {
+      const denormalizer = new ReduxApiStateDenormalizer();
+      const collection = ['type1Id1'];
+      collection[STATUS] = createStatus({ schema: 'type1', tag: ''});
+      let storage = storage = createSchemasMap(getStore(), createStorageMap());
+      const denormalizedData =
+        denormalizer.denormalizeCollection(collection, storage);
+      storage = createSchemasMap(getModifiedStore(), createStorageMap());
+      const cachedDenormalizedData =
+        denormalizer.denormalizeCollection(collection, storage);
+
+      assert.isOk(cachedDenormalizedData !== denormalizedData, 'didn\'t create new reference');
+      assert.isObject(cachedDenormalizedData[STATUS]);
+
+    });
   });
 });
 
