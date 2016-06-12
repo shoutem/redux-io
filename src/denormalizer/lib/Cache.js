@@ -2,37 +2,36 @@ import { createUniqueTargetKey } from '@shoutem/json-api-denormalizer';
 import { getModificationTime } from '../../status';
 import _ from 'lodash';
 
-function getUniqueTargetKey(item) {
+export function getUniqueTargetKey(item) {
   return createUniqueTargetKey(item);
 }
 
-function getUniqueCollectionKey(collection) {
+export function getUniqueCollectionKey(collection) {
   return `${collection.schema}.${collection.tag}`;
 }
 
-function getUniqueItemRelationshipsKey(item) {
+export function getUniqueItemRelationshipsKey(item) {
   return `${item.id}.${item.type}.relationships`;
 }
-function getUniqueRelationshipCollectionKey(item, relationshipSchema) {
+
+export function getUniqueRelationshipCollectionKey(item, relationshipSchema) {
   const itemRelationshipsKey = getUniqueItemRelationshipsKey(item);
   return `${itemRelationshipsKey}.${relationshipSchema}`;
 }
 
 function isCacheValid(cachedModificationTime, currentModificationTime) {
-  if (cachedModificationTime >= currentModificationTime) {
-    return false;
-  }
-  return true;
+  return cachedModificationTime < currentModificationTime;
 }
 
-function didCollectionChange(descriptorCollection, cachedCollection) {
-  const cachedCollectionModificationTime = getModificationTime(cachedCollection);
-  const currentCollectionModificationTime = getModificationTime(descriptorCollection);
-
-  return isCacheValid(cachedCollectionModificationTime, currentCollectionModificationTime);
+function didCollectionChange(cachedCollection, newCollection, matchedItemsLength) {
+  return (!cachedCollection && !!newCollection) ||
+    (
+      cachedCollection.length !== newCollection.length ||
+      cachedCollection.length !== matchedItemsLength
+    );
 }
 
-function isCollection(entity) {
+export function isCollection(entity) {
   return _.isArray(entity);
 }
 
@@ -108,7 +107,7 @@ export default class JsonApiCache {
     const cachedItemModificationTime = getModificationTime(cachedItem);
     const currentItemModificationTime = getModificationTime(item);
 
-    return isCacheValid(cachedItemModificationTime, currentItemModificationTime);
+    return !isCacheValid(cachedItemModificationTime, currentItemModificationTime);
   }
 
   isCollectionChanged(collection) {
@@ -128,15 +127,20 @@ export default class JsonApiCache {
   }
 
   resolveCollectionItemsChange(descriptorCollection, denormalizeItem) {
+    const cachedCollection = this.getCollection(descriptorCollection);
     let collectionChanged = false;
+    let matchedItems = 0;
     const newCollection = descriptorCollection.map(item => {
       const newItem = denormalizeItem(item);
       const cachedItem = this.getItem(item);
+      if (cachedCollection && cachedCollection.find(i => i === item.id)) {
+        matchedItems += 1;
+      }
       if (newItem !== cachedItem) {
         collectionChanged = true;
       }
     });
-    if (collectionChanged) {
+    if (collectionChanged || didCollectionChange(cachedCollection, newCollection, matchedItems)) {
       return newCollection;
     }
     return this.getCollection(descriptorCollection);
@@ -154,14 +158,14 @@ export default class JsonApiCache {
       const relationshipData = relationship.data;
       let newRelationship;
       let cachedRelationship;
+      let relationshipChanged = false;
 
       if (_.isPlainObject(relationshipData)) {
 
+        const cachedItem = this.getItem(relationshipData);
         newRelationship = denormalizeItem(relationshipData);
-        // console.log(relationshipData, newRelationship)
-        // console.log(this.isItemChanged(newRelationship), newRelationship.id);
-        if (!relationshipsChanged && this.isItemChanged(newRelationship)) {
-          relationshipsChanged = true;
+        if (cachedItem !== newRelationship) {
+          relationshipChanged = true;
         }
       } else if (isCollection(relationshipData)) {
 
@@ -171,38 +175,41 @@ export default class JsonApiCache {
         const collectionKey = getUniqueRelationshipCollectionKey(item, schema);
 
         newRelationship = relationshipData.map(item => {
+          const cachedItem = this.getItem(item);
+
           const relationshipItem = denormalizeItem(item);
           if (cachedRelationship && cachedRelationship.find(oldItem => oldItem.id === item.id)) {
             matchedRelationshipsItems += 1;
           }
-          // console.log(relationshipItem.id, item.id);
-          if (this.isItemChanged(relationshipItem)) {
+          if (cachedItem !== relationshipItem) {
             collectionChanged = true;
+            return relationshipItem;
           }
+          return cachedItem;
         });
 
-        if (
-          (!cachedRelationship && newRelationship) ||
-          (
-            cachedRelationship.length !== newRelationship.length ||
-            cachedRelationship.length !== matchedRelationshipsItems
-          )
-        ) {
-          cachedRelationship = true;
+        if (didCollectionChange(cachedRelationship, newRelationship, matchedRelationshipsItems)) {
+          collectionChanged = true;
         }
 
         if (collectionChanged) {
           this.cacheRelationshipCollection(newRelationship, collectionKey);
-          relationshipsChanged = true;
+          relationshipChanged = true;
         }
       } else if (relationshipData === null) {
         // for empty to-one relationships
         newRelationship = null;
-        if (!relationshipsChanged && this.isItemChanged(relationshipData)) {
-          relationshipsChanged = true;
+        if (this.isItemChanged(relationshipData)) {
+          relationshipChanged = true;
         }
       }
-      lels[schema] = newRelationship;
+
+      if (relationshipChanged) {
+        relationshipsChanged = true;
+        lels[schema] = newRelationship;
+      } else {
+        lels[schema] = cachedRelationship;
+      }
       return lels;
     }, {});
 
