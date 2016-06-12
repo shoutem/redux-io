@@ -21,6 +21,16 @@ export function createSchemasMap(store, storeSchemasPaths) {
 
   return storage;
 }
+
+function createDesriptorCollection(collection) {
+  const collectionDescription = getCollectionDescription(collection);
+  const descriptorCollection = collection.map(id => ({
+    id,
+    type: collectionDescription.schema
+  }));
+  applyStatus(collection, descriptorCollection);
+  return descriptorCollection;
+}
 /**
  * Returns provided data in denormalized form
  */
@@ -134,23 +144,13 @@ export default class ReduxApiStateDenormalizer extends ReduxDenormalizer {
    * @returns {{}}
    */
   denormalizeCollection(collection, storage) {
-    let denormalizedCollection;
-
     // Collection description contains { schema, tag }
-    const collectionDescription = getCollectionDescription(collection);
-    const descriptorCollection = collection.map(id => ({
-      id,
-      type: collectionDescription.schema
-    }));
-    applyStatus(collection, descriptorCollection);
+    this.updateStorage(storage);
+    const descriptorCollection = createDesriptorCollection(collection);
 
-    if (cache.hasCollection(collection)) {
-      denormalizedCollection =
-        cache.resolveCollectionItemsChange(descriptorCollection, this.denormalizeItem);
-    } else {
-      denormalizedCollection = super.denormalizeCollection(descriptorCollection, storage);
-    }
-    
+    const denormalizedCollection =
+      cache.resolveCollectionItemsChange(descriptorCollection, this.denormalizeItem);
+
     applyStatus(collection, denormalizedCollection);
     return cache.cacheCollection(denormalizedCollection);
   }
