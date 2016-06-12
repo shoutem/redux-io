@@ -1,5 +1,5 @@
 import ReduxDenormalizer from './ReduxDenormalizer';
-import Cache from './lib/Cache';
+import Cache, { isCollection, getUniqueRelationshipCollectionKey } from './lib/Cache';
 import { getCollectionDescription } from '../collection';
 import _ from 'lodash';
 import { applyStatus } from './../status';
@@ -50,7 +50,6 @@ export default class ReduxApiStateDenormalizer extends ReduxDenormalizer {
       super();
     }
     this.denormalizeItem = this.denormalizeItem.bind(this);
-    this.denormalizeRelationshipItem = this.denormalizeRelationshipItem.bind(this);
   }
 
   /**
@@ -64,27 +63,23 @@ export default class ReduxApiStateDenormalizer extends ReduxDenormalizer {
    * @returns {{}}
    */
   denormalizeItem(item) {
-    if (!cache.isItemChanged(item)) {
-      return this.useCache(item);
+    const normalizedItem = this.getNormalizedItem(item);
+    if (cache.hasItem(normalizedItem)) {
+      return this.useCache(normalizedItem);
     }
     return cache.cacheItem(super.denormalizeItem(item));
-  }
-  
-  denormalizeItemFromStorage(item, storage) {
-    return cache.cacheItem(super.denormalizeItemFromStorage(item, storage));
   }
 
   /**
-   * Resolving relationships use already set storage so data doesn't get mixed
+   * Used to denromalize item in ProvideStorage mode or specific storage.
    *
    * @param item
+   * @param storage
    * @returns {*}
    */
-  denormalizeRelationshipItem(item) {
-    if (!cache.isItemChanged(item)) {
-      return this.useCache(item);
-    }
-    return cache.cacheItem(super.denormalizeItem(item));
+  denormalizeItemFromStorage(item, storage) {
+    this.updateStorage(storage);
+    return this.denormalizeItem(item);
   }
 
   /**
@@ -93,15 +88,12 @@ export default class ReduxApiStateDenormalizer extends ReduxDenormalizer {
    * @param item
    * @returns {*}
    */
-  useCache(item) {
-    const normalizedItem = this.getNormalizedItem(item);
+  useCache(normalizedItem) {
+    const cachedRelationships = cache.getItemRelationships(normalizedItem);
     const newRelationships = this.denormalizeItemRelationships(normalizedItem);
-    // console.log('has cache', item.id, newRelationships);
-    if (!cache.areRelationshipsChanged(normalizedItem, newRelationships)) {
-      // console.log('relationships not changed')
+    if (!cache.isItemChanged(normalizedItem) && cachedRelationships === newRelationships) {
       return cache.getItem(normalizedItem);
     }
-    // console.log('relationships changed')
 
     const attributes = super.denormalizeItemAttributes(normalizedItem);
     return cache.cacheItem(this.mergeDenormalizedItemData(
@@ -111,14 +103,9 @@ export default class ReduxApiStateDenormalizer extends ReduxDenormalizer {
     ));
   }
 
-  denormalizeItemRelationships(item, storage) {
-    if (cache.hasItemRelationships(item)) {
-      // if relationships it self nor items haven't changed, relationship will stay the same
-      const relationships =
-        cache.resolveItemRelationshipsChanges(item, this.denormalizeRelationshipItem);
-      return cache.cacheRelationships(relationships, item);
-    }
-    return cache.cacheRelationships(super.denormalizeItemRelationships(item), item);
+  denormalizeItemRelationships(item) {
+    const relationships = cache.resolveItemRelationshipsChanges(item, this.denormalizeItem);
+    return cache.cacheRelationships(relationships, item);
   }
 
   /**
@@ -147,25 +134,24 @@ export default class ReduxApiStateDenormalizer extends ReduxDenormalizer {
    * @returns {{}}
    */
   denormalizeCollection(collection, storage) {
+    let denormalizedCollection;
+
     // Collection description contains { schema, tag }
     const collectionDescription = getCollectionDescription(collection);
     const descriptorCollection = collection.map(id => ({
       id,
       type: collectionDescription.schema
     }));
+    applyStatus(collection, descriptorCollection);
 
-    if (!cache.isCollectionChanged(collection)) {
-      const updatedCollection =
+    if (cache.hasCollection(collection)) {
+      denormalizedCollection =
         cache.resolveCollectionItemsChange(descriptorCollection, this.denormalizeItem);
-      if (updatedCollection !== cache.getCollection(collection)) {
-        applyStatus(updatedCollection, updatedCollection);
-      }
-      return updatedCollection;
+    } else {
+      denormalizedCollection = super.denormalizeCollection(descriptorCollection, storage);
     }
-
-    const denormalizedCollection = super.denormalizeCollection(descriptorCollection, storage);
+    
     applyStatus(collection, denormalizedCollection);
-
     return cache.cacheCollection(denormalizedCollection);
   }
 }
