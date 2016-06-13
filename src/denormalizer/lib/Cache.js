@@ -153,6 +153,7 @@ export default class JsonApiCache {
 
   resolveItemRelationshipsChanges(item, denormalizeItem) {
     let relationshipsChanged = false;
+    const cachedRelationships = this.getItemRelationships(item);
     const relationships = item.relationships;
 
     if (!relationships) {
@@ -167,9 +168,9 @@ export default class JsonApiCache {
 
       if (_.isPlainObject(relationshipData)) {
 
-        const cachedItem = this.getItem(relationshipData);
+        cachedRelationship = this.getItem(relationshipData);
         newRelationship = denormalizeItem(relationshipData);
-        if (cachedItem !== newRelationship) {
+        if (cachedRelationship !== newRelationship) {
           relationshipChanged = true;
         }
       } else if (isCollection(relationshipData)) {
@@ -204,10 +205,12 @@ export default class JsonApiCache {
       } else if (relationshipData === null) {
         // for empty to-one relationships
         newRelationship = null;
-        if (this.isItemChanged(relationshipData)) {
+        cachedRelationship = cachedRelationships && cachedRelationships[schema];
+        if (newRelationships !== cachedRelationship) {
           relationshipChanged = true;
         }
       }
+
 
       if (relationshipChanged) {
         relationshipsChanged = true;
@@ -219,7 +222,7 @@ export default class JsonApiCache {
     }, {});
 
     if (!relationshipsChanged) {
-      return this.getItemRelationships(item);
+      return cachedRelationships;
     }
     return newRelationships;
   }
