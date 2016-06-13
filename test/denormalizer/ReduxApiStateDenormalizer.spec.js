@@ -15,6 +15,10 @@ function createStorageMap() {
   };
 }
 
+// NOTE!
+// Take care when passing getStore in FindStorageMode,
+// items statuses will be changed which means item has changed
+// Better way is to first create storage and then pass the same storage with new function
 const getStore = () => {
   const store = {
     storage: {
