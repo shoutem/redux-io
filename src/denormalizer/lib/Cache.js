@@ -160,7 +160,7 @@ export default class JsonApiCache {
       return relationships
     }
 
-    const newRelationships = _.reduce(relationships, (lels, relationship, schema) => {
+    const newRelationships = _.reduce(relationships, (newRelationships, relationship, schema) => {
       const relationshipData = relationship.data;
       let newRelationship;
       let cachedRelationship;
@@ -214,11 +214,11 @@ export default class JsonApiCache {
 
       if (relationshipChanged) {
         relationshipsChanged = true;
-        lels[schema] = newRelationship;
+        newRelationships[schema] = newRelationship;
       } else {
-        lels[schema] = cachedRelationship;
+        newRelationships[schema] = cachedRelationship;
       }
-      return lels;
+      return newRelationships;
     }, {});
 
     if (!relationshipsChanged) {
