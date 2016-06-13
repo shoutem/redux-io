@@ -14,11 +14,6 @@ export function getUniqueItemRelationshipsKey(item) {
   return `${item.id}.${item.type}.relationships`;
 }
 
-export function getUniqueRelationshipCollectionKey(item, relationshipSchema) {
-  const itemRelationshipsKey = getUniqueItemRelationshipsKey(item);
-  return `${itemRelationshipsKey}.${relationshipSchema}`;
-}
-
 function isCacheValid(cachedModificationTime, currentModificationTime) {
   return cachedModificationTime >= currentModificationTime;
 }
@@ -64,10 +59,6 @@ export default class JsonApiCache {
     return this.getCacheByKey(getUniqueItemRelationshipsKey(item));
   }
 
-  getItemRelationshipCollection(item, relationshipSchema) {
-    return this.getCacheByKey(getUniqueRelationshipCollectionKey(item, relationshipSchema));
-  }
-
   hasItem(item) {
     return this.cacheExists(getUniqueTargetKey(item));
   }
@@ -88,11 +79,6 @@ export default class JsonApiCache {
 
   cacheCollection(collection) {
     const collectionKey = getUniqueCollectionKey(collection);
-    this.cache[collectionKey] = collection;
-    return this.getCacheByKey(collectionKey);
-  }
-
-  cacheRelationshipCollection(collection, collectionKey) {
     this.cache[collectionKey] = collection;
     return this.getCacheByKey(collectionKey);
   }
@@ -152,9 +138,9 @@ export default class JsonApiCache {
   }
 
   resolveItemRelationshipsChanges(item, denormalizeItem) {
-    let relationshipsChanged = false;
     const cachedRelationships = this.getItemRelationships(item);
     const relationships = item.relationships;
+    let relationshipsChanged = false;
 
     if (!relationships) {
       return relationships
@@ -162,23 +148,20 @@ export default class JsonApiCache {
 
     const newRelationships = _.reduce(relationships, (newRelationships, relationship, schema) => {
       const relationshipData = relationship.data;
+      const cachedRelationship = cachedRelationships && cachedRelationships[schema];
       let newRelationship;
-      let cachedRelationship;
       let relationshipChanged = false;
 
       if (_.isPlainObject(relationshipData)) {
 
-        cachedRelationship = this.getItem(relationshipData);
         newRelationship = denormalizeItem(relationshipData);
         if (cachedRelationship !== newRelationship) {
           relationshipChanged = true;
         }
       } else if (isCollection(relationshipData)) {
 
-        cachedRelationship = this.getItemRelationshipCollection(item, schema);
         let collectionChanged = false;
         let matchedRelationshipsItems = 0;
-        const collectionKey = getUniqueRelationshipCollectionKey(item, schema);
 
         newRelationship = relationshipData.map(item => {
           const cachedItem = this.getItem(item);
@@ -199,13 +182,11 @@ export default class JsonApiCache {
         }
 
         if (collectionChanged) {
-          this.cacheRelationshipCollection(newRelationship, collectionKey);
           relationshipChanged = true;
         }
       } else if (relationshipData === null) {
         // for empty to-one relationships
         newRelationship = null;
-        cachedRelationship = cachedRelationships && cachedRelationships[schema];
         if (newRelationships !== cachedRelationship) {
           relationshipChanged = true;
         }
