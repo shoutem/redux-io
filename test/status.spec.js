@@ -228,4 +228,49 @@ describe('Status metadata', () => {
       done();
     }, 100);
   });
+
+  it('doesn\'t interfere with forEach in Array', () => {
+    const obj = [1, 2, 3];
+    obj[STATUS] = createStatus();
+
+    let counter = 0;
+    obj.forEach(() => counter++);
+
+    expect(counter).to.be.eql(3);
+  });
+
+  it('doesn\'t interfere with map in Array', () => {
+    const obj = [1, 2, 3];
+    obj[STATUS] = createStatus();
+
+    let counter = 0;
+    obj.map(() => counter++);
+
+    expect(counter).to.be.eql(3);
+  });
+
+  it('does interfere with \'for in\' in Array', () => {
+    const obj = [1, 2, 3];
+    obj[STATUS] = createStatus();
+
+    let counter = 0;
+    for (const o in obj) {
+      counter++;
+    }
+
+    expect(counter).to.be.eql(4);
+  });
+
+  it('doesn\'t interfere with \'for of\' in Array', () => {
+    const obj = [1, 2, 3];
+    obj[STATUS] = createStatus();
+
+    let counter = 0;
+    for (const o of obj) {
+      counter++;
+    }
+
+    expect(counter).to.be.eql(3);
+  });
+
 });

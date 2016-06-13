@@ -18,9 +18,11 @@ describe('Collection reducer', () => {
     const testReducer = collection('test', 'test');
     const state = testReducer(undefined, {});
     const expectedStatus = createStatus();
-    expect(state).to.eql([]);
+
     expect(state[STATUS].validationStatus).to.eql(expectedStatus.validationStatus);
     expect(state[STATUS].busyStatus).to.eql(expectedStatus.busyStatus);
+    delete state[STATUS];
+    expect(state).to.eql([]);
   });
 
   it('adds collection of indices on Fetch', () => {
@@ -47,9 +49,10 @@ describe('Collection reducer', () => {
     const nextState = reducer(undefined, action);
     const expectedState = items.map(item => item.id);
 
-    expect(nextState).to.eql(expectedState);
     expect(nextState[STATUS].validationStatus).to.eql(validationStatus.VALID);
     expect(nextState[STATUS].busyStatus).to.eql(busyStatus.IDLE);
+    delete nextState[STATUS];
+    expect(nextState).to.eql(expectedState);
   });
 
   it('ignores action with different schema', () => {
@@ -156,9 +159,11 @@ describe('Collection reducer', () => {
 
     const nextState = reducer(undefined, action);
     const expectedState = itemsNew.map(item => item.id);
-    expect(nextState).to.eql(expectedState);
+
     expect(nextState[STATUS].validationStatus).to.eql(validationStatus.VALID);
     expect(nextState[STATUS].busyStatus).to.eql(busyStatus.IDLE);
+    delete nextState[STATUS];
+    expect(nextState).to.eql(expectedState);
   });
 
   it('invalidates collection with broadcast status', () => {
@@ -182,9 +187,12 @@ describe('Collection reducer', () => {
     };
 
     const nextState = reducer(undefined, action);
-    expect(nextState).to.eql(initialState);
+
     expect(nextState[STATUS].validationStatus).to.eql(validationStatus.INVALID);
     expect(nextState[STATUS].busyStatus).to.eql(busyStatus.IDLE);
+
+    nextState[STATUS] = initialState[STATUS];
+    expect(nextState).to.deep.eql(initialState);
   });
 
   it('change collection status to busy with non-broadcast status', () => {
@@ -210,14 +218,14 @@ describe('Collection reducer', () => {
     };
 
     const nextState = reducer(undefined, action);
-    expect(nextState).to.eql(initialState);
     expect(nextState[STATUS].validationStatus).to.eql(validationStatus.NONE);
     expect(nextState[STATUS].busyStatus).to.eql(busyStatus.BUSY);
 
     const nextOtherState = otherReducer(undefined, action);
-    expect(nextOtherState).to.eql(initialState);
     expect(nextOtherState[STATUS].validationStatus).to.eql(validationStatus.NONE);
     expect(nextOtherState[STATUS].busyStatus).to.eql(busyStatus.IDLE);
+
+    expect(nextOtherState).to.deep.eql(initialState);
   });
 
   it('throws exception on reserved tag value', () => {
@@ -253,9 +261,10 @@ describe('Collection reducer', () => {
     deepFreeze(initialState);
     const nextState = reducer(undefined, action);
 
-    expect(nextState).to.deep.equal([]);
     expect(nextState[STATUS].validationStatus).to.eql(validationStatus.VALID);
     expect(nextState[STATUS].busyStatus).to.eql(busyStatus.IDLE);
+    delete nextState[STATUS];
+    expect(nextState).to.deep.equal([]);
   });
 
   it('adds status to collection state without status', () => {
@@ -280,8 +289,9 @@ describe('Collection reducer', () => {
 
     const customState = [];
     const nextState = reducer(customState, action);
-    expect(nextState).to.deep.equal(customState);
     expect(nextState[STATUS].validationStatus).to.eql(validationStatus.NONE);
     expect(nextState[STATUS].busyStatus).to.eql(busyStatus.IDLE);
+    delete nextState[STATUS];
+    expect(nextState).to.deep.equal(customState);
   });
 });

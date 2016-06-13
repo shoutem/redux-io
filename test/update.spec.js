@@ -1,7 +1,7 @@
 /* eslint-disable no-unused-expressions */
 import { expect } from 'chai';
 import nock from 'nock';
-import { CALL_API, apiMiddleware } from 'redux-api-middleware';
+import { RSAA, apiMiddleware } from 'redux-api-middleware';
 import configureMockStore from 'redux-mock-store';
 import thunk from 'redux-thunk';
 import {
@@ -40,13 +40,13 @@ describe('Update action creator', () => {
     const item = { id: 1 };
     const action = update(config, schema, item);
 
-    expect(action[CALL_API]).to.not.be.undefined;
-    expect(action[CALL_API].method).to.equal('PATCH');
-    expect(action[CALL_API].endpoint).to.equal(config.endpoint);
-    expect(action[CALL_API].headers).to.equal(config.headers);
-    expect(action[CALL_API].types).to.not.be.undefined;
+    expect(action[RSAA]).to.not.be.undefined;
+    expect(action[RSAA].method).to.equal('PATCH');
+    expect(action[RSAA].endpoint).to.equal(config.endpoint);
+    expect(action[RSAA].headers).to.equal(config.headers);
+    expect(action[RSAA].types).to.not.be.undefined;
 
-    const types = action[CALL_API].types;
+    const types = action[RSAA].types;
     const expectedMeta = {
       source: middlewareJsonApiSource,
       schema,

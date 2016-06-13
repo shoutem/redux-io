@@ -1,5 +1,5 @@
 import _ from 'lodash';
-import { CALL_API } from 'redux-api-middleware';
+import { RSAA } from 'redux-api-middleware';
 import {
   CREATE_REQUEST,
   CREATE_SUCCESS,
@@ -7,7 +7,7 @@ import {
   middlewareJsonApiSource,
 } from './middleware';
 
-// Action creator used to create item on api (POST). Config arg is based on CALL_API
+// Action creator used to create item on api (POST). Config arg is based on RSAA
 // configuration from redux-api-middleware, allowing full customization expect types
 // part of configuration. Create function expects schema name of data which correspond
 // with storage reducer with same schema value to listen for created data. Item arg
@@ -42,7 +42,7 @@ export default (config, schema, item = null) => {
   };
 
   return {
-    [CALL_API]: {
+    [RSAA]: {
       method: 'POST',
       ...config,
       body,

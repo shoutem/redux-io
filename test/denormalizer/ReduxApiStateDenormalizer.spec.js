@@ -109,13 +109,15 @@ describe('ReduxApiStateDenormalizer', () => {
 
       const denormalizedData =
         denormalizer.denormalizeItem('type1Id1', 'type1', storage);
+      assert.isObject(denormalizedData[STATUS]);
+      assert.isObject(denormalizedData['type2.test'][STATUS]);
+      delete denormalizedData[STATUS];
+      delete denormalizedData['type2.test'][STATUS];
       assert.deepEqual(
         denormalizedData,
         expectedData,
         'item not denormalized correctly'
       );
-      assert.isObject(denormalizedData[STATUS]);
-      assert.isObject(denormalizedData['type2.test'][STATUS]);
     });
   });
   describe('denormalizeCollection', () => {
@@ -146,12 +148,15 @@ describe('ReduxApiStateDenormalizer', () => {
       collection[STATUS] = createStatus();
       const denormalizedData =
         denormalizer.denormalizeCollection(collection, 'type1');
+      assert.isObject(denormalizedData[STATUS]);
+      delete denormalizedData[STATUS];
+      delete denormalizedData[0][STATUS];
+      delete denormalizedData[0]['type2.test'][STATUS];
       assert.deepEqual(
         denormalizedData,
         expectedData,
         'collection not denormalized correctly'
       );
-      assert.isObject(denormalizedData[STATUS]);
     });
   });
 });

@@ -1,8 +1,8 @@
 import _ from 'lodash';
-import { getTransformation } from '../status';
+import { STATUS, getTransformation } from '../status';
 
 // Ignored properties are passed from store so they can not be Set
-const DEFAULT_IGNORED_PROPERTIES = { id: true, type: true };
+const DEFAULT_IGNORED_PROPERTIES = { id: true, type: true, [STATUS]: true };
 
 function getDefaultJsonItemAttributeNames() {
   return [
