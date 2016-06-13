@@ -10,8 +10,8 @@ import {
   LOAD_SUCCESS,
   LOAD_ERROR,
   OBJECT_FETCHED,
-  INDEX_FETCHED,
-  INDEX_STATUS,
+  REFERENCE_FETCHED,
+  REFERENCE_STATUS,
   apiStateMiddleware,
 } from '../src';
 import { middlewareJsonApiSource } from '../src/middleware';
@@ -146,7 +146,7 @@ describe('Find action creator', () => {
         expect(performedActions).to.have.length(6);
 
         const actionCollStatus = performedActions[0];
-        expect(actionCollStatus.type).to.equal(INDEX_STATUS);
+        expect(actionCollStatus.type).to.equal(REFERENCE_STATUS);
         expect(actionCollStatus.meta).to.deep.equal({ ...expectedMeta });
         const expectedCollStatusPayload = { busyStatus: busyStatus.BUSY };
         expect(actionCollStatus.payload).to.deep.equal(expectedCollStatusPayload);
@@ -159,7 +159,7 @@ describe('Find action creator', () => {
         expect(actionObjFetched.payload).to.deep.equal(expectedPayload.data[0]);
 
         const actionCollFetched = performedActions[4];
-        expect(actionCollFetched.type).to.equal(INDEX_FETCHED);
+        expect(actionCollFetched.type).to.equal(REFERENCE_FETCHED);
         expect(actionCollFetched.meta).to.deep.equal({ ...expectedMeta });
         expect(actionCollFetched.payload).to.deep.equal(expectedPayload.data);
 

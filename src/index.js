@@ -58,9 +58,9 @@ export {
   CREATE_SUCCESS,
   CREATE_ERROR,
   OBJECT_CREATED,
-  INDEX_FETCHED,
-  INDEX_STATUS,
-  INDEX_CLEAR,
+  REFERENCE_FETCHED,
+  REFERENCE_STATUS,
+  REFERENCE_CLEAR,
   middlewareJsonApiSource,
 } from './middleware';
 

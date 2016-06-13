@@ -2,9 +2,9 @@ import { expect } from 'chai';
 import deepFreeze from 'deep-freeze';
 import {
   collection,
-  INDEX_FETCHED,
-  INDEX_CLEAR,
-  INDEX_STATUS,
+  REFERENCE_FETCHED,
+  REFERENCE_CLEAR,
+  REFERENCE_STATUS,
 } from '../src';
 import {
   STATUS,
@@ -36,7 +36,7 @@ describe('Collection reducer', () => {
     deepFreeze(initialState);
 
     const action = {
-      type: INDEX_FETCHED,
+      type: REFERENCE_FETCHED,
       meta: {
         schema,
         tag,
@@ -64,7 +64,7 @@ describe('Collection reducer', () => {
     deepFreeze(initialState);
 
     const action = {
-      type: INDEX_FETCHED,
+      type: REFERENCE_FETCHED,
       meta: {
         schema: 'test2',
         tag,
@@ -90,7 +90,7 @@ describe('Collection reducer', () => {
     deepFreeze(initialState);
 
     const action = {
-      type: 'INDEX_FETCHED',
+      type: 'REFERENCE_FETCHED',
       meta: {
         schema,
         tag,
@@ -116,7 +116,7 @@ describe('Collection reducer', () => {
     deepFreeze(initialState);
 
     const action = {
-      type: INDEX_FETCHED,
+      type: REFERENCE_FETCHED,
       meta: {
         schema,
         tag: 'collection2',
@@ -146,7 +146,7 @@ describe('Collection reducer', () => {
       { id: 4 },
     ];
     const action = {
-      type: INDEX_FETCHED,
+      type: REFERENCE_FETCHED,
       meta: {
         schema,
         tag,
@@ -173,7 +173,7 @@ describe('Collection reducer', () => {
     deepFreeze(initialState);
 
     const action = {
-      type: INDEX_STATUS,
+      type: REFERENCE_STATUS,
       payload: { validationStatus: validationStatus.INVALID, busyStatus: busyStatus.IDLE },
       meta: {
         schema,
@@ -201,7 +201,7 @@ describe('Collection reducer', () => {
     deepFreeze(initialState);
 
     const action = {
-      type: INDEX_STATUS,
+      type: REFERENCE_STATUS,
       payload: { busyStatus: busyStatus.BUSY },
       meta: {
         schema,
@@ -242,7 +242,7 @@ describe('Collection reducer', () => {
     const tag = 'tag_test';
 
     const action = {
-      type: INDEX_CLEAR,
+      type: REFERENCE_CLEAR,
       meta: {
         schema,
         tag,

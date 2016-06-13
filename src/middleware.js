@@ -22,9 +22,9 @@ export const REMOVE_REQUEST = '@@redux_api_state/REMOVE_REQUEST';
 export const REMOVE_SUCCESS = '@@redux_api_state/REMOVE_SUCCESS';
 export const REMOVE_ERROR = '@@redux_api_state/REMOVE_ERROR';
 
-export const INDEX_FETCHED = '@@redux_api_state/INDEX_FETCHED';
-export const INDEX_STATUS = '@@redux_api_state/INDEX_STATUS';
-export const INDEX_CLEAR = '@@redux_api_state/INDEX_CLEAR';
+export const REFERENCE_FETCHED = '@@redux_api_state/REFERENCE_FETCHED';
+export const REFERENCE_STATUS = '@@redux_api_state/REFERENCE_STATUS';
+export const REFERENCE_CLEAR = '@@redux_api_state/REFERENCE_CLEAR';
 
 export const OBJECT_FETCHED = '@@redux_api_state/OBJECT_FETCHED';
 export const OBJECT_UPDATING = '@@redux_api_state/OBJECT_UPDATING';
@@ -129,7 +129,7 @@ const actionHandlers = {
     const { schema, tag } = action.meta;
     dispatch(makeIndexAction(
       action,
-      INDEX_STATUS,
+      REFERENCE_STATUS,
       { busyStatus: busyStatus.BUSY },
       schema,
       tag
@@ -139,16 +139,16 @@ const actionHandlers = {
     // Dispatch objects to storages and collection with specific tag
     const { schema, tag } = action.meta;
     data.map(item => dispatch(makeObjectAction(action, OBJECT_FETCHED, item)));
-    // TODO: once when we support findOne action and single reducer, INDEX_FETCHED
+    // TODO: once when we support findOne action and single reducer, REFERENCE_FETCHED
     // should trigger only for collections
-    dispatch(makeIndexAction(action, INDEX_FETCHED, data, schema, tag));
+    dispatch(makeIndexAction(action, REFERENCE_FETCHED, data, schema, tag));
   },
   [LOAD_ERROR]: (action, data, dispatch) => {
     // Invalidate and idle collection on error
     const { schema, tag } = action.meta;
     dispatch(makeIndexAction(
       action,
-      INDEX_STATUS,
+      REFERENCE_STATUS,
       {
         busyStatus: busyStatus.IDLE,
         validationStatus: validationStatus.INVALID,
@@ -163,7 +163,7 @@ const actionHandlers = {
     const schema = action.meta.schema;
     dispatch(makeIndexAction(
       action,
-      INDEX_STATUS,
+      REFERENCE_STATUS,
       { validationStatus: validationStatus.INVALID, busyStatus: busyStatus.BUSY },
       schema
     ));
@@ -174,7 +174,7 @@ const actionHandlers = {
     const schema = action.meta.schema;
     dispatch(makeIndexAction(
       action,
-      INDEX_STATUS,
+      REFERENCE_STATUS,
       { validationStatus: validationStatus.INVALID, busyStatus: busyStatus.IDLE },
       schema
     ));
@@ -184,7 +184,7 @@ const actionHandlers = {
     const schema = action.meta.schema;
     dispatch(makeIndexAction(
       action,
-      INDEX_STATUS,
+      REFERENCE_STATUS,
       {
         validationStatus: validationStatus.INVALID,
         busyStatus: busyStatus.IDLE,
@@ -198,7 +198,7 @@ const actionHandlers = {
     const schema = action.meta.schema;
     dispatch(makeIndexAction(
       action,
-      INDEX_STATUS,
+      REFERENCE_STATUS,
       { validationStatus: validationStatus.INVALID, busyStatus: busyStatus.BUSY },
       schema
     ));
@@ -210,7 +210,7 @@ const actionHandlers = {
     const schema = action.meta.schema;
     dispatch(makeIndexAction(
       action,
-      INDEX_STATUS,
+      REFERENCE_STATUS,
       { validationStatus: validationStatus.INVALID, busyStatus: busyStatus.IDLE },
       schema
     ));
@@ -220,7 +220,7 @@ const actionHandlers = {
     const schema = action.meta.schema;
     dispatch(makeIndexAction(
       action,
-      INDEX_STATUS,
+      REFERENCE_STATUS,
       {
         validationStatus: validationStatus.INVALID,
         busyStatus: busyStatus.IDLE,
@@ -234,7 +234,7 @@ const actionHandlers = {
     const schema = action.meta.schema;
     dispatch(makeIndexAction(
       action,
-      INDEX_STATUS,
+      REFERENCE_STATUS,
       { validationStatus: validationStatus.INVALID, busyStatus: busyStatus.BUSY },
       schema
     ));
@@ -246,7 +246,7 @@ const actionHandlers = {
     const schema = action.meta.schema;
     dispatch(makeIndexAction(
       action,
-      INDEX_STATUS,
+      REFERENCE_STATUS,
       { validationStatus: validationStatus.INVALID, busyStatus: busyStatus.IDLE },
       schema
     ));
@@ -256,7 +256,7 @@ const actionHandlers = {
     const schema = action.meta.schema;
     dispatch(makeIndexAction(
       action,
-      INDEX_STATUS,
+      REFERENCE_STATUS,
       {
         validationStatus: validationStatus.INVALID,
         busyStatus: busyStatus.IDLE,

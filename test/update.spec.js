@@ -11,7 +11,7 @@ import {
   UPDATE_ERROR,
   OBJECT_UPDATING,
   OBJECT_UPDATED,
-  INDEX_STATUS,
+  REFERENCE_STATUS,
   apiStateMiddleware,
 } from '../src';
 import { middlewareJsonApiSource } from '../src/middleware';
@@ -130,7 +130,7 @@ describe('Update action creator', () => {
         expect(performedActions).to.have.length(6);
 
         const actionCollStatusBusy = performedActions[0];
-        expect(actionCollStatusBusy.type).to.equal(INDEX_STATUS);
+        expect(actionCollStatusBusy.type).to.equal(REFERENCE_STATUS);
         expect(actionCollStatusBusy.meta)
           .to.deep.equal({ ...expectedMeta, tag: '*' });
         const expectedCollStatusBusyPayload = {
@@ -155,7 +155,7 @@ describe('Update action creator', () => {
         expect(actionObjUpdated.payload).to.deep.equal(expectedPayload.data);
 
         const actionCollStatusIdle = performedActions[4];
-        expect(actionCollStatusIdle.type).to.equal(INDEX_STATUS);
+        expect(actionCollStatusIdle.type).to.equal(REFERENCE_STATUS);
         expect(actionCollStatusIdle.meta)
           .to.deep.equal({ ...expectedMeta, tag: '*' });
         const expectedCollStatusIdlePayload = {

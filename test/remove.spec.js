@@ -11,7 +11,7 @@ import {
   REMOVE_ERROR,
   OBJECT_REMOVING,
   OBJECT_REMOVED,
-  INDEX_STATUS,
+  REFERENCE_STATUS,
   apiStateMiddleware,
 } from '../src';
 import { middlewareJsonApiSource } from '../src/middleware';
@@ -126,7 +126,7 @@ describe('Delete action creator', () => {
         expect(performedActions).to.have.length(6);
 
         const actionCollBusyRequest = performedActions[0];
-        expect(actionCollBusyRequest.type).to.equal(INDEX_STATUS);
+        expect(actionCollBusyRequest.type).to.equal(REFERENCE_STATUS);
         expect(actionCollBusyRequest.meta)
           .to.deep.equal({ ...expectedMeta, tag: '*' });
         const expectedCollBusyStatusPayload = {
@@ -146,7 +146,7 @@ describe('Delete action creator', () => {
         expect(actionObjRemoved.meta).to.deep.equal({ ...expectedMeta, transformation: {} });
 
         const actionCollStatus = performedActions[4];
-        expect(actionCollStatus.type).to.equal(INDEX_STATUS);
+        expect(actionCollStatus.type).to.equal(REFERENCE_STATUS);
         expect(actionCollStatus.meta).to.deep.equal({ ...expectedMeta, tag: '*' });
         const expectedCollStatusPayload = {
           validationStatus: validationStatus.INVALID,

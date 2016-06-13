@@ -1,8 +1,8 @@
 import _ from 'lodash';
 import {
-  INDEX_FETCHED,
-  INDEX_STATUS,
-  INDEX_CLEAR,
+  REFERENCE_FETCHED,
+  REFERENCE_STATUS,
+  REFERENCE_CLEAR,
 } from './middleware';
 import {
   STATUS,
@@ -19,9 +19,9 @@ function isValid(action, schema, tag) {
 
   // Only if the tag in the action is the same as the one on the collection reducer
   if (_.get(action, 'meta.tag') !== tag) {
-    // Every collection should change status if action is type of INDEX_STATUS
+    // Every collection should change status if action is type of REFERENCE_STATUS
     // and action meta tag is broadcast
-    if (action.type === INDEX_STATUS && _.get(action, 'meta.tag') === '*') {
+    if (action.type === REFERENCE_STATUS && _.get(action, 'meta.tag') === '*') {
       return true;
     }
     return false;
@@ -48,7 +48,7 @@ export default function single(schema, tag, initialValue = '') {
     }
 
     switch (action.type) {
-      case INDEX_FETCHED: {
+      case REFERENCE_FETCHED: {
         return {
           value: action.payload[0] ? action.payload[0].id : initialValue,
           [STATUS]: updateStatus(
@@ -61,7 +61,7 @@ export default function single(schema, tag, initialValue = '') {
           ),
         };
       }
-      case INDEX_CLEAR: {
+      case REFERENCE_CLEAR: {
         return {
           value: initialValue,
           [STATUS]: updateStatus(
@@ -74,7 +74,7 @@ export default function single(schema, tag, initialValue = '') {
           ),
         };
       }
-      case INDEX_STATUS: {
+      case REFERENCE_STATUS: {
         return {
           value: state.value,
           [STATUS]: updateStatus(
