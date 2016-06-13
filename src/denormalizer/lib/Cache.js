@@ -26,6 +26,13 @@ function didCollectionChange(cachedCollection, newCollection, matchedItemsLength
     );
 }
 
+function isRasEntityUpdated(entity, cachedEntity) {
+  const cachedEntityModificationTime = getModificationTime(cachedEntity);
+  const currentEntityModificationTime = getModificationTime(entity);
+
+  return isCacheValid(cachedEntityModificationTime, currentEntityModificationTime);
+}
+
 function isItemInCollection(collection, item) {
   return collection && collection.find(collectionItem => collectionItem.id === item.id);
 }
@@ -94,10 +101,7 @@ export default class JsonApiCache {
       return true;
     }
     const cachedItem = this.getItem(item);
-    const cachedItemModificationTime = getModificationTime(cachedItem);
-    const currentItemModificationTime = getModificationTime(item);
-
-    return !isCacheValid(cachedItemModificationTime, currentItemModificationTime);
+    return !isRasEntityUpdated(item, cachedItem);
   }
 
   isCollectionChanged(collection) {
@@ -105,10 +109,7 @@ export default class JsonApiCache {
       return true;
     }
     const cachedCollection = this.getCollection(collection);
-    const cachedCollectionModificationTime = getModificationTime(cachedCollection);
-    const currentCollectionModificationTime = getModificationTime(collection);
-
-    return isCacheValid(cachedCollectionModificationTime, currentCollectionModificationTime);
+    return !isRasEntityUpdated(collection, cachedCollection);
   }
 
   areRelationshipsChanged(item, newRelationships) {
@@ -118,7 +119,7 @@ export default class JsonApiCache {
 
   resolveCollectionItemsChange(descriptorCollection, denormalizeItem) {
     const cachedCollection = this.getCollection(descriptorCollection);
-    let collectionChanged = false;
+    let collectionChanged = this.isCollectionChanged(descriptorCollection);
     let matchedItems = 0;
     const newCollection = descriptorCollection.map(item => {
       const cachedItem = this.getItem(item);
@@ -131,9 +132,15 @@ export default class JsonApiCache {
       }
       return newItem;
     });
-    if (collectionChanged || didCollectionChange(cachedCollection, newCollection, matchedItems)) {
+
+    if (!collectionChanged) {
+      collectionChanged = didCollectionChange(cachedCollection, newCollection, matchedItems);
+    }
+
+    if (collectionChanged) {
       return newCollection;
     }
+
     return cachedCollection;
   }
 
