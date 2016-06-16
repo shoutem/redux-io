@@ -69,7 +69,9 @@ describe('Json api middleware', () => {
         const performedActions = store.getActions();
         expect(performedActions).to.have.length(2);
 
-        const actionCollStatus = performedActions[0];
+        const batchedActions = performedActions[0].payload;
+
+        const actionCollStatus = batchedActions[0];
         expect(actionCollStatus.type).to.equal(REFERENCE_STATUS);
         expect(actionCollStatus.meta).to.deep.equal(expectedMeta);
         const expectedCollStatusPayload = { busyStatus: busyStatus.BUSY };
@@ -115,21 +117,22 @@ describe('Json api middleware', () => {
     store.dispatch(actionPromise(mockSuccessAction))
       .then(() => {
         const performedActions = store.getActions();
-        expect(performedActions).to.have.length(4);
+        expect(performedActions).to.have.length(2);
 
-        const actionObjFetched = performedActions[0];
+        const batchedActions = performedActions[0].payload;
+
+        const actionObjFetched = batchedActions[0];
         expect(actionObjFetched.type).to.equal(OBJECT_FETCHED);
         expect(actionObjFetched.meta).to.deep.equal({ ...expectedMeta, transformation: {} });
         expect(actionObjFetched.payload).to.deep.equal(expectedPayload.data[0]);
 
-        const actionCollFetched = performedActions[2];
+        const actionCollFetched = batchedActions[2];
         expect(actionCollFetched.type).to.equal(REFERENCE_FETCHED);
         expect(actionCollFetched.meta).to.deep.equal(expectedMeta);
         expect(actionCollFetched.payload).to.deep.equal(expectedPayload.data);
 
-        const successAction = performedActions[3];
+        const successAction = performedActions[1];
         expect(successAction.type).to.equal(LOAD_SUCCESS);
-
         expect(successAction.meta).to.deep.equal(expectedMeta);
         expect(successAction.payload).to.deep.equal(expectedPayload);
       }).then(done).catch(done);
@@ -155,7 +158,9 @@ describe('Json api middleware', () => {
         const performedActions = store.getActions();
         expect(performedActions).to.have.length(2);
 
-        const actionCollStatus = performedActions[0];
+        const batchedActions = performedActions[0].payload;
+
+        const actionCollStatus = batchedActions[0];
         expect(actionCollStatus.type).to.equal(REFERENCE_STATUS);
         expect(actionCollStatus.meta).to.deep.equal(expectedMeta);
         const expectedCollStatusPayload = {
@@ -198,14 +203,16 @@ describe('Json api middleware', () => {
     store.dispatch(actionPromise(mockSuccessAction))
       .then(() => {
         const performedActions = store.getActions();
-        expect(performedActions).to.have.length(3);
+        expect(performedActions).to.have.length(2);
 
-        const actionObjCreated = performedActions[0];
+        const batchedActions = performedActions[0].payload;
+
+        const actionObjCreated = batchedActions[0];
         expect(actionObjCreated.type).to.equal(OBJECT_CREATED);
         expect(actionObjCreated.meta).to.deep.equal({ ...expectedMeta, transformation: {} });
         expect(actionObjCreated.payload).to.deep.equal(expectedPayload.data[0]);
 
-        const actionCollStatus = performedActions[1];
+        const actionCollStatus = batchedActions[1];
         expect(actionCollStatus.type).to.equal(REFERENCE_STATUS);
         expect(actionCollStatus.meta).to.deep.equal({ ...expectedMeta, tag: '*' });
         const expectedCollStatusPayload = {
@@ -214,9 +221,8 @@ describe('Json api middleware', () => {
         };
         expect(actionCollStatus.payload).to.deep.equal(expectedCollStatusPayload);
 
-        const successAction = performedActions[2];
+        const successAction = performedActions[1];
         expect(successAction.type).to.equal(CREATE_SUCCESS);
-
         expect(successAction.meta).to.deep.equal(expectedMeta);
         expect(successAction.payload).to.deep.equal(expectedPayload);
       }).then(done).catch(done);
@@ -240,7 +246,9 @@ describe('Json api middleware', () => {
         const performedActions = store.getActions();
         expect(performedActions).to.have.length(2);
 
-        const actionCollStatus = performedActions[0];
+        const batchedActions = performedActions[0].payload;
+
+        const actionCollStatus = batchedActions[0];
         expect(actionCollStatus.type).to.equal(REFERENCE_STATUS);
         expect(actionCollStatus.meta).to.deep.equal({ ...expectedMeta, tag: '*' });
         const expectedCollStatusPayload = {
@@ -282,9 +290,11 @@ describe('Json api middleware', () => {
     store.dispatch(actionPromise(mockSuccessAction))
       .then(() => {
         const performedActions = store.getActions();
-        expect(performedActions).to.have.length(3);
+        expect(performedActions).to.have.length(2);
 
-        const actionCollStatusBusy = performedActions[0];
+        const batchedActions = performedActions[0].payload;
+
+        const actionCollStatusBusy = batchedActions[0];
         expect(actionCollStatusBusy.type).to.equal(REFERENCE_STATUS);
         expect(actionCollStatusBusy.meta)
           .to.deep.equal({ ...expectedMeta, tag: '*' });
@@ -294,12 +304,12 @@ describe('Json api middleware', () => {
         };
         expect(actionCollStatusBusy.payload).to.deep.equal(expectedCollStatusBusyPayload);
 
-        const actionObjUpdating = performedActions[1];
+        const actionObjUpdating = batchedActions[1];
         expect(actionObjUpdating.type).to.equal(OBJECT_UPDATING);
         expect(actionObjUpdating.meta).to.deep.equal({ ...expectedMeta, transformation: {} });
         expect(actionObjUpdating.payload).to.deep.equal(expectedPayload.data[0]);
 
-        const actionUpdateRequest = performedActions[2];
+        const actionUpdateRequest = performedActions[1];
         expect(actionUpdateRequest.type).to.equal(UPDATE_REQUEST);
         expect(actionUpdateRequest.meta).to.deep.equal(expectedMeta);
         expect(actionUpdateRequest.payload).to.deep.equal(expectedPayload);
@@ -333,14 +343,16 @@ describe('Json api middleware', () => {
     store.dispatch(actionPromise(mockSuccessAction))
       .then(() => {
         const performedActions = store.getActions();
-        expect(performedActions).to.have.length(3);
+        expect(performedActions).to.have.length(2);
 
-        const actionObjUpdated = performedActions[0];
+        const batchedActions = performedActions[0].payload;
+
+        const actionObjUpdated = batchedActions[0];
         expect(actionObjUpdated.type).to.equal(OBJECT_UPDATED);
         expect(actionObjUpdated.meta).to.deep.equal({ ...expectedMeta, transformation: {} });
         expect(actionObjUpdated.payload).to.deep.equal(expectedPayload.data[0]);
 
-        const actionCollStatus = performedActions[1];
+        const actionCollStatus = batchedActions[1];
         expect(actionCollStatus.type).to.equal(REFERENCE_STATUS);
         expect(actionCollStatus.meta).to.deep.equal({ ...expectedMeta, tag: '*' });
         const expectedCollStatusPayload = {
@@ -349,7 +361,7 @@ describe('Json api middleware', () => {
         };
         expect(actionCollStatus.payload).to.deep.equal(expectedCollStatusPayload);
 
-        const successAction = performedActions[2];
+        const successAction = performedActions[1];
         expect(successAction.type).to.equal(UPDATE_SUCCESS);
 
         expect(successAction.meta).to.deep.equal(expectedMeta);
@@ -375,7 +387,9 @@ describe('Json api middleware', () => {
         const performedActions = store.getActions();
         expect(performedActions).to.have.length(2);
 
-        const actionCollStatus = performedActions[0];
+        const batchedActions = performedActions[0].payload;
+
+        const actionCollStatus = batchedActions[0];
         expect(actionCollStatus.type).to.equal(REFERENCE_STATUS);
         expect(actionCollStatus.meta).to.deep.equal({ ...expectedMeta, tag: '*' });
         const expectedCollStatusPayload = {
@@ -414,9 +428,11 @@ describe('Json api middleware', () => {
     store.dispatch(actionPromise(mockSuccessAction))
       .then(() => {
         const performedActions = store.getActions();
-        expect(performedActions).to.have.length(3);
+        expect(performedActions).to.have.length(2);
 
-        const actionCollRequest = performedActions[0];
+        const batchedActions = performedActions[0].payload;
+
+        const actionCollRequest = batchedActions[0];
         expect(actionCollRequest.type).to.equal(REFERENCE_STATUS);
         expect(actionCollRequest.meta).to.deep.equal({ ...expectedMeta, tag: '*' });
         const expectedCollStatusPayload = {
@@ -425,11 +441,11 @@ describe('Json api middleware', () => {
         };
         expect(actionCollRequest.payload).to.deep.equal(expectedCollStatusPayload);
 
-        const actionObjDeleting = performedActions[1];
+        const actionObjDeleting = batchedActions[1];
         expect(actionObjDeleting.type).to.equal(OBJECT_REMOVING);
         expect(actionObjDeleting.meta).to.deep.equal({ ...expectedMeta, transformation: {} });
 
-        const successAction = performedActions[2];
+        const successAction = performedActions[1];
         expect(successAction.type).to.equal(REMOVE_REQUEST);
         expect(successAction.meta).to.deep.equal(expectedMeta);
       }).then(done).catch(done);
@@ -459,13 +475,15 @@ describe('Json api middleware', () => {
     store.dispatch(actionPromise(mockSuccessAction))
       .then(() => {
         const performedActions = store.getActions();
-        expect(performedActions).to.have.length(3);
+        expect(performedActions).to.have.length(2);
 
-        const actionObjDeleted = performedActions[0];
+        const batchedActions = performedActions[0].payload;
+
+        const actionObjDeleted = batchedActions[0];
         expect(actionObjDeleted.type).to.equal(OBJECT_REMOVED);
         expect(actionObjDeleted.meta).to.deep.equal({ ...expectedMeta, transformation: {} });
 
-        const actionCollStatus = performedActions[1];
+        const actionCollStatus = batchedActions[1];
         expect(actionCollStatus.type).to.equal(REFERENCE_STATUS);
         expect(actionCollStatus.meta).to.deep.equal({ ...expectedMeta, tag: '*' });
         const expectedCollStatusPayload = {
@@ -474,7 +492,7 @@ describe('Json api middleware', () => {
         };
         expect(actionCollStatus.payload).to.deep.equal(expectedCollStatusPayload);
 
-        const successAction = performedActions[2];
+        const successAction = performedActions[1];
         expect(successAction.type).to.equal(REMOVE_SUCCESS);
         expect(successAction.meta).to.deep.equal(expectedMeta);
       }).then(done).catch(done);
@@ -498,7 +516,9 @@ describe('Json api middleware', () => {
         const performedActions = store.getActions();
         expect(performedActions).to.have.length(2);
 
-        const actionCollStatus = performedActions[0];
+        const batchedActions = performedActions[0].payload;
+
+        const actionCollStatus = batchedActions[0];
         expect(actionCollStatus.type).to.equal(REFERENCE_STATUS);
         expect(actionCollStatus.meta).to.deep.equal({ ...expectedMeta, tag: '*' });
         const expectedCollStatusPayload = {
@@ -565,9 +585,11 @@ describe('Json api middleware', () => {
     store.dispatch(actionPromise(mockSuccessAction))
       .then(() => {
         const performedActions = store.getActions();
-        expect(performedActions).to.have.length(6);
+        expect(performedActions).to.have.length(2);
 
-        const actionObjIncludedFetched = performedActions[0];
+        const batchedActions = performedActions[0].payload;
+
+        const actionObjIncludedFetched = batchedActions[0];
         expect(actionObjIncludedFetched.type).to.equal(OBJECT_FETCHED);
         expect(actionObjIncludedFetched.meta).to.deep.equal({
           ...expectedMeta,
@@ -576,19 +598,18 @@ describe('Json api middleware', () => {
         });
         expect(actionObjIncludedFetched.payload).to.deep.equal(expectedPayload.included[0]);
 
-        const actionObjFetched = performedActions[2];
+        const actionObjFetched = batchedActions[2];
         expect(actionObjFetched.type).to.equal(OBJECT_FETCHED);
         expect(actionObjFetched.meta).to.deep.equal({ ...expectedMeta, transformation: {} });
         expect(actionObjFetched.payload).to.deep.equal(expectedPayload.data[0]);
 
-        const actionCollFetched = performedActions[4];
+        const actionCollFetched = batchedActions[4];
         expect(actionCollFetched.type).to.equal(REFERENCE_FETCHED);
         expect(actionCollFetched.meta).to.deep.equal({ ...expectedMeta });
         expect(actionCollFetched.payload).to.deep.equal(expectedPayload.data);
 
-        const successAction = performedActions[5];
+        const successAction = performedActions[1];
         expect(successAction.type).to.equal(LOAD_SUCCESS);
-
         expect(successAction.meta).to.deep.equal(expectedMeta);
         expect(successAction.payload).to.deep.equal(expectedPayload);
       }).then(done).catch(done);
@@ -657,7 +678,9 @@ describe('Json api middleware', () => {
       .then(() => {
         const performedActions = store.getActions();
 
-        const actionFirstObjFetched = performedActions[0];
+        const batchedAction = performedActions[0];
+
+        const actionFirstObjFetched = batchedAction.payload[0];
         expect(actionFirstObjFetched.type).to.equal(OBJECT_FETCHED);
         const transformationFirstObj = {
           relationshipProperties: {
@@ -672,7 +695,7 @@ describe('Json api middleware', () => {
         expect(actionFirstObjFetched.meta).to.deep.equal(expectedMetaFirstObject);
         expect(actionFirstObjFetched.payload).to.deep.equal(expectedPayload.data[0]);
 
-        const actionSecondObjFetched = performedActions[1];
+        const actionSecondObjFetched = batchedAction.payload[1];
         expect(actionSecondObjFetched.type).to.equal(OBJECT_FETCHED);
         const transformationSecondObj = {
           relationshipProperties: {

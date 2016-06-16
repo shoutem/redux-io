@@ -123,9 +123,10 @@ describe('Delete action creator', () => {
     store.dispatch(action)
       .then(() => {
         const performedActions = store.getActions();
-        expect(performedActions).to.have.length(6);
+        expect(performedActions).to.have.length(4);
 
-        const actionCollBusyRequest = performedActions[0];
+        const batchedRemovingActions = performedActions[0];
+        const actionCollBusyRequest = batchedRemovingActions.payload[0];
         expect(actionCollBusyRequest.type).to.equal(REFERENCE_STATUS);
         expect(actionCollBusyRequest.meta)
           .to.deep.equal({ ...expectedMeta, tag: '*' });
@@ -135,17 +136,18 @@ describe('Delete action creator', () => {
         };
         expect(actionCollBusyRequest.payload).to.deep.equal(expectedCollBusyStatusPayload);
 
-        const actionObjDeleting = performedActions[1];
+        const actionObjDeleting = batchedRemovingActions.payload[1];
         expect(actionObjDeleting.type).to.equal(OBJECT_REMOVING);
         expect(actionObjDeleting.meta).to.deep.equal({ ...expectedMeta, transformation: {} });
 
-        expect(performedActions[2].type).to.equal(REMOVE_REQUEST);
+        expect(performedActions[1].type).to.equal(REMOVE_REQUEST);
 
-        const actionObjRemoved = performedActions[3];
+        const batchedRemovedActions = performedActions[2];
+        const actionObjRemoved = batchedRemovedActions.payload[0];
         expect(actionObjRemoved.type).to.equal(OBJECT_REMOVED);
         expect(actionObjRemoved.meta).to.deep.equal({ ...expectedMeta, transformation: {} });
 
-        const actionCollStatus = performedActions[4];
+        const actionCollStatus = batchedRemovedActions.payload[1];
         expect(actionCollStatus.type).to.equal(REFERENCE_STATUS);
         expect(actionCollStatus.meta).to.deep.equal({ ...expectedMeta, tag: '*' });
         const expectedCollStatusPayload = {
@@ -154,7 +156,7 @@ describe('Delete action creator', () => {
         };
         expect(actionCollStatus.payload).to.deep.equal(expectedCollStatusPayload);
 
-        const successAction = performedActions[5];
+        const successAction = performedActions[3];
         expect(successAction.type).to.equal(REMOVE_SUCCESS);
         expect(successAction.meta).to.deep.equal(expectedMeta);
       }).then(done).catch(done);
