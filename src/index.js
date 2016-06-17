@@ -72,3 +72,6 @@ export {
   shouldRefresh,
   getTransformation,
 } from './status';
+
+import { rioReducer } from './rioReducer';
+export { rioReducer };
