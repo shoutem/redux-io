@@ -75,3 +75,7 @@ export {
 
 import { rioReducer } from './rioReducer';
 export { rioReducer };
+
+import mergeReducers from './mergeReducers';
+import chainReducers from './chainReducers';
+export { mergeReducers, chainReducers };
