@@ -49,7 +49,7 @@ export default class JsonApiCache {
   flush() {
     this.cache = {};
   }
-  
+
   getCacheByKey(itemKey) {
     return this.cache[itemKey];
   }
@@ -115,12 +115,7 @@ export default class JsonApiCache {
     const cachedCollection = this.getCollection(collection);
     return !isRasEntityUpdated(collection, cachedCollection);
   }
-
-  areRelationshipsChanged(item, newRelationships) {
-    const cachedRelationships = this.getItemRelationships(item);
-    return cachedRelationships !== newRelationships;
-  }
-
+  
   resolveCollectionItemsChange(descriptorCollection, denormalizeItem) {
     const cachedCollection = this.getCollection(descriptorCollection);
     let collectionChanged = this.isCollectionChanged(descriptorCollection);

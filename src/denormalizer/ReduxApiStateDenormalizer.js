@@ -75,7 +75,7 @@ export default class ReduxApiStateDenormalizer extends ReduxDenormalizer {
   denormalizeItem(item) {
     const normalizedItem = this.getNormalizedItem(item);
     if (cache.hasItem(normalizedItem)) {
-      return this.useCache(normalizedItem);
+      return this.denormalizeCachedItem(normalizedItem);
     }
     return cache.cacheItem(super.denormalizeItem(item));
   }
@@ -98,9 +98,10 @@ export default class ReduxApiStateDenormalizer extends ReduxDenormalizer {
    * @param item
    * @returns {*}
    */
-  useCache(normalizedItem) {
+  denormalizeCachedItem(normalizedItem) {
     const cachedRelationships = cache.getItemRelationships(normalizedItem);
     const newRelationships = this.denormalizeItemRelationships(normalizedItem);
+
     if (!cache.isItemChanged(normalizedItem) && cachedRelationships === newRelationships) {
       return cache.getItem(normalizedItem);
     }
@@ -113,6 +114,12 @@ export default class ReduxApiStateDenormalizer extends ReduxDenormalizer {
     ));
   }
 
+  /**
+   * Denormalize and cache item relationships
+   *
+   * @param item
+   * @returns {*}
+   */
   denormalizeItemRelationships(item) {
     const relationships = cache.resolveItemRelationshipsChanges(item, this.denormalizeItem);
     return cache.cacheRelationships(relationships, item);
@@ -155,6 +162,9 @@ export default class ReduxApiStateDenormalizer extends ReduxDenormalizer {
     return cache.cacheCollection(denormalizedCollection);
   }
 
+  /**
+   * Clear cache
+   */
   flushCache() {
     cache.flush();
   }
