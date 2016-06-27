@@ -41,6 +41,10 @@ export function isCollection(entity) {
   return _.isArray(entity);
 }
 
+export function isSingleRelation(relationshipData) {
+  return _.isPlainObject(relationshipData) || relationshipData === null;
+}
+
 export default class JsonApiCache {
   constructor() {
     this.cache = {};
@@ -115,7 +119,7 @@ export default class JsonApiCache {
     const cachedCollection = this.getCollection(collection);
     return !isRasEntityUpdated(collection, cachedCollection);
   }
-  
+
   resolveCollectionItemsChange(descriptorCollection, denormalizeItem) {
     const cachedCollection = this.getCollection(descriptorCollection);
     let collectionChanged = this.isCollectionChanged(descriptorCollection);
@@ -149,7 +153,7 @@ export default class JsonApiCache {
     let relationshipsChanged = false;
 
     if (!relationships) {
-      return relationships
+      return relationships;
     }
 
     const newRelationships = _.reduce(relationships, (newRelationships, relationship, schema) => {
@@ -158,15 +162,14 @@ export default class JsonApiCache {
       let newRelationship;
       let relationshipChanged = false;
 
-      if (_.isPlainObject(relationshipData)) {
+      if (isSingleRelation(relationshipData)) {
 
-        newRelationship = denormalizeItem(relationshipData);
+        newRelationship = relationshipData === null ? null : denormalizeItem(relationshipData);
         if (cachedRelationship !== newRelationship) {
           relationshipChanged = true;
         }
       } else if (isCollection(relationshipData)) {
 
-        let collectionChanged = false;
         let matchedRelationshipsItems = 0;
 
         newRelationship = relationshipData.map(item => {
@@ -177,41 +180,25 @@ export default class JsonApiCache {
             matchedRelationshipsItems += 1;
           }
           if (cachedItem !== relationshipItem) {
-            collectionChanged = true;
+            relationshipChanged = true;
             return relationshipItem;
           }
           return cachedItem;
         });
 
         if (didCollectionChange(cachedRelationship, newRelationship, matchedRelationshipsItems)) {
-          collectionChanged = true;
-        }
-
-        if (collectionChanged) {
-          relationshipChanged = true;
-        }
-      } else if (relationshipData === null) {
-        // for empty to-one relationships
-        newRelationship = null;
-        if (newRelationships !== cachedRelationship) {
           relationshipChanged = true;
         }
       }
-
 
       if (relationshipChanged) {
         relationshipsChanged = true;
-        newRelationships[schema] = newRelationship;
-      } else {
-        newRelationships[schema] = cachedRelationship;
       }
+      newRelationships[schema] = relationshipChanged ? newRelationship : cachedRelationship;
       return newRelationships;
     }, {});
 
-    if (!relationshipsChanged) {
-      return cachedRelationships;
-    }
-    return newRelationships;
+    return relationshipsChanged ? newRelationships : cachedRelationships;
   }
 
 }
