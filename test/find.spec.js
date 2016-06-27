@@ -1,7 +1,7 @@
 /* eslint-disable no-unused-expressions */
 import { expect } from 'chai';
 import nock from 'nock';
-import { CALL_API, apiMiddleware } from 'redux-api-middleware';
+import { RSAA, apiMiddleware } from 'redux-api-middleware';
 import configureMockStore from 'redux-mock-store';
 import thunk from 'redux-thunk';
 import {
@@ -10,8 +10,8 @@ import {
   LOAD_SUCCESS,
   LOAD_ERROR,
   OBJECT_FETCHED,
-  COLLECTION_FETCHED,
-  COLLECTION_STATUS,
+  REFERENCE_FETCHED,
+  REFERENCE_STATUS,
   apiStateMiddleware,
 } from '../src';
 import { middlewareJsonApiSource } from '../src/middleware';
@@ -40,13 +40,13 @@ describe('Find action creator', () => {
     const tag = 'collection_test';
     const action = find(config, schema, tag);
 
-    expect(action[CALL_API]).to.not.be.undefined;
-    expect(action[CALL_API].method).to.equal('GET');
-    expect(action[CALL_API].endpoint).to.equal(config.endpoint);
-    expect(action[CALL_API].headers).to.equal(config.headers);
-    expect(action[CALL_API].types).to.not.be.undefined;
+    expect(action[RSAA]).to.not.be.undefined;
+    expect(action[RSAA].method).to.equal('GET');
+    expect(action[RSAA].endpoint).to.equal(config.endpoint);
+    expect(action[RSAA].headers).to.equal(config.headers);
+    expect(action[RSAA].types).to.not.be.undefined;
 
-    const types = action[CALL_API].types;
+    const types = action[RSAA].types;
     const expectedMeta = {
       source: middlewareJsonApiSource,
       schema,
@@ -56,7 +56,8 @@ describe('Find action creator', () => {
     expect(types[0].meta).to.deep.equal(expectedMeta);
     expect(types[1].type).to.equal(LOAD_SUCCESS);
     expect(types[1].meta).to.deep.equal(expectedMeta);
-    expect(types[2]).to.equal(LOAD_ERROR);
+    expect(types[2].type).to.equal(LOAD_ERROR);
+    expect(types[2].meta).to.deep.equal(expectedMeta);
   });
 
   it('creates a invalid action with null config', () => {
@@ -145,7 +146,7 @@ describe('Find action creator', () => {
         expect(performedActions).to.have.length(6);
 
         const actionCollStatus = performedActions[0];
-        expect(actionCollStatus.type).to.equal(COLLECTION_STATUS);
+        expect(actionCollStatus.type).to.equal(REFERENCE_STATUS);
         expect(actionCollStatus.meta).to.deep.equal({ ...expectedMeta });
         const expectedCollStatusPayload = { busyStatus: busyStatus.BUSY };
         expect(actionCollStatus.payload).to.deep.equal(expectedCollStatusPayload);
@@ -158,7 +159,7 @@ describe('Find action creator', () => {
         expect(actionObjFetched.payload).to.deep.equal(expectedPayload.data[0]);
 
         const actionCollFetched = performedActions[4];
-        expect(actionCollFetched.type).to.equal(COLLECTION_FETCHED);
+        expect(actionCollFetched.type).to.equal(REFERENCE_FETCHED);
         expect(actionCollFetched.meta).to.deep.equal({ ...expectedMeta });
         expect(actionCollFetched.payload).to.deep.equal(expectedPayload.data);
 

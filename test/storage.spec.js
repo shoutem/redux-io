@@ -277,10 +277,11 @@ describe('Storage reducer', () => {
     };
 
     const expectedState = { [itemNew.id]: itemNew };
-    expect(nextState).to.deep.equal(expectedState);
-    expect(nextStateItem).to.deep.equal(itemNew);
     expect(nextStateItem[STATUS].validationStatus).to.eql(validationStatus.INVALID);
     expect(nextStateItem[STATUS].busyStatus).to.eql(busyStatus.BUSY);
+    delete nextStateItem[STATUS];
+    expect(nextState).to.deep.equal(expectedState);
+    expect(nextStateItem).to.deep.equal(itemNew);
   });
 
   it('updates item and it\'s status in state on object updating', () => {
@@ -343,10 +344,11 @@ describe('Storage reducer', () => {
     const nextStateItem = nextState[item.id];
 
     const expectedState = { [itemNew.id]: itemNew };
-    expect(nextState).to.deep.equal(expectedState);
-    expect(nextStateItem).to.deep.equal(itemNew);
     expect(nextStateItem[STATUS].validationStatus).to.eql(validationStatus.INVALID);
     expect(nextStateItem[STATUS].busyStatus).to.eql(busyStatus.BUSY);
+    delete nextStateItem[STATUS];
+    expect(nextState).to.deep.equal(expectedState);
+    expect(nextStateItem).to.deep.equal(itemNew);
   });
 
   it('removes item from state on object removing', () => {
@@ -583,13 +585,14 @@ describe('Storage reducer', () => {
       },
     };
     const expectedState = { [expectedItem.id]: expectedItem };
-    expect(nextState).to.deep.equal(expectedState);
-    expect(nextStateItem).to.deep.equal(expectedItem);
     expect(nextStateItem[STATUS].validationStatus).to.eql(validationStatus.INVALID);
     expect(nextStateItem[STATUS].busyStatus).to.eql(busyStatus.BUSY);
     expect(nextStateItem[STATUS].transformation).to.eql(_.merge({},
       transformation,
       transformationPatch
     ));
+    delete nextStateItem[STATUS];
+    expect(nextState).to.deep.equal(expectedState);
+    expect(nextStateItem).to.deep.equal(expectedItem);
   });
 });

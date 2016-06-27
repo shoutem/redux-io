@@ -1,6 +1,6 @@
 import _ from 'lodash';
 
-export const STATUS = Symbol('status');
+export const STATUS = '@@redux-api-state/status';
 
 export const validationStatus = Object.freeze({
   NONE: 'none',
@@ -18,13 +18,14 @@ export const createStatus = (description = {}) => (
     ...description,
     validationStatus: validationStatus.NONE,
     busyStatus: busyStatus.IDLE,
+    error: false,
     modifiedTimestamp: Date.now(),
     transformation: {},
   }
 );
 
 export const updateStatus = (status, update) => (
-  _.merge({}, status, update, {modifiedTimestamp: Date.now()})
+  _.merge({}, status, update, { modifiedTimestamp: Date.now() })
 );
 
 export const applyStatus = (sourceObject, destinationObject) => {
@@ -45,9 +46,12 @@ export const isInitialized = obj =>
 export const isBusy = obj =>
   !!(obj[STATUS] && obj[STATUS].busyStatus === busyStatus.BUSY);
 
-export const shouldRefresh = obj =>
-  !isValid(obj) && !isBusy(obj);
-
 export const getStatus = obj => !!obj[STATUS] && obj[STATUS];
 
 export const getModificationTime = obj => !!obj[STATUS] && obj[STATUS].modifiedTimestamp;
+
+export const isError = obj =>
+  !!(obj[STATUS] && obj[STATUS].error);
+
+export const shouldRefresh = (obj, ignoreError = false) =>
+  !isValid(obj) && !isBusy(obj) && (!isError(obj) || ignoreError);

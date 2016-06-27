@@ -311,6 +311,8 @@ describe('json-normalizer', () => {
       Object.assign({}, expectedNormalizedItem),
       Object.assign({}, expectedNormalizedItem),
     ];
+    delete normalizedList[STATUS];
+    normalizedList.map(x => delete x[STATUS]);
     expect(normalizedList).to.be.deep.equal(expectedNormalizedList);
   });
 });

@@ -11,11 +11,17 @@ export {
   getCollectionDescription,
 };
 
+import single from './single';
+export { single };
+
 import find from './find';
 export { find };
 
 import create from './create';
 export { create };
+
+import update from './update';
+export { update };
 
 import remove from './remove';
 export { remove };
@@ -26,11 +32,11 @@ export { loaded };
 import created from './created';
 export { created };
 
+import updated from './updated';
+export { updated };
+
 import clear from './clear';
 export { clear };
-
-import update from './update';
-export { update };
 
 import ReduxApiStateDenormalizer from './denormalizer/ReduxApiStateDenormalizer';
 export { ReduxApiStateDenormalizer };
@@ -56,17 +62,17 @@ export {
   CREATE_SUCCESS,
   CREATE_ERROR,
   OBJECT_CREATED,
-  COLLECTION_FETCHED,
-  COLLECTION_STATUS,
+  REFERENCE_FETCHED,
+  REFERENCE_STATUS,
+  REFERENCE_CLEAR,
   middlewareJsonApiSource,
 } from './middleware';
-
 
 export {
   isValid,
   isBusy,
+  isError,
   isInitialized,
   shouldRefresh,
   getTransformation,
 } from './status';
-

@@ -1,5 +1,5 @@
 import _ from 'lodash';
-import { CALL_API } from 'redux-api-middleware';
+import { RSAA } from 'redux-api-middleware';
 import {
   REMOVE_REQUEST,
   REMOVE_SUCCESS,
@@ -7,7 +7,7 @@ import {
   middlewareJsonApiSource,
 } from './middleware';
 
-// Action creator used to delete item on api (DELETE). Config arg is based on CALL_API
+// Action creator used to delete item on api (DELETE). Config arg is based on RSAA
 // configuration from redux-api-middleware, allowing full customization expect types
 // part of configuration. Delete function expects schema name of data which correspond
 // with storage reducer with same schema value to listen for deleted data. Item arg
@@ -31,7 +31,7 @@ export default (config, schema, item) => {
   };
 
   return {
-    [CALL_API]: {
+    [RSAA]: {
       method: 'DELETE',
       ...config,
       types: [
@@ -45,7 +45,10 @@ export default (config, schema, item) => {
           meta,
           payload: () => ({ data: item }),
         },
-        REMOVE_ERROR,
+        {
+          type: REMOVE_ERROR,
+          meta,
+        },
       ],
     },
   };

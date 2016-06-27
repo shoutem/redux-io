@@ -46,6 +46,10 @@ export default class JsonApiCache {
     this.cache = {};
   }
 
+  flush() {
+    this.cache = {};
+  }
+  
   getCacheByKey(itemKey) {
     return this.cache[itemKey];
   }

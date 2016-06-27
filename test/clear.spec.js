@@ -1,13 +1,13 @@
 import { expect } from 'chai';
 import {
-  COLLECTION_CLEAR,
+  REFERENCE_CLEAR,
   clear,
 } from '../src';
 
 describe('Clear action creator', () => {
   it('creates valid action', () => {
     const action = {
-      type: COLLECTION_CLEAR,
+      type: REFERENCE_CLEAR,
       meta: {
         schema: 'schema_test',
         tag: 'all',
@@ -25,7 +25,7 @@ describe('Clear action creator', () => {
   it('creates a valid action with default tag', () => {
     const schema = 'schema_test';
     expect(clear(schema)).to.deep.equal({
-      type: COLLECTION_CLEAR,
+      type: REFERENCE_CLEAR,
       meta: {
         schema,
         tag: '',

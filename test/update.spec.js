@@ -1,7 +1,7 @@
 /* eslint-disable no-unused-expressions */
 import { expect } from 'chai';
 import nock from 'nock';
-import { CALL_API, apiMiddleware } from 'redux-api-middleware';
+import { RSAA, apiMiddleware } from 'redux-api-middleware';
 import configureMockStore from 'redux-mock-store';
 import thunk from 'redux-thunk';
 import {
@@ -11,7 +11,7 @@ import {
   UPDATE_ERROR,
   OBJECT_UPDATING,
   OBJECT_UPDATED,
-  COLLECTION_STATUS,
+  REFERENCE_STATUS,
   apiStateMiddleware,
 } from '../src';
 import { middlewareJsonApiSource } from '../src/middleware';
@@ -40,13 +40,13 @@ describe('Update action creator', () => {
     const item = { id: 1 };
     const action = update(config, schema, item);
 
-    expect(action[CALL_API]).to.not.be.undefined;
-    expect(action[CALL_API].method).to.equal('PATCH');
-    expect(action[CALL_API].endpoint).to.equal(config.endpoint);
-    expect(action[CALL_API].headers).to.equal(config.headers);
-    expect(action[CALL_API].types).to.not.be.undefined;
+    expect(action[RSAA]).to.not.be.undefined;
+    expect(action[RSAA].method).to.equal('PATCH');
+    expect(action[RSAA].endpoint).to.equal(config.endpoint);
+    expect(action[RSAA].headers).to.equal(config.headers);
+    expect(action[RSAA].types).to.not.be.undefined;
 
-    const types = action[CALL_API].types;
+    const types = action[RSAA].types;
     const expectedMeta = {
       source: middlewareJsonApiSource,
       schema,
@@ -56,7 +56,8 @@ describe('Update action creator', () => {
     expect(types[0].payload).to.deep.equal({ data: item });
     expect(types[1].type).to.equal(UPDATE_SUCCESS);
     expect(types[1].meta).to.deep.equal(expectedMeta);
-    expect(types[2]).to.equal(UPDATE_ERROR);
+    expect(types[2].type).to.equal(UPDATE_ERROR);
+    expect(types[2].meta).to.deep.equal(expectedMeta);
   });
 
   it('throws exception on invalid action with null config', () => {
@@ -129,7 +130,7 @@ describe('Update action creator', () => {
         expect(performedActions).to.have.length(6);
 
         const actionCollStatusBusy = performedActions[0];
-        expect(actionCollStatusBusy.type).to.equal(COLLECTION_STATUS);
+        expect(actionCollStatusBusy.type).to.equal(REFERENCE_STATUS);
         expect(actionCollStatusBusy.meta)
           .to.deep.equal({ ...expectedMeta, tag: '*' });
         const expectedCollStatusBusyPayload = {
@@ -154,7 +155,7 @@ describe('Update action creator', () => {
         expect(actionObjUpdated.payload).to.deep.equal(expectedPayload.data);
 
         const actionCollStatusIdle = performedActions[4];
-        expect(actionCollStatusIdle.type).to.equal(COLLECTION_STATUS);
+        expect(actionCollStatusIdle.type).to.equal(REFERENCE_STATUS);
         expect(actionCollStatusIdle.meta)
           .to.deep.equal({ ...expectedMeta, tag: '*' });
         const expectedCollStatusIdlePayload = {

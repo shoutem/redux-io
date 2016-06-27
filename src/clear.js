@@ -1,6 +1,6 @@
 import _ from 'lodash';
 import {
-  COLLECTION_CLEAR,
+  REFERENCE_CLEAR,
 } from './index';
 
 export default (schema, tag = '') => {
@@ -12,7 +12,7 @@ export default (schema, tag = '') => {
   }
 
   return {
-    type: COLLECTION_CLEAR,
+    type: REFERENCE_CLEAR,
     meta: {
       schema,
       tag,

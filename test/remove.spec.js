@@ -1,16 +1,17 @@
 /* eslint-disable no-unused-expressions */
 import { expect } from 'chai';
 import nock from 'nock';
-import { CALL_API, apiMiddleware } from 'redux-api-middleware';
+import { RSAA, apiMiddleware } from 'redux-api-middleware';
 import configureMockStore from 'redux-mock-store';
 import thunk from 'redux-thunk';
 import {
   remove,
   REMOVE_REQUEST,
   REMOVE_SUCCESS,
+  REMOVE_ERROR,
   OBJECT_REMOVING,
   OBJECT_REMOVED,
-  COLLECTION_STATUS,
+  REFERENCE_STATUS,
   apiStateMiddleware,
 } from '../src';
 import { middlewareJsonApiSource } from '../src/middleware';
@@ -39,22 +40,24 @@ describe('Delete action creator', () => {
     const item = { id: 1 };
     const action = remove(config, schema, item);
 
-    expect(action[CALL_API]).to.not.be.undefined;
-    expect(action[CALL_API].method).to.equal('DELETE');
-    expect(action[CALL_API].endpoint).to.equal(config.endpoint);
-    expect(action[CALL_API].headers).to.equal(config.headers);
-    expect(action[CALL_API].types).to.not.be.undefined;
+    expect(action[RSAA]).to.not.be.undefined;
+    expect(action[RSAA].method).to.equal('DELETE');
+    expect(action[RSAA].endpoint).to.equal(config.endpoint);
+    expect(action[RSAA].headers).to.equal(config.headers);
+    expect(action[RSAA].types).to.not.be.undefined;
 
     const expectedMeta = {
       source: middlewareJsonApiSource,
       schema,
     };
 
-    const types = action[CALL_API].types;
+    const types = action[RSAA].types;
     expect(types[0].type).to.equal(REMOVE_REQUEST);
     expect(types[0].meta).to.deep.equal(expectedMeta);
     expect(types[1].type).to.equal(REMOVE_SUCCESS);
     expect(types[1].meta).to.deep.equal(expectedMeta);
+    expect(types[2].type).to.equal(REMOVE_ERROR);
+    expect(types[2].meta).to.deep.equal(expectedMeta);
   });
 
   it('throws exception on invalid action with null config', () => {
@@ -123,7 +126,7 @@ describe('Delete action creator', () => {
         expect(performedActions).to.have.length(6);
 
         const actionCollBusyRequest = performedActions[0];
-        expect(actionCollBusyRequest.type).to.equal(COLLECTION_STATUS);
+        expect(actionCollBusyRequest.type).to.equal(REFERENCE_STATUS);
         expect(actionCollBusyRequest.meta)
           .to.deep.equal({ ...expectedMeta, tag: '*' });
         const expectedCollBusyStatusPayload = {
@@ -143,7 +146,7 @@ describe('Delete action creator', () => {
         expect(actionObjRemoved.meta).to.deep.equal({ ...expectedMeta, transformation: {} });
 
         const actionCollStatus = performedActions[4];
-        expect(actionCollStatus.type).to.equal(COLLECTION_STATUS);
+        expect(actionCollStatus.type).to.equal(REFERENCE_STATUS);
         expect(actionCollStatus.meta).to.deep.equal({ ...expectedMeta, tag: '*' });
         const expectedCollStatusPayload = {
           validationStatus: validationStatus.INVALID,

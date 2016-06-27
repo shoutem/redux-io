@@ -1,5 +1,5 @@
 import _ from 'lodash';
-import { CALL_API } from 'redux-api-middleware';
+import { RSAA } from 'redux-api-middleware';
 import {
   LOAD_REQUEST,
   LOAD_SUCCESS,
@@ -7,7 +7,7 @@ import {
   middlewareJsonApiSource,
 } from './middleware';
 
-// Action creator used to fetch data from api (GET). Config arg is based on CALL_API
+// Action creator used to fetch data from api (GET). Config arg is based on RSAA
 // configuration from redux-api-middleware, allowing full customization expect types
 // part of configuration. Find function expects schema name of data which correspond
 // with storage reducer with same schema value to listen for received data. Tag arg
@@ -31,7 +31,7 @@ export default (config, schema, tag = '') => {
   };
 
   return {
-    [CALL_API]: {
+    [RSAA]: {
       method: 'GET',
       ...config,
       types: [
@@ -43,7 +43,10 @@ export default (config, schema, tag = '') => {
           type: LOAD_SUCCESS,
           meta,
         },
-        LOAD_ERROR,
+        {
+          type: LOAD_ERROR,
+          meta,
+        },
       ],
     },
   };

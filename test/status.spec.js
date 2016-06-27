@@ -7,6 +7,7 @@ import {
   isValid,
   isBusy,
   isInitialized,
+  isError,
   shouldRefresh,
   validationStatus,
   busyStatus,
@@ -85,8 +86,17 @@ describe('Status metadata', () => {
     );
     const obj = {};
     obj[STATUS] = status;
-
     expect(isInitialized(obj)).to.be.false;
+  });
+
+  it('isError returns correct value on error', () => {
+    const status = updateStatus(
+      createStatus(),
+      { error: true }
+    );
+    const obj = {};
+    obj[STATUS] = status;
+    expect(isError(obj)).to.be.true;
   });
 
   it('isInitialized returns correct value on invalid', () => {
@@ -96,8 +106,17 @@ describe('Status metadata', () => {
     );
     const obj = {};
     obj[STATUS] = status;
-
     expect(isInitialized(obj)).to.be.true;
+  });
+
+  it('isError returns correct value on not error', () => {
+    const status = updateStatus(
+      createStatus(),
+      { error: false }
+    );
+    const obj = {};
+    obj[STATUS] = status;
+    expect(isError(obj)).to.be.false;
   });
 
   it('isInitialized returns correct value on valid', () => {
@@ -144,6 +163,36 @@ describe('Status metadata', () => {
     expect(shouldRefresh(obj)).to.be.false;
   });
 
+  it('shouldRefresh returns correct value on error', () => {
+    const status = updateStatus(
+      createStatus(),
+      {
+        busyStatus: busyStatus.IDLE,
+        validationStatus: validationStatus.INVALID,
+        error: true,
+      }
+    );
+    const obj = {};
+    obj[STATUS] = status;
+
+    expect(shouldRefresh(obj)).to.be.false;
+  });
+
+  it('shouldRefresh returns correct value on error with ignoreError flag', () => {
+    const status = updateStatus(
+      createStatus(),
+      {
+        busyStatus: busyStatus.IDLE,
+        validationStatus: validationStatus.INVALID,
+        error: true,
+      }
+    );
+    const obj = {};
+    obj[STATUS] = status;
+
+    expect(shouldRefresh(obj, true)).to.be.true;
+  });
+
   it('applyStatus applies cloned status on destination object from source object', () => {
     const status = updateStatus(
       createStatus(),
@@ -179,4 +228,49 @@ describe('Status metadata', () => {
       done();
     }, 100);
   });
+
+  it('doesn\'t interfere with forEach in Array', () => {
+    const obj = [1, 2, 3];
+    obj[STATUS] = createStatus();
+
+    let counter = 0;
+    obj.forEach(() => counter++);
+
+    expect(counter).to.be.eql(3);
+  });
+
+  it('doesn\'t interfere with map in Array', () => {
+    const obj = [1, 2, 3];
+    obj[STATUS] = createStatus();
+
+    let counter = 0;
+    obj.map(() => counter++);
+
+    expect(counter).to.be.eql(3);
+  });
+
+  it('does interfere with \'for in\' in Array', () => {
+    const obj = [1, 2, 3];
+    obj[STATUS] = createStatus();
+
+    let counter = 0;
+    for (const o in obj) {
+      counter++;
+    }
+
+    expect(counter).to.be.eql(4);
+  });
+
+  it('doesn\'t interfere with \'for of\' in Array', () => {
+    const obj = [1, 2, 3];
+    obj[STATUS] = createStatus();
+
+    let counter = 0;
+    for (const o of obj) {
+      counter++;
+    }
+
+    expect(counter).to.be.eql(3);
+  });
+
 });

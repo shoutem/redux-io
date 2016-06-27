@@ -1,22 +1,27 @@
 import { expect } from 'chai';
 import configureMockStore from 'redux-mock-store';
 import thunk from 'redux-thunk';
+import sinon from 'sinon';
 import {
   LOAD_REQUEST,
   LOAD_SUCCESS,
+  LOAD_ERROR,
   CREATE_SUCCESS,
+  CREATE_ERROR,
   UPDATE_REQUEST,
   UPDATE_SUCCESS,
+  UPDATE_ERROR,
   REMOVE_REQUEST,
   REMOVE_SUCCESS,
+  REMOVE_ERROR,
   OBJECT_CREATED,
   OBJECT_FETCHED,
   OBJECT_UPDATING,
   OBJECT_UPDATED,
   OBJECT_REMOVING,
   OBJECT_REMOVED,
-  COLLECTION_FETCHED,
-  COLLECTION_STATUS,
+  REFERENCE_FETCHED,
+  REFERENCE_STATUS,
   apiStateMiddleware,
 } from '../src';
 import {
@@ -35,8 +40,13 @@ describe('Json api middleware', () => {
     }).then(dispatch(action))
   );
 
+  beforeEach(() => {
+    sinon.spy(console, 'error');
+  });
+
   afterEach(() => {
     mockStore = configureMockStore([thunk, apiStateMiddleware]);
+    console.error.restore();
   });
 
   it('produces valid actions for fetch request', done => {
@@ -60,7 +70,7 @@ describe('Json api middleware', () => {
         expect(performedActions).to.have.length(2);
 
         const actionCollStatus = performedActions[0];
-        expect(actionCollStatus.type).to.equal(COLLECTION_STATUS);
+        expect(actionCollStatus.type).to.equal(REFERENCE_STATUS);
         expect(actionCollStatus.meta).to.deep.equal(expectedMeta);
         const expectedCollStatusPayload = { busyStatus: busyStatus.BUSY };
         expect(actionCollStatus.payload).to.deep.equal(expectedCollStatusPayload);
@@ -113,7 +123,7 @@ describe('Json api middleware', () => {
         expect(actionObjFetched.payload).to.deep.equal(expectedPayload.data[0]);
 
         const actionCollFetched = performedActions[2];
-        expect(actionCollFetched.type).to.equal(COLLECTION_FETCHED);
+        expect(actionCollFetched.type).to.equal(REFERENCE_FETCHED);
         expect(actionCollFetched.meta).to.deep.equal(expectedMeta);
         expect(actionCollFetched.payload).to.deep.equal(expectedPayload.data);
 
@@ -122,6 +132,42 @@ describe('Json api middleware', () => {
 
         expect(successAction.meta).to.deep.equal(expectedMeta);
         expect(successAction.payload).to.deep.equal(expectedPayload);
+      }).then(done).catch(done);
+  });
+
+  it('produces valid actions for fetch error', done => {
+    const schema = 'schema_test';
+    const tag = 'tag_test';
+    const expectedMeta = {
+      source: middlewareJsonApiSource,
+      schema,
+      tag,
+    };
+
+    const mockErrorAction = {
+      type: LOAD_ERROR,
+      meta: expectedMeta,
+    };
+
+    const store = mockStore({});
+    store.dispatch(actionPromise(mockErrorAction))
+      .then(() => {
+        const performedActions = store.getActions();
+        expect(performedActions).to.have.length(2);
+
+        const actionCollStatus = performedActions[0];
+        expect(actionCollStatus.type).to.equal(REFERENCE_STATUS);
+        expect(actionCollStatus.meta).to.deep.equal(expectedMeta);
+        const expectedCollStatusPayload = {
+          busyStatus: busyStatus.IDLE,
+          validationStatus: validationStatus.INVALID,
+          error: true,
+        };
+        expect(actionCollStatus.payload).to.deep.equal(expectedCollStatusPayload);
+
+        const requestAction = performedActions[1];
+        expect(requestAction.type).to.equal(LOAD_ERROR);
+        expect(requestAction.meta).to.deep.equal(expectedMeta);
       }).then(done).catch(done);
   });
 
@@ -160,7 +206,7 @@ describe('Json api middleware', () => {
         expect(actionObjCreated.payload).to.deep.equal(expectedPayload.data[0]);
 
         const actionCollStatus = performedActions[1];
-        expect(actionCollStatus.type).to.equal(COLLECTION_STATUS);
+        expect(actionCollStatus.type).to.equal(REFERENCE_STATUS);
         expect(actionCollStatus.meta).to.deep.equal({ ...expectedMeta, tag: '*' });
         const expectedCollStatusPayload = {
           validationStatus: validationStatus.INVALID,
@@ -173,6 +219,39 @@ describe('Json api middleware', () => {
 
         expect(successAction.meta).to.deep.equal(expectedMeta);
         expect(successAction.payload).to.deep.equal(expectedPayload);
+      }).then(done).catch(done);
+  });
+
+  it('produces valid actions for create error', done => {
+    const schema = 'schema_test';
+    const expectedMeta = {
+      source: middlewareJsonApiSource,
+      schema,
+    };
+
+    const mockErrorAction = {
+      type: CREATE_ERROR,
+      meta: expectedMeta,
+    };
+
+    const store = mockStore({});
+    store.dispatch(actionPromise(mockErrorAction))
+      .then(() => {
+        const performedActions = store.getActions();
+        expect(performedActions).to.have.length(2);
+
+        const actionCollStatus = performedActions[0];
+        expect(actionCollStatus.type).to.equal(REFERENCE_STATUS);
+        expect(actionCollStatus.meta).to.deep.equal({ ...expectedMeta, tag: '*' });
+        const expectedCollStatusPayload = {
+          busyStatus: busyStatus.IDLE,
+          validationStatus: validationStatus.INVALID,
+        };
+        expect(actionCollStatus.payload).to.deep.equal(expectedCollStatusPayload);
+
+        const requestAction = performedActions[1];
+        expect(requestAction.type).to.equal(CREATE_ERROR);
+        expect(requestAction.meta).to.deep.equal(expectedMeta);
       }).then(done).catch(done);
   });
 
@@ -206,7 +285,7 @@ describe('Json api middleware', () => {
         expect(performedActions).to.have.length(3);
 
         const actionCollStatusBusy = performedActions[0];
-        expect(actionCollStatusBusy.type).to.equal(COLLECTION_STATUS);
+        expect(actionCollStatusBusy.type).to.equal(REFERENCE_STATUS);
         expect(actionCollStatusBusy.meta)
           .to.deep.equal({ ...expectedMeta, tag: '*' });
         const expectedCollStatusBusyPayload = {
@@ -262,7 +341,7 @@ describe('Json api middleware', () => {
         expect(actionObjUpdated.payload).to.deep.equal(expectedPayload.data[0]);
 
         const actionCollStatus = performedActions[1];
-        expect(actionCollStatus.type).to.equal(COLLECTION_STATUS);
+        expect(actionCollStatus.type).to.equal(REFERENCE_STATUS);
         expect(actionCollStatus.meta).to.deep.equal({ ...expectedMeta, tag: '*' });
         const expectedCollStatusPayload = {
           busyStatus: busyStatus.IDLE,
@@ -275,6 +354,39 @@ describe('Json api middleware', () => {
 
         expect(successAction.meta).to.deep.equal(expectedMeta);
         expect(successAction.payload).to.deep.equal(expectedPayload);
+      }).then(done).catch(done);
+  });
+
+  it('produces valid actions for update error', done => {
+    const schema = 'schema_test';
+    const expectedMeta = {
+      source: middlewareJsonApiSource,
+      schema,
+    };
+
+    const mockErrorAction = {
+      type: UPDATE_ERROR,
+      meta: expectedMeta,
+    };
+
+    const store = mockStore({});
+    store.dispatch(actionPromise(mockErrorAction))
+      .then(() => {
+        const performedActions = store.getActions();
+        expect(performedActions).to.have.length(2);
+
+        const actionCollStatus = performedActions[0];
+        expect(actionCollStatus.type).to.equal(REFERENCE_STATUS);
+        expect(actionCollStatus.meta).to.deep.equal({ ...expectedMeta, tag: '*' });
+        const expectedCollStatusPayload = {
+          busyStatus: busyStatus.IDLE,
+          validationStatus: validationStatus.INVALID,
+        };
+        expect(actionCollStatus.payload).to.deep.equal(expectedCollStatusPayload);
+
+        const requestAction = performedActions[1];
+        expect(requestAction.type).to.equal(UPDATE_ERROR);
+        expect(requestAction.meta).to.deep.equal(expectedMeta);
       }).then(done).catch(done);
   });
 
@@ -305,7 +417,7 @@ describe('Json api middleware', () => {
         expect(performedActions).to.have.length(3);
 
         const actionCollRequest = performedActions[0];
-        expect(actionCollRequest.type).to.equal(COLLECTION_STATUS);
+        expect(actionCollRequest.type).to.equal(REFERENCE_STATUS);
         expect(actionCollRequest.meta).to.deep.equal({ ...expectedMeta, tag: '*' });
         const expectedCollStatusPayload = {
           validationStatus: validationStatus.INVALID,
@@ -354,7 +466,7 @@ describe('Json api middleware', () => {
         expect(actionObjDeleted.meta).to.deep.equal({ ...expectedMeta, transformation: {} });
 
         const actionCollStatus = performedActions[1];
-        expect(actionCollStatus.type).to.equal(COLLECTION_STATUS);
+        expect(actionCollStatus.type).to.equal(REFERENCE_STATUS);
         expect(actionCollStatus.meta).to.deep.equal({ ...expectedMeta, tag: '*' });
         const expectedCollStatusPayload = {
           validationStatus: validationStatus.INVALID,
@@ -365,6 +477,39 @@ describe('Json api middleware', () => {
         const successAction = performedActions[2];
         expect(successAction.type).to.equal(REMOVE_SUCCESS);
         expect(successAction.meta).to.deep.equal(expectedMeta);
+      }).then(done).catch(done);
+  });
+
+  it('produces valid actions for delete error', done => {
+    const schema = 'schema_test';
+    const expectedMeta = {
+      source: middlewareJsonApiSource,
+      schema,
+    };
+
+    const mockErrorAction = {
+      type: REMOVE_ERROR,
+      meta: expectedMeta,
+    };
+
+    const store = mockStore({});
+    store.dispatch(actionPromise(mockErrorAction))
+      .then(() => {
+        const performedActions = store.getActions();
+        expect(performedActions).to.have.length(2);
+
+        const actionCollStatus = performedActions[0];
+        expect(actionCollStatus.type).to.equal(REFERENCE_STATUS);
+        expect(actionCollStatus.meta).to.deep.equal({ ...expectedMeta, tag: '*' });
+        const expectedCollStatusPayload = {
+          busyStatus: busyStatus.IDLE,
+          validationStatus: validationStatus.INVALID,
+        };
+        expect(actionCollStatus.payload).to.deep.equal(expectedCollStatusPayload);
+
+        const requestAction = performedActions[1];
+        expect(requestAction.type).to.equal(REMOVE_ERROR);
+        expect(requestAction.meta).to.deep.equal(expectedMeta);
       }).then(done).catch(done);
   });
 
@@ -437,7 +582,7 @@ describe('Json api middleware', () => {
         expect(actionObjFetched.payload).to.deep.equal(expectedPayload.data[0]);
 
         const actionCollFetched = performedActions[4];
-        expect(actionCollFetched.type).to.equal(COLLECTION_FETCHED);
+        expect(actionCollFetched.type).to.equal(REFERENCE_FETCHED);
         expect(actionCollFetched.meta).to.deep.equal({ ...expectedMeta });
         expect(actionCollFetched.payload).to.deep.equal(expectedPayload.data);
 
@@ -691,7 +836,7 @@ describe('Json api middleware', () => {
       }).then(done).catch(done);
   });
 
-  it('exception if action doesn\'t have meta', done => {
+  it('writes error to console and ignores action if it doesn\'t have meta', done => {
     const schema = 'schema_test';
     const expectedPayload = {
       data: [{
@@ -715,11 +860,19 @@ describe('Json api middleware', () => {
     };
 
     const store = mockStore({});
-    expect(() => store.dispatch(actionPromise(mockSuccessAction))).to.throw('Meta is undefined.');
-    done();
+    store.dispatch(actionPromise(mockSuccessAction)).then(() => {
+      const performedActions = store.getActions();
+      expect(performedActions).to.have.length(1);
+
+      const requestAction = performedActions[0];
+      expect(requestAction.type).to.equal(LOAD_SUCCESS);
+
+      expect(console.error.calledOnce).to.be.true;
+      expect(console.error.calledWith('Meta is undefined.')).to.be.true;
+    }).then(done).catch(done);
   });
 
-  it('exception if action doesn\'t have source', done => {
+  it('writes error to console and ignores action if it doesn\'t have source', done => {
     const schema = 'schema_test';
     const tag = 'tag_test';
     const expectedPayload = {
@@ -750,8 +903,16 @@ describe('Json api middleware', () => {
     };
 
     const store = mockStore({});
-    expect(() => store.dispatch(actionPromise(mockSuccessAction))).to.throw('Source is undefined.');
-    done();
+    store.dispatch(actionPromise(mockSuccessAction)).then(() => {
+      const performedActions = store.getActions();
+      expect(performedActions).to.have.length(1);
+
+      const requestAction = performedActions[0];
+      expect(requestAction.type).to.equal(LOAD_SUCCESS);
+
+      expect(console.error.calledOnce).to.be.true;
+      expect(console.error.calledWith('Source is undefined.')).to.be.true;
+    }).then(done).catch(done);
   });
 
   it('exception if action doesn\'t have schema', done => {
@@ -785,8 +946,16 @@ describe('Json api middleware', () => {
     };
 
     const store = mockStore({});
-    expect(() => store.dispatch(actionPromise(mockSuccessAction))).to.throw('Schema is invalid.');
-    done();
+    store.dispatch(actionPromise(mockSuccessAction)).then(() => {
+      const performedActions = store.getActions();
+      expect(performedActions).to.have.length(1);
+
+      const requestAction = performedActions[0];
+      expect(requestAction.type).to.equal(LOAD_SUCCESS);
+
+      expect(console.error.calledOnce).to.be.true;
+      expect(console.error.calledWith('Schema is invalid.')).to.be.true;
+    }).then(done).catch(done);
   });
 
   it('exception if action doesn\'t have payload with data property', done => {
@@ -807,8 +976,15 @@ describe('Json api middleware', () => {
     };
 
     const store = mockStore({});
-    expect(() => store.dispatch(actionPromise(mockSuccessAction)))
-      .to.throw('Payload Data is invalid, expecting payload.data.');
-    done();
+    store.dispatch(actionPromise(mockSuccessAction)).then(() => {
+      const performedActions = store.getActions();
+      expect(performedActions).to.have.length(1);
+
+      const requestAction = performedActions[0];
+      expect(requestAction.type).to.equal(LOAD_SUCCESS);
+
+      expect(console.error.calledOnce).to.be.true;
+      expect(console.error.calledWith('Payload Data is invalid, expecting payload.data.')).to.be.true;
+    }).then(done).catch(done);
   });
 });

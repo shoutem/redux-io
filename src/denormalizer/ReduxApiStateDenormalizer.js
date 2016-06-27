@@ -154,4 +154,8 @@ export default class ReduxApiStateDenormalizer extends ReduxDenormalizer {
     applyStatus(collection, denormalizedCollection);
     return cache.cacheCollection(denormalizedCollection);
   }
+
+  flushCache() {
+    cache.flush();
+  }
 }
