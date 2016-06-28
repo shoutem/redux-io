@@ -255,7 +255,7 @@ describe('ReduxApiStateDenormalizer', () => {
           ],
         },
       ];
-      expectedData[STATUS] = createStatus({ schema: 'type1', tag: ''});
+      expectedData[STATUS] = collection[STATUS];
       const denormalizedData =
         denormalizer.denormalizeCollection(collection);
       assert.isObject(denormalizedData[STATUS]);
