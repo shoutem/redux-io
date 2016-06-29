@@ -157,48 +157,98 @@ export default class JsonApiCache {
     }
 
     const newRelationships = _.reduce(relationships, (newRelationships, relationship, schema) => {
-      const relationshipData = relationship.data;
       const cachedRelationship = cachedRelationships && cachedRelationships[schema];
-      let newRelationship;
-      let relationshipChanged = false;
 
-      if (isSingleRelation(relationshipData)) {
+      const relationshipReducer =
+        new RelationshipCacheReducer(relationship.data, this, denormalizeItem);
+      const newRelationship = relationshipReducer.reduce(cachedRelationship);
 
-        newRelationship = relationshipData === null ? null : denormalizeItem(relationshipData);
-        if (cachedRelationship !== newRelationship) {
-          relationshipChanged = true;
-        }
-      } else if (isCollection(relationshipData)) {
+      const relationshipChanged = relationshipReducer.isChanged();
 
-        let matchedRelationshipsItems = 0;
-
-        newRelationship = relationshipData.map(item => {
-          const cachedItem = this.getItem(item);
-
-          const relationshipItem = denormalizeItem(item);
-          if (isItemInCollection(cachedRelationship, item)) {
-            matchedRelationshipsItems += 1;
-          }
-          if (cachedItem !== relationshipItem) {
-            relationshipChanged = true;
-            return relationshipItem;
-          }
-          return cachedItem;
-        });
-
-        if (didCollectionChange(cachedRelationship, newRelationship, matchedRelationshipsItems)) {
-          relationshipChanged = true;
-        }
-      }
+      newRelationships[schema] = relationshipChanged ? newRelationship : cachedRelationship;
 
       if (relationshipChanged) {
         relationshipsChanged = true;
       }
-      newRelationships[schema] = relationshipChanged ? newRelationship : cachedRelationship;
+
       return newRelationships;
     }, {});
-
     return relationshipsChanged ? newRelationships : cachedRelationships;
   }
 
+}
+
+class RelationshipCacheReducer {
+  constructor(relationship, cache, denormalizeItem) {
+    this.relationship = relationship;
+    this.cache = cache;
+    this.denormalizeItem = denormalizeItem;
+    this.relationshipChanged = false;
+  }
+
+  reduce(cachedRelationship) {
+    if (isSingleRelation(this.relationship)) {
+      return this.reduceSingleRelationship(cachedRelationship);
+    } else if (isCollection(this.relationship)) {
+      return this.reduceCollectionRelationship(cachedRelationship);
+    }
+
+    throw Error('Unknown relationship format!');
+  }
+
+  reduceSingleRelationship(cachedRelationship) {
+    const newRelationship =
+      this.relationship === null ? null : this.denormalizeItem(this.relationship);
+    if (cachedRelationship !== newRelationship) {
+      this.relationshipChanged = true;
+    }
+    return newRelationship;
+  }
+
+  reduceCollectionRelationship(cachedRelationship) {
+    const collectionRelationshipReducer =
+      new CollectionRelationshipCacheReducer(this.relationship, this.cache, this.denormalizeItem);
+    const newRelationship = collectionRelationshipReducer.reduce(cachedRelationship);
+    if (collectionRelationshipReducer.isChanged()) {
+      this.relationshipChanged = true;
+    }
+    return newRelationship;
+  }
+
+  isChanged() {
+    return this.relationshipChanged;
+  }
+}
+
+class CollectionRelationshipCacheReducer {
+  constructor(collection, cache, denormalizeItem) {
+    this.collection = collection;
+    this.cache = cache;
+    this.denormalizeItem = denormalizeItem;
+    this.matchedRelationshipsItems = 0;
+    this.relationshipChanged = false;
+  }
+  reduce(cachedCollection) {
+    const reducedCollection = this.collection.map(item => {
+      const cachedItem = this.cache.getItem(item);
+
+      const relationshipItem = this.denormalizeItem(item);
+      if (isItemInCollection(cachedCollection, item)) {
+        this.matchedRelationshipsItems += 1;
+      }
+      if (cachedItem !== relationshipItem) {
+        this.relationshipChanged = true;
+        return relationshipItem;
+      }
+      return cachedItem;
+    });
+
+    if (didCollectionChange(cachedCollection, reducedCollection, this.matchedRelationshipsItems)) {
+      this.relationshipChanged = true;
+    }
+    return reducedCollection;
+  }
+  isChanged() {
+    return this.relationshipChanged;
+  }
 }
