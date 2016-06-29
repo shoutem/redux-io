@@ -10,6 +10,11 @@ function isItemInCollection(collection, item) {
   return collection && collection.find(collectionItem => collectionItem.id === item.id);
 }
 
+/**
+ * Reduce collection with cached data.
+ * Always return new reference.
+ * Provides method to check if any change occur.
+ */
 export default class {
   constructor(collection, cache, denormalizeItem) {
     this.collection = collection;
@@ -18,7 +23,7 @@ export default class {
     this.matchedRelationshipsItems = 0;
     this.relationshipChanged = false;
   }
-  
+
   reduce(cachedCollection) {
     const reducedCollection = this.collection.map(item => {
       const cachedItem = this.cache.getItem(item);

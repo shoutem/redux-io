@@ -20,14 +20,18 @@ function isCacheValid(cachedModificationTime, currentModificationTime) {
   return cachedModificationTime >= currentModificationTime;
 }
 
-function isRasEntityUpdated(entity, cachedEntity) {
+function isRioEntityUpdated(entity, cachedEntity) {
   const cachedEntityModificationTime = getModificationTime(cachedEntity);
   const currentEntityModificationTime = getModificationTime(entity);
 
   return isCacheValid(cachedEntityModificationTime, currentEntityModificationTime);
 }
 
-export default class JsonApiCache {
+/**
+ * Cache Redux input output data by 'type' and 'id'.
+ * Provides methods to validate, get and resolve new data with cached data.
+ */
+export default class RioCache {
   constructor() {
     this.cache = {};
   }
@@ -91,7 +95,7 @@ export default class JsonApiCache {
       return true;
     }
     const cachedItem = this.getItem(item);
-    return !isRasEntityUpdated(item, cachedItem);
+    return !isRioEntityUpdated(item, cachedItem);
   }
 
   isCollectionChanged(collection) {
@@ -99,9 +103,17 @@ export default class JsonApiCache {
       return true;
     }
     const cachedCollection = this.getCollection(collection);
-    return !isRasEntityUpdated(collection, cachedCollection);
+    return !isRioEntityUpdated(collection, cachedCollection);
   }
 
+  /**
+   * Check if collection or any item within is changed.
+   * If changed return new, otherwise return cached collection.
+   *
+   * @param descriptorCollection - collection with item descriptors [{id, type}...]
+   * @param denormalizeItem - function to denormalize single item
+   * @returns {*}
+   */
   resolveCollectionItemsChange(descriptorCollection, denormalizeItem) {
     const cachedCollection = this.getCollection(descriptorCollection);
     const collectionReducer =
@@ -116,6 +128,14 @@ export default class JsonApiCache {
     return cachedCollection;
   }
 
+  /**
+   * Check if any relationship is changed.
+   * If changed return new, otherwise return cached relationships.
+   *
+   * @param item - normalized item to resolve relationships
+   * @param denormalizeItem - function to denormalize single item
+   * @returns {*}
+   */
   resolveItemRelationshipsChanges(item, denormalizeItem) {
     const cachedRelationships = this.getItemRelationships(item);
     const relationships = item.relationships;

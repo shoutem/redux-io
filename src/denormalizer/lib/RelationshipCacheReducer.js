@@ -9,6 +9,11 @@ function isCollection(entity) {
   return _.isArray(entity);
 }
 
+/**
+ * Reduce item relationship with cached data.
+ * Always returns new reference.
+ * Provides method to check if any change occur.
+ */
 export default class {
   constructor(relationship, cache, denormalizeItem) {
     this.relationship = relationship;

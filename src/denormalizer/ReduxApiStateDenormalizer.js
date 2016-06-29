@@ -1,12 +1,12 @@
 import ReduxDenormalizer from './ReduxDenormalizer';
-import Cache, { isCollection, getUniqueRelationshipCollectionKey } from './lib/Cache';
+import RioCache from './lib/RioCache';
 import { getCollectionDescription } from '../collection';
 import _ from 'lodash';
 import { applyStatus } from './../status';
 
 // As redux has only one store, we can create single instance of cache
 // for every denormlizer instance
-const cache = new Cache();
+const cache = new RioCache();
 
 /**
  * Created getStore for ReduxDenormalizer by using storageMap to find relationships.
