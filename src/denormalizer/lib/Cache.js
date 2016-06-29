@@ -1,5 +1,7 @@
 import { createUniqueTargetKey } from '@shoutem/json-api-denormalizer';
 import { getModificationTime } from '../../status';
+import RelationshipCacheReducer from './RelationshipCacheReducer'
+import CollectionCacheReducer from './CollectionCacheReducer'
 import _ from 'lodash';
 
 export function getUniqueTargetKey(item) {
@@ -18,31 +20,11 @@ function isCacheValid(cachedModificationTime, currentModificationTime) {
   return cachedModificationTime >= currentModificationTime;
 }
 
-function didCollectionChange(cachedCollection, newCollection, matchedItemsLength) {
-  return (!cachedCollection && !!newCollection) ||
-    (
-      cachedCollection.length !== newCollection.length ||
-      cachedCollection.length !== matchedItemsLength
-    );
-}
-
 function isRasEntityUpdated(entity, cachedEntity) {
   const cachedEntityModificationTime = getModificationTime(cachedEntity);
   const currentEntityModificationTime = getModificationTime(entity);
 
   return isCacheValid(cachedEntityModificationTime, currentEntityModificationTime);
-}
-
-function isItemInCollection(collection, item) {
-  return collection && collection.find(collectionItem => collectionItem.id === item.id);
-}
-
-export function isCollection(entity) {
-  return _.isArray(entity);
-}
-
-export function isSingleRelation(relationshipData) {
-  return _.isPlainObject(relationshipData) || relationshipData === null;
 }
 
 export default class JsonApiCache {
@@ -122,25 +104,12 @@ export default class JsonApiCache {
 
   resolveCollectionItemsChange(descriptorCollection, denormalizeItem) {
     const cachedCollection = this.getCollection(descriptorCollection);
-    let collectionChanged = this.isCollectionChanged(descriptorCollection);
-    let matchedItems = 0;
-    const newCollection = descriptorCollection.map(item => {
-      const cachedItem = this.getItem(item);
-      const newItem = denormalizeItem(item);
-      if (isItemInCollection(cachedCollection, item)) {
-        matchedItems += 1;
-      }
-      if (newItem !== cachedItem) {
-        collectionChanged = true;
-      }
-      return newItem;
-    });
+    const collectionReducer =
+      new CollectionCacheReducer(descriptorCollection, this, denormalizeItem);
 
-    if (!collectionChanged) {
-      collectionChanged = didCollectionChange(cachedCollection, newCollection, matchedItems);
-    }
+    const newCollection = collectionReducer.reduce(cachedCollection);
 
-    if (collectionChanged) {
+    if (this.isCollectionChanged(descriptorCollection) || collectionReducer.isChanged()) {
       return newCollection;
     }
 
@@ -176,79 +145,4 @@ export default class JsonApiCache {
     return relationshipsChanged ? newRelationships : cachedRelationships;
   }
 
-}
-
-class RelationshipCacheReducer {
-  constructor(relationship, cache, denormalizeItem) {
-    this.relationship = relationship;
-    this.cache = cache;
-    this.denormalizeItem = denormalizeItem;
-    this.relationshipChanged = false;
-  }
-
-  reduce(cachedRelationship) {
-    if (isSingleRelation(this.relationship)) {
-      return this.reduceSingleRelationship(cachedRelationship);
-    } else if (isCollection(this.relationship)) {
-      return this.reduceCollectionRelationship(cachedRelationship);
-    }
-
-    throw Error('Unknown relationship format!');
-  }
-
-  reduceSingleRelationship(cachedRelationship) {
-    const newRelationship =
-      this.relationship === null ? null : this.denormalizeItem(this.relationship);
-    if (cachedRelationship !== newRelationship) {
-      this.relationshipChanged = true;
-    }
-    return newRelationship;
-  }
-
-  reduceCollectionRelationship(cachedRelationship) {
-    const collectionRelationshipReducer =
-      new CollectionRelationshipCacheReducer(this.relationship, this.cache, this.denormalizeItem);
-    const newRelationship = collectionRelationshipReducer.reduce(cachedRelationship);
-    if (collectionRelationshipReducer.isChanged()) {
-      this.relationshipChanged = true;
-    }
-    return newRelationship;
-  }
-
-  isChanged() {
-    return this.relationshipChanged;
-  }
-}
-
-class CollectionRelationshipCacheReducer {
-  constructor(collection, cache, denormalizeItem) {
-    this.collection = collection;
-    this.cache = cache;
-    this.denormalizeItem = denormalizeItem;
-    this.matchedRelationshipsItems = 0;
-    this.relationshipChanged = false;
-  }
-  reduce(cachedCollection) {
-    const reducedCollection = this.collection.map(item => {
-      const cachedItem = this.cache.getItem(item);
-
-      const relationshipItem = this.denormalizeItem(item);
-      if (isItemInCollection(cachedCollection, item)) {
-        this.matchedRelationshipsItems += 1;
-      }
-      if (cachedItem !== relationshipItem) {
-        this.relationshipChanged = true;
-        return relationshipItem;
-      }
-      return cachedItem;
-    });
-
-    if (didCollectionChange(cachedCollection, reducedCollection, this.matchedRelationshipsItems)) {
-      this.relationshipChanged = true;
-    }
-    return reducedCollection;
-  }
-  isChanged() {
-    return this.relationshipChanged;
-  }
 }
