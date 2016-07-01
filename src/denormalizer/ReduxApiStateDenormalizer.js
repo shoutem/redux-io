@@ -1,9 +1,9 @@
 import ReduxDenormalizer from './ReduxDenormalizer';
 import RioCache from './lib/RioCache';
+import CacheResolver from './lib/CacheResolver';
 import { getCollectionDescription } from '../collection';
 import _ from 'lodash';
 import { applyStatus } from './../status';
-import RelationshipsCacheResolver from './lib/RelationshipsCacheResolver';
 
 // As redux has only one store, we can create single instance of cache
 // for every denormlizer instance
@@ -61,6 +61,7 @@ export default class ReduxApiStateDenormalizer extends ReduxDenormalizer {
       super();
     }
     this.denormalizeItem = this.denormalizeItem.bind(this);
+    this.cacheResolver = new CacheResolver(cache, this.denormalizeItem);
   }
 
   /**
@@ -73,12 +74,22 @@ export default class ReduxApiStateDenormalizer extends ReduxDenormalizer {
    * @param storage
    * @returns {{}}
    */
-  denormalizeItem(item) {
-    const normalizedItem = this.getNormalizedItem(item);
-    if (cache.hasItem(normalizedItem)) {
-      return this.denormalizeCachedItem(normalizedItem);
+  denormalizeItem(itemDescriptor) {
+    const normalizedItem = this.getNormalizedItem(itemDescriptor);
+    const cachedItem = this.cacheResolver.resolveItem(normalizedItem);
+    let denormalizedItem;
+
+    if (cachedItem.isCached()) {
+      if (cachedItem.isValid()) {
+        denormalizedItem = cachedItem.get();
+      } else {
+        denormalizedItem = this.denormalizeFromCache(normalizedItem, cachedItem);
+      }
+    } else {
+      denormalizedItem = super.denormalizeItem(itemDescriptor);
     }
-    return cache.cacheItem(super.denormalizeItem(item));
+
+    return cache.cacheItem(denormalizedItem);
   }
 
   /**
@@ -93,27 +104,12 @@ export default class ReduxApiStateDenormalizer extends ReduxDenormalizer {
     return this.denormalizeItem(item);
   }
 
-  /**
-   * Reuse cached item or it's relationships
-   *
-   * @param item
-   * @returns {*}
-   */
-  denormalizeCachedItem(normalizedItem) {
-    const relationshipReducer =
-      new RelationshipsCacheResolver(normalizedItem, cache, this.denormalizeItem);
-    relationshipReducer.reduce();
-
-    if (!cache.isItemChanged(normalizedItem) && !relationshipReducer.isChanged()) {
-      return cache.getItem(normalizedItem);
-    }
-
-    const attributes = super.denormalizeItemAttributes(normalizedItem);
-    return cache.cacheItem(this.mergeDenormalizedItemData(
+  denormalizeFromCache(normalizedItem, cachedItem) {
+    return this.mergeDenormalizedItemData(
       normalizedItem,
-      attributes,
-      relationshipReducer.get()
-    ));
+      super.denormalizeItemAttributes(normalizedItem),
+      cachedItem.getNewRelationships()
+    );
   }
 
   /**
@@ -147,7 +143,7 @@ export default class ReduxApiStateDenormalizer extends ReduxDenormalizer {
     const descriptorCollection = createDesriptorCollection(collection);
 
     const denormalizedCollection =
-      cache.resolveCollectionItemsChange(descriptorCollection, this.denormalizeItem);
+      this.cacheResolver.resolveCollection(descriptorCollection);
 
     applyStatus(collection, denormalizedCollection);
     return cache.cacheCollection(denormalizedCollection);
