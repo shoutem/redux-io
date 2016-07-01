@@ -3,6 +3,7 @@ import RioCache from './lib/RioCache';
 import { getCollectionDescription } from '../collection';
 import _ from 'lodash';
 import { applyStatus } from './../status';
+import RelationshipsCacheResolver from './lib/RelationshipsCacheResolver';
 
 // As redux has only one store, we can create single instance of cache
 // for every denormlizer instance
@@ -99,10 +100,11 @@ export default class ReduxApiStateDenormalizer extends ReduxDenormalizer {
    * @returns {*}
    */
   denormalizeCachedItem(normalizedItem) {
-    const cachedRelationships = cache.getItemRelationships(normalizedItem);
-    const newRelationships = this.denormalizeItemRelationships(normalizedItem);
+    const relationshipReducer =
+      new RelationshipsCacheResolver(normalizedItem, cache, this.denormalizeItem);
+    relationshipReducer.reduce();
 
-    if (!cache.isItemChanged(normalizedItem) && cachedRelationships === newRelationships) {
+    if (!cache.isItemChanged(normalizedItem) && !relationshipReducer.isChanged()) {
       return cache.getItem(normalizedItem);
     }
 
@@ -110,19 +112,8 @@ export default class ReduxApiStateDenormalizer extends ReduxDenormalizer {
     return cache.cacheItem(this.mergeDenormalizedItemData(
       normalizedItem,
       attributes,
-      newRelationships
+      relationshipReducer.get()
     ));
-  }
-
-  /**
-   * Denormalize and cache item relationships
-   *
-   * @param item
-   * @returns {*}
-   */
-  denormalizeItemRelationships(item) {
-    const relationships = cache.resolveItemRelationshipsChanges(item, this.denormalizeItem);
-    return cache.cacheRelationships(relationships, item);
   }
 
   /**
