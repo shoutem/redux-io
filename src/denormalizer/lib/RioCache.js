@@ -1,6 +1,5 @@
 import { createUniqueTargetKey } from '@shoutem/json-api-denormalizer';
 import { getModificationTime } from '../../status';
-import CollectionCacheReducer from './CollectionCacheReducer'
 
 export function getUniqueTargetKey(item) {
   return createUniqueTargetKey(item);
@@ -86,25 +85,4 @@ export default class RioCache {
     return !isRioEntityUpdated(collection, cachedCollection);
   }
 
-  /**
-   * Check if collection or any item within is changed.
-   * If changed return new, otherwise return cached collection.
-   *
-   * @param descriptorCollection - collection with item descriptors [{id, type}...]
-   * @param denormalizeItem - function to denormalize single item
-   * @returns {*}
-   */
-  resolveCollectionItemsChange(descriptorCollection, denormalizeItem) {
-    const cachedCollection = this.getCollection(descriptorCollection);
-    const collectionReducer =
-      new CollectionCacheReducer(descriptorCollection, this, denormalizeItem);
-
-    const newCollection = collectionReducer.reduce(cachedCollection);
-
-    if (this.isCollectionChanged(descriptorCollection) || collectionReducer.isChanged()) {
-      return newCollection;
-    }
-
-    return cachedCollection;
-  }
 }
