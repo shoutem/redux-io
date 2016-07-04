@@ -72,3 +72,6 @@ export {
   shouldRefresh,
   getTransformation,
 } from './status';
+
+import rio from './rio';
+export default rio;
