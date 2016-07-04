@@ -73,5 +73,5 @@ export {
   getTransformation,
 } from './status';
 
-import { rioReducer } from './rioReducer';
-export { rioReducer };
+import { enableRio } from './enableRio';
+export { enableRio };

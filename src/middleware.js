@@ -1,4 +1,5 @@
 /* eslint-disable no-unused-expressions */
+/* eslint no-console: ["error", {allow: ["warn", "error"] }] */
 import _ from 'lodash';
 import { batchActions } from 'redux-batched-actions';
 import { transform } from './standardizer';
@@ -125,10 +126,10 @@ export function makeObjectAction(sourceAction, actionType, item) {
 }
 
 const actionHandlers = {
-  [LOAD_REQUEST]: (action, data, actions) => {
+  [LOAD_REQUEST]: (action, data, dispatch) => {
     // Make collection busy to prevent multiple requests
     const { schema, tag } = action.meta;
-    actions.push(makeIndexAction(
+    dispatch(makeIndexAction(
       action,
       REFERENCE_STATUS,
       { busyStatus: busyStatus.BUSY },
@@ -136,18 +137,18 @@ const actionHandlers = {
       tag
     ));
   },
-  [LOAD_SUCCESS]: (action, data, actions) => {
+  [LOAD_SUCCESS]: (action, data, dispatch) => {
     // Dispatch objects to storages and collection with specific tag
     const { schema, tag } = action.meta;
-    data.map(item => actions.push(makeObjectAction(action, OBJECT_FETCHED, item)));
+    data.map(item => dispatch(makeObjectAction(action, OBJECT_FETCHED, item)));
     // TODO: once when we support findOne action and single reducer, REFERENCE_FETCHED
     // should trigger only for collections
-    actions.push(makeIndexAction(action, REFERENCE_FETCHED, data, schema, tag));
+    dispatch(makeIndexAction(action, REFERENCE_FETCHED, data, schema, tag));
   },
-  [LOAD_ERROR]: (action, data, actions) => {
+  [LOAD_ERROR]: (action, data, dispatch) => {
     // Invalidate and idle collection on error
     const { schema, tag } = action.meta;
-    actions.push(makeIndexAction(
+    dispatch(makeIndexAction(
       action,
       REFERENCE_STATUS,
       {
@@ -159,31 +160,31 @@ const actionHandlers = {
       tag
     ));
   },
-  [CREATE_REQUEST]: (action, data, actions) => {
+  [CREATE_REQUEST]: (action, data, dispatch) => {
     // Change collection status to busy and invalid to prevent fetching.
     const schema = action.meta.schema;
-    actions.push(makeIndexAction(
+    dispatch(makeIndexAction(
       action,
       REFERENCE_STATUS,
       { validationStatus: validationStatus.INVALID, busyStatus: busyStatus.BUSY },
       schema
     ));
   },
-  [CREATE_SUCCESS]: (action, data, actions) => {
+  [CREATE_SUCCESS]: (action, data, dispatch) => {
     // Dispatch created objects to storage and change collection status to invalid, idle
-    data.map(item => actions.push(makeObjectAction(action, OBJECT_CREATED, item)));
+    data.map(item => dispatch(makeObjectAction(action, OBJECT_CREATED, item)));
     const schema = action.meta.schema;
-    actions.push(makeIndexAction(
+    dispatch(makeIndexAction(
       action,
       REFERENCE_STATUS,
       { validationStatus: validationStatus.INVALID, busyStatus: busyStatus.IDLE },
       schema
     ));
   },
-  [CREATE_ERROR]: (action, data, actions) => {
+  [CREATE_ERROR]: (action, data, dispatch) => {
     // Change collection status to idle and invalid to fetch again.
     const schema = action.meta.schema;
-    actions.push(makeIndexAction(
+    dispatch(makeIndexAction(
       action,
       REFERENCE_STATUS,
       {
@@ -193,33 +194,33 @@ const actionHandlers = {
       schema
     ));
   },
-  [UPDATE_REQUEST]: (action, data, actions) => {
+  [UPDATE_REQUEST]: (action, data, dispatch) => {
     // Change collection status to busy and invalid to prevent fetching and because of
     // local changes in storage state with updated item.
     const schema = action.meta.schema;
-    actions.push(makeIndexAction(
+    dispatch(makeIndexAction(
       action,
       REFERENCE_STATUS,
       { validationStatus: validationStatus.INVALID, busyStatus: busyStatus.BUSY },
       schema
     ));
-    data.map(item => actions.push(makeObjectAction(action, OBJECT_UPDATING, item)));
+    data.map(item => dispatch(makeObjectAction(action, OBJECT_UPDATING, item)));
   },
-  [UPDATE_SUCCESS]: (action, data, actions) => {
+  [UPDATE_SUCCESS]: (action, data, dispatch) => {
     // Dispatch updated objects from and change collections status to idle & invalid
-    data.map(item => actions.push(makeObjectAction(action, OBJECT_UPDATED, item)));
+    data.map(item => dispatch(makeObjectAction(action, OBJECT_UPDATED, item)));
     const schema = action.meta.schema;
-    actions.push(makeIndexAction(
+    dispatch(makeIndexAction(
       action,
       REFERENCE_STATUS,
       { validationStatus: validationStatus.INVALID, busyStatus: busyStatus.IDLE },
       schema
     ));
   },
-  [UPDATE_ERROR]: (action, data, actions) => {
+  [UPDATE_ERROR]: (action, data, dispatch) => {
     // Change collection status to idle and invalid
     const schema = action.meta.schema;
-    actions.push(makeIndexAction(
+    dispatch(makeIndexAction(
       action,
       REFERENCE_STATUS,
       {
@@ -229,33 +230,33 @@ const actionHandlers = {
       schema
     ));
   },
-  [REMOVE_REQUEST]: (action, data, actions) => {
+  [REMOVE_REQUEST]: (action, data, dispatch) => {
     // Change collections status to busy and invalid because of removing item in
     // local storage state
     const schema = action.meta.schema;
-    actions.push(makeIndexAction(
+    dispatch(makeIndexAction(
       action,
       REFERENCE_STATUS,
       { validationStatus: validationStatus.INVALID, busyStatus: busyStatus.BUSY },
       schema
     ));
-    data.map(item => actions.push(makeObjectAction(action, OBJECT_REMOVING, item)));
+    data.map(item => dispatch(makeObjectAction(action, OBJECT_REMOVING, item)));
   },
-  [REMOVE_SUCCESS]: (action, data, actions) => {
+  [REMOVE_SUCCESS]: (action, data, dispatch) => {
     // Remove object if already not removed during request
-    data.map(item => actions.push(makeObjectAction(action, OBJECT_REMOVED, item)));
+    data.map(item => dispatch(makeObjectAction(action, OBJECT_REMOVED, item)));
     const schema = action.meta.schema;
-    actions.push(makeIndexAction(
+    dispatch(makeIndexAction(
       action,
       REFERENCE_STATUS,
       { validationStatus: validationStatus.INVALID, busyStatus: busyStatus.IDLE },
       schema
     ));
   },
-  [REMOVE_ERROR]: (action, data, actions) => {
+  [REMOVE_ERROR]: (action, data, dispatch) => {
     // Change collections status to idle and invalid
     const schema = action.meta.schema;
-    actions.push(makeIndexAction(
+    dispatch(makeIndexAction(
       action,
       REFERENCE_STATUS,
       {
@@ -325,20 +326,19 @@ export default store => next => action => {
   }
 
   const actions = [];
+  const dispatch = dispatchAction => actions.push(dispatchAction);
 
   // First dispatch included objects
   const included = getIncluded(action.payload);
-  included.map(item => actions.push(makeObjectAction(action, OBJECT_FETCHED, item)));
+  included.map(item => dispatch(makeObjectAction(action, OBJECT_FETCHED, item)));
 
   // Find handler for supported action type to make appropriate logic
   const data = getData(action.payload);
-  actionHandlers[action.type](action, data, actions);
+  actionHandlers[action.type](action, data, dispatch);
 
-  if (_.isEmpty(actions)) {
-    return next(action);
+  if (!_.isEmpty(actions)) {
+    store.dispatch(batchActions(actions));
   }
-
-  store.dispatch(batchActions(actions))
 
   // After middleware handled action pass input action to next
   return next(action);
