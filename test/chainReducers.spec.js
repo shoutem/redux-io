@@ -4,42 +4,12 @@ import { expect } from 'chai';
 import {
   chainReducers,
 } from '../src';
-
-function reducerNormal(state = {}, action){
-  switch (action.type) {
-    case 'test':
-      return { ...state, data: action.payload };
-    default:
-      return state;
-  }
-}
-
-function reducerOther(state = {}, action){
-  switch (action.type) {
-    case 'test':
-      return { ...state, dataOther: action.payload };
-    default:
-      return state;
-  }
-}
-
-function reducerSquare(state = {}, action){
-  switch (action.type) {
-    case 'test':
-      return { ...state, data: action.payload * action.payload };
-    default:
-      return state;
-  }
-}
-
-function reducerSquareArray(state = {}, action){
-  switch (action.type) {
-    case 'test':
-      return { ...state, data: action.payload.map(x => x * x) };
-    default:
-      return state;
-  }
-}
+import {
+  reducerNormal,
+  reducerOther,
+  reducerSquare,
+  reducerSquareArray,
+} from './helpers/reducers';
 
 describe('Chain reducer', () => {
   it('has a valid initial state', () => {
@@ -104,7 +74,7 @@ describe('Chain reducer', () => {
 
     const state = testReducer(initialState, action);
     const expectedState = {
-      data: [1,4],
+      data: [1, 4],
     };
     expect(state).to.deep.equal(expectedState);
   });
