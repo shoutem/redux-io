@@ -64,4 +64,8 @@ describe('Rio', () => {
     expect(resolvedSchemaConfig).to.equal(expectedSchemaConfig);
   });
 
+  it('register with invalid schema', () => {
+    expect(() => rio.registerSchema('Test'))
+      .to.throw('Schema argument is invalid. Only object of function are allowed.');
+  });
 });

@@ -206,7 +206,7 @@ describe('Find action creator', () => {
       headers: {
         'Content-Type': 'application/vnd.api+json',
       },
-      endpoint: 'api.test/{:param1}/{:param2}/abc',
+      endpoint: 'api.test/{param1}/{param2}/abc',
     };
 
     const schema = 'app.builder';

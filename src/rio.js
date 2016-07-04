@@ -4,8 +4,10 @@ function isSchemaConfigValid (config) {
   // TODO: do we want to validate schema configurations?
 }
 
-// Adds additional layer over library by providing central place for defining rio behavior
-// and enabling easier usage by resolving configurations, standardization, denormalization.
+/**
+ * Adds additional layer over library by providing central place for defining rio behavior
+ * and enabling easier usage by resolving configurations, standardization, denormalization.
+ */
 export class Rio {
   constructor() {
     this.schemaConfigs = {};
@@ -13,20 +15,22 @@ export class Rio {
   }
 
   /**
-   * Register schema configuration.
-   * Allows passing objects or resolve functions
+   * Register schema configuration. As schema configuration object or
+   * as passing a function that acts as schema resolver.
   */
   registerSchema(config) {
     if (_.isFunction(config)) {
       this.schemaResolvers.push(config);
-    } else {
+    } else if (_.isObject(config)) {
       this.schemaConfigs[config.schema] = config;
+    } else {
+      throw new Error('Schema argument is invalid. Only object of function are allowed.');
     }
   }
 
   /**
-   * Resolve schema by finding a
-   * Allows passing objects or resolve functions
+   * Resolve schema by finding a schema configuration object
+   * or by resolving schema with registered schema resolvers.
    */
   resolveSchema(schema) {
     let config = this.schemaConfigs[schema];
@@ -45,6 +49,9 @@ export class Rio {
     return config;
   }
 
+  /**
+   * Clears registered collections and resolvers
+   */
   clear() {
     this.schemaConfigs = {};
     this.schemaResolvers = [];

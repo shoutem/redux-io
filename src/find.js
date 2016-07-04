@@ -8,11 +8,16 @@ import {
 } from './middleware';
 import rio from './rio';
 
-// Replace endpoint placeholders '{:key}' with corresponding value of key in params dict
-// Unused params are resolved into query params as 'key=value' pairs and concatenated to endpoint
+/**
+ * Replace endpoint placeholders '{key}' with corresponding value of key in params dict.
+ * Unused params are resolved into query params as 'key=value' pairs and concatenated to endpoint
+ * @param endpoint
+ * @param params
+ * @returns {string}
+ */
 function buildEndpoint(endpoint, params) {
   const usedParams = [];
-  const paramEndpoint = endpoint.replace(/{:(\w+)}/g, (match, key) => {
+  const paramEndpoint = endpoint.replace(/{(\w+)}/g, (match, key) => {
     usedParams.push(key);
     return params[key];
   });
@@ -24,9 +29,13 @@ function buildEndpoint(endpoint, params) {
   return `${paramEndpoint}?${queryParams.join('&')}`;
 }
 
-// Encapsulates additional logic around rio.resolveSchema. In case schema argument is object,
-// function merges argument configuration with registered configuration in rio. Allowing
-// overriding base configuration.
+/**
+ * Encapsulates additional logic around rio.resolveSchema. In case schema argument is object,
+ * function merges argument configuration with registered configuration in rio. Allowing
+ * overriding base configuration.
+ * @param schema
+ * @returns config
+ */
 function resolveConfig(schema) {
   if (_.isString(schema)) {
     return rio.resolveSchema(schema);
@@ -38,15 +47,20 @@ function resolveConfig(schema) {
   return undefined;
 }
 
-
-// Action creator used to fetch data from api (GET). Find function expects schema name of
-// data which correspond with storage reducer or schema configuration object. In both cases
-// rio resolves schema with registered schema configurations, and in case of schema
-// configuration passed in argument it merges two configuration objects. Schema configuration
-// object holds config.request attribute which is configuration based on RSAA
-// configuration from redux-api-middleware, allowing full customization expect types
-// part of configuration. Tag arg is optional, but when used allows your collections with same
-// tag value to respond on received data.
+/**
+ * Action creator used to fetch data from api (GET). Find function expects schema name of
+ * data which correspond with storage reducer or schema configuration object. In both cases
+ * rio resolves schema with registered schema configurations, and in case of schema
+ * configuration passed in argument it merges two configuration objects. Schema configuration
+ * object holds config.request attribute which is configuration based on RSAA
+ * configuration from redux-api-middleware, allowing full customization expect types
+ * part of configuration. Tag arg is optional, but when used allows your collections with same
+ * tag value to respond on received data.
+ * @param schema
+ * @param tag
+ * @param params
+ * @returns action
+ */
 export default (schema, tag = '', params = {}) => {
   const config = resolveConfig(schema);
   if (!config) {
