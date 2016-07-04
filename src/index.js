@@ -75,3 +75,7 @@ export {
 
 import { enableRio } from './enableRio';
 export { enableRio };
+
+import mergeReducers from './mergeReducers';
+import chainReducers from './chainReducers';
+export { mergeReducers, chainReducers };
