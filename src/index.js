@@ -79,3 +79,6 @@ export { enableRio };
 import mergeReducers from './mergeReducers';
 import chainReducers from './chainReducers';
 export { mergeReducers, chainReducers };
+
+import rio from './rio';
+export default rio;
