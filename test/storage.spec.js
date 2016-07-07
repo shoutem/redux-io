@@ -289,6 +289,63 @@ describe('Storage reducer', () => {
     expect(nextStateItem).to.deep.equal(itemNew);
   });
 
+  it('skips partial update of item on object updating if object not found', () => {
+    const item = {
+      id: 3,
+      type: 'a',
+      attributes: {
+        aa: 1,
+        bb: [1, 2, 3],
+      },
+      relationships: {
+        cc: {
+          data: { id: 1, type: 'c' },
+        },
+        dd: {
+          data: [
+            { id: 1, type: 'c' },
+            { id: 2, type: 'd' },
+            { id: 3, type: 'e' },
+          ],
+        },
+      },
+    };
+    item[STATUS] = createStatus();
+    const initialState = { [item.id]: item };
+    const schema = 'schema_test';
+    const reducer = storage(schema, initialState);
+    deepFreeze(initialState);
+
+    const itemPatch = {
+      id: 2,
+      type: 'a',
+      attributes: {
+        bb: [2],
+      },
+      relationships: {
+        dd: {
+          data: [
+            { id: 2, type: 'd' },
+          ],
+        },
+      },
+    };
+
+    const action = {
+      type: OBJECT_UPDATING,
+      meta: {
+        schema,
+      },
+      payload: itemPatch,
+    };
+
+    const nextState = reducer(initialState, action);
+    const nextStateItem = nextState[itemPatch.id];
+
+    expect(nextStateItem).to.be.undefined;
+    expect(nextState).to.shallowDeepEqual(initialState);
+  });
+
   it('updates item and it\'s status in state on object updating', () => {
     const item = {
       id: 2,

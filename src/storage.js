@@ -72,6 +72,9 @@ export default function storage(schema, initialState = {}) {
     const currentItem = state[item.id];
     switch (action.type) {
       case OBJECT_UPDATING: {
+        if (!currentItem) {
+          return state;
+        }
         const patchedItem = patchItemInState(currentItem, item, action.meta);
         return { ...state, [item.id]: patchedItem };
       }
