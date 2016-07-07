@@ -23,6 +23,8 @@ export const createStatus = () => (
   }
 );
 
+export const getStatus = obj => _.get(obj, STATUS);
+
 export const updateStatus = (status, update) => (
   _.merge({}, status, update, { modifiedTimestamp: Date.now() })
 );

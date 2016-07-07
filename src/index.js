@@ -34,8 +34,16 @@ export { updated };
 import clear from './clear';
 export { clear };
 
-import ReduxApiStateDenormalizer from './denormalizer/ReduxApiStateDenormalizer';
-export { ReduxApiStateDenormalizer };
+import ReduxApiStateDenormalizer, {
+  createSchemasMap,
+} from './denormalizer/ReduxApiStateDenormalizer';
+export {
+  ReduxApiStateDenormalizer,
+  createSchemasMap,
+};
+
+import { getCollection } from './denormalizer/getCollection';
+export { getCollection };
 
 export { normalizeItem, normalizeCollection } from './normalizer';
 

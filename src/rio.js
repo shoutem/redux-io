@@ -10,8 +10,7 @@ function isSchemaConfigValid (config) {
  */
 export class Rio {
   constructor() {
-    this.schemaConfigs = {};
-    this.schemaResolvers = [];
+    this.clear();
   }
 
   /**
@@ -50,11 +49,27 @@ export class Rio {
   }
 
   /**
+   * Set instance of configured denormalizer used for denormalization with Rio.
+   */
+  setDenormalizer(denormalizer) {
+    this.denormalizer = denormalizer;
+  }
+
+  /**
+   * Set instance of configured denormalizer used for denormalization with Rio.
+   */
+  setSchemaPaths(schemaPaths) {
+    this.schemaPaths = schemaPaths;
+  }
+
+  /**
    * Clears registered collections and resolvers
    */
   clear() {
     this.schemaConfigs = {};
     this.schemaResolvers = [];
+    this.schemaPaths = {};
+    this.denormalizer = null;
   }
 }
 
