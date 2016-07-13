@@ -4,31 +4,31 @@ import rio from './rio';
 import { getStatus } from './status';
 import ReduxApiStateDenormalizer from './denormalizer/ReduxApiStateDenormalizer';
 
-function traverseState(obj, path = [], paths = {}) {
+function discoverSchemaPaths(obj, currentPath = [], discoveredPaths = {}) {
   const status = getStatus(obj);
   if (status) {
-    // eslint-disable-next-line no-param-reassign
     // TODO: add validation if schema path are repeating to throw warning
-    paths[status.schema] = path;
-    return paths;
+    // eslint-disable-next-line no-param-reassign
+    discoveredPaths[status.schema] = currentPath;
+    return discoveredPaths;
   }
 
   _.forOwn(obj, (propValue, prop) => {
     if (_.isPlainObject(propValue)) {
-      traverseState(propValue, [...path, prop], paths);
+      discoverSchemaPaths(propValue, [...currentPath, prop], discoveredPaths);
     } else if (_.isArray(propValue)) {
       _.forIn(propValue, (item, index) => {
-        traverseState(item, [...path, index], paths);
+        discoverSchemaPaths(item, [...currentPath, index], discoveredPaths);
       });
     }
   });
 
-  return paths;
+  return discoveredPaths;
 }
 
 export function enableRio(reducer) {
   const initialState = reducer(undefined, { type: 'unknown' });
-  const paths = traverseState(initialState);
+  const paths = discoverSchemaPaths(initialState);
 
   rio.setSchemaPaths(paths);
   rio.setDenormalizer(new ReduxApiStateDenormalizer());

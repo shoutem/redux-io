@@ -1,6 +1,7 @@
 /* eslint-disable no-unused-expressions */
 import _ from 'lodash';
 import { combineReducers } from 'redux';
+import sinon from 'sinon';
 import chai, { expect } from 'chai';
 import shallowDeepEqual from 'chai-shallow-deep-equal';
 import { batchActions } from 'redux-batched-actions';
@@ -28,7 +29,7 @@ function initializeState() {
   return testBatchedReducer(undefined, batchActions([{}]));
 }
 
-describe('EnableRio reducer', () => {
+describe('getCollection', () => {
   const initialData = {
     locations: {
       1: {
@@ -83,8 +84,14 @@ describe('EnableRio reducer', () => {
     return testBatchedReducer(undefined, batchActions([{}]));
   };
 
+  beforeEach(() => {
+    sinon.spy(console, 'warn');
+  });
+
+
   afterEach(() => {
     rio.clear();
+    console.warn.restore();
   });
 
   it('denormalize collection', () => {
@@ -111,15 +118,15 @@ describe('EnableRio reducer', () => {
 
   it('on invalid state throws appropriate error', () => {
     expect(() => getCollection(initialData.topLocations, '', 'locations'))
-      .to.throw('State is invalid, should be an object.');
+      .to.throw('State argument is invalid, should be an object.');
   });
 
   it('on invalid schema throws appropriate error', () => {
     const state = initializeState();
     expect(() => getCollection(initialData.topLocations, state))
-      .to.throw(
-      `Schema name is invalid. Check collection
-      configuration or passed schema argument`
+    .to.throw(
+      'Missing schema name in getCollection function. Schema needs to'
+      + ' be defined in collection or as argument.'
     );
   });
 
@@ -127,6 +134,25 @@ describe('EnableRio reducer', () => {
     const state = initializeState();
     expect(() => getCollection({}, state))
       .to.throw('Collection argument needs to be array.');
+  });
+
+  it('warns that schema is defined in collection an via argument', () => {
+    const state = initializeState();
+
+    expect(state.topLocations).to.shallowDeepEqual(initialData.topLocations);
+    expect(state.users.locationsStorage).to.shallowDeepEqual(initialData.locations);
+
+    const denormalizedTopLocations = getCollection(state.topLocations, state, 'locations');
+    expect(denormalizedTopLocations).to.have.length(2);
+    expect(denormalizedTopLocations).to.be.shallowDeepEqual(expectedDenormalizedTopLocations);
+
+    expect(console.warn.calledOnce).to.be.true;
+    expect(console.warn.calledWith(
+      `getCollection gets both collection schema (locations)`
+      + ` and argument schema (locations). Collection schema has priority`
+      + ' over schema argument.'
+    )).to.be.true;
+
   });
 
   it('on state without storage for requested schema', () => {

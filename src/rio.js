@@ -1,7 +1,51 @@
 import _ from 'lodash';
+import Ajv from 'ajv';
 
-function isSchemaConfigValid (config) {
-  // TODO: do we want to validate schema configurations?
+const ajv = new Ajv({ allErrors: true });
+const schemaDefinition = {
+  type: 'object',
+  properties: {
+    schema: {
+      type: 'string',
+    },
+    request: {
+      type: 'object',
+      properties: {
+        endpoint: {
+          type: 'string',
+        },
+        headers: {
+          type: 'object',
+        },
+        method: {
+          type: 'string',
+        },
+        types: {
+          type: 'array',
+        },
+      },
+      additionalProperties: false,
+      required: [
+        'endpoint',
+        'headers',
+      ],
+    },
+  },
+  additionalProperties: false,
+  required: [
+    'schema',
+    'request',
+  ],
+};
+
+export function validateSchemaConfig(config) {
+  const validResult = ajv.validate(schemaDefinition, config);
+  if (!validResult) {
+    throw new Error(
+      `Schema configuration is invalid. Error: ${ajv.errorsText(validResult.errors)}`
+      + `Current schema config: ${config}`
+    );
+  }
 }
 
 /**
@@ -21,6 +65,7 @@ export class Rio {
     if (_.isFunction(config)) {
       this.schemaResolvers.push(config);
     } else if (_.isObject(config)) {
+      validateSchemaConfig(config);
       this.schemaConfigs[config.schema] = config;
     } else {
       throw new Error('Schema argument is invalid. Only object of function are allowed.');
@@ -40,6 +85,7 @@ export class Rio {
     this.schemaResolvers.forEach(resolver => {
       config = resolver(schema);
       if (config) {
+        validateSchemaConfig(config);
         return false;
       }
       return true;

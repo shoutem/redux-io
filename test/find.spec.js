@@ -156,12 +156,16 @@ describe('Find action creator', () => {
   it('creates a invalid action with missing registered schema', () => {
     const schema = 'app.builder';
     const tag = 'collection_test';
-    expect(() => find(schema, tag)).to.throw('Schema is invalid.');
+    expect(() => find(schema, tag)).to.throw(
+      `Couldn't resolve schema ${schema} in function find`
+    );
   });
 
   it('creates a invalid action with undefined schema', () => {
     const tag = 'collection_test';
-    expect(() => find(undefined, tag)).to.throw('Schema is invalid.');
+    expect(() => find(undefined, tag)).to.throw(
+      `Couldn't resolve schema undefined in function find.`
+    );
   });
 
   it('creates a invalid action with missing endpoint', () => {

@@ -31,6 +31,7 @@ describe('Rio', () => {
       schema,
       request: {
         endpoint: `api.test.${schema}`,
+        headers: {},
       },
     }));
 
@@ -41,9 +42,24 @@ describe('Rio', () => {
       schema: schemaName,
       request: {
         endpoint: `api.test.${schemaName}`,
+        headers: {},
       },
     }
     expect(resolvedSchemaConfig).to.deep.equal(expectedSchemaConfig);
+  });
+
+  it('register schema resolver that returns invalid schema', () => {
+    rio.registerSchema((schema) => ({
+      schema,
+      request: {
+        endpoint: `api.test.${schema}`,
+      },
+    }));
+
+    const schemaName = 'app.builder';
+    expect(() => rio.resolveSchema(schemaName))
+      .to.throw('Schema configuration is invalid. Error:'
+      + ' data.request should have required property \'headers\'');
   });
 
   it('resolve schema with blank rio', () => {
@@ -64,8 +80,27 @@ describe('Rio', () => {
     expect(resolvedSchemaConfig).to.equal(expectedSchemaConfig);
   });
 
-  it('register with invalid schema', () => {
+  it('register with invalid schema config type', () => {
     expect(() => rio.registerSchema('Test'))
       .to.throw('Schema argument is invalid. Only object of function are allowed.');
+  });
+
+  it('register invalid schema object', () => {
+    const config = {
+      headers: {
+        'Content-Type': 'application/vnd.api+json',
+      },
+      schema: 'api.test',
+    };
+    const schema = 'app.builder';
+    const schemaConfig = {
+      schema,
+      request: config,
+    };
+
+    expect(() => rio.registerSchema(schemaConfig))
+      .to.throw('Schema configuration is invalid. Error:'
+      + ' data.request should NOT have additional properties,'
+      + ' data.request should have required property \'endpoint\'');
   });
 });

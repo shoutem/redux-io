@@ -3,6 +3,32 @@ import rio from '../rio';
 import { createSchemasMap } from './ReduxApiStateDenormalizer';
 import { getStatus } from '../status';
 
+function resolveSchemaName(collection, schema) {
+  const collectionSchema = _.get(getStatus(collection), 'schema');
+
+  const isCollectionSchemaValid = !_.isEmpty(collectionSchema) && _.isString(collectionSchema);
+  const isArgumentSchemaValid = !_.isEmpty(schema) && _.isString(schema);
+
+  if (isCollectionSchemaValid && isArgumentSchemaValid) {
+    console.warn(
+      `getCollection gets both collection schema (${collectionSchema})`
+    + ` and argument schema (${schema}). Collection schema has priority`
+    + ' over schema argument.'
+    );
+  }
+  if (!isCollectionSchemaValid && !isArgumentSchemaValid) {
+    throw new Error(
+      'Missing schema name in getCollection function. Schema needs to'
+    + ' be defined in collection or as argument.'
+    );
+  }
+
+  if (isCollectionSchemaValid) {
+    return collectionSchema;
+  }
+  return schema;
+}
+
 /**
  * Connects rio configurations with denormalizer to simplify denormalization
  * of normalized data in state.
@@ -12,25 +38,14 @@ import { getStatus } from '../status';
  * @returns {{}}
  */
 export function getCollection(collection, state, schema = '') {
-  if (!_.isObject(state)) {
-    throw new Error('State is invalid, should be an object.');
-  }
   if (!_.isArray(collection)) {
     throw new Error('Collection argument needs to be array.');
   }
-
-  let resolvedSchema = schema;
-  const status = getStatus(collection);
-  if (status) {
-    resolvedSchema = status.schema;
+  if (!_.isObject(state)) {
+    throw new Error('State argument is invalid, should be an object.');
   }
 
-  if (!_.isString(resolvedSchema) || _.isEmpty(resolvedSchema)) {
-    throw new Error(
-      `Schema name is invalid. Check collection
-      configuration or passed schema argument`
-    );
-  }
+  const resolvedSchema = resolveSchemaName(collection, schema);
 
   const schemaPaths = rio.schemaPaths;
   if (!schemaPaths[resolvedSchema]) {

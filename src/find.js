@@ -64,7 +64,8 @@ function resolveConfig(schema) {
 export default (schema, tag = '', params = {}) => {
   const config = resolveConfig(schema);
   if (!config) {
-    throw new Error('Schema is invalid.');
+    const schemaName = schema && _.isObject(schema) ? schema.schema : schema;
+    throw new Error(`Couldn't resolve schema ${schemaName} in function find.`);
   }
   if (!_.isString(tag)) {
     throw new Error('Tag isn\'t string.');
