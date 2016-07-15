@@ -19,6 +19,7 @@ export function createSchemasMap(store, storeSchemasPaths) {
 }
 
 /**
+ * Create array of itemDescriptor from array of IDs
  *
  * @param collection - RIO collection or List of IDs
  * @param schema - used if collection is List of IDs
@@ -102,12 +103,10 @@ export default class ReduxApiStateDenormalizer extends ReduxDenormalizer {
 
   /**
    *
-   * Denormalize id for given schema.
+   * Denormalize item descriptor for given schema.
    * Storage is needed in ProvideStorage mode.
    *
-   * @param id
-   * @param schema
-   * @param storage
+   * @param itemDescriptor - { id, type }
    * @returns {{}}
    */
   denormalizeItem(itemDescriptor) {
@@ -119,8 +118,13 @@ export default class ReduxApiStateDenormalizer extends ReduxDenormalizer {
   }
 
   /**
+   * Denormalize single RIO entity or id value.
+   * If single is primitive value, schema is required so itemDescriptor can be created.
+   * Storage is needed in ProvideStorage mode.
    *
    * @param single - can be RIO single entity (with status) or id value
+   * @param schema (optional) - schema for ID, second argument
+   * @param storage (optional) - if no schema provided, storage is second argument otherwise third
    * @returns {{}}
    */
   denormalizeSingle(single) {
@@ -148,13 +152,15 @@ export default class ReduxApiStateDenormalizer extends ReduxDenormalizer {
     return mergedItem;
   }
 
+
   /**
-   * Denormalize collection for given schema
+   * Denormalize RIO collection.
+   * If single is primitive value, schema is required so itemDescriptor can be created.
    * Storage is needed in ProvideStorage mode.
    *
    * @param collection
-   * @param schema
-   * @param storage
+   * @param schema (optional) - schema for ID, second argument
+   * @param storage (optional) - if no schema provided, storage is second argument otherwise third
    * @returns {{}}
    */
   denormalizeCollection(collection) {
