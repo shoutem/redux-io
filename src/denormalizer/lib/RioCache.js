@@ -1,8 +1,18 @@
-import RelationshipCacheReducer from './RelationshipCacheReducer';
-import CollectionCacheReducer from './CollectionCacheReducer';
 import { createUniqueTargetKey } from '@shoutem/json-api-denormalizer';
 import { getModificationTime } from '../../status';
 import _ from 'lodash';
+
+function isItemInCollection(collection, item) {
+  return collection.find(collectionItem => collectionItem.id === item.id);
+}
+
+function isSingleRelation(relationshipData) {
+  return _.isPlainObject(relationshipData) || relationshipData === null;
+}
+
+function isCollection(entity) {
+  return _.isArray(entity);
+}
 
 export function getUniqueTargetKey(item) {
   return createUniqueTargetKey(item);
@@ -31,8 +41,6 @@ export default class RioCache {
   constructor(getNormalizedItem) {
     this.cache = {};
     this.getNormalizedItem = getNormalizedItem;
-    this.relationshipsCacheResolver = new RelationshipCacheReducer(this);
-    this.collectionCacheResolver = new CollectionCacheReducer(this);
   }
 
   flush() {
@@ -83,6 +91,14 @@ export default class RioCache {
     return !isRioEntityUpdated(item, cachedItem);
   }
 
+  isItemCacheValid(itemDescriptor) {
+    const normalizedItem = this.getNormalizedItem(itemDescriptor);
+    if (this.isItemModified(normalizedItem) || !this.areCachedItemRelationshipsValid(normalizedItem)) {
+      return false;
+    }
+    return true;
+  }
+
   isCollectionModified(collection) {
     if (!this.hasCollection(collection)) {
       return true;
@@ -91,29 +107,50 @@ export default class RioCache {
     return !isRioEntityUpdated(collection, cachedCollection);
   }
 
-  isRelationshipsCacheChanged(item) {
-    const relationshipsNames = Object.keys(item.relationships || {});
-
-    // TODO - can relationship be removed so there is no property at all?
-    // if so, new and old relationship keys must match to be valid!
-    return _.some(relationshipsNames,(relationshipName) => {
-      return this.relationshipsCacheResolver.isChanged(item, relationshipName);
-    });
-  }
-
-  isItemCacheValid(itemDescriptor) {
-    const normalizedItem = this.getNormalizedItem(itemDescriptor);
-    if (this.isItemModified(normalizedItem) || this.isRelationshipsCacheChanged(normalizedItem)) {
-      return false;
-    }
-    return true;
-  }
-
   isCollectionCacheValid(descriptorCollection) {
     if (this.isCollectionModified(descriptorCollection)) {
       return false;
     }
     const cachedCollection = this.getCollection(descriptorCollection);
-    return !this.collectionCacheResolver.isChanged(descriptorCollection, cachedCollection);
+
+    return !this.areCollectionItemsChanged(descriptorCollection, cachedCollection);
+  }
+
+  areCollectionItemsChanged(collection, cachedCollection = []) {
+    let matchedRelationshipsItems = 0;
+
+    const relationshipChanged = _.some(collection, item => {
+      if (!isItemInCollection(cachedCollection, item) || !this.isItemCacheValid(item)) {
+        return true;
+      } else {
+        matchedRelationshipsItems += 1;
+      }
+    });
+
+    return relationshipChanged || cachedCollection.length !== matchedRelationshipsItems;
+  }
+
+  areCachedItemRelationshipsValid(item) {
+    const relationshipsNames = Object.keys(item.relationships || {});
+
+    // TODO - can relationship be removed so there is no property at all?
+    // if so, new and old relationship keys must match to be valid!
+    return !_.some(relationshipsNames,(relationshipName) => {
+      return this.isRelationshipChanged(item, relationshipName);
+    });
+  }
+
+  isRelationshipChanged(item, relationshipName) {
+    const relationship = item.relationships[relationshipName].data;
+    const cachedItem = this.getItem(item);
+    const cachedRelationship = cachedItem[relationshipName];
+
+    if (isSingleRelation(relationship)) {
+      return !this.isItemCacheValid(relationship);
+    } else if (isCollection(relationship)) {
+      return this.areCollectionItemsChanged(relationship, cachedRelationship);
+    }
+
+    throw Error('Unknown relationship format!');
   }
 }

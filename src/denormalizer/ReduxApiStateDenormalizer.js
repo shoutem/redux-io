@@ -118,6 +118,11 @@ export default class ReduxApiStateDenormalizer extends ReduxDenormalizer {
     return this.cache.cacheItem(super.denormalizeItem(itemDescriptor));
   }
 
+  /**
+   *
+   * @param single - can be RIO single entity (with status) or id value
+   * @returns {{}}
+   */
   denormalizeSingle(single) {
     const { storage, schema } = resolveSchemaAndStorageFromArgs(arguments);
     const itemDescriptor = createSingleDescriptor(single, schema);
@@ -155,8 +160,6 @@ export default class ReduxApiStateDenormalizer extends ReduxDenormalizer {
   denormalizeCollection(collection) {
     const { storage, schema } = resolveSchemaAndStorageFromArgs(arguments);
     const descriptorCollection = createDesriptorCollection(collection, schema);
-
-    // Collection description contains { schema, tag }
 
     if (this.cache.isCollectionCacheValid(descriptorCollection)) {
       return this.cache.getCollection(collection);
