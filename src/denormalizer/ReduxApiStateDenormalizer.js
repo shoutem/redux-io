@@ -23,15 +23,53 @@ export function createSchemasMap(store, storeSchemasPaths) {
   return storage;
 }
 
-function createDesriptorCollection(collection) {
+/**
+ *
+ * @param collection - RIO collection or List of IDs
+ * @param schema - used if collection is List of IDs
+ * @returns {*}
+ */
+function createDesriptorCollection(collection, schema) {
   const collectionDescription = getCollectionDescription(collection);
   const descriptorCollection = collection.map(id => ({
     id,
-    type: collectionDescription.schema
+    type: schema || collectionDescription.schema
   }));
   applyStatus(collection, descriptorCollection);
   return descriptorCollection;
 }
+
+function createSingleDescriptor(single, schema) {
+  if (schema) {
+    return {
+      id: single,
+      type: schema,
+    };
+  }
+
+  return {
+    id: single.id,
+    type: single.type,
+  };
+}
+
+function resolveSchemaAndStorageFromArgs(args) {
+  let storage;
+  let schema;
+
+  if (args.length === 2) {
+    storage = args[1];
+  } else if (args.length === 3) {
+    schema = args[1];
+    storage = args[2];
+  }
+
+  return {
+    schema,
+    storage,
+  }
+}
+
 /**
  * Returns provided data in denormalized form
  */
@@ -92,16 +130,13 @@ export default class ReduxApiStateDenormalizer extends ReduxDenormalizer {
     return cache.cacheItem(denormalizedItem);
   }
 
-  /**
-   * Used to denromalize item in ProvideStorage mode or specific storage.
-   *
-   * @param item
-   * @param storage
-   * @returns {*}
-   */
-  denormalizeItemFromStorage(item, storage) {
+  denormalizeSingle(single) {
+    const { storage, schema } = resolveSchemaAndStorageFromArgs(arguments);
+    const itemDescriptor = createSingleDescriptor(single, schema);
+
+    // if storage is undefined, denormalizer is in Find storage mode
     this.updateStorage(storage);
-    return this.denormalizeItem(item);
+    return this.denormalizeItem(itemDescriptor);
   }
 
   denormalizeFromCache(normalizedItem, cachedItem) {
@@ -137,10 +172,12 @@ export default class ReduxApiStateDenormalizer extends ReduxDenormalizer {
    * @param storage
    * @returns {{}}
    */
-  denormalizeCollection(collection, storage) {
+  denormalizeCollection(collection) {
+    const { storage, schema } = resolveSchemaAndStorageFromArgs(arguments);
+
     // Collection description contains { schema, tag }
     this.updateStorage(storage);
-    const descriptorCollection = createDesriptorCollection(collection);
+    const descriptorCollection = createDesriptorCollection(collection, schema);
 
     const denormalizedCollection =
       this.cacheResolver.resolveCollection(descriptorCollection);
