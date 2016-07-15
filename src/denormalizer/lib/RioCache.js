@@ -93,7 +93,8 @@ export default class RioCache {
 
   isItemCacheValid(itemDescriptor) {
     const normalizedItem = this.getNormalizedItem(itemDescriptor);
-    if (this.isItemModified(normalizedItem) || !this.areCachedItemRelationshipsValid(normalizedItem)) {
+    if (this.isItemModified(normalizedItem) ||
+      !this.areCachedItemRelationshipsValid(normalizedItem)) {
       return false;
     }
     return true;
