@@ -241,9 +241,11 @@ describe('Create action creator', () => {
     store.dispatch(action)
       .then(() => {
         const performedActions = store.getActions();
-        expect(performedActions).to.have.length(5);
+        expect(performedActions).to.have.length(4);
 
-        const actionCollStatusBusy = performedActions[0];
+        const batchedActionsRequest = performedActions[0].payload;
+
+        const actionCollStatusBusy = batchedActionsRequest[0];
         expect(actionCollStatusBusy.type).to.equal(REFERENCE_STATUS);
         expect(actionCollStatusBusy.meta)
           .to.deep.equal({ ...expectedMeta, tag: '*' });
@@ -255,12 +257,14 @@ describe('Create action creator', () => {
 
         expect(performedActions[1].type).to.equal(CREATE_REQUEST);
 
-        const actionObjCreated = performedActions[2];
+        const batchedActionsSuccess = performedActions[2].payload;
+
+        const actionObjCreated = batchedActionsSuccess[0];
         expect(actionObjCreated.type).to.equal(OBJECT_CREATED);
         expect(actionObjCreated.meta).to.deep.equal({ ...expectedMeta, transformation: {} });
         expect(actionObjCreated.payload).to.deep.equal(expectedPayload.data);
 
-        const actionCollStatus = performedActions[3];
+        const actionCollStatus = batchedActionsSuccess[1];
         expect(actionCollStatus.type).to.equal(REFERENCE_STATUS);
         expect(actionCollStatus.meta).to.deep.equal({ ...expectedMeta, tag: '*' });
         const expectedCollStatusPayload = {
@@ -269,7 +273,7 @@ describe('Create action creator', () => {
         };
         expect(actionCollStatus.payload).to.deep.equal(expectedCollStatusPayload);
 
-        const successAction = performedActions[4];
+        const successAction = performedActions[3];
         expect(successAction.type).to.equal(CREATE_SUCCESS);
         expect(successAction.meta).to.deep.equal(expectedMeta);
         expect(successAction.payload).to.deep.equal(expectedPayload);

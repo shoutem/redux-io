@@ -1,6 +1,6 @@
 {
-  "name": "@shoutem/redux-api-state",
-  "version": "0.0.10-beta.6",
+  "name": "@shoutem/redux-io",
+  "version": "0.1.0",
   "description": "Action creators, reducers and middleware for simple handling of normalized json api data in state",
   "main": "lib/index.js",
   "files": [
@@ -38,6 +38,7 @@
     "babel-preset-stage-0": "^6.3.13",
     "babel-register": "^6.9.0",
     "chai": "^3.5.0",
+    "chai-shallow-deep-equal": "^1.4.0",
     "deep-freeze": "0.0.1",
     "eslint": "^2.11.1",
     "eslint-config-airbnb": "^9.0.1",
@@ -53,10 +54,12 @@
     "sinon": "^1.17.4"
   },
   "dependencies": {
+    "@shoutem/json-api-denormalizer": "^0.3.1",
+    "ajv": "^4.1.5",
     "lodash": "^4.13.1",
     "redux": "^3.3.1",
     "redux-api-middleware": "2.0.0-beta.1",
-    "redux-thunk": "^2.0.0",
-    "@shoutem/json-api-denormalizer": "^0.3.1"
+    "redux-batched-actions": "^0.1.2",
+    "redux-thunk": "^2.0.0"
   }
 }

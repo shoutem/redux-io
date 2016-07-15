@@ -1,4 +1,5 @@
-import { expect } from 'chai';
+import chai, { expect } from 'chai';
+import shallowDeepEqual from 'chai-shallow-deep-equal';
 import deepFreeze from 'deep-freeze';
 import {
   collection,
@@ -13,6 +14,8 @@ import {
   createStatus,
  } from '../src/status';
 
+chai.use(shallowDeepEqual);
+
 describe('Collection reducer', () => {
   it('has a valid initial state', () => {
     const testReducer = collection('test', 'test');
@@ -21,8 +24,8 @@ describe('Collection reducer', () => {
 
     expect(state[STATUS].validationStatus).to.eql(expectedStatus.validationStatus);
     expect(state[STATUS].busyStatus).to.eql(expectedStatus.busyStatus);
-    delete state[STATUS];
-    expect(state).to.eql([]);
+    expect(state[STATUS].schema).to.eql('test');
+    expect(state).to.shallowDeepEqual([]);
   });
 
   it('adds collection of indices on Fetch', () => {
@@ -51,8 +54,7 @@ describe('Collection reducer', () => {
 
     expect(nextState[STATUS].validationStatus).to.eql(validationStatus.VALID);
     expect(nextState[STATUS].busyStatus).to.eql(busyStatus.IDLE);
-    delete nextState[STATUS];
-    expect(nextState).to.eql(expectedState);
+    expect(nextState).to.shallowDeepEqual(expectedState);
   });
 
   it('ignores action with different schema', () => {
@@ -162,8 +164,7 @@ describe('Collection reducer', () => {
 
     expect(nextState[STATUS].validationStatus).to.eql(validationStatus.VALID);
     expect(nextState[STATUS].busyStatus).to.eql(busyStatus.IDLE);
-    delete nextState[STATUS];
-    expect(nextState).to.eql(expectedState);
+    expect(nextState).to.shallowDeepEqual(expectedState);
   });
 
   it('invalidates collection with broadcast status', () => {
@@ -263,8 +264,7 @@ describe('Collection reducer', () => {
 
     expect(nextState[STATUS].validationStatus).to.eql(validationStatus.VALID);
     expect(nextState[STATUS].busyStatus).to.eql(busyStatus.IDLE);
-    delete nextState[STATUS];
-    expect(nextState).to.deep.equal([]);
+    expect(nextState).to.shallowDeepEqual([]);
   });
 
   it('adds status to collection state without status', () => {
@@ -288,10 +288,10 @@ describe('Collection reducer', () => {
     };
 
     const customState = [];
+    deepFreeze(customState);
     const nextState = reducer(customState, action);
     expect(nextState[STATUS].validationStatus).to.eql(validationStatus.NONE);
     expect(nextState[STATUS].busyStatus).to.eql(busyStatus.IDLE);
-    delete nextState[STATUS];
-    expect(nextState).to.deep.equal(customState);
+    expect(nextState).to.shallowDeepEqual(customState);
   });
 });

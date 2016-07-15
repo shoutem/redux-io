@@ -1,5 +1,7 @@
 /* eslint-disable no-unused-expressions */
+/* eslint no-console: ["error", {allow: ["warn", "error"] }] */
 import _ from 'lodash';
+import { batchActions } from 'redux-batched-actions';
 import { transform } from './standardizer';
 import {
   validationStatus,
@@ -323,7 +325,8 @@ export default store => next => action => {
     return next(action);
   }
 
-  const dispatch = store.dispatch;
+  const actions = [];
+  const dispatch = dispatchAction => actions.push(dispatchAction);
 
   // First dispatch included objects
   const included = getIncluded(action.payload);
@@ -332,6 +335,10 @@ export default store => next => action => {
   // Find handler for supported action type to make appropriate logic
   const data = getData(action.payload);
   actionHandlers[action.type](action, data, dispatch);
+
+  if (!_.isEmpty(actions)) {
+    store.dispatch(batchActions(actions));
+  }
 
   // After middleware handled action pass input action to next
   return next(action);

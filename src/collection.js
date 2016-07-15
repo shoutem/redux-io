@@ -40,7 +40,10 @@ export default function collection(schema, tag, initialState = []) {
   }
   const collectionDescription = { schema, tag };
   // eslint-disable-next-line no-param-reassign
-  initialState[STATUS] = createStatus(collectionDescription);
+  initialState[STATUS] = createStatus();
+  // TODO-vedran: refactor status into context={status, config}
+  // eslint-disable-next-line no-param-reassign
+  initialState[STATUS] = updateStatus(initialState[STATUS], { schema });
   return (state = initialState, action) => {
     if (!isValid(action, schema, tag)) {
       return state;

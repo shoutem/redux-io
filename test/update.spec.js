@@ -127,9 +127,10 @@ describe('Update action creator', () => {
       .then(() => {
         const performedActions = store.getActions();
 
-        expect(performedActions).to.have.length(6);
+        expect(performedActions).to.have.length(4);
 
-        const actionCollStatusBusy = performedActions[0];
+        const batchedUpdatingActions = performedActions[0];
+        const actionCollStatusBusy = batchedUpdatingActions.payload[0];
         expect(actionCollStatusBusy.type).to.equal(REFERENCE_STATUS);
         expect(actionCollStatusBusy.meta)
           .to.deep.equal({ ...expectedMeta, tag: '*' });
@@ -139,22 +140,23 @@ describe('Update action creator', () => {
         };
         expect(actionCollStatusBusy.payload).to.deep.equal(expectedCollStatusBusyPayload);
 
-        const actionObjUpdating = performedActions[1];
+        const actionObjUpdating = batchedUpdatingActions.payload[1];
         expect(actionObjUpdating.type).to.equal(OBJECT_UPDATING);
         expect(actionObjUpdating.meta).to.deep.equal({ ...expectedMeta, transformation: {} });
         expect(actionObjUpdating.payload).to.deep.equal(item);
 
-        const actionUpdateRequest = performedActions[2];
+        const actionUpdateRequest = performedActions[1];
         expect(actionUpdateRequest.type).to.equal(UPDATE_REQUEST);
         expect(actionUpdateRequest.meta).to.deep.equal(expectedMeta);
         expect(actionUpdateRequest.payload).to.deep.equal(expectedPayload);
 
-        const actionObjUpdated = performedActions[3];
+        const batchedUpdatedActions = performedActions[2];
+        const actionObjUpdated = batchedUpdatedActions.payload[0];
         expect(actionObjUpdated.type).to.equal(OBJECT_UPDATED);
         expect(actionObjUpdated.meta).to.deep.equal({ ...expectedMeta, transformation: {} });
         expect(actionObjUpdated.payload).to.deep.equal(expectedPayload.data);
 
-        const actionCollStatusIdle = performedActions[4];
+        const actionCollStatusIdle = batchedUpdatedActions.payload[1];
         expect(actionCollStatusIdle.type).to.equal(REFERENCE_STATUS);
         expect(actionCollStatusIdle.meta)
           .to.deep.equal({ ...expectedMeta, tag: '*' });
@@ -164,7 +166,7 @@ describe('Update action creator', () => {
         };
         expect(actionCollStatusIdle.payload).to.deep.equal(expectedCollStatusIdlePayload);
 
-        const successAction = performedActions[5];
+        const successAction = performedActions[3];
         expect(successAction.type).to.equal(UPDATE_SUCCESS);
         expect(successAction.meta).to.deep.equal(expectedMeta);
         expect(successAction.payload).to.deep.equal(expectedPayload);

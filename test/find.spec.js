@@ -18,6 +18,7 @@ import { middlewareJsonApiSource } from '../src/middleware';
 import {
   busyStatus,
 } from '../src/status';
+import rio from '../src';
 
 describe('Find action creator', () => {
   const middlewares = [thunk, apiMiddleware, apiStateMiddleware];
@@ -26,6 +27,7 @@ describe('Find action creator', () => {
   afterEach(() => {
     nock.cleanAll();
     mockStore = configureMockStore(middlewares);
+    rio.clear();
   });
 
   it('creates a valid action', () => {
@@ -38,12 +40,18 @@ describe('Find action creator', () => {
 
     const schema = 'app.builder';
     const tag = 'collection_test';
-    const action = find(config, schema, tag);
+
+    const schemaConfig = {
+      schema,
+      request: config,
+    };
+
+    const action = find(schemaConfig, tag);
 
     expect(action[RSAA]).to.not.be.undefined;
     expect(action[RSAA].method).to.equal('GET');
     expect(action[RSAA].endpoint).to.equal(config.endpoint);
-    expect(action[RSAA].headers).to.equal(config.headers);
+    expect(action[RSAA].headers).to.deep.equal(config.headers);
     expect(action[RSAA].types).to.not.be.undefined;
 
     const types = action[RSAA].types;
@@ -60,23 +68,7 @@ describe('Find action creator', () => {
     expect(types[2].meta).to.deep.equal(expectedMeta);
   });
 
-  it('creates a invalid action with null config', () => {
-    const config = null;
-
-    const schema = 'app.builder';
-    const tag = 'collection_test';
-    expect(() => find(config, schema, tag)).to.throw('Config isn\'t object.');
-  });
-
-  it('creates a invalid action with string config', () => {
-    const config = '';
-
-    const schema = 'app.builder';
-    const tag = 'collection_test';
-    expect(() => find(config, schema, tag)).to.throw('Config isn\'t object.');
-  });
-
-  it('creates a invalid action with invalid schema', () => {
+  it('creates a valid action with predefined config', () => {
     const config = {
       headers: {
         'Content-Type': 'application/vnd.api+json',
@@ -84,9 +76,114 @@ describe('Find action creator', () => {
       endpoint: 'api.test',
     };
 
-    const schema = '';
+    const schema = 'app.builder';
     const tag = 'collection_test';
-    expect(() => find(config, schema, tag)).to.throw('Schema is invalid.');
+
+    const schemaConfig = {
+      schema,
+      request: config,
+    };
+    rio.registerSchema(schemaConfig);
+
+    const action = find(schema, tag);
+
+    expect(action[RSAA]).to.not.be.undefined;
+    expect(action[RSAA].method).to.equal('GET');
+    expect(action[RSAA].endpoint).to.equal(config.endpoint);
+    expect(action[RSAA].headers).to.deep.equal(config.headers);
+    expect(action[RSAA].types).to.not.be.undefined;
+
+    const types = action[RSAA].types;
+    const expectedMeta = {
+      source: middlewareJsonApiSource,
+      schema,
+      tag,
+    };
+    expect(types[0].type).to.equal(LOAD_REQUEST);
+    expect(types[0].meta).to.deep.equal(expectedMeta);
+    expect(types[1].type).to.equal(LOAD_SUCCESS);
+    expect(types[1].meta).to.deep.equal(expectedMeta);
+    expect(types[2].type).to.equal(LOAD_ERROR);
+    expect(types[2].meta).to.deep.equal(expectedMeta);
+  });
+
+  it('creates a valid action with merged config', () => {
+    const config = {
+      headers: {
+        'Content-Type': 'application/vnd.api+json',
+      },
+      endpoint: 'api.test',
+    };
+
+    const schema = 'app.builder';
+    const tag = 'collection_test';
+
+    const schemaConfig = {
+      schema,
+      request: config,
+    };
+    rio.registerSchema(schemaConfig);
+
+    const argSchemaConfig = {
+      schema,
+      request: {
+        endpoint: 'api.test2',
+      },
+    };
+
+    const action = find(argSchemaConfig, tag);
+
+    expect(action[RSAA]).to.not.be.undefined;
+    expect(action[RSAA].method).to.equal('GET');
+    expect(action[RSAA].endpoint).to.equal(argSchemaConfig.request.endpoint);
+    expect(action[RSAA].headers).to.deep.equal(config.headers);
+    expect(action[RSAA].types).to.not.be.undefined;
+
+    const types = action[RSAA].types;
+    const expectedMeta = {
+      source: middlewareJsonApiSource,
+      schema,
+      tag,
+    };
+    expect(types[0].type).to.equal(LOAD_REQUEST);
+    expect(types[0].meta).to.deep.equal(expectedMeta);
+    expect(types[1].type).to.equal(LOAD_SUCCESS);
+    expect(types[1].meta).to.deep.equal(expectedMeta);
+    expect(types[2].type).to.equal(LOAD_ERROR);
+    expect(types[2].meta).to.deep.equal(expectedMeta);
+  });
+
+  it('creates a invalid action with missing registered schema', () => {
+    const schema = 'app.builder';
+    const tag = 'collection_test';
+    expect(() => find(schema, tag)).to.throw(
+      `Couldn't resolve schema ${schema} in function find`
+    );
+  });
+
+  it('creates a invalid action with undefined schema', () => {
+    const tag = 'collection_test';
+    expect(() => find(undefined, tag)).to.throw(
+      `Couldn't resolve schema undefined in function find.`
+    );
+  });
+
+  it('creates a invalid action with missing endpoint', () => {
+    const config = {
+      headers: {
+        'Content-Type': 'application/vnd.api+json',
+      },
+    };
+
+    const schema = 'app.builder';
+    const tag = 'collection_test';
+
+    const schemaConfig = {
+      schema,
+      request: config,
+    };
+
+    expect(() => find(schemaConfig, tag)).to.throw('Undefined configuration request endpoint.');
   });
 
   it('creates a invalid action with invalid tag', () => {
@@ -99,7 +196,59 @@ describe('Find action creator', () => {
 
     const schema = 'app.builder';
     const tag = {};
-    expect(() => find(config, schema, tag)).to.throw('Tag isn\'t string.');
+
+    const schemaConfig = {
+      schema,
+      request: config,
+    };
+
+    expect(() => find(schemaConfig, tag)).to.throw('Tag isn\'t string.');
+  });
+
+  it('creates a valid action with valid endpoint with filled params', () => {
+    const config = {
+      headers: {
+        'Content-Type': 'application/vnd.api+json',
+      },
+      endpoint: 'api.test/{param1}/{param2}/abc',
+    };
+
+    const schema = 'app.builder';
+    const tag = 'collection_test';
+
+    const schemaConfig = {
+      schema,
+      request: config,
+    };
+
+    const params = {
+      param1: 'a',
+      param2: 'b',
+      q1: 'c',
+      q2: 'd',
+    };
+
+    const action = find(schemaConfig, tag, params);
+
+    const expectedEndpoint = 'api.test/a/b/abc?q1=c&q2=d';
+    expect(action[RSAA]).to.not.be.undefined;
+    expect(action[RSAA].method).to.equal('GET');
+    expect(action[RSAA].endpoint).to.equal(expectedEndpoint);
+    expect(action[RSAA].headers).to.deep.equal(config.headers);
+    expect(action[RSAA].types).to.not.be.undefined;
+
+    const types = action[RSAA].types;
+    const expectedMeta = {
+      source: middlewareJsonApiSource,
+      schema,
+      tag,
+    };
+    expect(types[0].type).to.equal(LOAD_REQUEST);
+    expect(types[0].meta).to.deep.equal(expectedMeta);
+    expect(types[1].type).to.equal(LOAD_SUCCESS);
+    expect(types[1].meta).to.deep.equal(expectedMeta);
+    expect(types[2].type).to.equal(LOAD_ERROR);
+    expect(types[2].meta).to.deep.equal(expectedMeta);
   });
 
   it('produces valid storage and collection actions', done => {
@@ -137,15 +286,22 @@ describe('Find action creator', () => {
       endpoint: 'http://api.server.local/apps',
     };
 
-    const action = find(config, schema, tag);
+    const schemaConfig = {
+      schema,
+      request: config,
+    };
+
+    const action = find(schemaConfig, tag);
 
     const store = mockStore({});
     store.dispatch(action)
       .then(() => {
         const performedActions = store.getActions();
-        expect(performedActions).to.have.length(6);
+        expect(performedActions).to.have.length(4);
 
-        const actionCollStatus = performedActions[0];
+        const batchedActionsRequest = performedActions[0].payload;
+
+        const actionCollStatus = batchedActionsRequest[0];
         expect(actionCollStatus.type).to.equal(REFERENCE_STATUS);
         expect(actionCollStatus.meta).to.deep.equal({ ...expectedMeta });
         const expectedCollStatusPayload = { busyStatus: busyStatus.BUSY };
@@ -153,17 +309,19 @@ describe('Find action creator', () => {
 
         expect(performedActions[1].type).to.equal(LOAD_REQUEST);
 
-        const actionObjFetched = performedActions[2];
+        const batchedActionsSuccess = performedActions[2].payload;
+
+        const actionObjFetched = batchedActionsSuccess[0];
         expect(actionObjFetched.type).to.equal(OBJECT_FETCHED);
         expect(actionObjFetched.meta).to.deep.equal({ ...expectedMeta, transformation: {} });
         expect(actionObjFetched.payload).to.deep.equal(expectedPayload.data[0]);
 
-        const actionCollFetched = performedActions[4];
+        const actionCollFetched = batchedActionsSuccess[2];
         expect(actionCollFetched.type).to.equal(REFERENCE_FETCHED);
         expect(actionCollFetched.meta).to.deep.equal({ ...expectedMeta });
         expect(actionCollFetched.payload).to.deep.equal(expectedPayload.data);
 
-        const successAction = performedActions[5];
+        const successAction = performedActions[3];
         expect(successAction.type).to.equal(LOAD_SUCCESS);
         expect(successAction.meta).to.deep.equal(expectedMeta);
         expect(successAction.payload).to.deep.equal(expectedPayload);

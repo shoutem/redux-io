@@ -38,8 +38,16 @@ export { updated };
 import clear from './clear';
 export { clear };
 
-import ReduxApiStateDenormalizer from './denormalizer/ReduxApiStateDenormalizer';
-export { ReduxApiStateDenormalizer };
+import ReduxApiStateDenormalizer, {
+  createSchemasMap,
+} from './denormalizer/ReduxApiStateDenormalizer';
+export {
+  ReduxApiStateDenormalizer,
+  createSchemasMap,
+};
+
+import { getCollection } from './denormalizer/getCollection';
+export { getCollection };
 
 export { normalizeItem, normalizeCollection } from './normalizer';
 
@@ -76,3 +84,13 @@ export {
   shouldRefresh,
   getTransformation,
 } from './status';
+
+import { enableRio } from './enableRio';
+export { enableRio };
+
+import mergeReducers from './mergeReducers';
+import chainReducers from './chainReducers';
+export { mergeReducers, chainReducers };
+
+import rio from './rio';
+export default rio;

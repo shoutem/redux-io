@@ -53,6 +53,10 @@ function patchItemInState(currentItem, patch, actionMeta) {
 // of typed storage reducers that are handling specific
 // OBJECT_ type actions.
 export default function storage(schema, initialState = {}) {
+  // eslint-disable-next-line no-param-reassign
+  initialState[STATUS] = {
+    schema,
+  };
   return (state = initialState, action) => {
     if (_.get(action, 'meta.schema') !== schema) {
       return state;
@@ -68,6 +72,9 @@ export default function storage(schema, initialState = {}) {
     const currentItem = state[item.id];
     switch (action.type) {
       case OBJECT_UPDATING: {
+        if (!currentItem) {
+          return state;
+        }
         const patchedItem = patchItemInState(currentItem, item, action.meta);
         return { ...state, [item.id]: patchedItem };
       }
@@ -91,7 +98,14 @@ export default function storage(schema, initialState = {}) {
         return newState;
       }
       default:
-        return state;
+        if (state[STATUS]) {
+          return state;
+        }
+        const newState = [...state];
+        newState[STATUS] = {
+          schema,
+        };
+        return newState;
     }
   };
 }
