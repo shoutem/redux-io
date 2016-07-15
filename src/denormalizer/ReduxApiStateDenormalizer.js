@@ -1,13 +1,8 @@
 import ReduxDenormalizer from './ReduxDenormalizer';
 import RioCache from './lib/RioCache';
-import CacheResolver from './lib/CacheResolver';
 import { getCollectionDescription } from '../collection';
 import _ from 'lodash';
 import { applyStatus } from './../status';
-
-// As redux has only one store, we can create single instance of cache
-// for every denormlizer instance
-const cache = new RioCache();
 
 /**
  * Created getStore for ReduxDenormalizer by using storageMap to find relationships.
@@ -91,6 +86,8 @@ export default class ReduxApiStateDenormalizer extends ReduxDenormalizer {
    * @param storeSchemasPaths - { schema: pathInStoreToSchema }
    */
   constructor(getStore, storeSchemasPaths) {
+    // TODO(Braco) - optimize relationships cache
+    // TODO(Braco) - use state entities to detect change
     if (getStore && storeSchemasPaths) {
       // FindStorage mode
       super(() => createSchemasMap(getStore(), storeSchemasPaths));
@@ -99,7 +96,8 @@ export default class ReduxApiStateDenormalizer extends ReduxDenormalizer {
       super();
     }
     this.denormalizeItem = this.denormalizeItem.bind(this);
-    this.cacheResolver = new CacheResolver(cache, this.denormalizeItem);
+    this.getNormalizedItem = this.getNormalizedItem.bind(this);
+    this.cache = new RioCache(this.getNormalizedItem);
   }
 
   /**
@@ -113,21 +111,11 @@ export default class ReduxApiStateDenormalizer extends ReduxDenormalizer {
    * @returns {{}}
    */
   denormalizeItem(itemDescriptor) {
-    const normalizedItem = this.getNormalizedItem(itemDescriptor);
-    const cachedItem = this.cacheResolver.resolveItem(normalizedItem);
-    let denormalizedItem;
-
-    if (cachedItem.isCached()) {
-      if (cachedItem.isValid()) {
-        denormalizedItem = cachedItem.get();
-      } else {
-        denormalizedItem = this.denormalizeFromCache(normalizedItem, cachedItem);
-      }
-    } else {
-      denormalizedItem = super.denormalizeItem(itemDescriptor);
+    if (this.cache.isItemCacheValid(itemDescriptor)) {
+      return this.cache.getItem(itemDescriptor);
     }
 
-    return cache.cacheItem(denormalizedItem);
+    return this.cache.cacheItem(super.denormalizeItem(itemDescriptor));
   }
 
   denormalizeSingle(single) {
@@ -137,14 +125,6 @@ export default class ReduxApiStateDenormalizer extends ReduxDenormalizer {
     // if storage is undefined, denormalizer is in Find storage mode
     this.updateStorage(storage);
     return this.denormalizeItem(itemDescriptor);
-  }
-
-  denormalizeFromCache(normalizedItem, cachedItem) {
-    return this.mergeDenormalizedItemData(
-      normalizedItem,
-      super.denormalizeItemAttributes(normalizedItem),
-      cachedItem.getNewRelationships()
-    );
   }
 
   /**
@@ -174,22 +154,27 @@ export default class ReduxApiStateDenormalizer extends ReduxDenormalizer {
    */
   denormalizeCollection(collection) {
     const { storage, schema } = resolveSchemaAndStorageFromArgs(arguments);
-
-    // Collection description contains { schema, tag }
-    this.updateStorage(storage);
     const descriptorCollection = createDesriptorCollection(collection, schema);
 
+    // Collection description contains { schema, tag }
+
+    if (this.cache.isCollectionCacheValid(descriptorCollection)) {
+      return this.cache.getCollection(collection);
+    }
+
+    this.updateStorage(storage);
+
     const denormalizedCollection =
-      this.cacheResolver.resolveCollection(descriptorCollection);
+      descriptorCollection.map(itemDescriptor => this.denormalizeItem(itemDescriptor));
 
     applyStatus(collection, denormalizedCollection);
-    return cache.cacheCollection(denormalizedCollection);
+    return this.cache.cacheCollection(denormalizedCollection);
   }
 
   /**
    * Clear cache
    */
   flushCache() {
-    cache.flush();
+    this.cache.flush();
   }
 }

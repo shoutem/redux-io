@@ -1,5 +1,8 @@
+import RelationshipCacheReducer from './RelationshipCacheReducer';
+import CollectionCacheReducer from './CollectionCacheReducer';
 import { createUniqueTargetKey } from '@shoutem/json-api-denormalizer';
 import { getModificationTime } from '../../status';
+import _ from 'lodash';
 
 export function getUniqueTargetKey(item) {
   return createUniqueTargetKey(item);
@@ -25,8 +28,11 @@ function isRioEntityUpdated(entity, cachedEntity) {
  * Provides methods to validate, get and resolve new data with cached data.
  */
 export default class RioCache {
-  constructor() {
+  constructor(getNormalizedItem) {
     this.cache = {};
+    this.getNormalizedItem = getNormalizedItem;
+    this.relationshipsCacheResolver = new RelationshipCacheReducer(this);
+    this.collectionCacheResolver = new CollectionCacheReducer(this);
   }
 
   flush() {
@@ -69,7 +75,7 @@ export default class RioCache {
     return this.getCacheByKey(collectionKey);
   }
 
-  isItemChanged(item) {
+  isItemModified(item) {
     if (!this.hasItem(item)) {
       return true;
     }
@@ -77,7 +83,7 @@ export default class RioCache {
     return !isRioEntityUpdated(item, cachedItem);
   }
 
-  isCollectionChanged(collection) {
+  isCollectionModified(collection) {
     if (!this.hasCollection(collection)) {
       return true;
     }
@@ -85,4 +91,29 @@ export default class RioCache {
     return !isRioEntityUpdated(collection, cachedCollection);
   }
 
+  isRelationshipsCacheChanged(item) {
+    const relationshipsNames = Object.keys(item.relationships || {});
+
+    // TODO - can relationship be removed so there is no property at all?
+    // if so, new and old relationship keys must match to be valid!
+    return _.some(relationshipsNames,(relationshipName) => {
+      return this.relationshipsCacheResolver.isChanged(item, relationshipName);
+    });
+  }
+
+  isItemCacheValid(itemDescriptor) {
+    const normalizedItem = this.getNormalizedItem(itemDescriptor);
+    if (this.isItemModified(normalizedItem) || this.isRelationshipsCacheChanged(normalizedItem)) {
+      return false;
+    }
+    return true;
+  }
+
+  isCollectionCacheValid(descriptorCollection) {
+    if (this.isCollectionModified(descriptorCollection)) {
+      return false;
+    }
+    const cachedCollection = this.getCollection(descriptorCollection);
+    return !this.collectionCacheResolver.isChanged(descriptorCollection, cachedCollection);
+  }
 }

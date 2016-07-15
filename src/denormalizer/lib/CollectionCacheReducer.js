@@ -1,13 +1,7 @@
-function didCollectionChange(cachedCollection, newCollection, matchedItemsLength) {
-  return (!cachedCollection && !!newCollection) ||
-    (
-      cachedCollection.length !== newCollection.length ||
-      cachedCollection.length !== matchedItemsLength
-    );
-}
+import _ from 'lodash';
 
 function isItemInCollection(collection, item) {
-  return collection && collection.find(collectionItem => collectionItem.id === item.id);
+  return collection.find(collectionItem => collectionItem.id === item.id);
 }
 
 /**
@@ -16,36 +10,21 @@ function isItemInCollection(collection, item) {
  * Provides method to check if any change occur.
  */
 export default class {
-  constructor(collection, cache, denormalizeItem) {
-    this.collection = collection;
+  constructor(cache) {
     this.cache = cache;
-    this.denormalizeItem = denormalizeItem;
-    this.matchedRelationshipsItems = 0;
-    this.relationshipChanged = false;
   }
 
-  reduce(cachedCollection) {
-    const reducedCollection = this.collection.map(item => {
-      const cachedItem = this.cache.getItem(item);
+  isChanged(collection, cachedCollection = []) {
+    let matchedRelationshipsItems = 0;
 
-      const relationshipItem = this.denormalizeItem(item);
-      if (isItemInCollection(cachedCollection, item)) {
-        this.matchedRelationshipsItems += 1;
+    const relationshipChanged = _.some(collection, item => {
+      if (!isItemInCollection(cachedCollection, item) || !this.cache.isItemCacheValid(item)) {
+        return true;
+      } else {
+        matchedRelationshipsItems += 1;
       }
-      if (cachedItem !== relationshipItem) {
-        this.relationshipChanged = true;
-        return relationshipItem;
-      }
-      return cachedItem;
     });
 
-    if (didCollectionChange(cachedCollection, reducedCollection, this.matchedRelationshipsItems)) {
-      this.relationshipChanged = true;
-    }
-    return reducedCollection;
-  }
-
-  isChanged() {
-    return this.relationshipChanged;
+    return relationshipChanged || cachedCollection.length !== matchedRelationshipsItems;
   }
 }

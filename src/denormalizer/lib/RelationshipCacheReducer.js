@@ -15,43 +15,22 @@ function isCollection(entity) {
  * Provides method to check if any change occur.
  */
 export default class {
-  constructor(relationship, cache, denormalizeItem) {
-    this.relationship = relationship;
+  constructor(cache) {
     this.cache = cache;
-    this.denormalizeItem = denormalizeItem;
-    this.relationshipChanged = false;
+    this.collectionRelationshipReducer = new CollectionCacheReducer(this.cache);
   }
 
-  reduce(cachedRelationship) {
-    if (isSingleRelation(this.relationship)) {
-      return this.reduceSingleRelationship(cachedRelationship);
-    } else if (isCollection(this.relationship)) {
-      return this.reduceCollectionRelationship(cachedRelationship);
+  isChanged(item, relationshipName) {
+    const relationship = item.relationships[relationshipName].data;
+    const cachedItem = this.cache.getItem(item);
+    const cachedRelationship = cachedItem[relationshipName];
+
+    if (isSingleRelation(relationship)) {
+      return !this.cache.isItemCacheValid(relationship);
+    } else if (isCollection(relationship)) {
+      return this.collectionRelationshipReducer.isChanged(relationship, cachedRelationship);
     }
 
     throw Error('Unknown relationship format!');
-  }
-
-  reduceSingleRelationship(cachedRelationship) {
-    const newRelationship =
-      this.relationship === null ? null : this.denormalizeItem(this.relationship);
-    if (cachedRelationship !== newRelationship) {
-      this.relationshipChanged = true;
-    }
-    return newRelationship;
-  }
-
-  reduceCollectionRelationship(cachedRelationship) {
-    const collectionRelationshipReducer =
-      new CollectionCacheReducer(this.relationship, this.cache, this.denormalizeItem);
-    const newRelationship = collectionRelationshipReducer.reduce(cachedRelationship);
-    if (collectionRelationshipReducer.isChanged()) {
-      this.relationshipChanged = true;
-    }
-    return newRelationship;
-  }
-
-  isChanged() {
-    return this.relationshipChanged;
   }
 }
