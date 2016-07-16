@@ -3,7 +3,7 @@ import {
   LOAD_SUCCESS,
   loaded,
   middlewareJsonApiSource,
-} from '../src';
+} from '../../src';
 
 describe('Loaded action creator', () => {
   it('creates valid action', () => {

@@ -1,52 +1,5 @@
 import _ from 'lodash';
-import Ajv from 'ajv';
-
-const ajv = new Ajv({ allErrors: true });
-const schemaDefinition = {
-  type: 'object',
-  properties: {
-    schema: {
-      type: 'string',
-    },
-    request: {
-      type: 'object',
-      properties: {
-        endpoint: {
-          type: 'string',
-        },
-        headers: {
-          type: 'object',
-        },
-        method: {
-          type: 'string',
-        },
-        types: {
-          type: 'array',
-        },
-      },
-      additionalProperties: false,
-      required: [
-        'endpoint',
-        'headers',
-      ],
-    },
-  },
-  additionalProperties: false,
-  required: [
-    'schema',
-    'request',
-  ],
-};
-
-export function validateSchemaConfig(config) {
-  const validResult = ajv.validate(schemaDefinition, config);
-  if (!validResult) {
-    throw new Error(
-      `Schema configuration is invalid. Error: ${ajv.errorsText(validResult.errors)}`
-      + `Current schema config: ${config}`
-    );
-  }
-}
+import { validateSchemaConfig } from './schemaConfig';
 
 /**
  * Adds additional layer over library by providing central place for defining rio behavior
@@ -76,7 +29,7 @@ export class Rio {
    * Resolve schema by finding a schema configuration object
    * or by resolving schema with registered schema resolvers.
    */
-  resolveSchema(schema) {
+  getSchema(schema) {
     let config = this.schemaConfigs[schema];
     if (config) {
       return config;

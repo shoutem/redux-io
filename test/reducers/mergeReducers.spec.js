@@ -2,18 +2,18 @@
 import _ from 'lodash';
 import { expect } from 'chai';
 import {
-  chainReducers,
-} from '../src';
+  mergeReducers,
+} from '../../src';
 import {
   reducerNormal,
   reducerOther,
   reducerSquare,
   reducerSquareArray,
-} from './helpers/reducers';
+} from './../helpers/reducers';
 
-describe('Chain reducer', () => {
+describe('Merge reducer', () => {
   it('has a valid initial state', () => {
-    const testReducer = chainReducers([
+    const testReducer = mergeReducers([
       reducerNormal,
       reducerOther,
     ]);
@@ -23,7 +23,7 @@ describe('Chain reducer', () => {
 
   it('extends state', () => {
     const initialState = {};
-    const testReducer = chainReducers([
+    const testReducer = mergeReducers([
       reducerNormal,
       reducerOther,
     ]);
@@ -43,7 +43,7 @@ describe('Chain reducer', () => {
 
   it('overrides state', () => {
     const initialState = {};
-    const testReducer = chainReducers([
+    const testReducer = mergeReducers([
       reducerNormal,
       reducerSquare,
     ]);
@@ -62,7 +62,7 @@ describe('Chain reducer', () => {
 
   it('merge arrays', () => {
     const initialState = {};
-    const testReducer = chainReducers([
+    const testReducer = mergeReducers([
       reducerNormal,
       reducerSquareArray,
     ]);

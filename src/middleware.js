@@ -292,13 +292,15 @@ function isValidAction(action) {
   }
   // Check that schema is defined
   if (!meta.schema) {
-    console.error('Schema is invalid.');
+    console.error('Action.meta.schema is undefined.');
     return false;
   }
   // Validate payload for payload-specific action, ignore others
   if (!actionsWithoutPayload.has(action.type)
     && !_.has(action, 'payload.data')) {
     console.error('Payload Data is invalid, expecting payload.data.');
+    // TODO: add maybe additional json-schema check for json-api?
+    // TODO: evaluate do we need to throw anything here-separate
     return false;
   }
   // Validate tag for tag-specific action, ignore others

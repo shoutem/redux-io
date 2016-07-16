@@ -3,14 +3,15 @@ import {
   REFERENCE_FETCHED,
   REFERENCE_STATUS,
   REFERENCE_CLEAR,
-} from './middleware';
+} from './../middleware';
 import {
   STATUS,
   validationStatus,
   busyStatus,
   createStatus,
   updateStatus,
-} from './status';
+  applyStatus,
+} from './../status';
 
 function isValid(action, schema, tag) {
   if (_.get(action, 'meta.schema') !== schema) {
@@ -30,18 +31,26 @@ function isValid(action, schema, tag) {
   return true;
 }
 
-// collection is generic collection reducer that enables creating
-// typed & named collection reducers that are handling specific
-// COLLECTION_ type actions with specific collection name.
-export default function collection(schema, tag, initialState = []) {
+function createDefaultStatus(schema) {
+  return updateStatus(
+    createStatus(),
+    {
+      schema,
+      type: 'one',
+    }
+  );
+}
+
+// single is generic single reducer that enables creating
+// typed & named single index reducers that are handling specific
+// type actions with specific collection name.
+export default function single(schema, tag = '', initialValue = '') {
   if (tag === '*') {
     throw new Error('Tag value \'*\' is reserved for redux-api-state and cannot be used.');
   }
   // eslint-disable-next-line no-param-reassign
-  initialState[STATUS] = createStatus();
-  // TODO-vedran: refactor status into context={status, config}
-  // eslint-disable-next-line no-param-reassign
-  initialState[STATUS] = updateStatus(initialState[STATUS], { schema });
+  const initialState = { value: initialValue };
+  applyStatus(initialState, createDefaultStatus(schema));
   return (state = initialState, action) => {
     if (!isValid(action, schema, tag)) {
       return state;
@@ -49,43 +58,45 @@ export default function collection(schema, tag, initialState = []) {
 
     switch (action.type) {
       case REFERENCE_FETCHED: {
-        const newState = action.payload.map(item => item.id);
-        newState[STATUS] = updateStatus(
+        const newState = {
+          value: action.payload[0] ? action.payload[0].id : initialValue,
+        };
+        applyStatus(newState, updateStatus(
           state[STATUS],
           {
             validationStatus: validationStatus.VALID,
             busyStatus: busyStatus.IDLE,
             error: false,
           }
-        );
+        ));
         return newState;
       }
       case REFERENCE_CLEAR: {
-        const newState = [];
-        newState[STATUS] = updateStatus(
+        const newState = { value: initialValue };
+        applyStatus(newState, updateStatus(
           state[STATUS],
           {
             validationStatus: validationStatus.VALID,
             busyStatus: busyStatus.IDLE,
             error: false,
           }
-        );
+        ));
         return newState;
       }
       case REFERENCE_STATUS: {
-        const newState = [...state];
-        newState[STATUS] = updateStatus(
-          state[STATUS],
-          action.payload
-        );
+        const newState = { value: state.value };
+        applyStatus(newState, updateStatus(
+            state[STATUS],
+            action.payload
+        ));
         return newState;
       }
       default: {
         if (state[STATUS]) {
           return state;
         }
-        const newState = [...state];
-        newState[STATUS] = createStatus();
+        const newState = { value: state.value ? state.value : initialValue };
+        applyStatus(newState, createDefaultStatus(schema));
         return newState;
       }
     }

@@ -3,7 +3,7 @@ import {
   CREATE_SUCCESS,
   created,
   middlewareJsonApiSource,
-} from '../src';
+} from '../../src';
 
 describe('Created action creator', () => {
   it('creates valid action', () => {

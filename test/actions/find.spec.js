@@ -13,12 +13,12 @@ import {
   REFERENCE_FETCHED,
   REFERENCE_STATUS,
   apiStateMiddleware,
-} from '../src';
-import { middlewareJsonApiSource } from '../src/middleware';
+} from '../../src';
+import { middlewareJsonApiSource } from '../../src/middleware';
 import {
   busyStatus,
-} from '../src/status';
-import rio from '../src';
+} from '../../src/status';
+import rio from '../../src';
 
 describe('Find action creator', () => {
   const middlewares = [thunk, apiMiddleware, apiStateMiddleware];
@@ -157,7 +157,7 @@ describe('Find action creator', () => {
     const schema = 'app.builder';
     const tag = 'collection_test';
     expect(() => find(schema, tag)).to.throw(
-      `Couldn't resolve schema ${schema} in function find`
+      `Couldn't resolve schema ${schema} in function find.`
     );
   });
 
@@ -183,7 +183,11 @@ describe('Find action creator', () => {
       request: config,
     };
 
-    expect(() => find(schemaConfig, tag)).to.throw('Undefined configuration request endpoint.');
+    expect(() => find(schemaConfig, tag)).to.throw(
+      'Schema configuration is invalid. Error: data.request should'
+    + ' have required property \'endpoint\''
+    + `Invalid schema config: ${schemaConfig}`
+    );
   });
 
   it('creates a invalid action with invalid tag', () => {

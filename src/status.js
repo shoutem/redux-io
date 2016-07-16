@@ -29,11 +29,25 @@ export const updateStatus = (status, update) => (
   _.merge({}, status, update, { modifiedTimestamp: Date.now() })
 );
 
-export const applyStatus = (sourceObject, destinationObject) => {
+export const applyStatus = (obj, status) => {
+  if (_.has(obj, STATUS)) {
+    // eslint-disable-next-line no-param-reassign
+    obj[STATUS] = status;
+  } else {
+    Object.defineProperty(obj, STATUS, {
+      value: status,
+      enumerable: false,
+      writable: true,
+    });
+  }
+}
+
+export const cloneStatus = (sourceObject, destinationObject) => {
   if (!sourceObject[STATUS]) {
     return;
   }
-  destinationObject[STATUS] = _.merge({}, sourceObject[STATUS]);
+  // eslint-disable-next-line no-param-reassign
+  applyStatus(destinationObject, _.merge({}, sourceObject[STATUS]));
 };
 
 export const getTransformation = obj => obj[STATUS] && obj[STATUS].transformation;

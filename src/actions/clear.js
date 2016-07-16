@@ -1,7 +1,7 @@
 import _ from 'lodash';
 import {
   REFERENCE_CLEAR,
-} from './index';
+} from './../';
 
 export default (schema, tag = '') => {
   if (!_.isString(schema)) {

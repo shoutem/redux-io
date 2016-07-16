@@ -2,7 +2,7 @@ import _ from 'lodash';
 import {
   LOAD_SUCCESS,
   middlewareJsonApiSource,
-} from './middleware';
+} from './../middleware';
 
 export default (payload, schema, tag = '') => {
   if (!_.isPlainObject(payload)) {

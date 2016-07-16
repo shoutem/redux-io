@@ -1,19 +1,19 @@
 import _ from 'lodash';
 import { RSAA } from 'redux-api-middleware';
 import {
-  REMOVE_REQUEST,
-  REMOVE_SUCCESS,
-  REMOVE_ERROR,
+  UPDATE_REQUEST,
+  UPDATE_SUCCESS,
+  UPDATE_ERROR,
   middlewareJsonApiSource,
-} from './middleware';
+} from './../middleware';
 
-// Action creator used to delete item on api (DELETE). Config arg is based on RSAA
+// Action creator used to update item on api (POST). Config arg is based on RSAA
 // configuration from redux-api-middleware, allowing full customization expect types
-// part of configuration. Delete function expects schema name of data which correspond
-// with storage reducer with same schema value to listen for deleted data. Item arg
-// holds object that you want to pass to api. Tag is not needed because all collection
-// with configured schema value as in argument of delete will be invalidated upon successful
-// action of deleting item on api.
+// part of configuration. Update function expects schema name of data which correspond
+// with storage reducer with same schema value to listen for updated data. Item arg
+// holds object that you want to pass to api. Tag is not needed because all collections
+// with configured schema value as in argument of update will be invalidated upon successful
+// action of updating item on api.
 export default (config, schema, item) => {
   if (!_.isObject(config)) {
     throw new TypeError('Config isn\'t object.');
@@ -32,21 +32,23 @@ export default (config, schema, item) => {
 
   return {
     [RSAA]: {
-      method: 'DELETE',
+      method: 'PATCH',
       ...config,
+      body: JSON.stringify({
+        data: item,
+      }),
       types: [
         {
-          type: REMOVE_REQUEST,
+          type: UPDATE_REQUEST,
           meta,
           payload: { data: item },
         },
         {
-          type: REMOVE_SUCCESS,
+          type: UPDATE_SUCCESS,
           meta,
-          payload: () => ({ data: item }),
         },
         {
-          type: REMOVE_ERROR,
+          type: UPDATE_ERROR,
           meta,
         },
       ],

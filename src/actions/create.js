@@ -5,7 +5,7 @@ import {
   CREATE_SUCCESS,
   CREATE_ERROR,
   middlewareJsonApiSource,
-} from './middleware';
+} from './../middleware';
 
 // Action creator used to create item on api (POST). Config arg is based on RSAA
 // configuration from redux-api-middleware, allowing full customization expect types

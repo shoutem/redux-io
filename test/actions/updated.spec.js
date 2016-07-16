@@ -3,7 +3,7 @@ import {
   UPDATE_SUCCESS,
   updated,
   middlewareJsonApiSource,
-} from '../src';
+} from '../../src';
 
 describe('Updated action creator', () => {
   it('updated valid action', () => {

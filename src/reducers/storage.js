@@ -6,14 +6,16 @@ import {
   OBJECT_UPDATED,
   OBJECT_REMOVING,
   OBJECT_REMOVED,
-} from './middleware';
+} from './../middleware';
 import {
   STATUS,
   validationStatus,
   busyStatus,
   createStatus,
   updateStatus,
-} from './status';
+  applyStatus,
+  cloneStatus,
+} from './../status';
 
 function mergeItemStatus(currentItem, newStatus) {
   const currentStatus = (currentItem && currentItem[STATUS])
@@ -38,15 +40,22 @@ function patchItemInState(currentItem, patch, actionMeta) {
       ...patch.relationships,
     },
   };
-  newItem[STATUS] = mergeItemStatus(
+  applyStatus(newItem, mergeItemStatus(
     currentItem,
     {
       validationStatus: validationStatus.INVALID,
       busyStatus: busyStatus.BUSY,
       transformation: actionMeta.transformation,
     }
-  );
+  ));
   return newItem;
+}
+
+function createDefaultStatus(schema) {
+  return {
+    schema,
+    type: 'storage',
+  };
 }
 
 // storage is generic storage reducer that enables creation
@@ -54,9 +63,8 @@ function patchItemInState(currentItem, patch, actionMeta) {
 // OBJECT_ type actions.
 export default function storage(schema, initialState = {}) {
   // eslint-disable-next-line no-param-reassign
-  initialState[STATUS] = {
-    schema,
-  };
+  applyStatus(initialState, createDefaultStatus(schema));
+
   return (state = initialState, action) => {
     if (_.get(action, 'meta.schema') !== schema) {
       return state;
@@ -76,7 +84,9 @@ export default function storage(schema, initialState = {}) {
           return state;
         }
         const patchedItem = patchItemInState(currentItem, item, action.meta);
-        return { ...state, [item.id]: patchedItem };
+        const newState = { ...state, [item.id]: patchedItem };
+        cloneStatus(newState, state);
+        return newState;
       }
       case OBJECT_FETCHED:
       case OBJECT_CREATED:
@@ -89,23 +99,25 @@ export default function storage(schema, initialState = {}) {
             transformation: action.meta.transformation,
           }
         );
-        return { ...state, [item.id]: item };
+        const newState = { ...state, [item.id]: item };
+        cloneStatus(newState, state);
+        return newState;
       }
       case OBJECT_REMOVING:
       case OBJECT_REMOVED: {
         const newState = { ...state };
         delete newState[item.id];
+        applyStatus(newState, createDefaultStatus(schema));
         return newState;
       }
-      default:
+      default: {
         if (state[STATUS]) {
           return state;
         }
-        const newState = [...state];
-        newState[STATUS] = {
-          schema,
-        };
+        const newState = { ...state };
+        applyStatus(newState, createDefaultStatus(schema));
         return newState;
+      }
     }
   };
 }

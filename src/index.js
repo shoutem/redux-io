@@ -1,37 +1,40 @@
 import apiStateMiddleware from './middleware';
 export { apiStateMiddleware };
 
-import storage from './storage';
+import resource from './reducers/resource';
+export { resource };
+
+import storage from './reducers/storage';
 export { storage };
 
-import collection from './collection';
+import collection from './reducers/collection';
 export { collection };
 
-import single from './single';
-export { single };
+import one from './reducers/one';
+export { one };
 
-import find from './find';
+import find from './actions/find';
 export { find };
 
-import create from './create';
+import create from './actions/create';
 export { create };
 
-import update from './update';
+import update from './actions/update';
 export { update };
 
-import remove from './remove';
+import remove from './actions/remove';
 export { remove };
 
-import loaded from './loaded';
+import loaded from './actions/loaded';
 export { loaded };
 
-import created from './created';
+import created from './actions/created';
 export { created };
 
-import updated from './updated';
+import updated from './actions/updated';
 export { updated };
 
-import clear from './clear';
+import clear from './actions/clear';
 export { clear };
 
 import ReduxApiStateDenormalizer, {
@@ -84,8 +87,8 @@ export {
 import { enableRio } from './enableRio';
 export { enableRio };
 
-import mergeReducers from './mergeReducers';
-import chainReducers from './chainReducers';
+import mergeReducers from './reducers/mergeReducers';
+import chainReducers from './reducers/chainReducers';
 export { mergeReducers, chainReducers };
 
 import rio from './rio';

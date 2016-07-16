@@ -2,7 +2,7 @@ import { expect } from 'chai';
 import {
   REFERENCE_CLEAR,
   clear,
-} from '../src';
+} from '../../src';
 
 describe('Clear action creator', () => {
   it('creates valid action', () => {

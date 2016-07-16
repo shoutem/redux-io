@@ -11,14 +11,14 @@ import {
   OBJECT_REMOVED,
   OBJECT_UPDATING,
   OBJECT_UPDATED,
-} from '../src';
+} from '../../src';
 import {
   STATUS,
   validationStatus,
   busyStatus,
   createStatus,
   updateStatus,
-} from '../src/status';
+} from '../../src/status';
 
 chai.use(shallowDeepEqual);
 
@@ -284,9 +284,8 @@ describe('Storage reducer', () => {
     const expectedState = { [itemNew.id]: itemNew };
     expect(nextStateItem[STATUS].validationStatus).to.eql(validationStatus.INVALID);
     expect(nextStateItem[STATUS].busyStatus).to.eql(busyStatus.BUSY);
-    delete nextStateItem[STATUS];
     expect(nextState).to.shallowDeepEqual(expectedState);
-    expect(nextStateItem).to.deep.equal(itemNew);
+    expect(nextStateItem).to.shallowDeepEqual(itemNew);
   });
 
   it('skips partial update of item on object updating if object not found', () => {
@@ -408,9 +407,8 @@ describe('Storage reducer', () => {
     const expectedState = { [itemNew.id]: itemNew };
     expect(nextStateItem[STATUS].validationStatus).to.eql(validationStatus.INVALID);
     expect(nextStateItem[STATUS].busyStatus).to.eql(busyStatus.BUSY);
-    delete nextStateItem[STATUS];
     expect(nextState).to.shallowDeepEqual(expectedState);
-    expect(nextStateItem).to.deep.equal(itemNew);
+    expect(nextStateItem).to.shallowDeepEqual(itemNew);
   });
 
   it('removes item from state on object removing', () => {
@@ -652,8 +650,27 @@ describe('Storage reducer', () => {
       transformation,
       transformationPatch
     ));
-    delete nextStateItem[STATUS];
     expect(nextState).to.shallowDeepEqual(expectedState);
-    expect(nextStateItem).to.deep.equal(expectedItem);
+    expect(nextStateItem).to.shallowDeepEqual(expectedItem);
+  });
+
+  it('adds status to storage state without status', () => {
+    const initialState = {};
+    const item = { id: 1 };
+    const schema = 'schema_test';
+    const action = {
+      type: 'unknown_action',
+      meta: {
+        schema,
+      },
+      payload: item,
+    };
+    const reducer = storage(schema, initialState);
+    deepFreeze(initialState);
+
+    const nextState = reducer(initialState, action);
+    expect(nextState).to.shallowDeepEqual({});
+    expect(nextState[STATUS].schema).to.eql(schema);
+    expect(nextState[STATUS].type).to.eql('storage');
   });
 });

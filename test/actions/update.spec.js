@@ -13,12 +13,12 @@ import {
   OBJECT_UPDATED,
   REFERENCE_STATUS,
   apiStateMiddleware,
-} from '../src';
-import { middlewareJsonApiSource } from '../src/middleware';
+} from '../../src';
+import { middlewareJsonApiSource } from '../../src/middleware';
 import {
   validationStatus,
   busyStatus,
-} from '../src/status';
+} from '../../src/status';
 
 describe('Update action creator', () => {
   const middlewares = [thunk, apiMiddleware, apiStateMiddleware];

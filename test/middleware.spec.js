@@ -938,7 +938,7 @@ describe('Json api middleware', () => {
     }).then(done).catch(done);
   });
 
-  it('exception if action doesn\'t have schema', done => {
+  it('writes error to console and ignores action if action doesn\'t have schema', done => {
     const tag = 'tag_test';
     const schema = 'schema_test';
     const expectedPayload = {
@@ -977,11 +977,11 @@ describe('Json api middleware', () => {
       expect(requestAction.type).to.equal(LOAD_SUCCESS);
 
       expect(console.error.calledOnce).to.be.true;
-      expect(console.error.calledWith('Schema is invalid.')).to.be.true;
+      expect(console.error.calledWith('Action.meta.schema is undefined.')).to.be.true;
     }).then(done).catch(done);
   });
 
-  it('exception if action doesn\'t have payload with data property', done => {
+  it('writes error to console and ignores action if action have empty payload', done => {
     const tag = 'tag_test';
     const schema = 'schema_test';
     const expectedPayload = {};
@@ -1010,4 +1010,38 @@ describe('Json api middleware', () => {
       expect(console.error.calledWith('Payload Data is invalid, expecting payload.data.')).to.be.true;
     }).then(done).catch(done);
   });
+
+  it('writes error to console and ignores action if action doesn\'t have payload with data property', done => {
+    const tag = 'tag_test';
+    const schema = 'schema_test';
+    const expectedPayload = {
+      name: 'Car',
+      description: 'Slow and fast at the same time',
+    };
+
+    const expectedMeta = {
+      // TODO: put some other source, because it'snot json-api?
+      source: middlewareJsonApiSource,
+      schema,
+      tag,
+    };
+
+    const mockSuccessAction = {
+      type: LOAD_SUCCESS,
+      meta: expectedMeta,
+      payload: expectedPayload,
+    };
+
+    const store = mockStore({});
+    store.dispatch(actionPromise(mockSuccessAction)).then(() => {
+      const performedActions = store.getActions();
+      expect(performedActions).to.have.length(1);
+
+      const requestAction = performedActions[0];
+      expect(requestAction.type).to.equal(LOAD_SUCCESS);
+
+      expect(console.error.calledOnce).to.be.false;
+      }).then(done).catch(done);
+  });
+
 });

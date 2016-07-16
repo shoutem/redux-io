@@ -1,8 +1,8 @@
 import _ from 'lodash';
 import {
-  CREATE_SUCCESS,
+  UPDATE_SUCCESS,
   middlewareJsonApiSource,
-} from './middleware';
+} from './../middleware';
 
 export default (payload, schema) => {
   if (!_.isPlainObject(payload)) {
@@ -16,7 +16,7 @@ export default (payload, schema) => {
   }
 
   return {
-    type: CREATE_SUCCESS,
+    type: UPDATE_SUCCESS,
     payload,
     meta: {
       source: middlewareJsonApiSource,

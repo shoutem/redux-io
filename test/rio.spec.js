@@ -21,7 +21,7 @@ describe('Rio', () => {
     };
 
     rio.registerSchema(schemaConfig);
-    const resolvedSchemaConfig = rio.resolveSchema(schema);
+    const resolvedSchemaConfig = rio.getSchema(schema);
 
     expect(resolvedSchemaConfig).to.equal(schemaConfig);
   });
@@ -36,7 +36,7 @@ describe('Rio', () => {
     }));
 
     const schemaName = 'app.builder';
-    const resolvedSchemaConfig = rio.resolveSchema(schemaName);
+    const resolvedSchemaConfig = rio.getSchema(schemaName);
 
     const expectedSchemaConfig = {
       schema: schemaName,
@@ -57,14 +57,14 @@ describe('Rio', () => {
     }));
 
     const schemaName = 'app.builder';
-    expect(() => rio.resolveSchema(schemaName))
+    expect(() => rio.getSchema(schemaName))
       .to.throw('Schema configuration is invalid. Error:'
       + ' data.request should have required property \'headers\'');
   });
 
   it('resolve schema with blank rio', () => {
     const schemaName = 'app.builder';
-    const resolvedSchemaConfig = rio.resolveSchema(schemaName);
+    const resolvedSchemaConfig = rio.getSchema(schemaName);
 
     const expectedSchemaConfig = undefined;
     expect(resolvedSchemaConfig).to.equal(expectedSchemaConfig);
@@ -74,7 +74,7 @@ describe('Rio', () => {
     rio.registerSchema(schema => undefined);
 
     const schemaName = 'app.builder';
-    const resolvedSchemaConfig = rio.resolveSchema(schemaName);
+    const resolvedSchemaConfig = rio.getSchema(schemaName);
 
     const expectedSchemaConfig = undefined;
     expect(resolvedSchemaConfig).to.equal(expectedSchemaConfig);

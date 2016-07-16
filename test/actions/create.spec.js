@@ -12,12 +12,12 @@ import {
   OBJECT_CREATED,
   REFERENCE_STATUS,
   apiStateMiddleware,
-} from '../src';
-import { middlewareJsonApiSource } from '../src/middleware';
+} from '../../src';
+import { middlewareJsonApiSource } from '../../src/middleware';
 import {
   validationStatus,
   busyStatus,
-} from '../src/status';
+} from '../../src/status';
 
 describe('Create action creator', () => {
   const middlewares = [thunk, apiMiddleware, apiStateMiddleware];

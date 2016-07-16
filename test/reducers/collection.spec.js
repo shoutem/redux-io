@@ -6,13 +6,13 @@ import {
   REFERENCE_FETCHED,
   REFERENCE_CLEAR,
   REFERENCE_STATUS,
-} from '../src';
+} from '../../src';
 import {
   STATUS,
   validationStatus,
   busyStatus,
   createStatus,
- } from '../src/status';
+ } from '../../src/status';
 
 chai.use(shallowDeepEqual);
 
@@ -45,6 +45,32 @@ describe('Collection reducer', () => {
       meta: {
         schema,
         tag,
+      },
+      payload: items,
+    };
+
+    const nextState = reducer(undefined, action);
+    const expectedState = items.map(item => item.id);
+
+    expect(nextState[STATUS].validationStatus).to.eql(validationStatus.VALID);
+    expect(nextState[STATUS].busyStatus).to.eql(busyStatus.IDLE);
+    expect(nextState).to.shallowDeepEqual(expectedState);
+  });
+
+  it('adds collection of indices on Fetch event with default tag', () => {
+    const items = [
+      { id: 1 },
+      { id: 2 },
+    ];
+
+    const schema = 'schema_test';
+    const reducer = collection(schema);
+
+    const action = {
+      type: REFERENCE_FETCHED,
+      meta: {
+        schema,
+        tag: '',
       },
       payload: items,
     };
@@ -292,6 +318,8 @@ describe('Collection reducer', () => {
     const nextState = reducer(customState, action);
     expect(nextState[STATUS].validationStatus).to.eql(validationStatus.NONE);
     expect(nextState[STATUS].busyStatus).to.eql(busyStatus.IDLE);
+    expect(nextState[STATUS].schema).to.eql(schema);
+    expect(nextState[STATUS].type).to.eql('collection');
     expect(nextState).to.shallowDeepEqual(customState);
   });
 });

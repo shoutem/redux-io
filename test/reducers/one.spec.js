@@ -1,21 +1,21 @@
 import { expect } from 'chai';
 import deepFreeze from 'deep-freeze';
 import {
-  single,
+  one,
   REFERENCE_FETCHED,
   REFERENCE_CLEAR,
   REFERENCE_STATUS,
-} from '../src';
+} from '../../src';
 import {
   STATUS,
   validationStatus,
   busyStatus,
   createStatus,
-} from '../src/status';
+} from '../../src/status';
 
-describe('Single reducer', () => {
+describe('One reducer', () => {
   it('has a valid initial state', () => {
-    const testReducer = single('test', 'test');
+    const testReducer = one('test', 'test');
     const state = testReducer(undefined, {});
     const expectedStatus = createStatus();
     expect(state.value).to.eql('');
@@ -31,7 +31,7 @@ describe('Single reducer', () => {
 
     const schema = 'schema_test';
     const tag = 'tag_test';
-    const reducer = single(schema, tag, initialValue);
+    const reducer = one(schema, tag, initialValue);
     deepFreeze(initialValue);
 
     const action = {
@@ -51,6 +51,31 @@ describe('Single reducer', () => {
     expect(nextState[STATUS].busyStatus).to.eql(busyStatus.IDLE);
   });
 
+  it('sets value on fetch event with default tag', () => {
+    const items = [
+      { id: 1 },
+    ];
+
+    const schema = 'schema_test';
+    const reducer = one(schema);
+
+    const action = {
+      type: REFERENCE_FETCHED,
+      meta: {
+        schema,
+        tag: '',
+      },
+      payload: items,
+    };
+
+    const nextState = reducer(undefined, action);
+    const expectedValue = items[0].id;
+
+    expect(nextState.value).to.eql(expectedValue);
+    expect(nextState[STATUS].validationStatus).to.eql(validationStatus.VALID);
+    expect(nextState[STATUS].busyStatus).to.eql(busyStatus.IDLE);
+  });
+
   it('ignores action with different schema', () => {
     const initialValue = '';
     const items = [
@@ -58,7 +83,7 @@ describe('Single reducer', () => {
     ];
     const schema = 'schema_test';
     const tag = 'tag_test';
-    const reducer = single(schema, tag, initialValue);
+    const reducer = one(schema, tag, initialValue);
     deepFreeze(initialValue);
 
     const action = {
@@ -83,7 +108,7 @@ describe('Single reducer', () => {
     ];
     const schema = 'schema_test';
     const tag = 'tag_test';
-    const reducer = single(schema, tag, initialValue);
+    const reducer = one(schema, tag, initialValue);
     deepFreeze(initialValue);
 
     const action = {
@@ -108,7 +133,7 @@ describe('Single reducer', () => {
     ];
     const schema = 'schema_test';
     const tag = 'tag_test';
-    const reducer = single(schema, tag, initialValue);
+    const reducer = one(schema, tag, initialValue);
     deepFreeze(initialValue);
 
     const action = {
@@ -126,11 +151,11 @@ describe('Single reducer', () => {
     expect(nextState[STATUS].busyStatus).to.eql(busyStatus.IDLE);
   });
 
-  it('overwrites value of single on fetch', () => {
+  it('overwrites value of one on fetch', () => {
     const initialValue = 1;
     const schema = 'schema_test';
     const tag = 'tag_test';
-    const reducer = single(schema, tag, initialValue);
+    const reducer = one(schema, tag, initialValue);
     deepFreeze(initialValue);
 
     const itemsNew = [
@@ -155,7 +180,7 @@ describe('Single reducer', () => {
     const initialValue = 1;
     const schema = 'schema_test';
     const tag = 'tag_value';
-    const reducer = single(schema, tag, initialValue);
+    const reducer = one(schema, tag, initialValue);
     deepFreeze(initialValue);
 
     const action = {
@@ -173,13 +198,13 @@ describe('Single reducer', () => {
     expect(nextState[STATUS].busyStatus).to.eql(busyStatus.IDLE);
   });
 
-  it('change single status to busy with non-broadcast status', () => {
+  it('change one status to busy with non-broadcast status', () => {
     const initialValue = 1;
     const schema = 'schema_test';
     const tag = 'tag_test';
-    const reducer = single(schema, tag, initialValue);
+    const reducer = one(schema, tag, initialValue);
     const otherTag = 'other_tag';
-    const otherReducer = single(schema, otherTag, initialValue);
+    const otherReducer = one(schema, otherTag, initialValue);
     deepFreeze(initialValue);
 
     const action = {
@@ -206,11 +231,11 @@ describe('Single reducer', () => {
     const initialValue = 1;
     const schema = 'schema_test';
     const tag = '*';
-    expect(() => single(schema, tag, initialValue))
+    expect(() => one(schema, tag, initialValue))
       .to.throw('Tag value \'*\' is reserved for redux-api-state and cannot be used.');
   });
 
-  it('clears single', () => {
+  it('clears one', () => {
     const initialValue = 1;
     const schema = 'schema_test';
     const tag = 'tag_test';
@@ -223,7 +248,7 @@ describe('Single reducer', () => {
       },
     };
 
-    const reducer = single(schema, tag, initialValue);
+    const reducer = one(schema, tag, initialValue);
     deepFreeze(initialValue);
     const nextState = reducer(undefined, action);
 
@@ -232,14 +257,14 @@ describe('Single reducer', () => {
     expect(nextState[STATUS].busyStatus).to.eql(busyStatus.IDLE);
   });
 
-  it('adds status to single state without status', () => {
+  it('adds status to one state without status', () => {
     const initialValue = -1;
     const items = [
       { id: 1 },
     ];
     const schema = 'schema_test';
     const tag = 'tag_test';
-    const reducer = single(schema, tag, initialValue);
+    const reducer = one(schema, tag, initialValue);
     deepFreeze(initialValue);
 
     const action = {
@@ -256,5 +281,7 @@ describe('Single reducer', () => {
     expect(nextState.value).to.deep.equal(initialValue);
     expect(nextState[STATUS].validationStatus).to.eql(validationStatus.NONE);
     expect(nextState[STATUS].busyStatus).to.eql(busyStatus.IDLE);
+    expect(nextState[STATUS].schema).to.eql(schema);
+    expect(nextState[STATUS].type).to.eql('one');
   });
 });
