@@ -262,7 +262,6 @@ describe('ReduxApiStateDenormalizer', () => {
         ],
       };
 
-
       assert.isOk(notCachedDenormalizedData !== denormalizedData, 'didn\'t create new object');
       assert.deepEqual(
         notCachedDenormalizedData,
@@ -373,19 +372,34 @@ describe('ReduxApiStateDenormalizer', () => {
         'collection not denormalized correctly'
       );
     });
+    it('throws error when denormalizing array of ids without schema', () => {
+      const denormalizer = new ReduxApiStateDenormalizer();
+      const storage = createSchemasMap(getStore(), createStorageMap());
+
+      assert.throws(() => {
+        denormalizer.denormalizeCollection(['type1Id1'], storage);
+      }, 'Denormalizing non RIO Collection (pure Array of IDs) but no schema provided!');
+    });
     it('gets collection from cache', () => {
       const store = getStore();
       const denormalizer = new ReduxApiStateDenormalizer(() => store, createStorageMap());
       const collection = ['type1Id1'];
       collection[STATUS] = createStatus({ schema: 'type1', tag: ''});
+
       const denormalizedData =
         denormalizer.denormalizeCollection(collection);
+
+      // Used to be sure that collection are not clashed between each other.
+      // That not other cached collection data is used.
+      const otherCollection = ['type1Id1'];
+        otherCollection[STATUS] = createStatus({ schema: 'type1', tag: 'other'});
+        denormalizer.denormalizeCollection(otherCollection);
+
       const cachedDenormalizedData =
         denormalizer.denormalizeCollection(collection);
 
       assert.isOk(cachedDenormalizedData === denormalizedData, 'didn\'t get cached item');
       assert.isObject(cachedDenormalizedData[STATUS]);
-
     });
     it('gets new collection reference when item changed', () => {
       const denormalizer = new ReduxApiStateDenormalizer();

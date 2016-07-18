@@ -1,8 +1,7 @@
 import ReduxDenormalizer from './ReduxDenormalizer';
 import RioCache from './lib/RioCache';
-import { getCollectionDescription } from '../collection';
 import _ from 'lodash';
-import { applyStatus } from './../status';
+import { applyStatus, getStatus } from './../status';
 
 /**
  * Created getStore for ReduxDenormalizer by using storageMap to find relationships.
@@ -18,6 +17,15 @@ export function createSchemasMap(store, storeSchemasPaths) {
   return storage;
 }
 
+function getType(collection, schema) {
+  const collectionStatus = getStatus(collection);
+
+  if (!collectionStatus && !schema) {
+    throw Error('Denormalizing non RIO Collection (pure Array of IDs) but no schema provided!');
+  }
+
+  return schema || collectionStatus.schema;
+}
 /**
  * Create array of itemDescriptor from array of IDs
  *
@@ -26,10 +34,10 @@ export function createSchemasMap(store, storeSchemasPaths) {
  * @returns {*}
  */
 function createDesriptorCollection(collection, schema) {
-  const collectionDescription = getCollectionDescription(collection);
+  const type = getType(collection, schema);
   const descriptorCollection = collection.map(id => ({
     id,
-    type: schema || collectionDescription.schema
+    type,
   }));
   applyStatus(collection, descriptorCollection);
   return descriptorCollection;
@@ -111,8 +119,8 @@ export default class ReduxApiStateDenormalizer extends ReduxDenormalizer {
    * Storage is needed in ProvideStorage mode.
    *
    * @param single - can be RIO single entity (with status) or id value
-   * @param schema (optional)
    * @param storage (optional)
+   * @param schema (optional)
    * @returns {{}}
    */
   denormalizeSingle(single, storage, schema) {
@@ -147,8 +155,8 @@ export default class ReduxApiStateDenormalizer extends ReduxDenormalizer {
    * Storage is needed in ProvideStorage mode.
    *
    * @param collection
-   * @param schema (optional)
    * @param storage (optional)
+   * @param schema (optional)
    * @returns {{}}
    */
   denormalizeCollection(collection, storage, schema) {
