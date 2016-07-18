@@ -94,6 +94,11 @@ export default function collection(schema, tag, initialState = []) {
   };
 }
 
+export function getUniqueCollectionKey(collection) {
+  const { schema, tag } = getCollectionDescription(collection);
+  return `${schema}.${tag}`;
+}
+
 export const getCollectionDescription = (collection) => {
   const collectionStatus = getStatus(collection) || {};
   return { schema: collectionStatus.schema, tag: collectionStatus.tag };

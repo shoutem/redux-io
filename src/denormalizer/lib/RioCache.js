@@ -1,6 +1,6 @@
 import { createUniqueTargetKey } from '@shoutem/json-api-denormalizer';
 import { getModificationTime } from '../../status';
-import { getCollectionDescription } from '../../collection';
+import { getUniqueCollectionKey } from '../../collection';
 import _ from 'lodash';
 
 function isItemInCollection(collection, item) {
@@ -17,11 +17,6 @@ function isCollection(entity) {
 
 export function getUniqueTargetKey(item) {
   return createUniqueTargetKey(item);
-}
-
-export function getUniqueCollectionKey(collection) {
-  const { schema, tag } = getCollectionDescription(collection);
-  return `${schema}.${tag}`;
 }
 
 function isCacheValid(cachedModificationTime, currentModificationTime) {
