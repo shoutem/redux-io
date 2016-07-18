@@ -53,5 +53,5 @@ export function getCollection(collection, state, schema = '') {
   }
   const storageMap = createSchemasMap(state, schemaPaths);
 
-  return rio.denormalizer.denormalizeCollection(collection, resolvedSchema, storageMap);
+  return rio.denormalizer.denormalizeCollection(collection, storageMap, resolvedSchema);
 }
