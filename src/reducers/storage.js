@@ -55,6 +55,7 @@ function createDefaultStatus(schema) {
   return {
     schema,
     type: 'storage',
+    id: _.uniqueId(),
   };
 }
 

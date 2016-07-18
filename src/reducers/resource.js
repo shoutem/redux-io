@@ -30,6 +30,7 @@ function createDefaultStatus(schema) {
     {
       schema,
       type: 'resource',
+      id: _.uniqueId(),
     }
   );
 }

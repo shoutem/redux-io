@@ -1,6 +1,6 @@
 import _ from 'lodash';
 import { validateSchemaConfig } from './schemaConfig';
-import { transform } from './standardizers/json-api-standardizer';
+import { JSON_API_SOURCE, transform } from './standardizers/json-api-standardizer';
 
 /**
  * Adds additional layer over library by providing central place for defining rio behavior
@@ -70,10 +70,10 @@ export class Rio {
    */
   getStandardizer(sourceType) {
     if (!_.isString(sourceType)) {
-      throw new Error('rio.registerSourceType sourceType argument must be string.');
+      throw new Error('rio.getStandardizer sourceType argument must be string.');
     }
     if (_.isEmpty(sourceType)) {
-      throw new Error('rio.registerSourceType sourceType is empty.');
+      throw new Error('rio.getStandardizer sourceType is empty.');
     }
 
     return this.standardizers[sourceType];
@@ -104,7 +104,7 @@ export class Rio {
     this.standardizers = {};
 
     // Default standardizer for json-api
-    this.standardizers['json-api'] = transform;
+    this.registerSourceType(JSON_API_SOURCE, transform);
   }
 }
 

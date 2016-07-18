@@ -285,7 +285,7 @@ function isValidAction(action) {
     console.error('Source is undefined.');
     return false;
   }
-  // Source value exists but check if rio support such source type
+  // Source value exists but check if rio support standardization of such source type
   if (!rio.getStandardizer(meta.source)) {
     return false;
   }

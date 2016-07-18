@@ -37,6 +37,7 @@ function createDefaultStatus(schema) {
     {
       schema,
       type: 'one',
+      id: _.uniqueId(),
     }
   );
 }

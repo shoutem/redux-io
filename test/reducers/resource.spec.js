@@ -142,6 +142,31 @@ describe('Resource reducer', () => {
     expect(nextState).to.shallowDeepEqual(payload);
   });
 
+  it('ignores load_success action without payload', () => {
+    const initialState = {};
+    const payload = {
+      id: 1,
+      description: 'today'
+    };
+
+    const schema = 'schema_test';
+    const reducer = resource(schema, initialState);
+    deepFreeze(initialState);
+
+    const action = {
+      type: LOAD_SUCCESS,
+      meta: {
+        schema,
+      },
+    };
+
+    const nextState = reducer(undefined, action);
+
+    expect(nextState[STATUS].validationStatus).to.eql(validationStatus.NONE);
+    expect(nextState[STATUS].busyStatus).to.eql(busyStatus.IDLE);
+    expect(nextState).to.shallowDeepEqual(initialState);
+  });
+
   it('correct state on load_error action', () => {
     const initialState =  {
       id: 1,
@@ -439,6 +464,32 @@ describe('Resource reducer', () => {
       type: LOAD_SUCCESS,
       meta: {
         schema: 'other_schema',
+      },
+      payload,
+    };
+
+    const nextState = reducer(undefined, action);
+
+    expect(nextState).to.equal(initialState);
+    expect(nextState[STATUS].validationStatus).to.eql(validationStatus.NONE);
+    expect(nextState[STATUS].busyStatus).to.eql(busyStatus.IDLE);
+  });
+
+  it('ignores action with different action', () => {
+    const initialState = {};
+    const payload = {
+      id: 1,
+      description: 'today'
+    };
+
+    const schema = 'schema_test';
+    const reducer = resource(schema, initialState);
+    deepFreeze(initialState);
+
+    const action = {
+      type: 'LOAD_SUCCESS',
+      meta: {
+        schema,
       },
       payload,
     };
