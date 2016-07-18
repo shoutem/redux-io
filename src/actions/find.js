@@ -8,6 +8,17 @@ import {
 } from './../middleware';
 import { buildEndpoint, resolveConfig } from './../schemaConfig';
 
+function buildRSAAConfig(config) {
+  const rsaaConfig = {
+    endpoint: config.request.endpoint,
+    headers: config.request.headers,
+    types: config.request.types,
+    method: config.request.method,
+  };
+
+  return _.omitBy(rsaaConfig, _.isNil);
+}
+
 /**
  * Action creator used to fetch data from api (GET). Find function expects schema name of
  * data which correspond with storage reducer or schema configuration object. In both cases
@@ -33,16 +44,17 @@ export default (schema, tag = '', params = {}) => {
   }
 
   const meta = {
-    source: middlewareJsonApiSource,
+    source: config.request.resourceType || middlewareJsonApiSource,
     schema: config.schema,
     tag,
   };
-  const endpoint = buildEndpoint(config.request.endpoint, params);
+  const rsaaConfig = buildRSAAConfig(config);
+  const endpoint = buildEndpoint(rsaaConfig.endpoint, params);
 
   return {
     [RSAA]: {
       method: 'GET',
-      ...config.request,
+      ...rsaaConfig,
       endpoint,
       types: [
         {

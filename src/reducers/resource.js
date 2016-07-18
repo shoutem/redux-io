@@ -68,7 +68,7 @@ export default function resource(schema, initialState = {}) {
     switch (action.type) {
       case CREATE_REQUEST:
       case LOAD_REQUEST: {
-        const newState = { ...state };
+        const newState = _.isArray(state) ? [...state] : { ...state };
         applyStatus(newState, updateStatus(
           state[STATUS],
           {
@@ -78,7 +78,7 @@ export default function resource(schema, initialState = {}) {
         return newState;
       }
       case UPDATE_REQUEST: {
-        const newState = { ...payload };
+        const newState = _.isArray(payload) ? [...payload] : { ...payload };
         applyStatus(newState, updateStatus(
           state[STATUS],
           {
@@ -89,7 +89,7 @@ export default function resource(schema, initialState = {}) {
         return newState;
       }
       case REMOVE_REQUEST: {
-        const newState = {};
+        const newState = _.isArray(state) ? [] : {};
         applyStatus(newState, updateStatus(
           state[STATUS],
           {
@@ -102,7 +102,7 @@ export default function resource(schema, initialState = {}) {
       case CREATE_SUCCESS:
       case LOAD_SUCCESS:
       case UPDATE_SUCCESS: {
-        const newState = { ...payload };
+        const newState = _.isArray(payload) ? [...payload] : { ...payload };
         applyStatus(newState, updateStatus(
           state[STATUS],
           {
@@ -116,7 +116,7 @@ export default function resource(schema, initialState = {}) {
       case CREATE_ERROR:
       case UPDATE_ERROR:
       case REMOVE_ERROR: {
-        const newState = { ...state };
+        const newState = _.isArray(state) ? [...state] : { ...state };
         applyStatus(newState, updateStatus(
           state[STATUS],
           {
@@ -127,7 +127,7 @@ export default function resource(schema, initialState = {}) {
         return newState;
       }
       case LOAD_ERROR: {
-        const newState = { ...state };
+        const newState = _.isArray(state) ? [...state] : { ...state };
         applyStatus(newState, updateStatus(
           state[STATUS],
           {
@@ -140,7 +140,7 @@ export default function resource(schema, initialState = {}) {
       }
       case REMOVE_SUCCESS:
       case REFERENCE_CLEAR: {
-        const newState = {};
+        const newState = _.isArray(state) ? [] : {};
         applyStatus(newState, updateStatus(
           state[STATUS],
           {
@@ -155,7 +155,7 @@ export default function resource(schema, initialState = {}) {
         if (state[STATUS]) {
           return state;
         }
-        const newState = { ...state };
+        const newState = _.isArray(state) ? [...state] : { ...state };
         applyStatus(newState, createDefaultStatus(schema));
         return newState;
       }

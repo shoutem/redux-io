@@ -1,3 +1,4 @@
+import _ from 'lodash';
 import chai, { expect } from 'chai';
 import shallowDeepEqual from 'chai-shallow-deep-equal';
 import deepFreeze from 'deep-freeze';
@@ -83,6 +84,33 @@ describe('Resource reducer', () => {
     expect(nextState[STATUS].validationStatus).to.eql(validationStatus.VALID);
     expect(nextState[STATUS].busyStatus).to.eql(busyStatus.IDLE);
     expect(nextState).to.shallowDeepEqual(payload);
+  });
+
+  it('adds array payload on load_success action', () => {
+    const initialState = {};
+    const payload = [{
+      id: 1,
+      description: 'today'
+    }];
+
+    const schema = 'schema_test';
+    const reducer = resource(schema, initialState);
+    deepFreeze(initialState);
+
+    const action = {
+      type: LOAD_SUCCESS,
+      meta: {
+        schema,
+      },
+      payload,
+    };
+
+    const nextState = reducer(undefined, action);
+
+    expect(nextState[STATUS].validationStatus).to.eql(validationStatus.VALID);
+    expect(nextState[STATUS].busyStatus).to.eql(busyStatus.IDLE);
+    expect(nextState).to.shallowDeepEqual(payload);
+    expect(nextState[0]).to.shallowDeepEqual(payload[0]);
   });
 
   it('overwrites payload on load_success action', () => {
@@ -318,6 +346,34 @@ describe('Resource reducer', () => {
     expect(nextState).to.shallowDeepEqual({});
   });
 
+  it('correct array state on remove_request action', () => {
+    const payload = [{
+      id: 1,
+      description: 'today'
+    }];
+    const initialState = payload;
+
+    const schema = 'schema_test';
+    const reducer = resource(schema, initialState);
+    deepFreeze(initialState);
+
+    const action = {
+      type: REMOVE_REQUEST,
+      meta: {
+        schema,
+        tag: '',
+      },
+      payload,
+    };
+
+    const nextState = reducer(initialState, action);
+    expect(nextState[STATUS].validationStatus).to.eql(validationStatus.INVALID);
+    expect(nextState[STATUS].busyStatus).to.eql(busyStatus.BUSY);
+    expect(nextState).to.shallowDeepEqual([]);
+    expect(_.isArray(nextState)).to.be.true;
+
+  });
+
   it('correct state on remove_success action', () => {
     const payload = {
       id: 1,
@@ -417,6 +473,32 @@ describe('Resource reducer', () => {
     expect(nextState[STATUS].validationStatus).to.eql(validationStatus.VALID);
     expect(nextState[STATUS].busyStatus).to.eql(busyStatus.IDLE);
     expect(nextState).to.shallowDeepEqual({});
+  });
+
+  it('clears array resource', () => {
+    const payload = [{
+      id: 1,
+      description: 'today',
+    }];
+    const initialState = payload;
+    const schema = 'schema_test';
+
+    const action = {
+      type: REFERENCE_CLEAR,
+      meta: {
+        schema,
+        tag: '',
+      },
+    };
+
+    const reducer = resource(schema, initialState);
+    deepFreeze(initialState);
+    const nextState = reducer(initialState, action);
+
+    expect(nextState[STATUS].validationStatus).to.eql(validationStatus.VALID);
+    expect(nextState[STATUS].busyStatus).to.eql(busyStatus.IDLE);
+    expect(nextState).to.shallowDeepEqual([]);
+    expect(_.isArray(nextState)).to.be.true;
   });
 
   it('adds status to resource state without status', () => {

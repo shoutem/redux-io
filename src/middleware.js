@@ -2,43 +2,43 @@
 /* eslint no-console: ["error", {allow: ["warn", "error"] }] */
 import _ from 'lodash';
 import { batchActions } from 'redux-batched-actions';
-import { transform } from './standardizer';
+import rio from './rio';
 import {
   validationStatus,
   busyStatus,
 } from './status';
 
-export const CREATE_REQUEST = '@@redux_api_state/CREATE_REQUEST';
-export const CREATE_SUCCESS = '@@redux_api_state/CREATE_SUCCESS';
-export const CREATE_ERROR = '@@redux_api_state/CREATE_ERROR';
+export const CREATE_REQUEST = '@@redux_io/CREATE_REQUEST';
+export const CREATE_SUCCESS = '@@redux_io/CREATE_SUCCESS';
+export const CREATE_ERROR = '@@redux_io/CREATE_ERROR';
 
-export const LOAD_REQUEST = '@@redux_api_state/LOAD_REQUEST';
-export const LOAD_SUCCESS = '@@redux_api_state/LOAD_SUCCESS';
-export const LOAD_ERROR = '@@redux_api_state/LOAD_ERROR';
+export const LOAD_REQUEST = '@@redux_io/LOAD_REQUEST';
+export const LOAD_SUCCESS = '@@redux_io/LOAD_SUCCESS';
+export const LOAD_ERROR = '@@redux_io/LOAD_ERROR';
 
-export const UPDATE_REQUEST = '@@redux_api_state/UPDATE_REQUEST';
-export const UPDATE_SUCCESS = '@@redux_api_state/UPDATE_SUCCESS';
-export const UPDATE_ERROR = '@@redux_api_state/UPDATE_ERROR';
+export const UPDATE_REQUEST = '@@redux_io/UPDATE_REQUEST';
+export const UPDATE_SUCCESS = '@@redux_io/UPDATE_SUCCESS';
+export const UPDATE_ERROR = '@@redux_io/UPDATE_ERROR';
 
-export const REMOVE_REQUEST = '@@redux_api_state/REMOVE_REQUEST';
-export const REMOVE_SUCCESS = '@@redux_api_state/REMOVE_SUCCESS';
-export const REMOVE_ERROR = '@@redux_api_state/REMOVE_ERROR';
+export const REMOVE_REQUEST = '@@redux_io/REMOVE_REQUEST';
+export const REMOVE_SUCCESS = '@@redux_io/REMOVE_SUCCESS';
+export const REMOVE_ERROR = '@@redux_io/REMOVE_ERROR';
 
-export const REFERENCE_FETCHED = '@@redux_api_state/REFERENCE_FETCHED';
-export const REFERENCE_STATUS = '@@redux_api_state/REFERENCE_STATUS';
-export const REFERENCE_CLEAR = '@@redux_api_state/REFERENCE_CLEAR';
+export const REFERENCE_FETCHED = '@@redux_io/REFERENCE_FETCHED';
+export const REFERENCE_STATUS = '@@redux_io/REFERENCE_STATUS';
+export const REFERENCE_CLEAR = '@@redux_io/REFERENCE_CLEAR';
 
-export const OBJECT_FETCHED = '@@redux_api_state/OBJECT_FETCHED';
-export const OBJECT_UPDATING = '@@redux_api_state/OBJECT_UPDATING';
-export const OBJECT_UPDATED = '@@redux_api_state/OBJECT_UPDATED';
-export const OBJECT_CREATED = '@@redux_api_state/OBJECT_CREATED';
-export const OBJECT_REMOVING = '@@redux_api_state/OBJECT_REMOVING';
-export const OBJECT_REMOVED = '@@redux_api_state/OBJECT_REMOVED';
+export const OBJECT_FETCHED = '@@redux_io/OBJECT_FETCHED';
+export const OBJECT_UPDATING = '@@redux_io/OBJECT_UPDATING';
+export const OBJECT_UPDATED = '@@redux_io/OBJECT_UPDATED';
+export const OBJECT_CREATED = '@@redux_io/OBJECT_CREATED';
+export const OBJECT_REMOVING = '@@redux_io/OBJECT_REMOVING';
+export const OBJECT_REMOVED = '@@redux_io/OBJECT_REMOVED';
 
-export const OBJECT_ERROR = '@@redux_api_state/OBJECT_ERROR';
-export const COLLECTION_ERROR = '@@redux_api_state/COLLECTION_ERROR';
+export const OBJECT_ERROR = '@@redux_io/OBJECT_ERROR';
+export const COLLECTION_ERROR = '@@redux_io/COLLECTION_ERROR';
 
-export const middlewareJsonApiSource = '@@redux_api_state/json_api';
+export const middlewareJsonApiSource = 'json-api';
 
 const actionsWithoutPayload = new Set([
   REMOVE_SUCCESS,
@@ -111,7 +111,9 @@ export function makeObjectAction(sourceAction, actionType, item) {
     return makeErrorAction(OBJECT_ERROR, 'Id is not valid.');
   }
 
-  // create transformation keys
+  // finds appropriate standardizer for transformation
+  const transform = rio.getStandardizer(sourceAction.meta.source);
+  // transforms item into standard model
   const transformation = transform(item);
 
   return {
@@ -284,10 +286,10 @@ function isValidAction(action) {
     console.error('Source is undefined.');
     return false;
   }
-  // Source exists but this middleware is not responsible for other source variants
-  // only for json_api
-  if (meta.source !== middlewareJsonApiSource) {
-    console.error('api source is unknown');
+  // Source value exists but check if rio support such source type
+  if (!rio.getStandardizer(meta.source)) {
+    // TODO: do we return that something is faulty?
+    //console.error('Api source is unknown, standardizer for corresponding source type not found.');
     return false;
   }
   // Check that schema is defined
@@ -298,9 +300,8 @@ function isValidAction(action) {
   // Validate payload for payload-specific action, ignore others
   if (!actionsWithoutPayload.has(action.type)
     && !_.has(action, 'payload.data')) {
+    // TODO: move this into standardizer specific area
     console.error('Payload Data is invalid, expecting payload.data.');
-    // TODO: add maybe additional json-schema check for json-api?
-    // TODO: evaluate do we need to throw anything here-separate
     return false;
   }
   // Validate tag for tag-specific action, ignore others

@@ -1,6 +1,6 @@
 import _ from 'lodash';
 import { expect } from 'chai';
-import { transform, inverse } from '../../src/standardizer';
+import { transform, inverse } from '../../src/standardizers/json-api-standardizer';
 
 const originalItem = {
   id: 1,

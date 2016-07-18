@@ -1,5 +1,6 @@
 import _ from 'lodash';
 import { validateSchemaConfig } from './schemaConfig';
+import { transform } from './standardizers/json-api-standardizer';
 
 /**
  * Adds additional layer over library by providing central place for defining rio behavior
@@ -48,6 +49,37 @@ export class Rio {
   }
 
   /**
+   * Register source type for data standardization.
+   */
+  registerSourceType(sourceType, standardizer) {
+    if (!_.isString(sourceType)) {
+      throw new Error('rio.registerSourceType sourceType argument must be string.');
+    }
+    if (_.isEmpty(sourceType)) {
+      throw new Error('rio.registerSourceType sourceType is empty.');
+    }
+    if (!_.isFunction(standardizer)) {
+      throw new Error('rio.registerSourceType standardizer argument must be a function.');
+    }
+
+    this.standardizers[sourceType] = standardizer;
+  }
+
+  /**
+   * Get standardizer function based on source type.
+   */
+  getStandardizer(sourceType) {
+    if (!_.isString(sourceType)) {
+      throw new Error('rio.registerSourceType sourceType argument must be string.');
+    }
+    if (_.isEmpty(sourceType)) {
+      throw new Error('rio.registerSourceType sourceType is empty.');
+    }
+
+    return this.standardizers[sourceType];
+  }
+
+  /**
    * Set instance of configured denormalizer used for denormalization with Rio.
    */
   setDenormalizer(denormalizer) {
@@ -69,6 +101,10 @@ export class Rio {
     this.schemaResolvers = [];
     this.schemaPaths = {};
     this.denormalizer = null;
+    this.standardizers = {};
+
+    // Default standardizer for json-api
+    this.standardizers['json-api'] = transform;
   }
 }
 

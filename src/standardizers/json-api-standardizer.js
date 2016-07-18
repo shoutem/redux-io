@@ -1,5 +1,7 @@
 import _ from 'lodash';
 
+export const JSON_API_SOURCE = 'json-api';
+
 export function transform(object) {
   if (!_.has(object, 'relationships')) {
     return {

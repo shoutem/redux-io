@@ -1011,7 +1011,7 @@ describe('Json api middleware', () => {
     }).then(done).catch(done);
   });
 
-  it('writes error to console and ignores action if action doesn\'t have payload with data property', done => {
+  it('ignores action if action doesn\'t have appropriate standardizer for such source type', done => {
     const tag = 'tag_test';
     const schema = 'schema_test';
     const expectedPayload = {
@@ -1020,8 +1020,7 @@ describe('Json api middleware', () => {
     };
 
     const expectedMeta = {
-      // TODO: put some other source, because it'snot json-api?
-      source: middlewareJsonApiSource,
+      source: 'json',
       schema,
       tag,
     };
@@ -1041,7 +1040,7 @@ describe('Json api middleware', () => {
       expect(requestAction.type).to.equal(LOAD_SUCCESS);
 
       expect(console.error.calledOnce).to.be.false;
-      }).then(done).catch(done);
+    }).then(done).catch(done);
   });
 
 });
