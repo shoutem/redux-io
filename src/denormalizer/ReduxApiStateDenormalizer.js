@@ -36,7 +36,12 @@ function createDesriptorCollection(collection, schema) {
 }
 
 function createSingleDescriptor(single, schema) {
-  if (schema) {
+  const singleIsPrimitiveValue = _.isNumber(single) || _.isString(single);
+  if (singleIsPrimitiveValue && !schema) {
+    throw Error('Denormalizing primitive single but no schema is provided!');
+  }
+
+  if (singleIsPrimitiveValue) {
     return {
       id: single,
       type: schema,
@@ -44,26 +49,9 @@ function createSingleDescriptor(single, schema) {
   }
 
   return {
-    id: single.id,
-    type: single.type,
+    id: single.value.id,
+    type: single.value.type,
   };
-}
-
-function resolveSchemaAndStorageFromArgs(args) {
-  let storage;
-  let schema;
-
-  if (args.length === 2) {
-    storage = args[1];
-  } else if (args.length === 3) {
-    schema = args[1];
-    storage = args[2];
-  }
-
-  return {
-    schema,
-    storage,
-  }
 }
 
 /**
@@ -123,12 +111,11 @@ export default class ReduxApiStateDenormalizer extends ReduxDenormalizer {
    * Storage is needed in ProvideStorage mode.
    *
    * @param single - can be RIO single entity (with status) or id value
-   * @param schema (optional) - schema for ID, second argument
-   * @param storage (optional) - if no schema provided, storage is second argument otherwise third
+   * @param schema (optional)
+   * @param storage (optional)
    * @returns {{}}
    */
-  denormalizeSingle(single) {
-    const { storage, schema } = resolveSchemaAndStorageFromArgs(arguments);
+  denormalizeSingle(single, storage, schema) {
     const itemDescriptor = createSingleDescriptor(single, schema);
 
     // if storage is undefined, denormalizer is in Find storage mode
@@ -154,17 +141,17 @@ export default class ReduxApiStateDenormalizer extends ReduxDenormalizer {
 
 
   /**
-   * Denormalize RIO collection.
-   * If single is primitive value, schema is required so itemDescriptor can be created.
+   * Denormalize RIO collection or array of IDs.
+   * If collection is not RIO collection but array of IDs,
+   * schema is required so itemDescriptors can be created.
    * Storage is needed in ProvideStorage mode.
    *
    * @param collection
-   * @param schema (optional) - schema for ID, second argument
-   * @param storage (optional) - if no schema provided, storage is second argument otherwise third
+   * @param schema (optional)
+   * @param storage (optional)
    * @returns {{}}
    */
-  denormalizeCollection(collection) {
-    const { storage, schema } = resolveSchemaAndStorageFromArgs(arguments);
+  denormalizeCollection(collection, storage, schema) {
     const descriptorCollection = createDesriptorCollection(collection, schema);
 
     if (this.cache.isCollectionCacheValid(descriptorCollection)) {
