@@ -1,8 +1,8 @@
 import _ from 'lodash';
 import {
   LOAD_SUCCESS,
-  middlewareJsonApiSource,
 } from './../middleware';
+import { JSON_API_SOURCE } from './..';
 
 export default (payload, schema, tag = '') => {
   if (!_.isPlainObject(payload)) {
@@ -22,7 +22,7 @@ export default (payload, schema, tag = '') => {
     type: LOAD_SUCCESS,
     payload,
     meta: {
-      source: middlewareJsonApiSource,
+      source: JSON_API_SOURCE,
       schema,
       tag,
     },

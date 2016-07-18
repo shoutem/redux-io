@@ -12,8 +12,8 @@ import {
   OBJECT_CREATED,
   REFERENCE_STATUS,
   apiStateMiddleware,
+  JSON_API_SOURCE,
 } from '../../src';
-import { middlewareJsonApiSource } from '../../src/middleware';
 import {
   validationStatus,
   busyStatus,
@@ -57,7 +57,7 @@ describe('Create action creator', () => {
     expect(action[RSAA].types).to.not.be.undefined;
 
     const expectedMeta = {
-      source: middlewareJsonApiSource,
+      source: JSON_API_SOURCE,
       schema,
     };
     const types = action[RSAA].types;
@@ -95,7 +95,7 @@ describe('Create action creator', () => {
     expect(action[RSAA].types).to.not.be.undefined;
 
     const expectedMeta = {
-      source: middlewareJsonApiSource,
+      source: JSON_API_SOURCE,
       schema,
     };
     const types = action[RSAA].types;
@@ -132,7 +132,7 @@ describe('Create action creator', () => {
     expect(action[RSAA].types).to.not.be.undefined;
 
     const expectedMeta = {
-      source: middlewareJsonApiSource,
+      source: JSON_API_SOURCE,
       schema,
     };
     const types = action[RSAA].types;
@@ -215,7 +215,7 @@ describe('Create action creator', () => {
       },
     };
     const expectedMeta = {
-      source: middlewareJsonApiSource,
+      source: JSON_API_SOURCE,
       schema,
     };
 

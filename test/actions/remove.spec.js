@@ -13,8 +13,8 @@ import {
   OBJECT_REMOVED,
   REFERENCE_STATUS,
   apiStateMiddleware,
+  JSON_API_SOURCE,
 } from '../../src';
-import { middlewareJsonApiSource } from '../../src/middleware';
 import {
   validationStatus,
   busyStatus,
@@ -47,7 +47,7 @@ describe('Delete action creator', () => {
     expect(action[RSAA].types).to.not.be.undefined;
 
     const expectedMeta = {
-      source: middlewareJsonApiSource,
+      source: JSON_API_SOURCE,
       schema,
     };
 
@@ -102,7 +102,7 @@ describe('Delete action creator', () => {
     const schema = 'schema_test';
     const item = { id: 1, type: schema };
     const expectedMeta = {
-      source: middlewareJsonApiSource,
+      source: JSON_API_SOURCE,
       schema,
     };
 

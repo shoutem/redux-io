@@ -4,8 +4,8 @@ import {
   LOAD_REQUEST,
   LOAD_SUCCESS,
   LOAD_ERROR,
-  middlewareJsonApiSource,
 } from './../middleware';
+import { JSON_API_SOURCE } from './..';
 import { buildEndpoint, resolveConfig } from './../schemaConfig';
 
 function buildRSAAConfig(config) {
@@ -44,7 +44,7 @@ export default (schema, tag = '', params = {}) => {
   }
 
   const meta = {
-    source: config.request.resourceType || middlewareJsonApiSource,
+    source: config.request.resourceType || JSON_API_SOURCE,
     schema: config.schema,
     tag,
   };

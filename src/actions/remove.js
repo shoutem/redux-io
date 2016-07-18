@@ -4,8 +4,8 @@ import {
   REMOVE_REQUEST,
   REMOVE_SUCCESS,
   REMOVE_ERROR,
-  middlewareJsonApiSource,
 } from './../middleware';
+import { JSON_API_SOURCE } from './..';
 
 // Action creator used to delete item on api (DELETE). Config arg is based on RSAA
 // configuration from redux-api-middleware, allowing full customization expect types
@@ -26,7 +26,7 @@ export default (config, schema, item) => {
   }
 
   const meta = {
-    source: middlewareJsonApiSource,
+    source: JSON_API_SOURCE,
     schema,
   };
 

@@ -38,7 +38,6 @@ export const OBJECT_REMOVED = '@@redux_io/OBJECT_REMOVED';
 export const OBJECT_ERROR = '@@redux_io/OBJECT_ERROR';
 export const COLLECTION_ERROR = '@@redux_io/COLLECTION_ERROR';
 
-export const middlewareJsonApiSource = 'json-api';
 
 const actionsWithoutPayload = new Set([
   REMOVE_SUCCESS,
@@ -288,8 +287,6 @@ function isValidAction(action) {
   }
   // Source value exists but check if rio support such source type
   if (!rio.getStandardizer(meta.source)) {
-    // TODO: do we return that something is faulty?
-    //console.error('Api source is unknown, standardizer for corresponding source type not found.');
     return false;
   }
   // Check that schema is defined
@@ -300,7 +297,8 @@ function isValidAction(action) {
   // Validate payload for payload-specific action, ignore others
   if (!actionsWithoutPayload.has(action.type)
     && !_.has(action, 'payload.data')) {
-    // TODO: move this into standardizer specific area
+    // TODO: move this into standardizer specific area once json standardization
+    // is supported
     console.error('Payload Data is invalid, expecting payload.data.');
     return false;
   }
@@ -327,6 +325,8 @@ export default store => next => action => {
   if (!isValidAction(action)) {
     return next(action);
   }
+
+  // TODO: add standardization of whole payload once we support json standardization
 
   const actions = [];
   const dispatch = dispatchAction => actions.push(dispatchAction);

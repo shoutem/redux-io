@@ -37,6 +37,9 @@ export { updated };
 import clear from './actions/clear';
 export { clear };
 
+import { JSON_API_SOURCE } from './standardizers/json-api-standardizer';
+export { JSON_API_SOURCE };
+
 import ReduxApiStateDenormalizer, {
   createSchemasMap,
 } from './denormalizer/ReduxApiStateDenormalizer';
@@ -72,7 +75,6 @@ export {
   REFERENCE_FETCHED,
   REFERENCE_STATUS,
   REFERENCE_CLEAR,
-  middlewareJsonApiSource,
 } from './middleware';
 
 export {

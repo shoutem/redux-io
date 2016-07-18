@@ -2,7 +2,7 @@ import { expect } from 'chai';
 import {
   UPDATE_SUCCESS,
   updated,
-  middlewareJsonApiSource,
+  JSON_API_SOURCE,
 } from '../../src';
 
 describe('Updated action creator', () => {
@@ -23,7 +23,7 @@ describe('Updated action creator', () => {
       payload: item,
       meta: {
         schema,
-        source: middlewareJsonApiSource,
+        source: JSON_API_SOURCE,
       },
     };
     const updateSuccessAction = updated(item, schema);

@@ -13,8 +13,8 @@ import {
   OBJECT_UPDATED,
   REFERENCE_STATUS,
   apiStateMiddleware,
+  JSON_API_SOURCE,
 } from '../../src';
-import { middlewareJsonApiSource } from '../../src/middleware';
 import {
   validationStatus,
   busyStatus,
@@ -48,7 +48,7 @@ describe('Update action creator', () => {
 
     const types = action[RSAA].types;
     const expectedMeta = {
-      source: middlewareJsonApiSource,
+      source: JSON_API_SOURCE,
       schema,
     };
     expect(types[0].type).to.equal(UPDATE_REQUEST);
@@ -102,7 +102,7 @@ describe('Update action creator', () => {
     const schema = 'schema_test';
     const item = { id: 2, type: schema };
     const expectedMeta = {
-      source: middlewareJsonApiSource,
+      source: JSON_API_SOURCE,
       schema,
     };
     const expectedPayload = {

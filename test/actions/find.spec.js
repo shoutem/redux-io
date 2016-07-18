@@ -4,7 +4,7 @@ import nock from 'nock';
 import { RSAA, apiMiddleware } from 'redux-api-middleware';
 import configureMockStore from 'redux-mock-store';
 import thunk from 'redux-thunk';
-import {
+import rio, {
   find,
   LOAD_REQUEST,
   LOAD_SUCCESS,
@@ -13,12 +13,11 @@ import {
   REFERENCE_FETCHED,
   REFERENCE_STATUS,
   apiStateMiddleware,
+  JSON_API_SOURCE,
 } from '../../src';
-import { middlewareJsonApiSource } from '../../src/middleware';
 import {
   busyStatus,
 } from '../../src/status';
-import rio from '../../src';
 
 describe('Find action creator', () => {
   const middlewares = [thunk, apiMiddleware, apiStateMiddleware];
@@ -56,7 +55,7 @@ describe('Find action creator', () => {
 
     const types = action[RSAA].types;
     const expectedMeta = {
-      source: middlewareJsonApiSource,
+      source: JSON_API_SOURCE,
       schema,
       tag,
     };
@@ -95,7 +94,7 @@ describe('Find action creator', () => {
 
     const types = action[RSAA].types;
     const expectedMeta = {
-      source: middlewareJsonApiSource,
+      source: JSON_API_SOURCE,
       schema,
       tag,
     };
@@ -141,7 +140,7 @@ describe('Find action creator', () => {
 
     const types = action[RSAA].types;
     const expectedMeta = {
-      source: middlewareJsonApiSource,
+      source: JSON_API_SOURCE,
       schema,
       tag,
     };
@@ -243,7 +242,7 @@ describe('Find action creator', () => {
 
     const types = action[RSAA].types;
     const expectedMeta = {
-      source: middlewareJsonApiSource,
+      source: JSON_API_SOURCE,
       schema,
       tag,
     };
@@ -274,7 +273,7 @@ describe('Find action creator', () => {
       }],
     };
     const expectedMeta = {
-      source: middlewareJsonApiSource,
+      source: JSON_API_SOURCE,
       schema,
       tag,
     };

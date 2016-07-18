@@ -2,7 +2,7 @@ import { expect } from 'chai';
 import {
   LOAD_SUCCESS,
   loaded,
-  middlewareJsonApiSource,
+  JSON_API_SOURCE,
 } from '../../src';
 
 describe('Loaded action creator', () => {
@@ -24,7 +24,7 @@ describe('Loaded action creator', () => {
       payload: item,
       meta: {
         schema,
-        source: middlewareJsonApiSource,
+        source: JSON_API_SOURCE,
         tag,
       },
     };

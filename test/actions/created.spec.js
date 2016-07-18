@@ -2,7 +2,7 @@ import { expect } from 'chai';
 import {
   CREATE_SUCCESS,
   created,
-  middlewareJsonApiSource,
+  JSON_API_SOURCE,
 } from '../../src';
 
 describe('Created action creator', () => {
@@ -23,7 +23,7 @@ describe('Created action creator', () => {
       payload: item,
       meta: {
         schema,
-        source: middlewareJsonApiSource,
+        source: JSON_API_SOURCE,
       },
     };
     const createSuccessAction = created(item, schema);
