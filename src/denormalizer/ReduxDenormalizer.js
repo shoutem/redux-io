@@ -1,7 +1,7 @@
 import { ObjectDenormalizer } from '@shoutem/json-api-denormalizer';
 import _ from 'lodash';
 
-function getStorage(getStore, storagePath) {
+function resolveStorageMap(getStore, storagePath) {
   const store = getStore();
 
   if (!storagePath) {
@@ -48,17 +48,17 @@ export default class ReduxDenormalizer extends ObjectDenormalizer {
     this.denormalizeItem = this.denormalizeItem.bind(this);
   }
 
-  createStorage(storage) {
+  createStorageMap(storage) {
     // Check if ReduxDenormalizer is in ProvideStorage mode and if it is,
     // check if storage is provided. ProvideStorage mode requires storage!
     if (this.provideStorageMode && !storage) {
       throw Error('Invalid storage, ProvideStorage mode requires storage object');
     }
-    return storage || getStorage(this.getStore, this.storagePath);
+    return storage || resolveStorageMap(this.getStore, this.storagePath);
   }
 
   updateStorage(storage) {
-    const denormalizationStorage = this.createStorage(storage);
+    const denormalizationStorage = this.createStorageMap(storage);
     super.setNormalizedData(denormalizationStorage);
   }
 
