@@ -94,12 +94,13 @@ export default function collection(schema, tag, initialState = []) {
   };
 }
 
-export function getUniqueCollectionKey(collection) {
-  const { schema, tag } = getCollectionDescription(collection);
+export function getCollectionDescription(collectionEntity) {
+  const collectionStatus = getStatus(collectionEntity) || {};
+  return { schema: collectionStatus.schema, tag: collectionStatus.tag };
+}
+
+export function getUniqueCollectionKey(collectionEntity) {
+  const { schema, tag } = getCollectionDescription(collectionEntity);
   return `${schema}.${tag}`;
 }
 
-export const getCollectionDescription = (collection) => {
-  const collectionStatus = getStatus(collection) || {};
-  return { schema: collectionStatus.schema, tag: collectionStatus.tag };
-}

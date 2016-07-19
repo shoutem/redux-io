@@ -120,9 +120,10 @@ export default class RioCache {
     const relationshipChanged = _.some(collection, item => {
       if (!isItemInCollection(cachedCollection, item) || !this.isItemCacheValid(item)) {
         return true;
-      } else {
-        matchedRelationshipsItems += 1;
       }
+
+      matchedRelationshipsItems += 1;
+      return false;
     });
 
     return relationshipChanged || cachedCollection.length !== matchedRelationshipsItems;
@@ -133,9 +134,10 @@ export default class RioCache {
 
     // TODO - can relationship be removed so there is no property at all?
     // if so, new and old relationship keys must match to be valid!
-    return !_.some(relationshipsNames,(relationshipName) => {
-      return this.isRelationshipChanged(item, relationshipName);
-    });
+    return !_.some(
+      relationshipsNames,
+      relationshipName => this.isRelationshipChanged(item, relationshipName)
+    );
   }
 
   isRelationshipChanged(item, relationshipName) {

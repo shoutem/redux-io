@@ -12,6 +12,7 @@ import { applyStatus, getStatus } from './../status';
 export function createSchemasMap(store, storeSchemasPaths) {
   const storage = {};
 
+  // eslint-disable-next-line no-return-assign
   _.forEach(storeSchemasPaths, (path, schema) => storage[schema] = _.get(store, path));
 
   return storage;

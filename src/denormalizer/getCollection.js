@@ -10,6 +10,7 @@ function resolveSchemaName(collection, schema) {
   const isArgumentSchemaValid = !_.isEmpty(schema) && _.isString(schema);
 
   if (isCollectionSchemaValid && isArgumentSchemaValid) {
+    // eslint-disable-next-line no-console
     console.warn(
       `getCollection gets both collection schema (${collectionSchema})`
     + ` and argument schema (${schema}). Collection schema has priority`
