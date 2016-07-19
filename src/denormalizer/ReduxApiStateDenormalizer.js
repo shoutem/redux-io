@@ -56,9 +56,11 @@ function createSingleDescriptor(single, schema) {
     };
   }
 
+  const { schema: type } = getStatus(single);
+
   return {
-    id: single.value.id,
-    type: single.value.type,
+    id: single.value,
+    type,
   };
 }
 

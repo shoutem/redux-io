@@ -135,7 +135,9 @@ describe('ReduxApiStateDenormalizer', () => {
         ],
       };
 
-      const single = { value: { id: 'type1Id1', type: 'type1' } };
+      const single = { value: 'type1Id1' };
+      single[STATUS] = { schema: 'type1' };
+
       const denormalizedData =
         denormalizer.denormalizeSingle(single, storage);
       assert.deepEqual(
@@ -202,7 +204,8 @@ describe('ReduxApiStateDenormalizer', () => {
       const denormalizer = new ReduxApiStateDenormalizer();
       const storage = createSchemasMap(getStore(), createStorageMap());
 
-      const single = { value: { id: 'type1Id1', type: 'type1' } };
+      const single = { value: 'type1Id1' };
+      single[STATUS] = { schema: 'type1' };
 
       const denormalizedData =
         denormalizer.denormalizeSingle(single, storage);
@@ -218,7 +221,8 @@ describe('ReduxApiStateDenormalizer', () => {
       const store = getStore();
       let storage = createSchemasMap(store, createStorageMap());
 
-      const single = { value: { id: 'type1Id1', type: 'type1' } };
+      const single = { value: 'type1Id1' };
+      single[STATUS] = { schema: 'type1' };
 
       const denormalizedData = denormalizer.denormalizeSingle(single, storage);
 
