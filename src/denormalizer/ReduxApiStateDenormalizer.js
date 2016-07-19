@@ -129,7 +129,7 @@ export default class ReduxApiStateDenormalizer extends ReduxDenormalizer {
     const itemDescriptor = createSingleDescriptor(single, schema);
 
     // if storage is undefined, denormalizer is in Find storage mode
-    this.updateStorage(storage);
+    this.updateStorageMap(storage);
     return this.denormalizeItem(itemDescriptor);
   }
 
@@ -168,7 +168,7 @@ export default class ReduxApiStateDenormalizer extends ReduxDenormalizer {
       return this.cache.getCollection(collection);
     }
 
-    this.updateStorage(storage);
+    this.updateStorageMap(storage);
 
     const denormalizedCollection =
       descriptorCollection.map(itemDescriptor => this.denormalizeItem(itemDescriptor));

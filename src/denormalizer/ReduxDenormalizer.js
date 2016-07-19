@@ -48,6 +48,12 @@ export default class ReduxDenormalizer extends ObjectDenormalizer {
     this.denormalizeItem = this.denormalizeItem.bind(this);
   }
 
+  /**
+   * Create new storageMap depending on active mode.
+   *
+   * @param storage
+   * @returns {*}
+   */
   createStorageMap(storage) {
     // Check if ReduxDenormalizer is in ProvideStorage mode and if it is,
     // check if storage is provided. ProvideStorage mode requires storage!
@@ -57,18 +63,19 @@ export default class ReduxDenormalizer extends ObjectDenormalizer {
     return storage || resolveStorageMap(this.getStore, this.storagePath);
   }
 
-  updateStorage(storage) {
+  /**
+   * Create new storageMap and update normalized data with it.
+   * Normalized data is ObjectDenormalizer pool for normalized items.
+   *
+   * @param storage
+   */
+  updateStorageMap(storage) {
     const denormalizationStorage = this.createStorageMap(storage);
     super.setNormalizedData(denormalizationStorage);
   }
 
-  denormalizeItemFromStorage(item, storage) {
-    this.updateStorage(storage);
-    return this.denormalizeItem(item);
-  }
   /**
    * Returns denormalized item
-   * Storage is needed in ProvideStorage mode.
    *
    * @returns {{}}
    */
@@ -76,19 +83,43 @@ export default class ReduxDenormalizer extends ObjectDenormalizer {
     // TODO(Braco) - find a way to be sure that when in ProvideStorageMode,
     // denormalize is not called directly
     if (!this.provideStorageMode) {
-      this.updateStorage();
+      this.updateStorageMap();
     }
     return super.denormalizeItem(item);
   }
 
   /**
-   * Returns denormalized collection
-   * Storage is needed in ProvideStorage mode.
+   * Updates denormalizer storage and denormalizes item
    *
+   * @param collection
+   * @param storage
    * @returns {{}} - denormalized items
    */
-  denormalizeCollection(collection, storage) {
-    this.updateStorage(storage);
+
+  denormalizeItemFromStorage(item, storage) {
+    this.updateStorageMap(storage);
+    return this.denormalizeItem(item);
+  }
+
+  /**
+   * Denormalizes collection
+   *
+   * @param collection
+   * @returns {{}} - denormalized items
+   */
+  denormalizeCollection(collection) {
     return collection.map(this.denormalizeItem);
+  }
+
+  /**
+   * Updates denormalizer storage and denormalizes collection
+   *
+   * @param collection
+   * @param storage
+   * @returns {{}} - denormalized items
+   */
+  denormalizeCollectionFromStorage(collection, storage) {
+    this.updateStorageMap(storage);
+    return this.denormalizeCollection(collection);
   }
 }

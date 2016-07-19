@@ -228,7 +228,7 @@ describe('ReduxDenormalizer', () => {
         },
       ];
       const denormalizedData =
-        denormalizer.denormalizeCollection(
+        denormalizer.denormalizeCollectionFromStorage(
           [
             { id: 'type1Id1', type: 'type1' },
             { id: 'type2Id1', type: 'type2' },
@@ -243,7 +243,7 @@ describe('ReduxDenormalizer', () => {
     });
     it('throws error if invalid storage in ProvideStorage mode', () => {
       assert.throw(() => {
-        new ReduxDenormalizer().denormalizeCollection([1]);
+        new ReduxDenormalizer().denormalizeCollectionFromStorage([1]);
       }, 'Invalid storage, ProvideStorage mode requires storage object');
     });
   });
