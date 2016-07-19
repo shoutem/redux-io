@@ -114,7 +114,7 @@ describe('ReduxDenormalizer', () => {
         ],
       };
       const denormalizedData =
-        denormalizer.denormalizeItem({ id: 'type1Id1', type: 'type1' });
+        denormalizer.denormalizeSingle({ id: 'type1Id1', type: 'type1' });
       assert.deepEqual(
         denormalizedData,
         expectedData,
@@ -143,7 +143,7 @@ describe('ReduxDenormalizer', () => {
         ],
       };
       const denormalizedData =
-        denormalizer.denormalizeItemFromStorage(
+        denormalizer.denormalizeSingle(
           { id: 'type1Id1', type: 'type1' },
           getStore().storage
         );
@@ -155,7 +155,7 @@ describe('ReduxDenormalizer', () => {
     });
     it('throws error if invalid storage in ProvideStorage mode', () => {
       assert.throw(() => {
-        new ReduxDenormalizer().denormalizeItemFromStorage();
+        new ReduxDenormalizer().denormalizeSingle();
       }, 'Invalid storage, ProvideStorage mode requires storage object');
     });
   });
@@ -228,7 +228,7 @@ describe('ReduxDenormalizer', () => {
         },
       ];
       const denormalizedData =
-        denormalizer.denormalizeCollectionFromStorage(
+        denormalizer.denormalizeCollection(
           [
             { id: 'type1Id1', type: 'type1' },
             { id: 'type2Id1', type: 'type2' },
@@ -243,7 +243,7 @@ describe('ReduxDenormalizer', () => {
     });
     it('throws error if invalid storage in ProvideStorage mode', () => {
       assert.throw(() => {
-        new ReduxDenormalizer().denormalizeCollectionFromStorage([1]);
+        new ReduxDenormalizer().denormalizeCollection([1]);
       }, 'Invalid storage, ProvideStorage mode requires storage object');
     });
   });
