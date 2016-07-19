@@ -84,6 +84,7 @@ export {
   isInitialized,
   shouldRefresh,
   getTransformation,
+  cloneStatus,
 } from './status';
 
 import { enableRio } from './enableRio';
