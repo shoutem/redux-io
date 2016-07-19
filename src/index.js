@@ -4,11 +4,10 @@ export { apiStateMiddleware };
 import storage from './storage';
 export { storage };
 
-import collection, { COLLECTION_CLEAR, getCollectionDescription } from './collection';
+import collection, { COLLECTION_CLEAR } from './collection';
 export {
   collection,
   COLLECTION_CLEAR,
-  getCollectionDescription,
 };
 
 import single from './single';
