@@ -196,7 +196,7 @@ describe('ReduxApiStateDenormalizer', () => {
 
       assert.throws(() => {
         denormalizer.denormalizeSingle('type1Id1', storage);
-      }, 'Denormalizing primitive single but no schema is provided!');
+      }, 'Cannot create primitive single descriptor, schema is not provided.');
     });
     it('gets object from cache', () => {
       const denormalizer = new ReduxApiStateDenormalizer();

@@ -33,7 +33,7 @@ function getType(collection, schema) {
  * @param schema - used if collection is List of IDs
  * @returns {*}
  */
-function createDesriptorCollection(collection, schema) {
+function createDescriptorCollection(collection, schema) {
   const type = getType(collection, schema);
   const descriptorCollection = collection.map(id => ({
     id,
@@ -46,7 +46,7 @@ function createDesriptorCollection(collection, schema) {
 function createSingleDescriptor(single, schema) {
   const singleIsPrimitiveValue = _.isNumber(single) || _.isString(single);
   if (singleIsPrimitiveValue && !schema) {
-    throw Error('Denormalizing primitive single but no schema is provided!');
+    throw Error('Cannot create primitive single descriptor, schema is not provided.!');
   }
 
   if (singleIsPrimitiveValue) {
@@ -160,7 +160,7 @@ export default class ReduxApiStateDenormalizer extends ReduxDenormalizer {
    * @returns {{}}
    */
   denormalizeCollection(collection, storage, schema) {
-    const descriptorCollection = createDesriptorCollection(collection, schema);
+    const descriptorCollection = createDescriptorCollection(collection, schema);
 
     if (this.cache.isCollectionCacheValid(descriptorCollection)) {
       return this.cache.getCollection(collection);
