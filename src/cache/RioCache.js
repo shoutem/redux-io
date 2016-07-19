@@ -1,6 +1,6 @@
 import { createUniqueTargetKey } from '@shoutem/json-api-denormalizer';
-import { getModificationTime } from '../../status';
-import { getUniqueCollectionKey } from '../../collection';
+import { getModificationTime } from '../status';
+import { getUniqueCollectionKey } from '../collection';
 import _ from 'lodash';
 
 function isItemInCollection(collection, item) {

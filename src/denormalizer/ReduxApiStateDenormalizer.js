@@ -1,5 +1,5 @@
 import ReduxDenormalizer from './ReduxDenormalizer';
-import RioCache from './lib/RioCache';
+import RioCache from '../cache/RioCache';
 import _ from 'lodash';
 import { applyStatus, getStatus } from './../status';
 
