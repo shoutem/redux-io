@@ -67,6 +67,45 @@ describe('Find action creator', () => {
     expect(types[2].meta).to.deep.equal(expectedMeta);
   });
 
+  it('creates a valid action with appendMode option', () => {
+    const config = {
+      headers: {
+        'Content-Type': 'application/vnd.api+json',
+      },
+      endpoint: 'api.test',
+    };
+
+    const schema = 'app.builder';
+    const tag = 'collection_test';
+
+    const schemaConfig = {
+      schema,
+      request: config,
+    };
+
+    const action = find(schemaConfig, tag, undefined, { appendMode: true});
+
+    expect(action[RSAA]).to.not.be.undefined;
+    expect(action[RSAA].method).to.equal('GET');
+    expect(action[RSAA].endpoint).to.equal(config.endpoint);
+    expect(action[RSAA].headers).to.deep.equal(config.headers);
+    expect(action[RSAA].types).to.not.be.undefined;
+
+    const types = action[RSAA].types;
+    const expectedMeta = {
+      source: JSON_API_SOURCE,
+      schema,
+      tag,
+      appendMode: true,
+    };
+    expect(types[0].type).to.equal(LOAD_REQUEST);
+    expect(types[0].meta).to.deep.equal(expectedMeta);
+    expect(types[1].type).to.equal(LOAD_SUCCESS);
+    expect(types[1].meta).to.deep.equal(expectedMeta);
+    expect(types[2].type).to.equal(LOAD_ERROR);
+    expect(types[2].meta).to.deep.equal(expectedMeta);
+  });
+
   it('creates a valid action with predefined config', () => {
     const config = {
       headers: {
