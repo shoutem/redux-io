@@ -16,6 +16,9 @@ export { one };
 import find from './actions/find';
 export { find };
 
+import next from './actions/next';
+export { next };
+
 import create from './actions/create';
 export { create };
 
