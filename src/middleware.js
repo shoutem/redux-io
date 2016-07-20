@@ -317,8 +317,18 @@ const getData = payload => {
   return [].concat(data);
 };
 const getIncluded = payload => (
-  _.has(payload, 'included') ? payload.included : []
+  _.get(payload, 'included', [])
 );
+const getLinks = payload => _.get(payload, 'links');
+
+function saveLinks(action, dispatch) {
+  const { schema, tag } = action.meta;
+  const links = getLinks(action.payload);
+  if (!links && action.type !== LOAD_SUCCESS) {
+    return;
+  }
+  dispatch(makeIndexAction(action, REFERENCE_STATUS, { links }, schema, tag));
+}
 
 export default store => next => action => {
   // Validate action, if not valid pass
@@ -338,6 +348,8 @@ export default store => next => action => {
   // Find handler for supported action type to make appropriate logic
   const data = getData(action.payload);
   actionHandlers[action.type](action, data, dispatch);
+
+  saveLinks(action, dispatch);
 
   if (!_.isEmpty(actions)) {
     store.dispatch(batchActions(actions));
