@@ -8,11 +8,12 @@ import {
   STATUS,
   validationStatus,
   busyStatus,
+  getStatus,
   createStatus,
   updateStatus,
   applyStatus,
 } from './../status';
-
+export const APPEND_MODE = 'appendMode';
 function isValid(action, schema, tag) {
   if (_.get(action, 'meta.schema') !== schema) {
     return false;
@@ -42,6 +43,18 @@ function createDefaultStatus(schema) {
   );
 }
 
+export function getCollectionLink(col, pointer) {
+  return _.get(getStatus(col), ['links', pointer]);
+}
+
+function handleActionPayload(action, state = []) {
+  const appendMode = _.get(action, ['meta', APPEND_MODE]);
+
+  return _.reduce(action.payload,
+    (newState, item) => newState.concat(item.id),
+    appendMode ? [...state] : []);
+}
+
 // collection is generic collection reducer that enables creating
 // typed & named collection reducers that are handling specific
 // COLLECTION_ type actions with specific collection name.
@@ -59,7 +72,7 @@ export default function collection(schema, tag = '', initialState = []) {
 
     switch (action.type) {
       case REFERENCE_FETCHED: {
-        const newState = action.payload.map(item => item.id);
+        const newState = handleActionPayload(action, state);
         applyStatus(newState, updateStatus(
           state[STATUS],
           {

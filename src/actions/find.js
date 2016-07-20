@@ -6,6 +6,7 @@ import {
   LOAD_ERROR,
 } from './../middleware';
 import { JSON_API_SOURCE } from './..';
+import { APPEND_MODE } from './../reducers/collection';
 import { buildEndpoint, resolveConfig } from './../schemaConfig';
 
 function buildRSAAConfig(config) {
@@ -18,7 +19,13 @@ function buildRSAAConfig(config) {
 
   return _.omitBy(rsaaConfig, _.isNil);
 }
-
+function applyMetaOptions(meta, options) {
+  const appendMode = _.get(options, APPEND_MODE);
+  if (appendMode) {
+    // eslint-disable-next-line no-param-reassign
+    meta[APPEND_MODE] = true;
+  }
+}
 /**
  * Action creator used to fetch data from api (GET). Find function expects schema name of
  * data which correspond with storage reducer or schema configuration object. In both cases
@@ -28,12 +35,14 @@ function buildRSAAConfig(config) {
  * configuration from redux-api-middleware, allowing full customization expect types
  * part of configuration. Tag arg is optional, but when used allows your collections with same
  * tag value to respond on received data.
+ * Options are used to configure reducers behaviors while updating state.
  * @param schema
  * @param tag
  * @param params
+ * @param options - {appendMode}
  * @returns action
  */
-export default (schema, tag = '', params = {}) => {
+export default (schema, tag = '', params = {}, options = {}) => {
   const config = resolveConfig(schema);
   if (!config) {
     const schemaName = schema && _.isObject(schema) ? schema.schema : schema;
@@ -48,6 +57,8 @@ export default (schema, tag = '', params = {}) => {
     schema: config.schema,
     tag,
   };
+  applyMetaOptions(meta, options);
+
   const rsaaConfig = buildRSAAConfig(config);
   const endpoint = buildEndpoint(rsaaConfig.endpoint, params);
 
