@@ -83,6 +83,34 @@ describe('Collection reducer', () => {
     expect(nextState).to.shallowDeepEqual(expectedState);
   });
 
+  it('appends collection of indices on Fetch event with default tag', () => {
+    const initialState = [4, 5];
+    const items = [
+      { id: 1 },
+      { id: 2 },
+    ];
+
+    const schema = 'schema_test';
+    const reducer = collection(schema);
+
+    const action = {
+      type: REFERENCE_FETCHED,
+      meta: {
+        schema,
+        tag: '',
+        appendMode: true,
+      },
+      payload: items,
+    };
+
+    const nextState = reducer(initialState, action);
+    const expectedState = [...initialState, ...items.map(item => item.id)];
+
+    expect(nextState[STATUS].validationStatus).to.eql(validationStatus.VALID);
+    expect(nextState[STATUS].busyStatus).to.eql(busyStatus.IDLE);
+    expect(nextState).to.shallowDeepEqual(expectedState);
+  });
+
   it('ignores action with different schema', () => {
     const initialState = [];
     const items = [
