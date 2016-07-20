@@ -32,11 +32,12 @@ function isValid(action, schema, tag) {
   return true;
 }
 
-function createDefaultStatus(schema) {
+function createDescription(schema, tag) {
   return updateStatus(
     createStatus(),
     {
       schema,
+      tag,
       type: 'collection',
       id: _.uniqueId(),
     }
@@ -63,7 +64,7 @@ export default function collection(schema, tag = '', initialState = []) {
     throw new Error('Tag value \'*\' is reserved for redux-api-state and cannot be used.');
   }
   // eslint-disable-next-line no-param-reassign
-  applyStatus(initialState, createDefaultStatus(schema));
+  applyStatus(initialState, createDescription(schema, tag));
   // TODO-vedran: refactor status into context={status, config}
   return (state = initialState, action) => {
     if (!isValid(action, schema, tag)) {
@@ -108,7 +109,7 @@ export default function collection(schema, tag = '', initialState = []) {
           return state;
         }
         const newState = [...state];
-        applyStatus(newState, createDefaultStatus(schema));
+        applyStatus(newState, createDescription(schema, tag));
         return newState;
       }
     }
