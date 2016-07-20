@@ -8,7 +8,7 @@
   ],
   "scripts": {
     "lint": "eslint src test",
-    "test": "mocha --compilers js:babel-core/register --reporter spec --recursive test",
+    "test": "mocha --require babelTestSetup --reporter spec --recursive test",
     "coverage": "babel-node node_modules/isparta/bin/isparta cover --report text --report html node_modules/mocha/bin/_mocha -- -R spec --recursive test",
     "build": "babel src --out-dir lib"
   },
