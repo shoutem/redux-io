@@ -32,7 +32,7 @@ function isValid(action, schema, tag) {
   return true;
 }
 
-function createDescription(schema, tag) {
+function createDefaultStatus(schema, tag) {
   return updateStatus(
     createStatus(),
     {
@@ -48,12 +48,13 @@ export function getCollectionLink(col, pointer) {
   return _.get(getStatus(col), ['links', pointer]);
 }
 
-function handleActionPayload(action, state = []) {
+function handleReferencePayload(action, state = []) {
   const appendMode = _.get(action, ['meta', APPEND_MODE]);
-
-  return _.reduce(action.payload,
-    (newState, item) => newState.concat(item.id),
-    appendMode ? [...state] : []);
+  const newIds = action.payload.map(item => item.id);
+  if (appendMode) {
+    return [...state, ...newIds];
+  }
+  return newIds;
 }
 
 // collection is generic collection reducer that enables creating
@@ -64,7 +65,7 @@ export default function collection(schema, tag = '', initialState = []) {
     throw new Error('Tag value \'*\' is reserved for redux-api-state and cannot be used.');
   }
   // eslint-disable-next-line no-param-reassign
-  applyStatus(initialState, createDescription(schema, tag));
+  applyStatus(initialState, createDefaultStatus(schema, tag));
   // TODO-vedran: refactor status into context={status, config}
   return (state = initialState, action) => {
     if (!isValid(action, schema, tag)) {
@@ -73,7 +74,7 @@ export default function collection(schema, tag = '', initialState = []) {
 
     switch (action.type) {
       case REFERENCE_FETCHED: {
-        const newState = handleActionPayload(action, state);
+        const newState = handleReferencePayload(action, state);
         applyStatus(newState, updateStatus(
           state[STATUS],
           {
@@ -109,7 +110,7 @@ export default function collection(schema, tag = '', initialState = []) {
           return state;
         }
         const newState = [...state];
-        applyStatus(newState, createDescription(schema, tag));
+        applyStatus(newState, createDefaultStatus(schema, tag));
         return newState;
       }
     }
