@@ -222,10 +222,12 @@ describe('Find action creator', () => {
     };
 
     expect(() => find(schemaConfig, tag)).to.throw(
-      'Schema configuration is invalid. Error: data.request should'
-    + ' have required property \'endpoint\''
-    + `Invalid schema config: ${schemaConfig}`
-    );
+      'Schema configuration is invalid. Error:'
+      + ' [{"code":"OBJECT_MISSING_REQUIRED_PROPERTY","params":'
+      + '["endpoint"],"message":"Missing required property: endpoint"'
+      + ',"path":"#/request"}]. Invalid schema config: {"schema":"'
+      + 'app.builder","request":{"headers":{"Content-Type":"application'
+      + '/vnd.api+json"}}}');
   });
 
   it('creates a invalid action with invalid tag', () => {

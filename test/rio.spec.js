@@ -59,7 +59,10 @@ describe('Rio', () => {
     const schemaName = 'app.builder';
     expect(() => rio.getSchema(schemaName))
       .to.throw('Schema configuration is invalid. Error:'
-      + ' data.request should have required property \'headers\'');
+      + ' [{"code":"OBJECT_MISSING_REQUIRED_PROPERTY","params":["headers"],'
+      + '"message":"Missing required property: headers","path":"#/request"}].'
+      + ' Invalid schema config: {"schema":"app.builder","request":{"endpoint"'
+      + ':"api.test.app.builder"}}');
   });
 
   it('resolve schema with blank rio', () => {
@@ -100,8 +103,9 @@ describe('Rio', () => {
 
     expect(() => rio.registerSchema(schemaConfig))
       .to.throw('Schema configuration is invalid. Error:'
-      + ' data.request should NOT have additional properties,'
-      + ' data.request should have required property \'endpoint\'');
+      + ' [{"code":"OBJECT_ADDITIONAL_PROPERTIES","params":[["schema"]],'
+      + '"message":"Additional properties not allowed: schema","path":"#/request"}].'
+      + ' Invalid schema config: ' + JSON.stringify(schemaConfig));
   });
 
   it('register source type', () => {

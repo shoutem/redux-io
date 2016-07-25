@@ -1,8 +1,8 @@
 import _ from 'lodash';
-import Ajv from 'ajv';
+import ZSchema from 'z-schema';
 import rio from './rio';
 
-const ajv = new Ajv({ allErrors: true });
+const validator = new ZSchema();
 const schemaDefinition = {
   type: 'object',
   properties: {
@@ -48,11 +48,13 @@ const schemaDefinition = {
  * @param config
  */
 export function validateSchemaConfig(config) {
-  const validResult = ajv.validate(schemaDefinition, config);
+  const validResult = validator.validate(config, schemaDefinition);
   if (!validResult) {
+    const validationErrorsMsg = JSON.stringify(validator.getLastErrors());
+    const configMsg = JSON.stringify(config);
     throw new Error(
-      `Schema configuration is invalid. Error: ${ajv.errorsText(validResult.errors)}`
-      + `Invalid schema config: ${config}`
+      `Schema configuration is invalid. Error: ${validationErrorsMsg}.`
+      + ` Invalid schema config: ${configMsg}`
     );
   }
 }
