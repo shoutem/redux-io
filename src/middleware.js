@@ -319,14 +319,23 @@ const getData = payload => {
 const getIncluded = payload => (
   _.get(payload, 'included', [])
 );
-const getLinks = payload => _.get(payload, 'links');
+const getLinks = payload => {
+  // Destruction ensure that every link has value
+  const { prev, next, self, last } = _.get(payload, 'links', {});
+  return {
+    prev,
+    next,
+    self,
+    last,
+  };
+};
 
 function saveLinks(action, dispatch) {
-  const { schema, tag } = action.meta;
-  const links = getLinks(action.payload);
-  if (!links && action.type !== LOAD_SUCCESS) {
+  if (action.type !== LOAD_SUCCESS) {
     return;
   }
+  const { schema, tag } = action.meta;
+  const links = getLinks(action.payload);
   dispatch(makeIndexAction(action, REFERENCE_STATUS, { links }, schema, tag));
 }
 
