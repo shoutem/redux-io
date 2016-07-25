@@ -638,7 +638,7 @@ describe('Json api middleware', () => {
       links: {
           self: 'self url',
           next: 'next url',
-          last: 'last url',
+          prev: 'last url',
         },
     };
     const expectedMeta = {
@@ -653,6 +653,10 @@ describe('Json api middleware', () => {
       payload: expectedPayload,
     };
 
+    const expectedLinks = {
+      ...expectedPayload.links,
+      last: undefined
+    };
     const store = mockStore({});
     store.dispatch(actionPromise(mockSuccessAction))
       .then(() => {
@@ -674,7 +678,7 @@ describe('Json api middleware', () => {
         const actionLinks= batchedActions[3];
         expect(actionLinks.type).to.equal(REFERENCE_STATUS);
         expect(actionLinks.meta).to.deep.equal({ ...expectedMeta });
-        expect(actionLinks.payload).to.deep.equal({ links: expectedPayload.links });
+        expect(actionLinks.payload).to.deep.equal({ links: expectedLinks });
 
         const successAction = performedActions[1];
         expect(successAction.type).to.equal(LOAD_SUCCESS);
