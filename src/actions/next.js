@@ -17,7 +17,6 @@ export default (collection, appendMode = true) => {
   const findConfig = {
     request: {
       endpoint: nextLink,
-      headers: { 'Content-Type': 'application/vnd.api+json' },
     },
     schema,
   };

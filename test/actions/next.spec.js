@@ -28,6 +28,18 @@ describe('Next action creator', () => {
   it('creates a valid action', () => {
     const schema = 'schema_test';
     const tag = 'tag_test';
+    const config = {
+      headers: {
+        'Content-Type': 'application/vnd.api+json',
+      },
+      endpoint: 'api.test',
+    };
+    const schemaConfig = {
+      schema,
+      request: config,
+    };
+    rio.registerSchema(schemaConfig);
+
     const links = {
       self: 'self url',
       next: 'next url',
