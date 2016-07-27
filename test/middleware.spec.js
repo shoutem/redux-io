@@ -655,7 +655,7 @@ describe('Json api middleware', () => {
 
     const expectedLinks = {
       ...expectedPayload.links,
-      last: undefined
+      last: null
     };
     const store = mockStore({});
     store.dispatch(actionPromise(mockSuccessAction))
