@@ -69,3 +69,5 @@ export const isError = obj =>
 
 export const shouldRefresh = (obj, ignoreError = false) =>
   !isValid(obj) && !isBusy(obj) && (!isError(obj) || ignoreError);
+
+export const getId = obj => obj[STATUS] && obj[STATUS].id;
