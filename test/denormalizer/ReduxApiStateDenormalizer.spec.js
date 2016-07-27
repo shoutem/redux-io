@@ -5,10 +5,45 @@ import { createSchemasMap } from '../../src/denormalizer/ReduxApiStateDenormaliz
 import {
   STATUS,
   createStatus,
-  updateStatus,
 } from '../../src/status';
+import _ from 'lodash';
 
 chai.use(shallowDeepEqual);
+
+function mergeStatus(denormalizedData) {
+  if (!denormalizedData) {
+    return denormalizedData;
+  }
+  const result = _.mergeWith({}, denormalizedData, (objVal, srcVal, key, object) => {
+    if (_.isArray(srcVal)) {
+      return applyStatusToCollectionItems(srcVal);
+    } else if (_.isPlainObject(srcVal) && srcVal[STATUS]) {
+      return {
+        ...mergeStatus(srcVal),
+        [STATUS]: srcVal[STATUS]
+      }
+    }
+  });
+  if (denormalizedData && denormalizedData[STATUS]) {
+    result[STATUS] = denormalizedData[STATUS];
+  }
+  return result;
+}
+
+function applyStatusToCollectionItems(collection) {
+  return _.reduce(collection, (result, item, key) => {
+    result[key] = mergeStatus(item);
+    return result;
+  }, []);
+}
+
+function addStatusToCollection(collection) {
+  const collectionItemsWithStatus = applyStatusToCollectionItems(collection);
+  if (collection[STATUS]) {
+    collectionItemsWithStatus[STATUS] = collection[STATUS];
+  }
+  return collectionItemsWithStatus;
+}
 
 function createStorageMap() {
   return {
@@ -74,10 +109,10 @@ const getStore = () => {
       },
     },
   };
-  store.storage.type1.type1Id1[STATUS] = createStatus();
-  store.storage.type1.type1Id2[STATUS] = createStatus();
-  store.storage.type1.type1Id3[STATUS] = createStatus();
-  store.storage['type2.test'].type2Id1[STATUS] = createStatus();
+  store.storage.type1.type1Id1[STATUS] = createStatus({id: _.uniqueId()});
+  store.storage.type1.type1Id2[STATUS] = createStatus({id: _.uniqueId()});
+  store.storage.type1.type1Id3[STATUS] = createStatus({id: _.uniqueId()});
+  store.storage['type2.test'].type2Id1[STATUS] = createStatus({id: _.uniqueId()});
   return store;
 };
 function getModifiedStore(store) {
@@ -139,9 +174,10 @@ describe('ReduxApiStateDenormalizer', () => {
 
       const single = { value: 'type1Id1' };
       single[STATUS] = { schema: 'type1' };
-
       const denormalizedData =
-        denormalizer.denormalizeSingle(single, storage);
+        mergeStatus(denormalizer.denormalizeSingle(single, storage));
+
+      console.log(denormalizedData[STATUS]);
       assert.deepEqual(
         denormalizedData,
         expectedData,
@@ -187,7 +223,7 @@ describe('ReduxApiStateDenormalizer', () => {
       };
 
       const denormalizedData =
-      denormalizer.denormalizeSingle('type1Id1', storage, 'type1');
+        mergeStatus(denormalizer.denormalizeSingle('type1Id1', storage, 'type1'));
       assert.isObject(denormalizedData[STATUS]);
       assert.isObject(denormalizedData['type2.test'][STATUS]);
       assert.shallowDeepEqual(
@@ -201,7 +237,7 @@ describe('ReduxApiStateDenormalizer', () => {
       const storage = createSchemasMap(getStore(), createStorageMap());
 
       assert.throws(() => {
-        denormalizer.denormalizeSingle('type1Id1', storage);
+        mergeStatus(denormalizer.denormalizeSingle('type1Id1', storage));
       }, 'Cannot create primitive single descriptor, schema is not provided.');
     });
     it('gets object from cache', () => {
@@ -228,12 +264,12 @@ describe('ReduxApiStateDenormalizer', () => {
       const single = { value: 'type1Id1' };
       single[STATUS] = { schema: 'type1' };
 
-      const denormalizedData = denormalizer.denormalizeSingle(single, storage);
+      const denormalizedData = mergeStatus(denormalizer.denormalizeSingle(single, storage));
 
       storage = createSchemasMap(getModifiedStore(store), createStorageMap());
 
       const notCachedDenormalizedData =
-        denormalizer.denormalizeSingle(single, storage);
+        mergeStatus(denormalizer.denormalizeSingle(single, storage));
 
       const expectedData = {
         id: 'type1Id1',
@@ -373,7 +409,7 @@ describe('ReduxApiStateDenormalizer', () => {
         },
       ];
       const denormalizedData =
-        denormalizer.denormalizeCollection(collection, null, 'type1');
+        addStatusToCollection(denormalizer.denormalizeCollection(collection, null, 'type1'));
       assert.deepEqual(
         denormalizedData,
         expectedData,
@@ -400,7 +436,7 @@ describe('ReduxApiStateDenormalizer', () => {
       // Used to be sure that collection are not clashed between each other.
       // That not other cached collection data is used.
       const otherCollection = ['type1Id1'];
-        otherCollection[STATUS] = createStatus({ schema: 'type1', tag: 'other'});
+        otherCollection[STATUS] = createStatus({ schema: 'type1', tag: 'other', id: _.uniqueId()});
         denormalizer.denormalizeCollection(otherCollection);
 
       const cachedDenormalizedData =
