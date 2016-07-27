@@ -49,7 +49,7 @@ export function getCollectionLink(col, pointer) {
 }
 
 function handleReferencePayload(action, state = []) {
-  const appendMode = _.get(action, ['meta', APPEND_MODE]);
+  const appendMode = _.get(action, ['meta', 'options', APPEND_MODE]);
   const newIds = action.payload.map(item => item.id);
   if (appendMode) {
     return [...state, ...newIds];

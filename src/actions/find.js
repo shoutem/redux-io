@@ -6,7 +6,6 @@ import {
   LOAD_ERROR,
 } from './../middleware';
 import { JSON_API_SOURCE } from './..';
-import { APPEND_MODE } from './../reducers/collection';
 import { buildEndpoint, resolveConfig } from './../schemaConfig';
 
 function buildRSAAConfig(config) {
@@ -18,13 +17,6 @@ function buildRSAAConfig(config) {
   };
 
   return _.omitBy(rsaaConfig, _.isNil);
-}
-function applyMetaOptions(meta, options) {
-  const appendMode = _.get(options, APPEND_MODE);
-  if (appendMode) {
-    // eslint-disable-next-line no-param-reassign
-    meta[APPEND_MODE] = true;
-  }
 }
 /**
  * Action creator used to fetch data from api (GET). Find function expects schema name of
@@ -56,8 +48,8 @@ export default (schema, tag = '', params = {}, options = {}) => {
     source: config.request.resourceType || JSON_API_SOURCE,
     schema: config.schema,
     tag,
+    options,
   };
-  applyMetaOptions(meta, options);
 
   const rsaaConfig = buildRSAAConfig(config);
   const endpoint = buildEndpoint(rsaaConfig.endpoint, params);
