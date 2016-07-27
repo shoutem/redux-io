@@ -2,43 +2,42 @@
 /* eslint no-console: ["error", {allow: ["warn", "error"] }] */
 import _ from 'lodash';
 import { batchActions } from 'redux-batched-actions';
-import { transform } from './standardizer';
+import rio from './rio';
 import {
   validationStatus,
   busyStatus,
 } from './status';
 
-export const CREATE_REQUEST = '@@redux_api_state/CREATE_REQUEST';
-export const CREATE_SUCCESS = '@@redux_api_state/CREATE_SUCCESS';
-export const CREATE_ERROR = '@@redux_api_state/CREATE_ERROR';
+export const CREATE_REQUEST = '@@redux_io/CREATE_REQUEST';
+export const CREATE_SUCCESS = '@@redux_io/CREATE_SUCCESS';
+export const CREATE_ERROR = '@@redux_io/CREATE_ERROR';
 
-export const LOAD_REQUEST = '@@redux_api_state/LOAD_REQUEST';
-export const LOAD_SUCCESS = '@@redux_api_state/LOAD_SUCCESS';
-export const LOAD_ERROR = '@@redux_api_state/LOAD_ERROR';
+export const LOAD_REQUEST = '@@redux_io/LOAD_REQUEST';
+export const LOAD_SUCCESS = '@@redux_io/LOAD_SUCCESS';
+export const LOAD_ERROR = '@@redux_io/LOAD_ERROR';
 
-export const UPDATE_REQUEST = '@@redux_api_state/UPDATE_REQUEST';
-export const UPDATE_SUCCESS = '@@redux_api_state/UPDATE_SUCCESS';
-export const UPDATE_ERROR = '@@redux_api_state/UPDATE_ERROR';
+export const UPDATE_REQUEST = '@@redux_io/UPDATE_REQUEST';
+export const UPDATE_SUCCESS = '@@redux_io/UPDATE_SUCCESS';
+export const UPDATE_ERROR = '@@redux_io/UPDATE_ERROR';
 
-export const REMOVE_REQUEST = '@@redux_api_state/REMOVE_REQUEST';
-export const REMOVE_SUCCESS = '@@redux_api_state/REMOVE_SUCCESS';
-export const REMOVE_ERROR = '@@redux_api_state/REMOVE_ERROR';
+export const REMOVE_REQUEST = '@@redux_io/REMOVE_REQUEST';
+export const REMOVE_SUCCESS = '@@redux_io/REMOVE_SUCCESS';
+export const REMOVE_ERROR = '@@redux_io/REMOVE_ERROR';
 
-export const REFERENCE_FETCHED = '@@redux_api_state/REFERENCE_FETCHED';
-export const REFERENCE_STATUS = '@@redux_api_state/REFERENCE_STATUS';
-export const REFERENCE_CLEAR = '@@redux_api_state/REFERENCE_CLEAR';
+export const REFERENCE_FETCHED = '@@redux_io/REFERENCE_FETCHED';
+export const REFERENCE_STATUS = '@@redux_io/REFERENCE_STATUS';
+export const REFERENCE_CLEAR = '@@redux_io/REFERENCE_CLEAR';
 
-export const OBJECT_FETCHED = '@@redux_api_state/OBJECT_FETCHED';
-export const OBJECT_UPDATING = '@@redux_api_state/OBJECT_UPDATING';
-export const OBJECT_UPDATED = '@@redux_api_state/OBJECT_UPDATED';
-export const OBJECT_CREATED = '@@redux_api_state/OBJECT_CREATED';
-export const OBJECT_REMOVING = '@@redux_api_state/OBJECT_REMOVING';
-export const OBJECT_REMOVED = '@@redux_api_state/OBJECT_REMOVED';
+export const OBJECT_FETCHED = '@@redux_io/OBJECT_FETCHED';
+export const OBJECT_UPDATING = '@@redux_io/OBJECT_UPDATING';
+export const OBJECT_UPDATED = '@@redux_io/OBJECT_UPDATED';
+export const OBJECT_CREATED = '@@redux_io/OBJECT_CREATED';
+export const OBJECT_REMOVING = '@@redux_io/OBJECT_REMOVING';
+export const OBJECT_REMOVED = '@@redux_io/OBJECT_REMOVED';
 
-export const OBJECT_ERROR = '@@redux_api_state/OBJECT_ERROR';
-export const COLLECTION_ERROR = '@@redux_api_state/COLLECTION_ERROR';
+export const OBJECT_ERROR = '@@redux_io/OBJECT_ERROR';
+export const COLLECTION_ERROR = '@@redux_io/COLLECTION_ERROR';
 
-export const middlewareJsonApiSource = '@@redux_api_state/json_api';
 
 const actionsWithoutPayload = new Set([
   REMOVE_SUCCESS,
@@ -111,7 +110,9 @@ export function makeObjectAction(sourceAction, actionType, item) {
     return makeErrorAction(OBJECT_ERROR, 'Id is not valid.');
   }
 
-  // create transformation keys
+  // finds appropriate standardizer for transformation
+  const transform = rio.getStandardizer(sourceAction.meta.source);
+  // transforms item into standard model
   const transformation = transform(item);
 
   return {
@@ -284,20 +285,20 @@ function isValidAction(action) {
     console.error('Source is undefined.');
     return false;
   }
-  // Source exists but this middleware is not responsible for other source variants
-  // only for json_api
-  if (meta.source !== middlewareJsonApiSource) {
-    console.error('api source is unknown');
+  // Source value exists but check if rio support standardization of such source type
+  if (!rio.getStandardizer(meta.source)) {
     return false;
   }
   // Check that schema is defined
   if (!meta.schema) {
-    console.error('Schema is invalid.');
+    console.error('Action.meta.schema is undefined.');
     return false;
   }
   // Validate payload for payload-specific action, ignore others
   if (!actionsWithoutPayload.has(action.type)
     && !_.has(action, 'payload.data')) {
+    // TODO: move this into standardizer specific area once json standardization
+    // is supported
     console.error('Payload Data is invalid, expecting payload.data.');
     return false;
   }
@@ -316,14 +317,34 @@ const getData = payload => {
   return [].concat(data);
 };
 const getIncluded = payload => (
-  _.has(payload, 'included') ? payload.included : []
+  _.get(payload, 'included', [])
 );
+const getLinks = payload => {
+  const links = _.get(payload, 'links', {});
+  return {
+    prev: links.prev || null,
+    next: links.next || null,
+    self: links.self || null,
+    last: links.last || null,
+  };
+};
+
+function saveLinks(action, dispatch) {
+  if (action.type !== LOAD_SUCCESS) {
+    return;
+  }
+  const { schema, tag } = action.meta;
+  const links = getLinks(action.payload);
+  dispatch(makeIndexAction(action, REFERENCE_STATUS, { links }, schema, tag));
+}
 
 export default store => next => action => {
   // Validate action, if not valid pass
   if (!isValidAction(action)) {
     return next(action);
   }
+
+  // TODO: add standardization of whole payload once we support json standardization
 
   const actions = [];
   const dispatch = dispatchAction => actions.push(dispatchAction);
@@ -335,6 +356,8 @@ export default store => next => action => {
   // Find handler for supported action type to make appropriate logic
   const data = getData(action.payload);
   actionHandlers[action.type](action, data, dispatch);
+
+  saveLinks(action, dispatch);
 
   if (!_.isEmpty(actions)) {
     store.dispatch(batchActions(actions));

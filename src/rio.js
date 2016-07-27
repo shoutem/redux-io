@@ -1,52 +1,6 @@
 import _ from 'lodash';
-import Ajv from 'ajv';
-
-const ajv = new Ajv({ allErrors: true });
-const schemaDefinition = {
-  type: 'object',
-  properties: {
-    schema: {
-      type: 'string',
-    },
-    request: {
-      type: 'object',
-      properties: {
-        endpoint: {
-          type: 'string',
-        },
-        headers: {
-          type: 'object',
-        },
-        method: {
-          type: 'string',
-        },
-        types: {
-          type: 'array',
-        },
-      },
-      additionalProperties: false,
-      required: [
-        'endpoint',
-        'headers',
-      ],
-    },
-  },
-  additionalProperties: false,
-  required: [
-    'schema',
-    'request',
-  ],
-};
-
-export function validateSchemaConfig(config) {
-  const validResult = ajv.validate(schemaDefinition, config);
-  if (!validResult) {
-    throw new Error(
-      `Schema configuration is invalid. Error: ${ajv.errorsText(validResult.errors)}`
-      + `Current schema config: ${config}`
-    );
-  }
-}
+import { validateSchemaConfig } from './schemaConfig';
+import { JSON_API_SOURCE, transform } from './standardizers/json-api-standardizer';
 
 /**
  * Adds additional layer over library by providing central place for defining rio behavior
@@ -76,7 +30,7 @@ export class Rio {
    * Resolve schema by finding a schema configuration object
    * or by resolving schema with registered schema resolvers.
    */
-  resolveSchema(schema) {
+  getSchema(schema) {
     let config = this.schemaConfigs[schema];
     if (config) {
       return config;
@@ -92,6 +46,37 @@ export class Rio {
     });
 
     return config;
+  }
+
+  /**
+   * Register source type for data standardization.
+   */
+  registerSourceType(sourceType, standardizer) {
+    if (!_.isString(sourceType)) {
+      throw new Error('rio.registerSourceType sourceType argument must be string.');
+    }
+    if (_.isEmpty(sourceType)) {
+      throw new Error('rio.registerSourceType sourceType is empty.');
+    }
+    if (!_.isFunction(standardizer)) {
+      throw new Error('rio.registerSourceType standardizer argument must be a function.');
+    }
+
+    this.standardizers[sourceType] = standardizer;
+  }
+
+  /**
+   * Get standardizer function based on source type.
+   */
+  getStandardizer(sourceType) {
+    if (!_.isString(sourceType)) {
+      throw new Error('rio.getStandardizer sourceType argument must be string.');
+    }
+    if (_.isEmpty(sourceType)) {
+      throw new Error('rio.getStandardizer sourceType is empty.');
+    }
+
+    return this.standardizers[sourceType];
   }
 
   /**
@@ -116,6 +101,10 @@ export class Rio {
     this.schemaResolvers = [];
     this.schemaPaths = {};
     this.denormalizer = null;
+    this.standardizers = {};
+
+    // Default standardizer for json-api
+    this.registerSourceType(JSON_API_SOURCE, transform);
   }
 }
 

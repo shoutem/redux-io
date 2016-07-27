@@ -23,13 +23,14 @@ import {
   REFERENCE_FETCHED,
   REFERENCE_STATUS,
   apiStateMiddleware,
+  JSON_API_SOURCE,
 } from '../src';
 import {
-  middlewareJsonApiSource,
 } from '../src/middleware';
 import {
   validationStatus,
   busyStatus,
+  STATUS,
 } from '../src/status';
 
 describe('Json api middleware', () => {
@@ -53,7 +54,7 @@ describe('Json api middleware', () => {
     const schema = 'schema_test';
     const tag = 'tag_test';
     const expectedMeta = {
-      source: middlewareJsonApiSource,
+      source: JSON_API_SOURCE,
       schema,
       tag,
     };
@@ -102,7 +103,7 @@ describe('Json api middleware', () => {
       }],
     };
     const expectedMeta = {
-      source: middlewareJsonApiSource,
+      source: JSON_API_SOURCE,
       schema,
       tag,
     };
@@ -142,7 +143,7 @@ describe('Json api middleware', () => {
     const schema = 'schema_test';
     const tag = 'tag_test';
     const expectedMeta = {
-      source: middlewareJsonApiSource,
+      source: JSON_API_SOURCE,
       schema,
       tag,
     };
@@ -188,7 +189,7 @@ describe('Json api middleware', () => {
       }],
     };
     const expectedMeta = {
-      source: middlewareJsonApiSource,
+      source: JSON_API_SOURCE,
       schema,
       tag: '',
     };
@@ -231,7 +232,7 @@ describe('Json api middleware', () => {
   it('produces valid actions for create error', done => {
     const schema = 'schema_test';
     const expectedMeta = {
-      source: middlewareJsonApiSource,
+      source: JSON_API_SOURCE,
       schema,
     };
 
@@ -275,7 +276,7 @@ describe('Json api middleware', () => {
       }],
     };
     const expectedMeta = {
-      source: middlewareJsonApiSource,
+      source: JSON_API_SOURCE,
       schema,
       tag: '',
     };
@@ -328,7 +329,7 @@ describe('Json api middleware', () => {
       }],
     };
     const expectedMeta = {
-      source: middlewareJsonApiSource,
+      source: JSON_API_SOURCE,
       schema,
       tag: '',
     };
@@ -372,7 +373,7 @@ describe('Json api middleware', () => {
   it('produces valid actions for update error', done => {
     const schema = 'schema_test';
     const expectedMeta = {
-      source: middlewareJsonApiSource,
+      source: JSON_API_SOURCE,
       schema,
     };
 
@@ -414,7 +415,7 @@ describe('Json api middleware', () => {
     const expectedPayload = { data: deletedItem };
 
     const expectedMeta = {
-      source: middlewareJsonApiSource,
+      source: JSON_API_SOURCE,
       schema,
       tag: '',
     };
@@ -461,7 +462,7 @@ describe('Json api middleware', () => {
     const expectedPayload = { data: deletedItem };
 
     const expectedMeta = {
-      source: middlewareJsonApiSource,
+      source: JSON_API_SOURCE,
       schema,
       tag: '',
     };
@@ -501,7 +502,7 @@ describe('Json api middleware', () => {
   it('produces valid actions for delete error', done => {
     const schema = 'schema_test';
     const expectedMeta = {
-      source: middlewareJsonApiSource,
+      source: JSON_API_SOURCE,
       schema,
     };
 
@@ -570,7 +571,7 @@ describe('Json api middleware', () => {
       ],
     };
     const expectedMeta = {
-      source: middlewareJsonApiSource,
+      source: JSON_API_SOURCE,
       schema,
       tag,
     };
@@ -607,6 +608,77 @@ describe('Json api middleware', () => {
         expect(actionCollFetched.type).to.equal(REFERENCE_FETCHED);
         expect(actionCollFetched.meta).to.deep.equal({ ...expectedMeta });
         expect(actionCollFetched.payload).to.deep.equal(expectedPayload.data);
+
+        const successAction = performedActions[1];
+        expect(successAction.type).to.equal(LOAD_SUCCESS);
+        expect(successAction.meta).to.deep.equal(expectedMeta);
+        expect(successAction.payload).to.deep.equal(expectedPayload);
+      }).then(done).catch(done);
+  });
+
+  it('produces valid actions for links data in payload', done => {
+    const schema = 'schema_test';
+    const tag = 'tag_test';
+    const expectedPayload = {
+      data: [
+        {
+          type: schema,
+          id: '1',
+          attributes: {
+            name: 'Test1',
+          },
+        }, {
+          type: schema,
+          id: '2',
+          attributes: {
+            name: 'Test2',
+          },
+        },
+      ],
+      links: {
+          self: 'self url',
+          next: 'next url',
+          prev: 'last url',
+        },
+    };
+    const expectedMeta = {
+      source: JSON_API_SOURCE,
+      schema,
+      tag,
+    };
+
+    const mockSuccessAction = {
+      type: LOAD_SUCCESS,
+      meta: expectedMeta,
+      payload: expectedPayload,
+    };
+
+    const expectedLinks = {
+      ...expectedPayload.links,
+      last: undefined
+    };
+    const store = mockStore({});
+    store.dispatch(actionPromise(mockSuccessAction))
+      .then(() => {
+        const performedActions = store.getActions();
+        expect(performedActions).to.have.length(2);
+
+        const batchedActions = performedActions[0].payload;
+
+        const actionObjFetched = batchedActions[0];
+        expect(actionObjFetched.type).to.equal(OBJECT_FETCHED);
+        expect(actionObjFetched.meta).to.deep.equal({ ...expectedMeta, transformation: {} });
+        expect(actionObjFetched.payload).to.deep.equal(expectedPayload.data[0]);
+
+        const actionCollFetched = batchedActions[2];
+        expect(actionCollFetched.type).to.equal(REFERENCE_FETCHED);
+        expect(actionCollFetched.meta).to.deep.equal({ ...expectedMeta });
+        expect(actionCollFetched.payload).to.deep.equal(expectedPayload.data);
+
+        const actionLinks= batchedActions[3];
+        expect(actionLinks.type).to.equal(REFERENCE_STATUS);
+        expect(actionLinks.meta).to.deep.equal({ ...expectedMeta });
+        expect(actionLinks.payload).to.deep.equal({ links: expectedLinks });
 
         const successAction = performedActions[1];
         expect(successAction.type).to.equal(LOAD_SUCCESS);
@@ -662,7 +734,7 @@ describe('Json api middleware', () => {
       }],
     };
     const expectedMeta = {
-      source: middlewareJsonApiSource,
+      source: JSON_API_SOURCE,
       schema,
       tag,
     };
@@ -730,7 +802,7 @@ describe('Json api middleware', () => {
       }],
     };
     const expectedMeta = {
-      source: middlewareJsonApiSource,
+      source: JSON_API_SOURCE,
       schema,
       tag,
     };
@@ -797,7 +869,7 @@ describe('Json api middleware', () => {
     const schema = 'schema_test';
     const tag = undefined;
     const expectedMeta = {
-      source: middlewareJsonApiSource,
+      source: JSON_API_SOURCE,
       schema,
       tag,
     };
@@ -837,7 +909,7 @@ describe('Json api middleware', () => {
       }],
     };
     const expectedMeta = {
-      source: middlewareJsonApiSource,
+      source: JSON_API_SOURCE,
       schema,
       tag,
     };
@@ -938,7 +1010,7 @@ describe('Json api middleware', () => {
     }).then(done).catch(done);
   });
 
-  it('exception if action doesn\'t have schema', done => {
+  it('writes error to console and ignores action if action doesn\'t have schema', done => {
     const tag = 'tag_test';
     const schema = 'schema_test';
     const expectedPayload = {
@@ -958,7 +1030,7 @@ describe('Json api middleware', () => {
     };
 
     const expectedMeta = {
-      source: middlewareJsonApiSource,
+      source: JSON_API_SOURCE,
       tag,
     };
 
@@ -977,17 +1049,17 @@ describe('Json api middleware', () => {
       expect(requestAction.type).to.equal(LOAD_SUCCESS);
 
       expect(console.error.calledOnce).to.be.true;
-      expect(console.error.calledWith('Schema is invalid.')).to.be.true;
+      expect(console.error.calledWith('Action.meta.schema is undefined.')).to.be.true;
     }).then(done).catch(done);
   });
 
-  it('exception if action doesn\'t have payload with data property', done => {
+  it('writes error to console and ignores action if action have empty payload', done => {
     const tag = 'tag_test';
     const schema = 'schema_test';
     const expectedPayload = {};
 
     const expectedMeta = {
-      source: middlewareJsonApiSource,
+      source: JSON_API_SOURCE,
       schema,
       tag,
     };
@@ -1010,4 +1082,37 @@ describe('Json api middleware', () => {
       expect(console.error.calledWith('Payload Data is invalid, expecting payload.data.')).to.be.true;
     }).then(done).catch(done);
   });
+
+  it('ignores action if action doesn\'t have appropriate standardizer for such source type', done => {
+    const tag = 'tag_test';
+    const schema = 'schema_test';
+    const expectedPayload = {
+      name: 'Car',
+      description: 'Slow and fast at the same time',
+    };
+
+    const expectedMeta = {
+      source: 'json',
+      schema,
+      tag,
+    };
+
+    const mockSuccessAction = {
+      type: LOAD_SUCCESS,
+      meta: expectedMeta,
+      payload: expectedPayload,
+    };
+
+    const store = mockStore({});
+    store.dispatch(actionPromise(mockSuccessAction)).then(() => {
+      const performedActions = store.getActions();
+      expect(performedActions).to.have.length(1);
+
+      const requestAction = performedActions[0];
+      expect(requestAction.type).to.equal(LOAD_SUCCESS);
+
+      expect(console.error.calledOnce).to.be.false;
+    }).then(done).catch(done);
+  });
+
 });

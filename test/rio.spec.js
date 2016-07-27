@@ -1,6 +1,6 @@
 /* eslint-disable no-unused-expressions */
 import { expect } from 'chai';
-import rio from '../src';
+import rio, { JSON_API_SOURCE } from '../src';
 
 describe('Rio', () => {
   afterEach(() => {
@@ -21,7 +21,7 @@ describe('Rio', () => {
     };
 
     rio.registerSchema(schemaConfig);
-    const resolvedSchemaConfig = rio.resolveSchema(schema);
+    const resolvedSchemaConfig = rio.getSchema(schema);
 
     expect(resolvedSchemaConfig).to.equal(schemaConfig);
   });
@@ -36,7 +36,7 @@ describe('Rio', () => {
     }));
 
     const schemaName = 'app.builder';
-    const resolvedSchemaConfig = rio.resolveSchema(schemaName);
+    const resolvedSchemaConfig = rio.getSchema(schemaName);
 
     const expectedSchemaConfig = {
       schema: schemaName,
@@ -57,14 +57,17 @@ describe('Rio', () => {
     }));
 
     const schemaName = 'app.builder';
-    expect(() => rio.resolveSchema(schemaName))
+    expect(() => rio.getSchema(schemaName))
       .to.throw('Schema configuration is invalid. Error:'
-      + ' data.request should have required property \'headers\'');
+      + ' [{"code":"OBJECT_MISSING_REQUIRED_PROPERTY","params":["headers"],'
+      + '"message":"Missing required property: headers","path":"#/request"}].'
+      + ' Invalid schema config: {"schema":"app.builder","request":{"endpoint"'
+      + ':"api.test.app.builder"}}');
   });
 
   it('resolve schema with blank rio', () => {
     const schemaName = 'app.builder';
-    const resolvedSchemaConfig = rio.resolveSchema(schemaName);
+    const resolvedSchemaConfig = rio.getSchema(schemaName);
 
     const expectedSchemaConfig = undefined;
     expect(resolvedSchemaConfig).to.equal(expectedSchemaConfig);
@@ -74,7 +77,7 @@ describe('Rio', () => {
     rio.registerSchema(schema => undefined);
 
     const schemaName = 'app.builder';
-    const resolvedSchemaConfig = rio.resolveSchema(schemaName);
+    const resolvedSchemaConfig = rio.getSchema(schemaName);
 
     const expectedSchemaConfig = undefined;
     expect(resolvedSchemaConfig).to.equal(expectedSchemaConfig);
@@ -100,7 +103,52 @@ describe('Rio', () => {
 
     expect(() => rio.registerSchema(schemaConfig))
       .to.throw('Schema configuration is invalid. Error:'
-      + ' data.request should NOT have additional properties,'
-      + ' data.request should have required property \'endpoint\'');
+      + ' [{"code":"OBJECT_ADDITIONAL_PROPERTIES","params":[["schema"]],'
+      + '"message":"Additional properties not allowed: schema","path":"#/request"}].'
+      + ' Invalid schema config: ' + JSON.stringify(schemaConfig));
+  });
+
+  it('register source type', () => {
+    rio.registerSourceType('test_source', () => true);
+    const standardizer = rio.getStandardizer('test_source');
+
+    expect(standardizer).to.not.be.undefined;
+    const result = standardizer();
+    expect(result).to.be.true;
+  });
+
+  it('throws error if source type argument isn\'t string on registration of source type', () => {
+    expect(() => rio.registerSourceType({}, () => true)).to.throw(
+      'rio.registerSourceType sourceType argument must be string.'
+    );
+  });
+
+  it('throws error if source type argument is empty on registration of source type', () => {
+    expect(() => rio.registerSourceType('', () => true)).to.throw(
+      'rio.registerSourceType sourceType is empty.'
+    );
+  });
+
+  it('throws error if standardizer argument isn\'t function on registration of source type', () => {
+    expect(() => rio.registerSourceType('test', {})).to.throw(
+      'rio.registerSourceType standardizer argument must be a function.'
+    );
+  });
+
+  it('resolve default JSON-API standardizer', () => {
+    const standardizer = rio.getStandardizer(JSON_API_SOURCE);
+    expect(standardizer).to.not.be.undefined;
+  });
+
+  it('throws error if source type argument isn\'t string on getStandardizer', () => {
+    expect(() => rio.getStandardizer({})).to.throw(
+      'rio.getStandardizer sourceType argument must be string.'
+    );
+  });
+
+  it('throws error if source type argument is empty on getStandardizer', () => {
+    expect(() => rio.getStandardizer('')).to.throw(
+      'rio.getStandardizer sourceType is empty.'
+    );
   });
 });

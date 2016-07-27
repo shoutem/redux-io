@@ -1,14 +1,14 @@
 {
   "name": "@shoutem/redux-io",
-  "version": "0.1.0",
+  "version": "0.2.0-alpha.6",
   "description": "Action creators, reducers and middleware for simple handling of normalized json api data in state",
   "main": "lib/index.js",
   "files": [
     "lib"
   ],
   "scripts": {
-    "lint": "eslint src test; exit 0;",
-    "test": "mocha --compilers js:babel-core/register --reporter spec --recursive test",
+    "lint": "eslint src test",
+    "test": "mocha --require babelTestSetup --reporter spec --recursive test",
     "coverage": "babel-node node_modules/isparta/bin/isparta cover --report text --report html node_modules/mocha/bin/_mocha -- -R spec --recursive test",
     "build": "babel src --out-dir lib"
   },
@@ -55,11 +55,11 @@
   },
   "dependencies": {
     "@shoutem/json-api-denormalizer": "^0.3.1",
-    "ajv": "^4.1.5",
     "lodash": "^4.13.1",
     "redux": "^3.3.1",
     "redux-api-middleware": "2.0.0-beta.1",
     "redux-batched-actions": "^0.1.2",
-    "redux-thunk": "^2.0.0"
+    "redux-thunk": "^2.0.0",
+    "z-schema": "^3.17.0"
   }
 }

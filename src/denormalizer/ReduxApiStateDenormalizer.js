@@ -1,7 +1,7 @@
 import ReduxDenormalizer from './ReduxDenormalizer';
 import RioCache from '../cache/RioCache';
 import _ from 'lodash';
-import { applyStatus, getStatus } from './../status';
+import { cloneStatus, getStatus } from './../status';
 
 /**
  * Created getStore for ReduxDenormalizer by using storageMap to find relationships.
@@ -40,7 +40,7 @@ function createDescriptorCollection(collection, schema) {
     id,
     type,
   }));
-  applyStatus(collection, descriptorCollection);
+  cloneStatus(collection, descriptorCollection);
   return descriptorCollection;
 }
 
@@ -146,7 +146,7 @@ export default class ReduxApiStateDenormalizer extends ReduxDenormalizer {
    */
   mergeDenormalizedItemData(normalizedItem, itemData, relationshipsData) {
     const mergedItem = super.mergeDenormalizedItemData(normalizedItem, itemData, relationshipsData);
-    applyStatus(normalizedItem, mergedItem);
+    cloneStatus(normalizedItem, mergedItem);
     return mergedItem;
   }
 
@@ -178,7 +178,7 @@ export default class ReduxApiStateDenormalizer extends ReduxDenormalizer {
       return denormalizedCollection;
     }
 
-    applyStatus(collection, denormalizedCollection);
+    cloneStatus(collection, denormalizedCollection);
     return this.cache.cacheCollection(denormalizedCollection);
   }
 

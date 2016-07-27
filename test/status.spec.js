@@ -12,13 +12,14 @@ import {
   validationStatus,
   busyStatus,
   STATUS,
+  cloneStatus,
   applyStatus,
 } from '../src/status';
 
 describe('Status metadata', () => {
   it('initial status', () => {
     const obj = {};
-    obj[STATUS] = createStatus();
+    applyStatus(obj, createStatus());
 
     expect(isValid(obj)).to.be.false;
     expect(isBusy(obj)).to.be.false;
@@ -30,7 +31,7 @@ describe('Status metadata', () => {
       { validationStatus: validationStatus.VALID }
     );
     const obj = {};
-    obj[STATUS] = status;
+    applyStatus(obj, status);
 
     expect(isValid(obj)).to.be.true;
   });
@@ -41,7 +42,7 @@ describe('Status metadata', () => {
       { validationStatus: validationStatus.INVALID }
     );
     const obj = {};
-    obj[STATUS] = status;
+    applyStatus(obj, status);
 
     expect(isValid(obj)).to.be.false;
   });
@@ -52,7 +53,7 @@ describe('Status metadata', () => {
       { validationStatus: validationStatus.NONE }
     );
     const obj = {};
-    obj[STATUS] = status;
+    applyStatus(obj, status);
 
     expect(isValid(obj)).to.be.false;
   });
@@ -63,7 +64,7 @@ describe('Status metadata', () => {
       { busyStatus: busyStatus.BUSY }
     );
     const obj = {};
-    obj[STATUS] = status;
+    applyStatus(obj, status);
 
     expect(isBusy(obj)).to.be.true;
   });
@@ -74,7 +75,7 @@ describe('Status metadata', () => {
       { busyStatus: busyStatus.IDLE }
     );
     const obj = {};
-    obj[STATUS] = status;
+    applyStatus(obj, status);
 
     expect(isBusy(obj)).to.be.false;
   });
@@ -85,7 +86,7 @@ describe('Status metadata', () => {
       { validationStatus: validationStatus.NONE }
     );
     const obj = {};
-    obj[STATUS] = status;
+    applyStatus(obj, status);
     expect(isInitialized(obj)).to.be.false;
   });
 
@@ -95,7 +96,7 @@ describe('Status metadata', () => {
       { error: true }
     );
     const obj = {};
-    obj[STATUS] = status;
+    applyStatus(obj, status);
     expect(isError(obj)).to.be.true;
   });
 
@@ -105,7 +106,7 @@ describe('Status metadata', () => {
       { validationStatus: validationStatus.INVALID }
     );
     const obj = {};
-    obj[STATUS] = status;
+    applyStatus(obj, status);
     expect(isInitialized(obj)).to.be.true;
   });
 
@@ -115,7 +116,7 @@ describe('Status metadata', () => {
       { error: false }
     );
     const obj = {};
-    obj[STATUS] = status;
+    applyStatus(obj, status);
     expect(isError(obj)).to.be.false;
   });
 
@@ -125,7 +126,7 @@ describe('Status metadata', () => {
       { validationStatus: validationStatus.VALID }
     );
     const obj = {};
-    obj[STATUS] = status;
+    applyStatus(obj, status);
 
     expect(isInitialized(obj)).to.be.true;
   });
@@ -144,7 +145,7 @@ describe('Status metadata', () => {
       }
     );
     const obj = {};
-    obj[STATUS] = status;
+    applyStatus(obj, status);
 
     expect(shouldRefresh(obj)).to.be.true;
   });
@@ -158,7 +159,7 @@ describe('Status metadata', () => {
       }
     );
     const obj = {};
-    obj[STATUS] = status;
+    applyStatus(obj, status);
 
     expect(shouldRefresh(obj)).to.be.false;
   });
@@ -173,7 +174,7 @@ describe('Status metadata', () => {
       }
     );
     const obj = {};
-    obj[STATUS] = status;
+    applyStatus(obj, status);
 
     expect(shouldRefresh(obj)).to.be.false;
   });
@@ -188,12 +189,12 @@ describe('Status metadata', () => {
       }
     );
     const obj = {};
-    obj[STATUS] = status;
+    applyStatus(obj, status);
 
     expect(shouldRefresh(obj, true)).to.be.true;
   });
 
-  it('applyStatus applies cloned status on destination object from source object', () => {
+  it('cloneStatus clones status on destination object from source object', () => {
     const status = updateStatus(
       createStatus(),
       {
@@ -207,21 +208,21 @@ describe('Status metadata', () => {
     );
     deepFreeze(status);
     const sourceObj = {};
-    sourceObj[STATUS] = status;
+    applyStatus(sourceObj, status);
 
     const destObj = {};
-    applyStatus(sourceObj, destObj);
+    cloneStatus(sourceObj, destObj);
 
     expect(destObj[STATUS]).to.be.deep.equal(status);
   });
 
   it('update status updates timestamp to newer', (done) => {
     const obj = {};
-    obj[STATUS] = createStatus();
+    applyStatus(obj, createStatus());
     const initModifiedTimestamp = obj[STATUS].modifiedTimestamp;
 
     setTimeout(() => {
-      obj[STATUS] = updateStatus(obj[STATUS], {});
+      applyStatus(obj, updateStatus(obj[STATUS], {}));
       const updatedModifiedTimestamp = obj[STATUS].modifiedTimestamp;
 
       expect(updatedModifiedTimestamp).to.be.above(initModifiedTimestamp);
@@ -231,7 +232,7 @@ describe('Status metadata', () => {
 
   it('doesn\'t interfere with forEach in Array', () => {
     const obj = [1, 2, 3];
-    obj[STATUS] = createStatus();
+    applyStatus(obj, createStatus());
 
     let counter = 0;
     obj.forEach(() => counter++);
@@ -241,7 +242,7 @@ describe('Status metadata', () => {
 
   it('doesn\'t interfere with map in Array', () => {
     const obj = [1, 2, 3];
-    obj[STATUS] = createStatus();
+    applyStatus(obj, createStatus());
 
     let counter = 0;
     obj.map(() => counter++);
@@ -249,21 +250,21 @@ describe('Status metadata', () => {
     expect(counter).to.be.eql(3);
   });
 
-  it('does interfere with \'for in\' in Array', () => {
+  it('does\'t interfere with \'for in\' in Array', () => {
     const obj = [1, 2, 3];
-    obj[STATUS] = createStatus();
+    applyStatus(obj, createStatus());
 
     let counter = 0;
     for (const o in obj) {
       counter++;
     }
 
-    expect(counter).to.be.eql(4);
+    expect(counter).to.be.eql(3);
   });
 
   it('doesn\'t interfere with \'for of\' in Array', () => {
     const obj = [1, 2, 3];
-    obj[STATUS] = createStatus();
+    applyStatus(obj, createStatus());
 
     let counter = 0;
     for (const o of obj) {
@@ -271,6 +272,49 @@ describe('Status metadata', () => {
     }
 
     expect(counter).to.be.eql(3);
+  });
+
+  it('does\'t interfere with \'Object.keys\' in Object', () => {
+    const obj = {
+      a: 5,
+      b: 6,
+      c: 7,
+    };
+    applyStatus(obj, createStatus());
+
+    let counter = 0;
+    for (const o in Object.keys(obj)) {
+      counter++;
+    }
+
+    expect(counter).to.be.eql(3);
+  });
+
+  it('does\'t interfere with \'Object.keys\' in Array', () => {
+    const obj = [1, 2, 3];
+    applyStatus(obj, createStatus());
+
+    let counter = 0;
+    for (const o in Object.keys(obj)) {
+      counter++;
+    }
+
+    expect(counter).to.be.eql(3);
+  });
+
+  it('spread operator doesn\'t copy status', () => {
+    const obj = { 1:{}, 2:{}, 3:{} };
+    applyStatus(obj, createStatus());
+
+    const newObj = { ...obj };
+
+    let counter = 0;
+    for (const o in Object.keys(newObj)) {
+      counter++;
+    }
+
+    expect(counter).to.be.eql(3);
+    expect(newObj[STATUS]).to.be.undefined;
   });
 
 });

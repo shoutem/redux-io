@@ -1,4 +1,5 @@
-import { assert } from 'chai';
+import chai, { assert } from 'chai';
+import shallowDeepEqual from 'chai-shallow-deep-equal';
 import { ReduxApiStateDenormalizer } from '../../src/index';
 import { createSchemasMap } from '../../src/denormalizer/ReduxApiStateDenormalizer';
 import {
@@ -7,6 +8,7 @@ import {
   updateStatus,
 } from '../../src/status';
 
+chai.use(shallowDeepEqual);
 
 function createStorageMap() {
   return {
@@ -186,7 +188,9 @@ describe('ReduxApiStateDenormalizer', () => {
 
       const denormalizedData =
       denormalizer.denormalizeSingle('type1Id1', storage, 'type1');
-      assert.deepEqual(
+      assert.isObject(denormalizedData[STATUS]);
+      assert.isObject(denormalizedData['type2.test'][STATUS]);
+      assert.shallowDeepEqual(
         denormalizedData,
         expectedData,
         'item not denormalized correctly'
@@ -321,7 +325,7 @@ describe('ReduxApiStateDenormalizer', () => {
       const denormalizedData =
         denormalizer.denormalizeCollection(collection);
       assert.isObject(denormalizedData[STATUS]);
-      assert.deepEqual(
+      assert.shallowDeepEqual(
         denormalizedData,
         expectedData,
         'collection not denormalized correctly'

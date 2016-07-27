@@ -16,10 +16,6 @@ function discoverSchemaPaths(obj, currentPath = [], discoveredPaths = {}) {
   _.forOwn(obj, (propValue, prop) => {
     if (_.isPlainObject(propValue)) {
       discoverSchemaPaths(propValue, [...currentPath, prop], discoveredPaths);
-    } else if (_.isArray(propValue)) {
-      _.forIn(propValue, (item, index) => {
-        discoverSchemaPaths(item, [...currentPath, index], discoveredPaths);
-      });
     }
   });
 
