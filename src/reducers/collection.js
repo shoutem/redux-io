@@ -64,7 +64,6 @@ export default function collection(schema, tag = '', initialState = []) {
   if (tag === '*') {
     throw new Error('Tag value \'*\' is reserved for redux-api-state and cannot be used.');
   }
-  const collectionDescription = { schema, tag };
   // eslint-disable-next-line no-param-reassign
   applyStatus(initialState, createDefaultStatus(schema, tag));
   // TODO-vedran: refactor status into context={status, config}
@@ -122,9 +121,3 @@ export function getCollectionDescription(collectionEntity) {
   const collectionStatus = getStatus(collectionEntity) || {};
   return { schema: collectionStatus.schema, tag: collectionStatus.tag };
 }
-
-export function getUniqueCollectionKey(collectionEntity) {
-  const { schema, tag } = getCollectionDescription(collectionEntity);
-  return `${schema}.${tag}`;
-}
-
