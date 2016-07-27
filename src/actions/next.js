@@ -2,12 +2,18 @@ import { getCollectionLink, APPEND_MODE } from '../reducers/collection';
 import { getStatus } from '../status';
 import find from './find';
 
+const NO_MORE_RESULTS = '@@redux_io/NO_MORE_RESULTS';
+
 export default (collection, appendMode = true) => {
   const nextLink = getCollectionLink(collection, 'next');
-  if (!nextLink) {
-    return new Promise((resolve, reject) => reject('No next!'));
-  }
   const { schema, tag } = getStatus(collection);
+  if (!nextLink) {
+    return {
+      type: NO_MORE_RESULTS,
+      schema,
+      tag,
+    };
+  }
   const findConfig = {
     request: {
       endpoint: nextLink,

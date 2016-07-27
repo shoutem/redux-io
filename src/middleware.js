@@ -320,13 +320,12 @@ const getIncluded = payload => (
   _.get(payload, 'included', [])
 );
 const getLinks = payload => {
-  // Destruction ensure that every link has value
-  const { prev, next, self, last } = _.get(payload, 'links', {});
+  const links = _.get(payload, 'links', {});
   return {
-    prev,
-    next,
-    self,
-    last,
+    prev: links.prev || null,
+    next: links.next || null,
+    self: links.self || null,
+    last: links.last || null,
   };
 };
 
