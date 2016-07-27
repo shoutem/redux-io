@@ -4,7 +4,7 @@ import {
 } from './../middleware';
 import { JSON_API_SOURCE } from './..';
 
-export default (payload, schema) => {
+export default function updated(payload, schema) {
   if (!_.isPlainObject(payload)) {
     throw new Error('Invalid payload type.');
   }
@@ -12,7 +12,10 @@ export default (payload, schema) => {
     throw new Error('Missing payload data property.');
   }
   if (!_.isString(schema)) {
-    throw new Error('Schema is invalid.');
+    throw new Error(`Invalid schema, "updated" expected a string but got: ${JSON.stringify(schema)}`);
+  }
+  if (_.isEmpty(schema)) {
+    throw new Error('Empty schema string.');
   }
 
   return {
@@ -23,4 +26,4 @@ export default (payload, schema) => {
       schema,
     },
   };
-};
+}

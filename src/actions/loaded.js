@@ -4,7 +4,7 @@ import {
 } from './../middleware';
 import { JSON_API_SOURCE } from './..';
 
-export default (payload, schema, tag = '') => {
+export default function loaded(payload, schema, tag = '') {
   if (!_.isPlainObject(payload)) {
     throw new Error('Invalid payload type.');
   }
@@ -12,10 +12,10 @@ export default (payload, schema, tag = '') => {
     throw new Error('Missing payload data property.');
   }
   if (!_.isString(schema)) {
-    throw new Error('Schema is invalid.');
+    throw new Error(`Invalid schema, "loaded" expected a string but got: ${JSON.stringify(schema)}`);
   }
   if (!_.isString(tag)) {
-    throw new Error('Tag isn\'t string.');
+    throw new Error(`Invalid tag, "loaded" expected a string but got: ${JSON.stringify(tag)}`);
   }
 
   return {
@@ -27,4 +27,4 @@ export default (payload, schema, tag = '') => {
       tag,
     },
   };
-};
+}

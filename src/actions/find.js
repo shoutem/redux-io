@@ -20,27 +20,28 @@ function buildRSAAConfig(config) {
 }
 
 /**
- * Action creator used to fetch data from api (GET). Find function expects schema name of
- * data which correspond with storage reducer or schema configuration object. In both cases
+ * Action creator used to fetch data from api (GET).
+ * @param schema can be name of schema or schema configuration. In both cases
  * rio resolves schema with registered schema configurations, and in case of schema
  * configuration passed in argument it merges two configuration objects. Schema configuration
  * object holds config.request attribute which is configuration based on RSAA
  * configuration from redux-api-middleware, allowing full customization expect types
- * part of configuration. Tag arg is optional, but when used allows your collections with same
+ * part of configuration.
+ * @param tag is optional, but when used allows your collections with same
  * tag value to respond on received data.
- * @param schema
- * @param tag
- * @param params
+ * @param params to be resolved in schema configuration endpoint. Params are first resolved
+ * in endpoint if endpoint holds exact keys {param}, rest of params are resolved
+ * as query params key=value
  * @returns action
  */
-export default (schema, tag = '', params = {}) => {
+export default function find(schema, tag = '', params = {}) {
   const config = resolveConfig(schema);
   if (!config) {
     const schemaName = schema && _.isObject(schema) ? schema.schema : schema;
     throw new Error(`Couldn't resolve schema ${schemaName} in function find.`);
   }
   if (!_.isString(tag)) {
-    throw new Error('Tag isn\'t string.');
+    throw new Error(`Invalid tag, "find" expected a string but got: ${JSON.stringify(tag)}`);
   }
 
   const meta = {
@@ -72,4 +73,4 @@ export default (schema, tag = '', params = {}) => {
       ],
     },
   };
-};
+}

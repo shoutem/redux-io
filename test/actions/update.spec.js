@@ -83,7 +83,7 @@ describe('Update action creator', () => {
     };
     const schema = '';
     const item = {};
-    expect(() => update(config, schema, item)).to.throw('Schema is invalid.');
+    expect(() => update(config, schema, item)).to.throw('Empty schema string.');
   });
 
   it('throws exception on invalid action with invalid item', () => {

@@ -38,7 +38,7 @@ describe('Loaded action creator', () => {
       data: {
       },
     };
-    expect(() => loaded(payload)).to.throw('Schema is invalid.');
+    expect(() => loaded(payload)).to.throw('Invalid schema, "loaded" expected a string but got: undefined');
   });
 
   it('creates a invalid action with invalid payload', () => {
@@ -56,6 +56,8 @@ describe('Loaded action creator', () => {
       },
     };
     const tag = {};
-    expect(() => loaded(payload, 'schema_test', tag)).to.throw('Tag isn\'t string.');
+    expect(() => loaded(payload, 'schema_test', tag)).to.throw(
+      'Invalid tag, "loaded" expected a string but got: {}'
+    );
   });
 });

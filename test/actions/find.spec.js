@@ -205,7 +205,7 @@ describe('Find action creator', () => {
       request: config,
     };
 
-    expect(() => find(schemaConfig, tag)).to.throw('Tag isn\'t string.');
+    expect(() => find(schemaConfig, tag)).to.throw('Invalid tag, "find" expected a string but got: {}');
   });
 
   it('creates a valid action with valid endpoint with filled params', () => {

@@ -3,12 +3,12 @@ import {
   REFERENCE_CLEAR,
 } from './../';
 
-export default (schema, tag = '') => {
+export default function clear(schema, tag = '') {
   if (!_.isString(schema)) {
-    throw new Error('Schema is invalid.');
+    throw new Error(`Invalid schema, "clear" expected a string but got: ${JSON.stringify(schema)}`);
   }
   if (!_.isString(tag)) {
-    throw new Error('Tag isn\'t string.');
+    throw new Error(`Invalid tag, "updated" expected a string but got: ${JSON.stringify(tag)}`);
   }
 
   return {
@@ -18,4 +18,4 @@ export default (schema, tag = '') => {
       tag,
     },
   };
-};
+}

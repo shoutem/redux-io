@@ -36,7 +36,7 @@ describe('Created action creator', () => {
       data: {
       },
     };
-    expect(() => created(payload)).to.throw('Schema is invalid.');
+    expect(() => created(payload)).to.throw('Invalid schema, "created" expected a string but got: undefined');
   });
 
   it('creates a invalid action with invalid payload', () => {
