@@ -4,6 +4,13 @@ import find from './find';
 
 const NO_MORE_RESULTS = '@@redux_io/NO_MORE_RESULTS';
 
+/**
+ * Create action for next collection items in sequence from collection links.
+ *
+ * @param collection
+ * @param appendMode
+ * @returns {*}
+ */
 export default function next(collection, appendMode = true) {
   const nextLink = getCollectionLink(collection, 'next');
   const { schema, tag } = getStatus(collection);
