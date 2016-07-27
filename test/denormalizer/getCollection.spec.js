@@ -11,6 +11,10 @@ import rio, {
   collection,
   getCollection,
 } from '../../src';
+import {
+  STATUS,
+  createStatus,
+} from '../../src/status';
 
 chai.use(shallowDeepEqual);
 
@@ -56,6 +60,9 @@ describe('getCollection', () => {
     },
     topLocations: [1,3],
   };
+  initialData.locations[1][STATUS] = createStatus({id: _.uniqueId()})
+  initialData.locations[2][STATUS] = createStatus({id: _.uniqueId()})
+  initialData.locations[3][STATUS] = createStatus({id: _.uniqueId()})
   const expectedDenormalizedTopLocations = [
     {
       id: 1,
