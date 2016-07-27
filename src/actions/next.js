@@ -4,7 +4,7 @@ import find from './find';
 
 const NO_MORE_RESULTS = '@@redux_io/NO_MORE_RESULTS';
 
-export default (collection, appendMode = true) => {
+export default function next(collection, appendMode = true) {
   const nextLink = getCollectionLink(collection, 'next');
   const { schema, tag } = getStatus(collection);
   if (!nextLink) {
@@ -21,4 +21,4 @@ export default (collection, appendMode = true) => {
     schema,
   };
   return find(findConfig, tag, undefined, { [APPEND_MODE]: appendMode });
-};
+}
