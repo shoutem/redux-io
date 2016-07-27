@@ -14,6 +14,7 @@ import {
   applyStatus,
 } from './../status';
 export const APPEND_MODE = 'appendMode';
+
 function isValid(action, schema, tag) {
   if (_.get(action, 'meta.schema') !== schema) {
     return false;
