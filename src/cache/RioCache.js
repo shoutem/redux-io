@@ -1,6 +1,4 @@
-import { createUniqueTargetKey } from '@shoutem/json-api-denormalizer';
-import { getModificationTime } from '../status';
-import { getUniqueCollectionKey } from '../collection';
+import { getModificationTime, getId } from '../status';
 import _ from 'lodash';
 
 function isItemInCollection(collection, item) {
@@ -13,10 +11,6 @@ function isSingleRelation(relationshipData) {
 
 function isCollection(entity) {
   return _.isArray(entity);
-}
-
-export function getUniqueTargetKey(item) {
-  return createUniqueTargetKey(item);
 }
 
 function isCacheValid(cachedModificationTime, currentModificationTime) {
@@ -53,29 +47,29 @@ export default class RioCache {
   }
 
   getItem(item) {
-    return this.getCacheByKey(getUniqueTargetKey(item));
+    return this.getCacheByKey(getId(item));
   }
 
   getCollection(collection) {
-    return this.getCacheByKey(getUniqueCollectionKey(collection));
+    return this.getCacheByKey(getId(collection));
   }
 
   hasItem(item) {
-    return this.cacheExists(getUniqueTargetKey(item));
+    return this.cacheExists(getId(item));
   }
 
   hasCollection(collection) {
-    return this.cacheExists(getUniqueCollectionKey(collection));
+    return this.cacheExists(getId(collection));
   }
 
   cacheItem(item) {
-    const itemKey = getUniqueTargetKey(item);
+    const itemKey = getId(item);
     this.cache[itemKey] = item;
     return this.getCacheByKey(itemKey);
   }
 
   cacheCollection(collection) {
-    const collectionKey = getUniqueCollectionKey(collection);
+    const collectionKey = getId(collection);
     this.cache[collectionKey] = collection;
     return this.getCacheByKey(collectionKey);
   }
