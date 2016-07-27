@@ -109,8 +109,10 @@ export default class ReduxApiStateDenormalizer extends ReduxDenormalizer {
    * @returns {{}}
    */
   denormalizeItem(itemDescriptor) {
-    if (this.cache.isItemCacheValid(itemDescriptor)) {
-      return this.cache.getItem(itemDescriptor);
+    const normalizedItem = this.getNormalizedItem(itemDescriptor);
+
+    if (this.cache.isItemCacheValid(normalizedItem)) {
+      return this.cache.getItem(normalizedItem);
     }
 
     return this.cache.cacheItem(super.denormalizeItem(itemDescriptor));
