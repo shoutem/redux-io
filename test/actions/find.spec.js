@@ -58,6 +58,7 @@ describe('Find action creator', () => {
       source: JSON_API_SOURCE,
       schema,
       tag,
+      options: {},
     };
     expect(types[0].type).to.equal(LOAD_REQUEST);
     expect(types[0].meta).to.deep.equal(expectedMeta);
@@ -96,7 +97,9 @@ describe('Find action creator', () => {
       source: JSON_API_SOURCE,
       schema,
       tag,
-      appendMode: true,
+      options: {
+        appendMode: true,
+      },
     };
     expect(types[0].type).to.equal(LOAD_REQUEST);
     expect(types[0].meta).to.deep.equal(expectedMeta);
@@ -136,6 +139,7 @@ describe('Find action creator', () => {
       source: JSON_API_SOURCE,
       schema,
       tag,
+      options: {},
     };
     expect(types[0].type).to.equal(LOAD_REQUEST);
     expect(types[0].meta).to.deep.equal(expectedMeta);
@@ -182,6 +186,7 @@ describe('Find action creator', () => {
       source: JSON_API_SOURCE,
       schema,
       tag,
+      options: {},
     };
     expect(types[0].type).to.equal(LOAD_REQUEST);
     expect(types[0].meta).to.deep.equal(expectedMeta);
@@ -286,6 +291,7 @@ describe('Find action creator', () => {
       source: JSON_API_SOURCE,
       schema,
       tag,
+      options: {},
     };
     expect(types[0].type).to.equal(LOAD_REQUEST);
     expect(types[0].meta).to.deep.equal(expectedMeta);
@@ -317,6 +323,7 @@ describe('Find action creator', () => {
       source: JSON_API_SOURCE,
       schema,
       tag,
+      options: {},
     };
 
     nock('http://api.server.local')

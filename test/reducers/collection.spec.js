@@ -98,7 +98,9 @@ describe('Collection reducer', () => {
       meta: {
         schema,
         tag: '',
-        appendMode: true,
+        options: {
+          appendMode: true,
+        },
       },
       payload: items,
     };
