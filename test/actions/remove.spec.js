@@ -83,7 +83,7 @@ describe('Delete action creator', () => {
     };
     const schema = '';
     const item = {};
-    expect(() => remove(config, schema, item)).to.throw('Schema is invalid.');
+    expect(() => remove(config, schema, item)).to.throw('Empty schema string.');
   });
 
   it('throws exception on invalid action with invalid item', () => {

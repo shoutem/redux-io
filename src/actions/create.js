@@ -7,19 +7,25 @@ import {
 } from './../middleware';
 import { JSON_API_SOURCE } from './..';
 
-// Action creator used to create item on api (POST). Config arg is based on RSAA
-// configuration from redux-api-middleware, allowing full customization expect types
-// part of configuration. Create function expects schema name of data which correspond
-// with storage reducer with same schema value to listen for created data. Item arg
-// holds object that you want to pass to api. Tag is not needed because all collection
-// with configured schema value as in argument of create will be invalidated upon successful
-// action of creating item on api.
-export default (config, schema, item = null) => {
+/**
+ * Action creator used to create item on api (POST). Tag is not needed because all collection
+ * with configured schema value as in argument of create will be invalidated upon successful
+ * action of creating item on api.
+ * @param config based on RSAA configuration from redux-api-middleware,
+ * allowing full customization expect types part of configuration
+ * @param schema defines what reducers will listen for creation of new item
+ * @param item holds object that you want to pass to api
+ * @returns {{}}
+ */
+export default function create(config, schema, item = null) {
   if (!_.isObject(config)) {
     throw new TypeError('Config isn\'t an object.');
   }
-  if (!_.isString(schema) || _.isEmpty(schema)) {
-    throw new Error('Schema is invalid.');
+  if (!_.isString(schema)) {
+    throw new Error(`Invalid schema, "create" expected a string but got: ${JSON.stringify(schema)}`);
+  }
+  if (_.isEmpty(schema)) {
+    throw new Error('Empty schema string.');
   }
 
   let body = null;
@@ -62,4 +68,4 @@ export default (config, schema, item = null) => {
       ],
     },
   };
-};
+}

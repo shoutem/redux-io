@@ -19,7 +19,8 @@ describe('Clear action creator', () => {
   });
 
   it('throws exception on action with invalid schema', () => {
-    expect(() => clear(undefined, 'collection_test')).to.throw('Schema is invalid.');
+    expect(() => clear(undefined, 'collection_test'))
+      .to.throw('Invalid schema, "clear" expected a string but got: undefined');
   });
 
   it('creates a valid action with default tag', () => {
@@ -35,6 +36,7 @@ describe('Clear action creator', () => {
 
   it('throws exception on action with invalid tag', () => {
     const schema = 'schema_test';
-    expect(() => clear(schema, {})).to.throw('Tag isn\'t string.');
+    expect(() => clear(schema, {}))
+      .to.throw('Invalid tag, "updated" expected a string but got: {}');
   });
 });

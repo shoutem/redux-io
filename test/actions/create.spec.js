@@ -172,7 +172,7 @@ describe('Create action creator', () => {
         name: 'Test1',
       },
     };
-    expect(() => create(config, schema, item)).to.throw('Schema is invalid.');
+    expect(() => create(config, schema, item)).to.throw('Empty schema string.');
   });
 
   it('throws exception on action with invalid item', () => {

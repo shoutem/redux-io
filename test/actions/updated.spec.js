@@ -36,7 +36,9 @@ describe('Updated action creator', () => {
       data: {
       },
     };
-    expect(() => updated(payload)).to.throw('Schema is invalid.');
+    expect(() => updated(payload)).to.throw(
+      'Invalid schema, "updated" expected a string but got: undefined'
+    );
   });
 
   it('throw exception on updated with invalid payload', () => {
