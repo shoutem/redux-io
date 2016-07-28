@@ -38,18 +38,19 @@ export default class RioCache {
     this.cache = {};
   }
 
-  getCacheByKey(itemKey) {
-    return this.cache[itemKey];
-  }
-
-  cacheExists(key) {
-    return this.cache.hasOwnProperty(key);
+  getCacheByKey(key) {
+    return this.cache[key];
   }
 
   getItem(normalizedItem) {
     return this.getCacheByKey(getId(normalizedItem));
   }
 
+  getCollection(collection) {
+    return this.getCacheByKey(getId(collection));
+  }
+
+  // eslint-disable-next-line consistent-return
   getValidItem(itemDescriptor) {
     const normalizedItem = this.getNormalizedItem(itemDescriptor);
     if (this.isItemCacheValid(normalizedItem)) {
@@ -57,16 +58,16 @@ export default class RioCache {
     }
   }
 
-  getCollection(collection) {
-    return this.getCacheByKey(getId(collection));
-  }
+  getValidCollection(descriptorCollection) {
+    const cachedCollection = this.getCollection(descriptorCollection);
 
-  hasItem(item) {
-    return this.cacheExists(getId(item));
-  }
+    if (this.isCollectionModified(descriptorCollection) ||
+      this.areCollectionItemsChanged(descriptorCollection, cachedCollection)) {
+      return;
+    }
 
-  hasCollection(collection) {
-    return this.getItem(collection);
+    // eslint-disable-next-line consistent-return
+    return cachedCollection;
   }
 
   cacheItem(denormalizedItem) {
@@ -82,11 +83,8 @@ export default class RioCache {
   }
 
   isItemModified(normalizedItem) {
-    if (!this.hasItem(normalizedItem)) {
-      return true;
-    }
     const cachedItem = this.getItem(normalizedItem);
-    return !isRioEntityUpdated(normalizedItem, cachedItem);
+    return !cachedItem || !isRioEntityUpdated(normalizedItem, cachedItem);
   }
 
   isItemCacheValid(normalizedItem) {
@@ -98,20 +96,8 @@ export default class RioCache {
   }
 
   isCollectionModified(collection) {
-    if (!this.hasCollection(collection)) {
-      return true;
-    }
     const cachedCollection = this.getCollection(collection);
-    return !isRioEntityUpdated(collection, cachedCollection);
-  }
-
-  isCollectionCacheValid(descriptorCollection) {
-    if (this.isCollectionModified(descriptorCollection)) {
-      return false;
-    }
-    const cachedCollection = this.getCollection(descriptorCollection);
-
-    return !this.areCollectionItemsChanged(descriptorCollection, cachedCollection);
+    return !cachedCollection || !isRioEntityUpdated(collection, cachedCollection);
   }
 
   areCollectionItemsChanged(collection, cachedCollection = []) {
