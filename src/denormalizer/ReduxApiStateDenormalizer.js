@@ -165,21 +165,22 @@ export default class ReduxApiStateDenormalizer extends ReduxDenormalizer {
   denormalizeCollection(collection, storage, schema) {
     const descriptorCollection = createDescriptorCollection(collection, schema);
 
-    if (this.cache.isCollectionCacheValid(descriptorCollection)) {
-      return this.cache.getCollection(collection);
+    let denormalizedCollection = this.cache.getValidCollection(descriptorCollection);
+    if (!denormalizedCollection) {
+      this.updateStorageMap(storage);
+
+      denormalizedCollection =
+        descriptorCollection.map(itemDescriptor => this.denormalizeItem(itemDescriptor));
+
+      if (!getStatus(collection)) {
+        return denormalizedCollection;
+      }
+
+      cloneStatus(collection, denormalizedCollection);
+      this.cache.cacheCollection(denormalizedCollection);
     }
 
-    this.updateStorageMap(storage);
-
-    const denormalizedCollection =
-      descriptorCollection.map(itemDescriptor => this.denormalizeItem(itemDescriptor));
-
-    if (!getStatus(collection)) {
-      return denormalizedCollection;
-    }
-
-    cloneStatus(collection, denormalizedCollection);
-    return this.cache.cacheCollection(denormalizedCollection);
+    return denormalizedCollection;
   }
 
   /**
