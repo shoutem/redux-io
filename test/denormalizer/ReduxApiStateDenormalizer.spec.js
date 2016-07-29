@@ -177,7 +177,6 @@ describe('ReduxApiStateDenormalizer', () => {
       const denormalizedData =
         mergeStatus(denormalizer.denormalizeSingle(single, storage));
 
-      console.log(denormalizedData[STATUS]);
       assert.deepEqual(
         denormalizedData,
         expectedData,
@@ -311,6 +310,23 @@ describe('ReduxApiStateDenormalizer', () => {
         notCachedDenormalizedData,
         expectedData,
         'item not denormalized correctly'
+      );
+    });
+    it('denormalize item which is not in state', () => {
+      const denormalizer = new ReduxApiStateDenormalizer();
+      const storage = createSchemasMap(getStore(), createStorageMap());
+      const single = { value: 'type1Id7' };
+      single[STATUS] = { schema: 'type1' };
+      const denormalizedData = denormalizer.denormalizeSingle(single, storage);
+      const expectedData = {
+        id: 'type1Id7',
+        type: 'type1',
+      };
+
+      assert.deepEqual(
+        denormalizedData,
+        expectedData,
+        'didn\'t return item descriptor'
       );
     });
   });

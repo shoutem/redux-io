@@ -53,7 +53,7 @@ export default class RioCache {
   // eslint-disable-next-line consistent-return
   getValidItem(itemDescriptor) {
     const normalizedItem = this.getNormalizedItem(itemDescriptor);
-    if (this.isItemCacheValid(normalizedItem)) {
+    if (normalizedItem && this.isItemCacheValid(normalizedItem)) {
       return this.getItem(normalizedItem);
     }
   }
