@@ -11,7 +11,7 @@ import {
   getStatus,
   createStatus,
   updateStatus,
-  applyStatus,
+  setStatus,
 } from './../status';
 export const APPEND_MODE = 'appendMode';
 
@@ -58,15 +58,27 @@ function handleReferencePayload(action, state = []) {
   return newIds;
 }
 
-// collection is generic collection reducer that enables creating
-// typed & named collection reducers that are handling specific
-// COLLECTION_ type actions with specific collection name.
+/**
+ * Collection is generic reducer that enables creating
+ * typed & named collection reducers that are handling specific
+ * REFERENCE_ type actions with specific collection name. Collection reducer
+ * holds array of ids in normalized state. Every collection is defined with
+ * schema and tag. Collections keeps order of ids in array.
+ * @param schema is name of schema that describes data for which reducer
+ * is responsible and will process rio actions with same schema defined.
+ * @param tag defines along schema collection reducer responsibility to process
+ * rio action. Tag enable to have multiple collections for same schema. It's important
+ * if you want to have normalized state and instances in one place, but different collections
+ * of data.
+ * @param initialState is initial state of reducer, can be array or object.
+ * @returns {Function}
+ */
 export default function collection(schema, tag = '', initialState = []) {
   if (tag === '*') {
     throw new Error('Tag value \'*\' is reserved for redux-api-state and cannot be used.');
   }
   // eslint-disable-next-line no-param-reassign
-  applyStatus(initialState, createDefaultStatus(schema, tag));
+  setStatus(initialState, createDefaultStatus(schema, tag));
   // TODO-vedran: refactor status into context={status, config}
   return (state = initialState, action) => {
     if (!isValid(action, schema, tag)) {
@@ -76,7 +88,7 @@ export default function collection(schema, tag = '', initialState = []) {
     switch (action.type) {
       case REFERENCE_FETCHED: {
         const newState = handleReferencePayload(action, state);
-        applyStatus(newState, updateStatus(
+        setStatus(newState, updateStatus(
           state[STATUS],
           {
             validationStatus: validationStatus.VALID,
@@ -88,7 +100,7 @@ export default function collection(schema, tag = '', initialState = []) {
       }
       case REFERENCE_CLEAR: {
         const newState = [];
-        applyStatus(newState, updateStatus(
+        setStatus(newState, updateStatus(
           state[STATUS],
           {
             validationStatus: validationStatus.VALID,
@@ -100,7 +112,7 @@ export default function collection(schema, tag = '', initialState = []) {
       }
       case REFERENCE_STATUS: {
         const newState = [...state];
-        applyStatus(newState, updateStatus(
+        setStatus(newState, updateStatus(
           state[STATUS],
           action.payload
         ));
@@ -111,7 +123,7 @@ export default function collection(schema, tag = '', initialState = []) {
           return state;
         }
         const newState = [...state];
-        applyStatus(newState, createDefaultStatus(schema, tag));
+        setStatus(newState, createDefaultStatus(schema, tag));
         return newState;
       }
     }

@@ -21,7 +21,7 @@ import {
   busyStatus,
   createStatus,
   updateStatus,
-  applyStatus,
+  setStatus,
 } from './../status';
 
 function createDefaultStatus(schema) {
@@ -46,17 +46,35 @@ const actionsWithoutPayload = new Set([
   REFERENCE_CLEAR,
 ]);
 
+function createNewState(state) {
+  return _.isArray(state) ? [...state] : { ...state };
+}
+
+function createEmptyState(state) {
+  return _.isArray(state) ? [] : {};
+}
+
+function canHandleAction(action, schema) {
+  if (_.get(action, 'meta.schema') !== schema) {
+    return false;
+  }
+  return true;
+}
+
 /**
- * resource ...
- * @param schema
- * @param initialState
+ * Resource reducer saves any payload received with action into state, overwritting
+ * previous state. This reducer doesn't require rio middleware, and only depends on
+ * rio action and redux-api-middleware.
+ * @param schema is name of schema that describes data for which resource reducer
+ * is responsible and will process rio actions with same schema defined.
+ * @param initialState is initial state of reducer, can be array or object.
  * @returns {Function}
  */
 export default function resource(schema, initialState = {}) {
   // eslint-disable-next-line no-param-reassign
-  applyStatus(initialState, createDefaultStatus(schema));
+  setStatus(initialState, createDefaultStatus(schema));
   return (state = initialState, action) => {
-    if (_.get(action, 'meta.schema') !== schema) {
+    if (!canHandleAction(action, schema)) {
       return state;
     }
 
@@ -69,8 +87,8 @@ export default function resource(schema, initialState = {}) {
     switch (action.type) {
       case CREATE_REQUEST:
       case LOAD_REQUEST: {
-        const newState = _.isArray(state) ? [...state] : { ...state };
-        applyStatus(newState, updateStatus(
+        const newState = createNewState(state);
+        setStatus(newState, updateStatus(
           state[STATUS],
           {
             busyStatus: busyStatus.BUSY,
@@ -79,8 +97,8 @@ export default function resource(schema, initialState = {}) {
         return newState;
       }
       case UPDATE_REQUEST: {
-        const newState = _.isArray(payload) ? [...payload] : { ...payload };
-        applyStatus(newState, updateStatus(
+        const newState = createNewState(payload);
+        setStatus(newState, updateStatus(
           state[STATUS],
           {
             validationStatus: validationStatus.INVALID,
@@ -90,8 +108,8 @@ export default function resource(schema, initialState = {}) {
         return newState;
       }
       case REMOVE_REQUEST: {
-        const newState = _.isArray(state) ? [] : {};
-        applyStatus(newState, updateStatus(
+        const newState = createEmptyState(state);
+        setStatus(newState, updateStatus(
           state[STATUS],
           {
             validationStatus: validationStatus.INVALID,
@@ -103,8 +121,8 @@ export default function resource(schema, initialState = {}) {
       case CREATE_SUCCESS:
       case LOAD_SUCCESS:
       case UPDATE_SUCCESS: {
-        const newState = _.isArray(payload) ? [...payload] : { ...payload };
-        applyStatus(newState, updateStatus(
+        const newState = createNewState(payload);
+        setStatus(newState, updateStatus(
           state[STATUS],
           {
             validationStatus: validationStatus.VALID,
@@ -117,8 +135,8 @@ export default function resource(schema, initialState = {}) {
       case CREATE_ERROR:
       case UPDATE_ERROR:
       case REMOVE_ERROR: {
-        const newState = _.isArray(state) ? [...state] : { ...state };
-        applyStatus(newState, updateStatus(
+        const newState = createNewState(state);
+        setStatus(newState, updateStatus(
           state[STATUS],
           {
             validationStatus: validationStatus.INVALID,
@@ -128,8 +146,8 @@ export default function resource(schema, initialState = {}) {
         return newState;
       }
       case LOAD_ERROR: {
-        const newState = _.isArray(state) ? [...state] : { ...state };
-        applyStatus(newState, updateStatus(
+        const newState = createNewState(state);
+        setStatus(newState, updateStatus(
           state[STATUS],
           {
             validationStatus: validationStatus.INVALID,
@@ -141,8 +159,8 @@ export default function resource(schema, initialState = {}) {
       }
       case REMOVE_SUCCESS:
       case REFERENCE_CLEAR: {
-        const newState = _.isArray(state) ? [] : {};
-        applyStatus(newState, updateStatus(
+        const newState = createEmptyState(state);
+        setStatus(newState, updateStatus(
           state[STATUS],
           {
             validationStatus: validationStatus.VALID,
@@ -156,8 +174,8 @@ export default function resource(schema, initialState = {}) {
         if (state[STATUS]) {
           return state;
         }
-        const newState = _.isArray(state) ? [...state] : { ...state };
-        applyStatus(newState, createDefaultStatus(schema));
+        const newState = createNewState(state);
+        setStatus(newState, createDefaultStatus(schema));
         return newState;
       }
     }

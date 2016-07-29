@@ -13,7 +13,7 @@ import {
   busyStatus,
   createStatus,
   updateStatus,
-  applyStatus,
+  setStatus,
   cloneStatus,
 } from './../status';
 
@@ -40,7 +40,7 @@ function patchItemInState(currentItem, patch, actionMeta) {
       ...patch.relationships,
     },
   };
-  applyStatus(newItem, mergeItemStatus(
+  setStatus(newItem, mergeItemStatus(
     currentItem,
     {
       validationStatus: validationStatus.INVALID,
@@ -59,12 +59,18 @@ function createDefaultStatus(schema) {
   };
 }
 
-// storage is generic storage reducer that enables creation
-// of typed storage reducers that are handling specific
-// OBJECT_ type actions.
+/**
+ * Storage is generic storage reducer that enables creation of typed storage
+ * reducers that are handling specific OBJECT_ type actions. Holds instnaces
+ * of objects in normalized state.
+ * @param schema is name of schema that describes data for which reducer
+ * is responsible and will process rio actions with same schema defined.
+ * @param initialState is initial state of reducer, can be array or object.
+ * @returns {Function}
+ */
 export default function storage(schema, initialState = {}) {
   // eslint-disable-next-line no-param-reassign
-  applyStatus(initialState, createDefaultStatus(schema));
+  setStatus(initialState, createDefaultStatus(schema));
 
   return (state = initialState, action) => {
     if (_.get(action, 'meta.schema') !== schema) {
@@ -108,7 +114,7 @@ export default function storage(schema, initialState = {}) {
       case OBJECT_REMOVED: {
         const newState = { ...state };
         delete newState[item.id];
-        applyStatus(newState, createDefaultStatus(schema));
+        cloneStatus(newState, state);
         return newState;
       }
       default: {
@@ -116,7 +122,7 @@ export default function storage(schema, initialState = {}) {
           return state;
         }
         const newState = { ...state };
-        applyStatus(newState, createDefaultStatus(schema));
+        cloneStatus(newState, state);
         return newState;
       }
     }

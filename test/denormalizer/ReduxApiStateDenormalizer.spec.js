@@ -16,7 +16,7 @@ function mergeStatus(denormalizedData) {
   }
   const result = _.mergeWith({}, denormalizedData, (objVal, srcVal, key, object) => {
     if (_.isArray(srcVal)) {
-      return applyStatusToCollectionItems(srcVal);
+      return setStatusToCollectionItems(srcVal);
     } else if (_.isPlainObject(srcVal) && srcVal[STATUS]) {
       return {
         ...mergeStatus(srcVal),
@@ -30,7 +30,7 @@ function mergeStatus(denormalizedData) {
   return result;
 }
 
-function applyStatusToCollectionItems(collection) {
+function setStatusToCollectionItems(collection) {
   return _.reduce(collection, (result, item, key) => {
     result[key] = mergeStatus(item);
     return result;
@@ -38,7 +38,7 @@ function applyStatusToCollectionItems(collection) {
 }
 
 function addStatusToCollection(collection) {
-  const collectionItemsWithStatus = applyStatusToCollectionItems(collection);
+  const collectionItemsWithStatus = setStatusToCollectionItems(collection);
   if (collection[STATUS]) {
     collectionItemsWithStatus[STATUS] = collection[STATUS];
   }

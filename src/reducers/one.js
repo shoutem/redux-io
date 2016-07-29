@@ -10,7 +10,7 @@ import {
   busyStatus,
   createStatus,
   updateStatus,
-  applyStatus,
+  setStatus,
 } from './../status';
 
 function isValid(action, schema, tag) {
@@ -42,16 +42,29 @@ function createDefaultStatus(schema) {
   );
 }
 
-// single is generic single reducer that enables creating
-// typed & named single index reducers that are handling specific
-// type actions with specific collection name.
+/**
+ * One is generic reducer that enables creating typed & named one reducers that
+ * are handling specific REFERENCE_ type actions with specific one name. Collection
+ * reducer holds array of id in normalized state. Every one is defined with
+ * schema andd tag. One have same purpose as collection reducer, but it holds only one
+ * id of any type that references object in state handled by storage reducer. If one
+ * reducer receives payload with multiple items, first item will be taken only.
+ * @param schema is name of schema that describes data for which reducer
+ * is responsible and will process rio actions with same schema defined.
+ * @param tag defines along schema one reducer responsibility to process
+ * rio action. Tag enable to have multiple collections for same schema. It's important
+ * if you want to have normalized state and instances in one place, but different
+ * collections of data.
+ * @param initialState is initial state of reducer, can be array or object.
+ * @returns {Function}
+ */
 export default function single(schema, tag = '', initialValue = '') {
   if (tag === '*') {
     throw new Error('Tag value \'*\' is reserved for redux-api-state and cannot be used.');
   }
   // eslint-disable-next-line no-param-reassign
   const initialState = { value: initialValue };
-  applyStatus(initialState, createDefaultStatus(schema));
+  setStatus(initialState, createDefaultStatus(schema));
   return (state = initialState, action) => {
     if (!isValid(action, schema, tag)) {
       return state;
@@ -62,7 +75,7 @@ export default function single(schema, tag = '', initialValue = '') {
         const newState = {
           value: action.payload[0] ? action.payload[0].id : initialValue,
         };
-        applyStatus(newState, updateStatus(
+        setStatus(newState, updateStatus(
           state[STATUS],
           {
             validationStatus: validationStatus.VALID,
@@ -74,7 +87,7 @@ export default function single(schema, tag = '', initialValue = '') {
       }
       case REFERENCE_CLEAR: {
         const newState = { value: initialValue };
-        applyStatus(newState, updateStatus(
+        setStatus(newState, updateStatus(
           state[STATUS],
           {
             validationStatus: validationStatus.VALID,
@@ -86,7 +99,7 @@ export default function single(schema, tag = '', initialValue = '') {
       }
       case REFERENCE_STATUS: {
         const newState = { value: state.value };
-        applyStatus(newState, updateStatus(
+        setStatus(newState, updateStatus(
             state[STATUS],
             action.payload
         ));
@@ -97,7 +110,7 @@ export default function single(schema, tag = '', initialValue = '') {
           return state;
         }
         const newState = { value: state.value ? state.value : initialValue };
-        applyStatus(newState, createDefaultStatus(schema));
+        setStatus(newState, createDefaultStatus(schema));
         return newState;
       }
     }

@@ -13,7 +13,7 @@ import rio, {
   JSON_API_SOURCE,
   collection,
 } from '../../src';
-import { applyStatus, updateStatus, getStatus } from '../../src/status';
+import { setStatus, updateStatus, getStatus } from '../../src/status';
 
 describe('Next action creator', () => {
   const middlewares = [thunk, apiMiddleware, apiStateMiddleware];
@@ -47,7 +47,7 @@ describe('Next action creator', () => {
     };
     const reducer = collection(schema, tag, [1, 2, 3]);
     const demoCollection = reducer();
-    applyStatus(demoCollection, updateStatus(getStatus(demoCollection), { links }));
+    setStatus(demoCollection, updateStatus(getStatus(demoCollection), { links }));
 
     const action = next(demoCollection);
 
