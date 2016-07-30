@@ -276,38 +276,46 @@ describe('RioCache', () => {
   });
   describe('areCollectionItemsChanged', () => {
     it('confirms that collection is unchanged', () => {
-      const store = getNormalizedData();
-      const normalizedData = new NormalizedData(store);
+      const normalizedData = new NormalizedData(getNormalizedData());
       const cache = new RioCache(normalizedData.getNormalizedItem);
       const denormalizedItems = getDenormalizedItems();
+
       const item1 = denormalizedItems[0];
       const item2 = denormalizedItems[1];
+
       denormalizedItems.forEach((item) => {
         cache.cacheItem(item);
       });
-      const cachedCollection = [item1, item2];
+
       const collection = [{ id: item1.id, type: item1.type }, { id: item2.id, type: item2.type }];
       collection[STATUS] = { schema: item1.type }; // both items must be same type!
+
+      const cachedCollection = [item1, item2];
+
       assert.isNotOk(
         cache.areCollectionItemsChanged(collection, cachedCollection),
         'indicates that collection items are changed'
       );
     });
     it('confirms that collection is changed', () => {
-      const store = getNormalizedData();
-      const normalizedData = new NormalizedData(store);
-      const cache = new RioCache(normalizedData.getNormalizedItem);
-      const denormalizedItems = getDenormalizedItems();
-      const item1 = denormalizedItems[0];
-      const item2 = denormalizedItems[1];
       const type = 'type1';
       const id3 = 'type1Id3';
+
+      const normalizedData = new NormalizedData(getNormalizedData());
+      const cache = new RioCache(normalizedData.getNormalizedItem);
+      const denormalizedItems = getDenormalizedItems();
+
+      const item1 = denormalizedItems[0];
+      const item2 = denormalizedItems[1];
+
       denormalizedItems.forEach((item) => {
         cache.cacheItem(item);
       });
-      const cachedCollection = [item1, item2];
+
       const collection = [{ id: item1.id, type: item1.type }, { id: item2.id, type: item2.type }];
       collection[STATUS] = { schema: item1.type }; // both items must be same type!
+
+      const cachedCollection = [item1, item2];
 
       const normalizedItemType1Id3 = normalizedData.getNormalizedItem({ id: id3, type });
 
@@ -323,33 +331,37 @@ describe('RioCache', () => {
   });
   describe('areItemRelationshipsValid', () => {
     it('confirms that unchanged relationships are valid', () => {
-      const store = getNormalizedData();
-      const normalizedData = new NormalizedData(store);
+      const normalizedData = new NormalizedData(getNormalizedData());
       const cache = new RioCache(normalizedData.getNormalizedItem);
       const denormalizedItems = getDenormalizedItems();
+
       denormalizedItems.forEach((item) => {
         cache.cacheItem(item);
       });
+
       const normalizedItemType1Id1 = normalizedData.getNormalizedItem({
         id: 'type1Id1',
         type: 'type1'
       });
+
       assert.isOk(
         cache.areCachedItemRelationshipsValid(normalizedItemType1Id1),
         'item relationships marked as invalid (changed)'
       );
     });
     it('confirms that changed relationships aren\'t valid', () => {
-      const store = getNormalizedData();
       const id = 'type1Id1';
       const id3 = 'type1Id3';
       const type = 'type1';
-      const normalizedData = new NormalizedData(store);
+
+      const normalizedData = new NormalizedData(getNormalizedData());
       const cache = new RioCache(normalizedData.getNormalizedItem);
       const denormalizedItems = getDenormalizedItems();
+
       denormalizedItems.forEach((item) => {
         cache.cacheItem(item);
       });
+
       const normalizedItemType1Id1 = normalizedData.getNormalizedItem({ id, type });
       const normalizedItemType1Id3 = normalizedData.getNormalizedItem({ id: id3, type });
 
