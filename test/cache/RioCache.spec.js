@@ -218,21 +218,25 @@ describe('RioCache', () => {
       const id = 1;
       const schema = 'type';
       const type = schema;
-      const item = { id, type };
-      const reference = [1];
-      item[STATUS] = { id: _.uniqueId(), modifiedTimestamp: 1 };
-      reference[STATUS] = { schema, id: _.uniqueId(), modifiedTimestamp: 1 };
-      const cache = new RioCache(() => item);
 
+      const item = { id, type };
+      item[STATUS] = { id: _.uniqueId(), modifiedTimestamp: 1 };
+
+      const collection = [1];
+      collection[STATUS] = { schema, id: _.uniqueId(), modifiedTimestamp: 1 };
+
+      const cache = new RioCache(() => item);
       cache.cacheItem(item);
 
       const denormalizedReference = [{ id, type }];
-      denormalizedReference[STATUS] = spread(reference[STATUS]);
+      denormalizedReference[STATUS] = spread(collection[STATUS]);
+
       cache.cacheReference(denormalizedReference);
 
       const descriptorCollection = [{ id, type }];
       // simulate collection update - change modifiedTimestamp
-      descriptorCollection[STATUS] = { ...reference[STATUS], modifiedTimestamp: 2 };
+      descriptorCollection[STATUS] = { ...collection[STATUS], modifiedTimestamp: 2 };
+
       assert.isUndefined(
         cache.getValidCollection(descriptorCollection),
         'didn\'t return valid reference'
@@ -242,23 +246,28 @@ describe('RioCache', () => {
       const id = 1;
       const schema = 'type';
       const type = schema;
+
       const item = { id, type };
-      const reference = [1];
-      const changedItem = { id, type };
       item[STATUS] = { id: _.uniqueId(), modifiedTimestamp: 1 };
+
+      const reference = [1];
+      reference[STATUS] = { schema, id: _.uniqueId(), modifiedTimestamp: 1 };
+
+      const changedItem = { id, type };
       // simulate item update - change modifiedTimestamp
       changedItem[STATUS] = { ...item[STATUS], modifiedTimestamp: 2 };
-      reference[STATUS] = { schema, id: _.uniqueId(), modifiedTimestamp: 1 };
-      const cache = new RioCache(() => changedItem);
 
+      const cache = new RioCache(() => changedItem);
       cache.cacheItem(item);
 
       const denormalizedReference = [{ id, type }];
       denormalizedReference[STATUS] = spread(reference[STATUS]);
+
       cache.cacheReference(denormalizedReference);
 
       const descriptorCollection = [{ id, type }];
       descriptorCollection[STATUS] = spread(reference[STATUS]);
+
       assert.isUndefined(
         cache.getValidCollection(descriptorCollection),
         'didn\'t return valid reference'
