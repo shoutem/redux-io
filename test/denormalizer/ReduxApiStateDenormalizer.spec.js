@@ -444,7 +444,7 @@ describe('ReduxApiStateDenormalizer', () => {
       const store = getStore();
       const denormalizer = new ReduxApiStateDenormalizer(() => store, createStorageMap());
       const collection = ['type1Id1'];
-      collection[STATUS] = createStatus({ schema: 'type1', tag: ''});
+      collection[STATUS] = createStatus({ schema: 'type1', tag: '', id: _.uniqueId()});
 
       const denormalizedData =
         denormalizer.denormalizeCollection(collection);

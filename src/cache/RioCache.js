@@ -48,6 +48,10 @@ export default class RioCache {
 
   cacheReference(reference) {
     const referenceKey = getId(reference);
+    if (!referenceKey) {
+      // If provided entity is not RIO reference, it can not be cached
+      return reference;
+    }
     this.cache[referenceKey] = reference;
     return this.getCacheByKey(referenceKey);
   }
