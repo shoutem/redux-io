@@ -297,7 +297,7 @@ describe('RioCache', () => {
         'indicates that collection items are changed'
       );
     });
-    it('confirms that collection is changed', () => {
+    it('confirms that collection is changed if collection item is changed', () => {
       const type = 'type1';
       const id3 = 'type1Id3';
 
@@ -328,6 +328,75 @@ describe('RioCache', () => {
         'indicates that collection items are not changed'
       );
     });
+    it('confirms that collection is changed if collection get new item', () => {
+      const normalizedData = new NormalizedData(getNormalizedData());
+      const cache = new RioCache(normalizedData.getNormalizedItem);
+      const denormalizedItems = getDenormalizedItems();
+
+      const item1 = denormalizedItems[0];
+      const item2 = denormalizedItems[1];
+      const item3 = denormalizedItems[2];
+
+      denormalizedItems.forEach((item) => {
+        cache.cacheItem(item);
+      });
+
+      const collection = [{ id: item1.id, type: item1.type }, { id: item2.id, type: item2.type }];
+      collection[STATUS] = { schema: item1.type }; // both items must be same type!
+
+      const cachedCollection = [item1, item2, item3];
+
+      assert.isOk(
+        cache.areCollectionItemsChanged(collection, cachedCollection),
+        'indicates that collection items are not changed'
+      );
+    });
+    it('confirms that collection is changed if collection loose item', () => {
+      const normalizedData = new NormalizedData(getNormalizedData());
+      const cache = new RioCache(normalizedData.getNormalizedItem);
+      const denormalizedItems = getDenormalizedItems();
+
+      const item1 = denormalizedItems[0];
+      const item2 = denormalizedItems[1];
+      const item3 = denormalizedItems[2];
+
+      denormalizedItems.forEach((item) => {
+        cache.cacheItem(item);
+      });
+
+      const collection = [{ id: item1.id, type: item1.type }, { id: item2.id, type: item2.type }];
+      collection[STATUS] = { schema: item1.type }; // both items must be same type!
+
+      const cachedCollection = [item1];
+
+      assert.isOk(
+        cache.areCollectionItemsChanged(collection, cachedCollection),
+        'indicates that collection items are not changed'
+      );
+    });
+    it('confirms that collection is changed if collection replace item', () => {
+      const normalizedData = new NormalizedData(getNormalizedData());
+      const cache = new RioCache(normalizedData.getNormalizedItem);
+      const denormalizedItems = getDenormalizedItems();
+
+      const item1 = denormalizedItems[0];
+      const item2 = denormalizedItems[1];
+      const item3 = denormalizedItems[2];
+
+      denormalizedItems.forEach((item) => {
+        cache.cacheItem(item);
+      });
+
+      const collection = [{ id: item1.id, type: item1.type }, { id: item2.id, type: item2.type }];
+      collection[STATUS] = { schema: item1.type }; // both items must be same type!
+
+      const cachedCollection = [item1, item3];
+
+      assert.isOk(
+        cache.areCollectionItemsChanged(collection, cachedCollection),
+        'indicates that collection items are not changed'
+      );
+    });
   });
   describe('areItemRelationshipsValid', () => {
     it('confirms that unchanged relationships are valid', () => {
@@ -349,30 +418,60 @@ describe('RioCache', () => {
         'item relationships marked as invalid (changed)'
       );
     });
-    it('confirms that changed relationships aren\'t valid', () => {
-      const id = 'type1Id1';
-      const id3 = 'type1Id3';
-      const type = 'type1';
+    describe('single relationship change', () => {
+      it('confirms that changed relationships aren\'t valid', () => {
+        const id = 'type1Id1';
+        const type = 'type1';
+        const id2 = 'type2Id1';
+        const type2 = 'type2.test';
 
-      const normalizedData = new NormalizedData(getNormalizedData());
-      const cache = new RioCache(normalizedData.getNormalizedItem);
-      const denormalizedItems = getDenormalizedItems();
+        const normalizedData = new NormalizedData(getNormalizedData());
+        const cache = new RioCache(normalizedData.getNormalizedItem);
+        const denormalizedItems = getDenormalizedItems();
 
-      denormalizedItems.forEach((item) => {
-        cache.cacheItem(item);
+        denormalizedItems.forEach((item) => {
+          cache.cacheItem(item);
+        });
+
+        const normalizedItemType1Id1 = normalizedData.getNormalizedItem({ id, type });
+        const normalizedItemType2Id1 = normalizedData.getNormalizedItem({ id: id2, type: type2 });
+
+        const changedItem = { id: id2, type: type2 };
+        changedItem[STATUS] = { ...normalizedItemType2Id1[STATUS], modifiedTimestamp: Date.now() };
+        normalizedData.updateItem(changedItem);
+
+        assert.isNotOk(
+          cache.areCachedItemRelationshipsValid(normalizedItemType1Id1),
+          'item relationships marked as valid (unchanged)'
+        );
       });
+    });
+    describe('collection relationship change', () => {
+      it('confirms that changed relationships aren\'t valid', () => {
+        const id = 'type1Id1';
+        const id3 = 'type1Id3';
+        const type = 'type1';
 
-      const normalizedItemType1Id1 = normalizedData.getNormalizedItem({ id, type });
-      const normalizedItemType1Id3 = normalizedData.getNormalizedItem({ id: id3, type });
+        const normalizedData = new NormalizedData(getNormalizedData());
+        const cache = new RioCache(normalizedData.getNormalizedItem);
+        const denormalizedItems = getDenormalizedItems();
 
-      const changedItem = { id: id3, type };
-      changedItem[STATUS] = { ...normalizedItemType1Id3[STATUS], modifiedTimestamp: Date.now() };
-      normalizedData.updateItem(changedItem);
+        denormalizedItems.forEach((item) => {
+          cache.cacheItem(item);
+        });
 
-      assert.isNotOk(
-        cache.areCachedItemRelationshipsValid(normalizedItemType1Id1),
-        'item relationships marked as valid (unchanged)'
-      );
+        const normalizedItemType1Id1 = normalizedData.getNormalizedItem({ id, type });
+        const normalizedItemType1Id3 = normalizedData.getNormalizedItem({ id: id3, type });
+
+        const changedItem = { id: id3, type };
+        changedItem[STATUS] = { ...normalizedItemType1Id3[STATUS], modifiedTimestamp: Date.now() };
+        normalizedData.updateItem(changedItem);
+
+        assert.isNotOk(
+          cache.areCachedItemRelationshipsValid(normalizedItemType1Id1),
+          'item relationships marked as valid (unchanged)'
+        );
+      });
     });
   });
 });
