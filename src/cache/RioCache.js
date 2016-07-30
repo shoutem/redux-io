@@ -110,10 +110,17 @@ export default class RioCache {
     return !cachedCollection || !isRioEntityUpdated(collection, cachedCollection);
   }
 
-  areCollectionItemsChanged(collection, cachedCollection = []) {
+  /**
+   * Takes collection of item descriptors and check if cached collection items match current items
+   *
+   * @param descriptorCollection
+   * @param cachedCollection
+   * @returns {boolean}
+   */
+  areCollectionItemsChanged(descriptorCollection, cachedCollection = []) {
     let matchedRelationshipsItems = 0;
 
-    const relationshipChanged = _.some(collection, item => {
+    const relationshipChanged = _.some(descriptorCollection, item => {
       if (!isItemInCollection(cachedCollection, item) || !this.getValidItem(item)) {
         return true;
       }
