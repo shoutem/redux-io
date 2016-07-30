@@ -2,7 +2,7 @@ import { getCollectionLink, APPEND_MODE } from '../reducers/collection';
 import { getStatus } from '../status';
 import find from './find';
 
-const NO_MORE_RESULTS = '@@redux_io/NO_MORE_RESULTS';
+export const NO_MORE_RESULTS = '@@redux_io/NO_MORE_RESULTS';
 
 /**
  * Create action for next collection items in sequence from collection links.
