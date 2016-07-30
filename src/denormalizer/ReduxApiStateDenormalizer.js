@@ -126,7 +126,7 @@ export default class ReduxApiStateDenormalizer extends ReduxDenormalizer {
    * @param schema (optional)
    * @returns {{}}
    */
-  denormalizeSingle(single, storage, schema) {
+  denormalizeOne(single, storage, schema) {
     const itemDescriptor = createSingleDescriptor(single, schema);
 
     // if storage is undefined, denormalizer is in Find storage mode
