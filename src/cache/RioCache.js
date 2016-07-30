@@ -42,6 +42,16 @@ export default class RioCache {
     return this.cache[key];
   }
 
+  getReference(reference) {
+    return this.getCacheByKey(getId(reference));
+  }
+
+  cacheReference(reference) {
+    const referenceKey = getId(reference);
+    this.cache[referenceKey] = reference;
+    return this.getCacheByKey(referenceKey);
+  }
+
   getItem(normalizedItem) {
     return this.getCacheByKey(getId(normalizedItem));
   }
@@ -71,15 +81,11 @@ export default class RioCache {
   }
 
   cacheItem(denormalizedItem) {
-    const itemKey = getId(denormalizedItem);
-    this.cache[itemKey] = denormalizedItem;
-    return this.getCacheByKey(itemKey);
+    return this.cacheReference(denormalizedItem);
   }
 
   cacheCollection(collection) {
-    const collectionKey = getId(collection);
-    this.cache[collectionKey] = collection;
-    return this.getCacheByKey(collectionKey);
+    return this.cacheReference(collection);
   }
 
   isItemModified(normalizedItem) {
