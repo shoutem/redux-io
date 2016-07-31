@@ -38,12 +38,8 @@ export default class RioCache {
     this.cache = {};
   }
 
-  getCacheByKey(key) {
-    return this.cache[key];
-  }
-
   getReference(reference) {
-    return this.getCacheByKey(getId(reference));
+    return this.cache[getId(reference)];
   }
 
   cacheReference(reference) {
@@ -53,15 +49,15 @@ export default class RioCache {
       return reference;
     }
     this.cache[referenceKey] = reference;
-    return this.getCacheByKey(referenceKey);
+    return this.getReference(reference);
   }
 
   getItem(normalizedItem) {
-    return this.getCacheByKey(getId(normalizedItem));
+    return this.getReference(normalizedItem);
   }
 
   getCollection(collection) {
-    return this.getCacheByKey(getId(collection));
+    return this.getReference(collection);
   }
 
   // eslint-disable-next-line consistent-return
