@@ -111,7 +111,7 @@ export default class ReduxApiStateDenormalizer extends ReduxDenormalizer {
   denormalizeItem(itemDescriptor) {
     let item = this.cache.getValidItem(itemDescriptor);
     if (!item) {
-      item = this.cache.cacheItem(super.denormalizeItem(itemDescriptor));
+      item = this.cache.add(super.denormalizeItem(itemDescriptor));
     }
     return item;
   }
@@ -177,7 +177,7 @@ export default class ReduxApiStateDenormalizer extends ReduxDenormalizer {
       }
 
       cloneStatus(collection, denormalizedCollection);
-      this.cache.cacheCollection(denormalizedCollection);
+      this.cache.add(denormalizedCollection);
     }
 
     return denormalizedCollection;

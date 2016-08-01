@@ -38,38 +38,30 @@ export default class RioCache {
     this.cache = {};
   }
 
-  getReference(reference) {
+  get(reference) {
     return this.cache[getId(reference)];
   }
 
-  cacheReference(reference) {
+  add(reference) {
     const referenceKey = getId(reference);
     if (!referenceKey) {
       // If provided entity is not RIO reference, it can not be cached
       return reference;
     }
     this.cache[referenceKey] = reference;
-    return this.getReference(reference);
-  }
-
-  getItem(normalizedItem) {
-    return this.getReference(normalizedItem);
-  }
-
-  getCollection(collection) {
-    return this.getReference(collection);
+    return this.get(reference);
   }
 
   // eslint-disable-next-line consistent-return
   getValidItem(itemDescriptor) {
     const normalizedItem = this.getNormalizedItem(itemDescriptor);
     if (normalizedItem && this.isItemCacheValid(normalizedItem)) {
-      return this.getItem(normalizedItem);
+      return this.get(normalizedItem);
     }
   }
 
   getValidCollection(descriptorCollection) {
-    const cachedCollection = this.getCollection(descriptorCollection);
+    const cachedCollection = this.get(descriptorCollection);
 
     if (this.isCollectionModified(descriptorCollection) ||
       this.areCollectionItemsChanged(descriptorCollection, cachedCollection)) {
@@ -80,16 +72,8 @@ export default class RioCache {
     return cachedCollection;
   }
 
-  cacheItem(denormalizedItem) {
-    return this.cacheReference(denormalizedItem);
-  }
-
-  cacheCollection(collection) {
-    return this.cacheReference(collection);
-  }
-
   isItemModified(normalizedItem) {
-    const cachedItem = this.getItem(normalizedItem);
+    const cachedItem = this.get(normalizedItem);
     return !cachedItem || !isRioEntityUpdated(normalizedItem, cachedItem);
   }
 
@@ -102,7 +86,7 @@ export default class RioCache {
   }
 
   isCollectionModified(collection) {
-    const cachedCollection = this.getCollection(collection);
+    const cachedCollection = this.get(collection);
     return !cachedCollection || !isRioEntityUpdated(collection, cachedCollection);
   }
 
@@ -141,7 +125,7 @@ export default class RioCache {
 
   isRelationshipChanged(normalizedItem, relationshipName) {
     const relationship = normalizedItem.relationships[relationshipName].data;
-    const cachedItem = this.getItem(normalizedItem);
+    const cachedItem = this.get(normalizedItem);
     const cachedRelationship = cachedItem[relationshipName];
 
     if (isSingleRelation(relationship)) {

@@ -133,17 +133,17 @@ describe('RioCache', () => {
       const reference = {};
       reference[STATUS] = { id: _.uniqueId() };
 
-      cache.cacheReference(reference);
+      cache.add(reference);
 
-      assert.isOk(reference === cache.getReference(reference), 'did not cache valid reference');
+      assert.isOk(reference === cache.get(reference), 'did not cache valid reference');
     });
     it('doesn\'t cache non reference entity', () => {
       const cache = new RioCache();
       const reference = {};
 
-      cache.cacheReference(reference);
+      cache.add(reference);
 
-      assert.isUndefined(cache.getReference(reference), 'returned something from cache');
+      assert.isUndefined(cache.get(reference), 'returned something from cache');
     });
   });
   describe('getValidItem', () => {
@@ -159,7 +159,7 @@ describe('RioCache', () => {
       const denormalizedReference = {};
       denormalizedReference[STATUS] = spread(reference[STATUS]);
 
-      cache.cacheReference(denormalizedReference);
+      cache.add(denormalizedReference);
 
       assert.isOk(denormalizedReference === cache.getValidItem({
           id,
@@ -181,7 +181,7 @@ describe('RioCache', () => {
       denormalizedReference[STATUS] = spread(reference[STATUS]);
 
       const cache = new RioCache(() => changedReference);
-      cache.cacheReference(denormalizedReference);
+      cache.add(denormalizedReference);
 
       assert.isUndefined(cache.getValidItem({ id, type }), 'returned some entity');
     });
@@ -199,12 +199,12 @@ describe('RioCache', () => {
       collection[STATUS] = { schema, id: _.uniqueId(), modifiedTimestamp: 1 };
 
       const cache = new RioCache(() => item);
-      cache.cacheItem(item);
+      cache.add(item);
 
       const denormalizedReference = [{ id, type }];
       denormalizedReference[STATUS] = spread(collection[STATUS]);
 
-      cache.cacheReference(denormalizedReference);
+      cache.add(denormalizedReference);
 
       const descriptorCollection = [{ id, type }];
       descriptorCollection[STATUS] = spread(collection[STATUS]);
@@ -226,12 +226,12 @@ describe('RioCache', () => {
       collection[STATUS] = { schema, id: _.uniqueId(), modifiedTimestamp: 1 };
 
       const cache = new RioCache(() => item);
-      cache.cacheItem(item);
+      cache.add(item);
 
       const denormalizedReference = [{ id, type }];
       denormalizedReference[STATUS] = spread(collection[STATUS]);
 
-      cache.cacheReference(denormalizedReference);
+      cache.add(denormalizedReference);
 
       const descriptorCollection = [{ id, type }];
       // simulate collection update - change modifiedTimestamp
@@ -258,12 +258,12 @@ describe('RioCache', () => {
       changedItem[STATUS] = { ...item[STATUS], modifiedTimestamp: 2 };
 
       const cache = new RioCache(() => changedItem);
-      cache.cacheItem(item);
+      cache.add(item);
 
       const denormalizedReference = [{ id, type }];
       denormalizedReference[STATUS] = spread(reference[STATUS]);
 
-      cache.cacheReference(denormalizedReference);
+      cache.add(denormalizedReference);
 
       const descriptorCollection = [{ id, type }];
       descriptorCollection[STATUS] = spread(reference[STATUS]);
@@ -284,7 +284,7 @@ describe('RioCache', () => {
       const item2 = denormalizedItems[1];
 
       denormalizedItems.forEach((item) => {
-        cache.cacheItem(item);
+        cache.add(item);
       });
 
       const collection = [{ id: item1.id, type: item1.type }, { id: item2.id, type: item2.type }];
@@ -309,7 +309,7 @@ describe('RioCache', () => {
       const item2 = denormalizedItems[1];
 
       denormalizedItems.forEach((item) => {
-        cache.cacheItem(item);
+        cache.add(item);
       });
 
       const collection = [{ id: item1.id, type: item1.type }, { id: item2.id, type: item2.type }];
@@ -338,7 +338,7 @@ describe('RioCache', () => {
       const item3 = denormalizedItems[2];
 
       denormalizedItems.forEach((item) => {
-        cache.cacheItem(item);
+        cache.add(item);
       });
 
       const collection = [{ id: item1.id, type: item1.type }, { id: item2.id, type: item2.type }];
@@ -361,7 +361,7 @@ describe('RioCache', () => {
       const item3 = denormalizedItems[2];
 
       denormalizedItems.forEach((item) => {
-        cache.cacheItem(item);
+        cache.add(item);
       });
 
       const collection = [{ id: item1.id, type: item1.type }, { id: item2.id, type: item2.type }];
@@ -384,7 +384,7 @@ describe('RioCache', () => {
       const item3 = denormalizedItems[2];
 
       denormalizedItems.forEach((item) => {
-        cache.cacheItem(item);
+        cache.add(item);
       });
 
       const collection = [{ id: item1.id, type: item1.type }, { id: item2.id, type: item2.type }];
@@ -405,7 +405,7 @@ describe('RioCache', () => {
       const denormalizedItems = getDenormalizedItems();
 
       denormalizedItems.forEach((item) => {
-        cache.cacheItem(item);
+        cache.add(item);
       });
 
       const normalizedItemType1Id1 = normalizedData.getNormalizedItem({
@@ -430,7 +430,7 @@ describe('RioCache', () => {
         const denormalizedItems = getDenormalizedItems();
 
         denormalizedItems.forEach((item) => {
-          cache.cacheItem(item);
+          cache.add(item);
         });
 
         const normalizedItemType1Id1 = normalizedData.getNormalizedItem({ id, type });
@@ -457,7 +457,7 @@ describe('RioCache', () => {
         const denormalizedItems = getDenormalizedItems();
 
         denormalizedItems.forEach((item) => {
-          cache.cacheItem(item);
+          cache.add(item);
         });
 
         const normalizedItemType1Id1 = normalizedData.getNormalizedItem({ id, type });
