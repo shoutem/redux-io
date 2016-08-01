@@ -129,8 +129,3 @@ export default function collection(schema, tag = '', initialState = []) {
     }
   };
 }
-
-export function getCollectionDescription(collectionEntity) {
-  const collectionStatus = getStatus(collectionEntity) || {};
-  return { schema: collectionStatus.schema, tag: collectionStatus.tag };
-}

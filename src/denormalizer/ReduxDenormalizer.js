@@ -80,7 +80,7 @@ export default class ReduxDenormalizer extends ObjectDenormalizer {
    * @param storage
    * @returns {{}} - denormalized items
    */
-  denormalizeSingle(item, storage) {
+  denormalizeOne(item, storage) {
     this.updateStorageMap(storage);
     return super.denormalizeItem(item);
   }

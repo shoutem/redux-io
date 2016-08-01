@@ -4,6 +4,7 @@ import nock from 'nock';
 import { RSAA, apiMiddleware } from 'redux-api-middleware';
 import configureMockStore from 'redux-mock-store';
 import thunk from 'redux-thunk';
+import { NO_MORE_RESULTS } from '../../src/actions/next';
 import rio, {
   next,
   LOAD_REQUEST,
@@ -72,5 +73,19 @@ describe('Next action creator', () => {
     expect(types[1].meta).to.deep.equal(expectedMeta);
     expect(types[2].type).to.equal(LOAD_ERROR);
     expect(types[2].meta).to.deep.equal(expectedMeta);
+  });
+
+  it('creates NO_MORE_ITEMS action', () => {
+    const schema = 'test_schema';
+    const tag = 'test_tag';
+    const reducer = collection(schema, tag, [1, 2, 3]);
+    const demoCollection = reducer();
+    setStatus(demoCollection, updateStatus(getStatus(demoCollection)));
+
+    const action = next(demoCollection);
+    expect(action.type).to.equal(NO_MORE_RESULTS);
+    expect(action.schema).to.equal(schema);
+    expect(action.tag).to.equal(tag);
+
   });
 });

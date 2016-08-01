@@ -133,7 +133,7 @@ describe('ReduxApiStateDenormalizer', () => {
       );
     });
   });
-  describe('denormalizeSingle', () => {
+  describe('denormalizeOne', () => {
     it('denormalizes valid object relationships data', () => {
       const denormalizer = new ReduxApiStateDenormalizer();
       const storage = createSchemasMap(getStore(), createStorageMap());
@@ -175,9 +175,8 @@ describe('ReduxApiStateDenormalizer', () => {
       const single = { value: 'type1Id1' };
       single[STATUS] = { schema: 'type1' };
       const denormalizedData =
-        mergeStatus(denormalizer.denormalizeSingle(single, storage));
+        mergeStatus(denormalizer.denormalizeOne(single, storage));
 
-      console.log(denormalizedData[STATUS]);
       assert.deepEqual(
         denormalizedData,
         expectedData,
@@ -223,7 +222,7 @@ describe('ReduxApiStateDenormalizer', () => {
       };
 
       const denormalizedData =
-        mergeStatus(denormalizer.denormalizeSingle('type1Id1', storage, 'type1'));
+        mergeStatus(denormalizer.denormalizeOne('type1Id1', storage, 'type1'));
       assert.isObject(denormalizedData[STATUS]);
       assert.isObject(denormalizedData['type2.test'][STATUS]);
       assert.shallowDeepEqual(
@@ -237,7 +236,7 @@ describe('ReduxApiStateDenormalizer', () => {
       const storage = createSchemasMap(getStore(), createStorageMap());
 
       assert.throws(() => {
-        mergeStatus(denormalizer.denormalizeSingle('type1Id1', storage));
+        mergeStatus(denormalizer.denormalizeOne('type1Id1', storage));
       }, 'Cannot create primitive single descriptor, schema is not provided.');
     });
     it('gets object from cache', () => {
@@ -248,9 +247,9 @@ describe('ReduxApiStateDenormalizer', () => {
       single[STATUS] = { schema: 'type1' };
 
       const denormalizedData =
-        denormalizer.denormalizeSingle(single, storage);
+        denormalizer.denormalizeOne(single, storage);
       const cachedDenormalizedData =
-        denormalizer.denormalizeSingle(single, storage);
+        denormalizer.denormalizeOne(single, storage);
 
       assert.isOk(cachedDenormalizedData === denormalizedData, 'didn\'t get cached item');
       assert.isObject(cachedDenormalizedData[STATUS]);
@@ -264,12 +263,12 @@ describe('ReduxApiStateDenormalizer', () => {
       const single = { value: 'type1Id1' };
       single[STATUS] = { schema: 'type1' };
 
-      const denormalizedData = mergeStatus(denormalizer.denormalizeSingle(single, storage));
+      const denormalizedData = mergeStatus(denormalizer.denormalizeOne(single, storage));
 
       storage = createSchemasMap(getModifiedStore(store), createStorageMap());
 
       const notCachedDenormalizedData =
-        mergeStatus(denormalizer.denormalizeSingle(single, storage));
+        mergeStatus(denormalizer.denormalizeOne(single, storage));
 
       const expectedData = {
         id: 'type1Id1',
@@ -311,6 +310,23 @@ describe('ReduxApiStateDenormalizer', () => {
         notCachedDenormalizedData,
         expectedData,
         'item not denormalized correctly'
+      );
+    });
+    it('denormalize item which is not in state', () => {
+      const denormalizer = new ReduxApiStateDenormalizer();
+      const storage = createSchemasMap(getStore(), createStorageMap());
+      const single = { value: 'type1Id7' };
+      single[STATUS] = { schema: 'type1' };
+      const denormalizedData = denormalizer.denormalizeOne(single, storage);
+      const expectedData = {
+        id: 'type1Id7',
+        type: 'type1',
+      };
+
+      assert.deepEqual(
+        denormalizedData,
+        expectedData,
+        'didn\'t return item descriptor'
       );
     });
   });
@@ -428,7 +444,7 @@ describe('ReduxApiStateDenormalizer', () => {
       const store = getStore();
       const denormalizer = new ReduxApiStateDenormalizer(() => store, createStorageMap());
       const collection = ['type1Id1'];
-      collection[STATUS] = createStatus({ schema: 'type1', tag: ''});
+      collection[STATUS] = createStatus({ schema: 'type1', tag: '', id: _.uniqueId()});
 
       const denormalizedData =
         denormalizer.denormalizeCollection(collection);

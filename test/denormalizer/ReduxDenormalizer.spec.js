@@ -114,7 +114,7 @@ describe('ReduxDenormalizer', () => {
         ],
       };
       const denormalizedData =
-        denormalizer.denormalizeSingle({ id: 'type1Id1', type: 'type1' });
+        denormalizer.denormalizeOne({ id: 'type1Id1', type: 'type1' });
       assert.deepEqual(
         denormalizedData,
         expectedData,
@@ -143,7 +143,7 @@ describe('ReduxDenormalizer', () => {
         ],
       };
       const denormalizedData =
-        denormalizer.denormalizeSingle(
+        denormalizer.denormalizeOne(
           { id: 'type1Id1', type: 'type1' },
           getStore().storage
         );
@@ -155,7 +155,7 @@ describe('ReduxDenormalizer', () => {
     });
     it('throws error if invalid storage in ProvideStorage mode', () => {
       assert.throw(() => {
-        new ReduxDenormalizer().denormalizeSingle();
+        new ReduxDenormalizer().denormalizeOne();
       }, 'Invalid storage, ProvideStorage mode requires storage object');
     });
   });

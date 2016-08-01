@@ -39,7 +39,7 @@ export const setStatus = (obj, status) => {
       writable: true,
     });
   }
-}
+};
 
 export const cloneStatus = (sourceObject, destinationObject) => {
   if (!sourceObject[STATUS]) {
@@ -49,25 +49,27 @@ export const cloneStatus = (sourceObject, destinationObject) => {
   setStatus(destinationObject, _.merge({}, sourceObject[STATUS]));
 };
 
-export const getTransformation = obj => obj[STATUS] && obj[STATUS].transformation;
+function statusProp(obj, prop) {
+  return _.get(obj, [STATUS, prop]);
+}
+
+export const getStatus = obj => _.get(obj, [STATUS]);
+
+export const getTransformation = obj => statusProp(obj, 'transformation');
 
 export const isValid = obj =>
-  !!obj[STATUS] && obj[STATUS].validationStatus === validationStatus.VALID;
+  !!getStatus(obj) && statusProp(obj, 'validationStatus') === validationStatus.VALID;
 
 export const isInitialized = obj =>
-  !!obj[STATUS] && obj[STATUS].validationStatus !== validationStatus.NONE;
+  !!getStatus(obj) && statusProp(obj, 'validationStatus') !== validationStatus.NONE;
 
-export const isBusy = obj =>
-  !!(obj[STATUS] && obj[STATUS].busyStatus === busyStatus.BUSY);
+export const isBusy = obj => !!(statusProp(obj, 'busyStatus') === busyStatus.BUSY);
 
-export const getStatus = obj => !!obj[STATUS] && obj[STATUS];
+export const getModificationTime = obj => statusProp(obj, 'modifiedTimestamp');
 
-export const getModificationTime = obj => !!obj[STATUS] && obj[STATUS].modifiedTimestamp;
-
-export const isError = obj =>
-  !!(obj[STATUS] && obj[STATUS].error);
+export const isError = obj => !!(statusProp(obj, 'error'));
 
 export const shouldRefresh = (obj, ignoreError = false) =>
   !isValid(obj) && !isBusy(obj) && (!isError(obj) || ignoreError);
 
-export const getId = obj => obj[STATUS] && obj[STATUS].id;
+export const getId = obj => statusProp(obj, 'id');
