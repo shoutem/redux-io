@@ -27,6 +27,9 @@ const schemaDefinition = {
         resourceType: {
           type: 'string',
         },
+        body: {
+          type: 'object',
+        },
       },
       additionalProperties: false,
       required: [

@@ -58,7 +58,7 @@ function createDefaultStatus(schema) {
  * @param initialState is initial state of reducer, can be array or object.
  * @returns {Function}
  */
-export default function single(schema, tag = '', initialValue = '') {
+export default function one(schema, tag = '', initialValue = '') {
   if (tag === '*') {
     throw new Error('Tag value \'*\' is reserved for redux-api-state and cannot be used.');
   }
