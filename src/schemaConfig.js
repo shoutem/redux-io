@@ -28,7 +28,7 @@ const schemaDefinition = {
           type: 'string',
         },
         body: {
-          type: 'object',
+          type: ['object', 'string'],
         },
       },
       additionalProperties: false,
