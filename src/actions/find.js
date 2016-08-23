@@ -14,6 +14,7 @@ function buildRSAAConfig(config) {
     headers: config.request.headers,
     types: config.request.types,
     method: config.request.method,
+    body: config.request.body,
   };
 
   return _.omitBy(rsaaConfig, _.isNil);

@@ -149,6 +149,49 @@ describe('Find action creator', () => {
     expect(types[2].meta).to.deep.equal(expectedMeta);
   });
 
+  it('creates a valid action with predefined config overriding find defaults', () => {
+    const config = {
+      headers: {
+        'Content-Type': 'application/vnd.api+json',
+      },
+      endpoint: 'api.test',
+      body: { a: 1 },
+      method: 'POST',
+    };
+
+    const schema = 'app.builder';
+    const tag = 'collection_test';
+
+    const schemaConfig = {
+      schema,
+      request: config,
+    };
+    rio.registerSchema(schemaConfig);
+
+    const action = find(schema, tag);
+
+    expect(action[RSAA]).to.not.be.undefined;
+    expect(action[RSAA].method).to.equal(config.method);
+    expect(action[RSAA].endpoint).to.equal(config.endpoint);
+    expect(action[RSAA].headers).to.deep.equal(config.headers);
+    expect(action[RSAA].body).to.deep.equal(config.body);
+    expect(action[RSAA].types).to.not.be.undefined;
+
+    const types = action[RSAA].types;
+    const expectedMeta = {
+      source: JSON_API_SOURCE,
+      schema,
+      tag,
+      options: {},
+    };
+    expect(types[0].type).to.equal(LOAD_REQUEST);
+    expect(types[0].meta).to.deep.equal(expectedMeta);
+    expect(types[1].type).to.equal(LOAD_SUCCESS);
+    expect(types[1].meta).to.deep.equal(expectedMeta);
+    expect(types[2].type).to.equal(LOAD_ERROR);
+    expect(types[2].meta).to.deep.equal(expectedMeta);
+  });
+
   it('creates a valid action with merged config', () => {
     const config = {
       headers: {
