@@ -137,10 +137,10 @@ export default class ReduxApiStateDenormalizer extends ReduxDenormalizer {
       // is RIO One reference
       let denormalizedOne = this.cache.getValidOne(one);
       if (!denormalizedOne) {
-        denormalizedOne = this.denormalizeItem(itemDescriptor);
+        // One is different object then denormalizedItem
+        denormalizedOne = { ...this.denormalizeItem(itemDescriptor) };
         // Append One status to denormalizedOne
         // When One is RIO reference we want status of reference and not status of contained item.
-
         cloneStatus(one, denormalizedOne);
         this.cache.add(denormalizedOne);
       }
