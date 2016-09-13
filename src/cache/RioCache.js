@@ -13,6 +13,17 @@ function isCollection(entity) {
   return _.isArray(entity);
 }
 
+/**
+ * Compare cached entity modification time with current.
+ * Modification time can be number or false.
+ * It is false when there is no normalized entity in store.
+ * In that case we consider entity not to be changed
+ * as we are returning always same value, entity descriptor.
+ *
+ * @param cachedModificationTime
+ * @param currentModificationTime
+ * @returns {boolean}
+ */
 function isCacheValid(cachedModificationTime, currentModificationTime) {
   return cachedModificationTime >= currentModificationTime;
 }
