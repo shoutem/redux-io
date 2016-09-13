@@ -101,6 +101,19 @@ export default class ReduxApiStateDenormalizer extends ReduxDenormalizer {
   }
 
   /**
+   * Return normalized item or item descriptor.
+   * Item which is not accessible from storage map will be denormalized and saved in cache
+   * as given descriptor. Cache must to be able to get normalized item to validate cache,
+   * this function provides either true normalized item or descriptor which will be cached.
+   *
+   * @param itemDescriptor
+   * @returns {*}
+   */
+  getNormalizedItem(itemDescriptor) {
+    return super.getNormalizedItem(itemDescriptor) || itemDescriptor;
+  }
+
+  /**
    *
    * Denormalize item descriptor for given schema.
    * Storage is needed in ProvideStorage mode.
