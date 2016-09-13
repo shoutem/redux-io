@@ -5,15 +5,15 @@ import { cloneStatus, getStatus } from './../status';
 
 /**
  * Created getStore for ReduxDenormalizer by using storageMap to find relationships.
- * @param store
- * @param storeSchemasPaths
+ * @param state
+ * @param storeSchemasPaths {schema: 'path.to.storage' || schema: ['path', 'to', 'storage]}
  * @returns {{}}
  */
-export function createSchemasMap(store, storeSchemasPaths) {
+export function createSchemasMap(state, storeSchemasPaths) {
   const storage = {};
 
   // eslint-disable-next-line no-return-assign
-  _.forEach(storeSchemasPaths, (path, schema) => storage[schema] = _.get(store, path));
+  _.forEach(storeSchemasPaths, (path, schema) => storage[schema] = _.get(state, path));
 
   return storage;
 }
