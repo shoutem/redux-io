@@ -24,6 +24,14 @@ function isRioEntityUpdated(entity, cachedEntity) {
   return isCacheValid(cachedEntityModificationTime, currentEntityModificationTime);
 }
 
+function getJsonApiUniqueKey(item) {
+  return _.isPlainObject(item) && item.id && item.type ? `${item.type}.${item.id}` : undefined;
+}
+
+function getReferenceUniqueKey(reference) {
+  return getId(reference) || getJsonApiUniqueKey(reference);
+}
+
 /**
  * Cache Redux input output data by 'type' and 'id'.
  * Provides methods to validate, get and resolve new data with cached data.
@@ -39,11 +47,11 @@ export default class RioCache {
   }
 
   get(reference) {
-    return this.cache[getId(reference)];
+    return this.cache[getReferenceUniqueKey(reference)];
   }
 
   add(reference) {
-    const referenceKey = getId(reference);
+    const referenceKey = getReferenceUniqueKey(reference);
     if (!referenceKey) {
       // If provided entity is not RIO reference, it can not be cached
       return reference;
