@@ -273,7 +273,7 @@ describe('ReduxApiStateDenormalizer', () => {
       const expectedData = {
         id: 'type1Id1',
         type: 'type1',
-        [STATUS]: storage['type1']['type1Id1'][STATUS],
+        [STATUS]: one[STATUS],
         name: 'type1Id1',
         'type2.test': {
           [STATUS]: storage['type2.test']['type2Id1'][STATUS],
