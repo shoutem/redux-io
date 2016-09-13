@@ -1,34 +1,7 @@
 import _ from 'lodash';
 import rio from '../rio';
 import { createSchemasMap } from './ReduxApiStateDenormalizer';
-import { getStatus } from '../status';
-
-function resolveSchemaName(collection, schema) {
-  const collectionSchema = _.get(getStatus(collection), 'schema');
-
-  const isCollectionSchemaValid = !_.isEmpty(collectionSchema) && _.isString(collectionSchema);
-  const isArgumentSchemaValid = !_.isEmpty(schema) && _.isString(schema);
-
-  if (isCollectionSchemaValid && isArgumentSchemaValid) {
-    // eslint-disable-next-line no-console
-    console.warn(
-      `getCollection gets both collection schema (${collectionSchema})`
-    + ` and argument schema (${schema}). Collection schema has priority`
-    + ' over schema argument.'
-    );
-  }
-  if (!isCollectionSchemaValid && !isArgumentSchemaValid) {
-    throw new Error(
-      'Missing schema name in getCollection function. Schema needs to'
-    + ' be defined in collection or as argument.'
-    );
-  }
-
-  if (isCollectionSchemaValid) {
-    return collectionSchema;
-  }
-  return schema;
-}
+import { resolveSchemaName } from './helpers/resolveSchemaName';
 
 /**
  * Connects rio configurations with denormalizer to simplify denormalization
