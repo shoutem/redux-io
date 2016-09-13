@@ -15,10 +15,6 @@ function isCollection(entity) {
 
 /**
  * Compare cached entity modification time with current.
- * Modification time can be number or false.
- * It is false when there is no normalized entity in store.
- * In that case we consider entity not to be changed
- * as we are returning always same value, entity descriptor.
  *
  * @param cachedModificationTime
  * @param currentModificationTime
@@ -28,11 +24,27 @@ function isCacheValid(cachedModificationTime, currentModificationTime) {
   return cachedModificationTime >= currentModificationTime;
 }
 
-function isRioReferenceChanged(entity, cachedEntity) {
-  const cachedEntityModificationTime = getModificationTime(cachedEntity);
-  const currentEntityModificationTime = getModificationTime(entity);
+/**
+ *
+ * @param reference - either RIO reference or descriotor
+ * @param cachedReference - either RIO reference or descriotor
+ * @returns {boolean}
+ */
+export function isReferenceChanged(reference, cachedReference) {
+  const cachedReferenceModificationTime = getModificationTime(cachedReference);
+  const currentReferenceModificationTime = getModificationTime(reference);
 
-  return !isCacheValid(cachedEntityModificationTime, currentEntityModificationTime);
+  /**
+   * If modification times are undefined, references are descriptors
+   * without STATUS object because there is no reference in state.
+   * In that case we consider entity not to be changed
+   * as we are always returning descriptor.
+   */
+  if (!cachedReferenceModificationTime && !currentReferenceModificationTime) {
+    return false;
+  }
+
+  return !isCacheValid(cachedReferenceModificationTime, currentReferenceModificationTime);
 }
 
 function getJsonApiUniqueKey(item) {
@@ -119,7 +131,7 @@ export default class RioCache {
     const oneItem = cachedOne && this.getNormalizedItem({ id: cachedOne.id, type: cachedOne.type });
     if (
       cachedOne && cachedOne &&
-      !isRioReferenceChanged(one, cachedOne) && this.isItemCacheValid(oneItem)
+      !isReferenceChanged(one, cachedOne) && this.isItemCacheValid(oneItem)
     ) {
       return true;
     }
@@ -140,12 +152,12 @@ export default class RioCache {
 
   isItemModified(normalizedItem) {
     const cachedItem = this.get(normalizedItem);
-    return !cachedItem || isRioReferenceChanged(normalizedItem, cachedItem);
+    return !cachedItem || isReferenceChanged(normalizedItem, cachedItem);
   }
 
   isCollectionModified(collection) {
     const cachedCollection = this.get(collection);
-    return !cachedCollection || isRioReferenceChanged(collection, cachedCollection);
+    return !cachedCollection || isReferenceChanged(collection, cachedCollection);
   }
 
   /**
