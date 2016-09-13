@@ -46,8 +46,8 @@ export default class RioCache {
     this.cache = {};
   }
 
-  releaseReference(reference) {
-    delete this.cache[getId(reference)];
+  delete(reference) {
+    delete this.cache[getReferenceUniqueKey(reference)];
   }
 
   get(reference) {
@@ -99,7 +99,7 @@ export default class RioCache {
       return true;
     }
     // Delete invalid cache
-    this.releaseReference(normalizedItem);
+    this.delete(normalizedItem);
     return false;
   }
 
@@ -113,7 +113,7 @@ export default class RioCache {
       return true;
     }
     // Delete invalid cache
-    this.releaseReference(one);
+    this.delete(one);
     return false;
   }
 
@@ -123,7 +123,7 @@ export default class RioCache {
       return true;
     }
     // Delete invalid cache
-    this.releaseReference(collection);
+    this.delete(collection);
     return false;
   }
 
