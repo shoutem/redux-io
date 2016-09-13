@@ -38,6 +38,10 @@ export default class RioCache {
     this.cache = {};
   }
 
+  releaseReference(reference) {
+    delete this.cache[reference];
+  }
+
   get(reference) {
     return this.cache[getId(reference)];
   }
@@ -80,6 +84,8 @@ export default class RioCache {
   isItemCacheValid(normalizedItem) {
     if (this.isItemModified(normalizedItem) ||
       !this.areCachedItemRelationshipsValid(normalizedItem)) {
+      // Delete invalid cache
+      this.releaseReference(normalizedItem);
       return false;
     }
     return true;
