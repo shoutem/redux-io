@@ -18,21 +18,6 @@ import {
 
 chai.use(shallowDeepEqual);
 
-function initializeState() {
-  const userReducer = combineReducers({
-    locationsStorage: storage('locations', initialData.locations),
-    interestsStorage: storage('interests'),
-  });
-  const testReducer = combineReducers({
-    users: userReducer,
-    carsStorage: storage('cars'),
-    topLocations: collection('locations', 'topLocations', initialData.topLocations),
-  });
-
-  const testBatchedReducer = enableRio(testReducer);
-  return testBatchedReducer(undefined, batchActions([{}]));
-}
-
 describe('getCollection', () => {
   const initialData = {
     locations: {
@@ -132,8 +117,8 @@ describe('getCollection', () => {
     const state = initializeState();
     expect(() => getCollection(initialData.topLocations, state))
     .to.throw(
-      'Missing schema name in getCollection function. Schema needs to'
-      + ' be defined in collection or as argument.'
+      'Missing schema name in getCollection or getOne function. Schema needs to'
+      + ' be defined in reference or as argument.'
     );
   });
 
@@ -155,8 +140,8 @@ describe('getCollection', () => {
 
     expect(console.warn.calledOnce).to.be.true;
     expect(console.warn.calledWith(
-      `getCollection gets both collection schema (locations)`
-      + ` and argument schema (locations). Collection schema has priority`
+      `getCollection or getOne gets both reference schema (locations)`
+      + ` and argument schema (locations). Reference schema has priority`
       + ' over schema argument.'
     )).to.be.true;
 
