@@ -70,6 +70,23 @@ const getNormalizedData = () => {
         id: 'type1Id3',
         type: 'type1',
       },
+      type1Id4: {
+        id: 'type1Id4',
+        type: 'type1',
+        attributes: {name: 'type1Id4'},
+        relationships: {
+          type6: {
+            data: [
+              {id: 'type6Id1', type: 'type6'},
+            ],
+          },
+          type1: {
+            data: {
+              id: 'type1Id7', type: 'type1',
+            },
+          },
+        },
+      },
     },
     'type2.test': {
       type2Id1: {
@@ -152,11 +169,11 @@ describe('RioCache', () => {
       const type = 'type';
 
       const reference = { id, type };
-      reference[STATUS] = { id: _.uniqueId(), modifiedTimestamp: 1 };
+      reference[STATUS] = { modifiedTimestamp: 1 };
 
       const cache = new RioCache(() => reference);
 
-      const denormalizedReference = {};
+      const denormalizedReference = { ...reference };
       denormalizedReference[STATUS] = spread(reference[STATUS]);
 
       cache.add(denormalizedReference);
@@ -171,7 +188,7 @@ describe('RioCache', () => {
       const type = 'type';
 
       const reference = { id, type };
-      reference[STATUS] = { id: _.uniqueId(), modifiedTimestamp: 1 };
+      reference[STATUS] = { modifiedTimestamp: 1 };
 
       const changedReference = { id, type };
       // simulate update - change modifiedTimestamp
@@ -184,6 +201,90 @@ describe('RioCache', () => {
       cache.add(denormalizedReference);
 
       assert.isUndefined(cache.getValidItem({ id, type }), 'returned some entity');
+    });
+  });
+  describe('getValidOne', () => {
+    it('returns cached one', () => {
+      const id = 1;
+      const type = 'type';
+
+      const item = { id, type };
+      item[STATUS] = { modifiedTimestamp: 1 };
+
+      const one = {};
+      one[STATUS] = { id: _.uniqueId(), modifiedTimestamp: 1 };
+
+      const cache = new RioCache((descriptor) => descriptor.id ? item : one);
+
+      const denormalizedOne = { ...item };
+      denormalizedOne[STATUS] = spread(one[STATUS]);
+
+      const denormalizedItem = { ...item };
+      denormalizedItem[STATUS] = spread(item[STATUS]);
+
+      cache.add(denormalizedOne);
+      cache.add(denormalizedItem);
+
+      assert.isOk(
+        denormalizedOne === cache.getValidOne(one)
+        , 'didn\'t return valid reference'
+      );
+    });
+    it('doesn\'t return cached one when one changed' , () => {
+      const id = 1;
+      const type = 'type';
+
+      const item = { id, type };
+      item[STATUS] = { modifiedTimestamp: 1 };
+
+      const one = {};
+      one[STATUS] = { id: _.uniqueId(), modifiedTimestamp: 1 };
+      const changedOne = {};
+      changedOne[STATUS] = {...one[STATUS], modifiedTimestamp: 2};
+
+      const cache = new RioCache((descriptor) => descriptor.id ? item : one);
+
+      const denormalizedOne = { ...item };
+      denormalizedOne[STATUS] = spread(one[STATUS]);
+
+      const denormalizedItem = { ...item };
+      denormalizedItem[STATUS] = spread(item[STATUS]);
+
+      cache.add(denormalizedOne);
+      cache.add(denormalizedItem);
+
+      assert.isOk(
+        denormalizedOne !== cache.getValidOne(changedOne)
+        , 'returned cached one'
+      );
+    });
+    it('doesn\'t return cached one when item modified' , () => {
+      const id = 1;
+      const type = 'type';
+
+      const item = { id, type };
+      item[STATUS] = { modifiedTimestamp: 1 };
+      const changedItem = {...item};
+      changedItem[STATUS] = {...item[STATUS], modifiedTimestamp: 2};
+
+      const one = {};
+      one[STATUS] = { id: _.uniqueId(), modifiedTimestamp: 1 };
+
+      const cache = new RioCache((descriptor) => descriptor.id ? changedItem : one);
+
+      const denormalizedOne = { ...item };
+      denormalizedOne[STATUS] = spread(one[STATUS]);
+
+      const denormalizedItem = { ...item };
+      denormalizedItem[STATUS] = spread(item[STATUS]);
+
+      cache.add(denormalizedOne);
+      cache.add(denormalizedItem);
+
+      assert.isOk(
+        denormalizedOne !== cache.getValidOne(one)
+        , 'returned cached one'
+      );
     });
   });
   describe('getValidCollection', () => {
