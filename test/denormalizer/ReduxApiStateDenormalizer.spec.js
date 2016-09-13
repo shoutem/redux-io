@@ -135,12 +135,14 @@ describe('ReduxApiStateDenormalizer', () => {
   });
   describe('denormalizeOne', () => {
     it('denormalizes valid object relationships data', () => {
+      const one = { value: 'type1Id1' };
+      one[STATUS] = { schema: 'type1' };
       const denormalizer = new ReduxApiStateDenormalizer();
       const storage = createSchemasMap(getStore(), createStorageMap());
       const expectedData = {
         id: 'type1Id1',
         type: 'type1',
-        [STATUS]: storage['type1']['type1Id1'][STATUS],
+        [STATUS]: one[STATUS],
         name: 'type1Id1',
         'type2.test': {
           [STATUS]: storage['type2.test']['type2Id1'][STATUS],
@@ -172,10 +174,8 @@ describe('ReduxApiStateDenormalizer', () => {
         ],
       };
 
-      const single = { value: 'type1Id1' };
-      single[STATUS] = { schema: 'type1' };
       const denormalizedData =
-        mergeStatus(denormalizer.denormalizeOne(single, storage));
+        mergeStatus(denormalizer.denormalizeOne(one, storage));
 
       assert.deepEqual(
         denormalizedData,
@@ -231,25 +231,25 @@ describe('ReduxApiStateDenormalizer', () => {
         'item not denormalized correctly'
       );
     });
-    it('throws error when denormalizing primitive single and no schema provided', () => {
+    it('throws error when denormalizing primitive one and no schema provided', () => {
       const denormalizer = new ReduxApiStateDenormalizer();
       const storage = createSchemasMap(getStore(), createStorageMap());
 
       assert.throws(() => {
         mergeStatus(denormalizer.denormalizeOne('type1Id1', storage));
-      }, 'Cannot create primitive single descriptor, schema is not provided.');
+      }, 'Cannot create primitive one descriptor, schema is not provided.');
     });
     it('gets object from cache', () => {
       const denormalizer = new ReduxApiStateDenormalizer();
       const storage = createSchemasMap(getStore(), createStorageMap());
 
-      const single = { value: 'type1Id1' };
-      single[STATUS] = { schema: 'type1' };
+      const one = { value: 'type1Id1' };
+      one[STATUS] = { schema: 'type1', id: _.uniqueId() };
 
       const denormalizedData =
-        denormalizer.denormalizeOne(single, storage);
+        denormalizer.denormalizeOne(one, storage);
       const cachedDenormalizedData =
-        denormalizer.denormalizeOne(single, storage);
+        denormalizer.denormalizeOne(one, storage);
 
       assert.isOk(cachedDenormalizedData === denormalizedData, 'didn\'t get cached item');
       assert.isObject(cachedDenormalizedData[STATUS]);
@@ -260,15 +260,15 @@ describe('ReduxApiStateDenormalizer', () => {
       const store = getStore();
       let storage = createSchemasMap(store, createStorageMap());
 
-      const single = { value: 'type1Id1' };
-      single[STATUS] = { schema: 'type1' };
+      const one = { value: 'type1Id1' };
+      one[STATUS] = { schema: 'type1', id: _.uniqueId() };
 
-      const denormalizedData = mergeStatus(denormalizer.denormalizeOne(single, storage));
+      const denormalizedData = mergeStatus(denormalizer.denormalizeOne(one, storage));
 
       storage = createSchemasMap(getModifiedStore(store), createStorageMap());
 
       const notCachedDenormalizedData =
-        mergeStatus(denormalizer.denormalizeOne(single, storage));
+        mergeStatus(denormalizer.denormalizeOne(one, storage));
 
       const expectedData = {
         id: 'type1Id1',
@@ -315,9 +315,9 @@ describe('ReduxApiStateDenormalizer', () => {
     it('denormalize item which is not in state', () => {
       const denormalizer = new ReduxApiStateDenormalizer();
       const storage = createSchemasMap(getStore(), createStorageMap());
-      const single = { value: 'type1Id7' };
-      single[STATUS] = { schema: 'type1' };
-      const denormalizedData = denormalizer.denormalizeOne(single, storage);
+      const one = { value: 'type1Id7' };
+      one[STATUS] = { schema: 'type1' };
+      const denormalizedData = denormalizer.denormalizeOne(one, storage);
       const expectedData = {
         id: 'type1Id7',
         type: 'type1',
