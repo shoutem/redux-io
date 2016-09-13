@@ -39,7 +39,7 @@ export default class RioCache {
   }
 
   releaseReference(reference) {
-    delete this.cache[reference];
+    delete this.cache[getId(reference)];
   }
 
   get(reference) {
@@ -64,31 +64,37 @@ export default class RioCache {
     }
   }
 
+  // eslint-disable-next-line consistent-return
   getValidCollection(descriptorCollection) {
     const cachedCollection = this.get(descriptorCollection);
-
-    if (this.isCollectionModified(descriptorCollection) ||
-      this.areCollectionItemsChanged(descriptorCollection, cachedCollection)) {
-      return;
+    if (this.isCollectionCacheValid(descriptorCollection, cachedCollection)) {
+      return cachedCollection;
     }
+  }
 
-    // eslint-disable-next-line consistent-return
-    return cachedCollection;
+  isItemCacheValid(normalizedItem) {
+    if (!this.isItemModified(normalizedItem) &&
+      this.areCachedItemRelationshipsValid(normalizedItem)) {
+      return true;
+    }
+    // Delete invalid cache
+    this.releaseReference(normalizedItem);
+    return false;
+  }
+
+  isCollectionCacheValid(collection, cachedCollection) {
+    if (!this.isCollectionModified(collection) &&
+      !this.areCollectionItemsChanged(collection, cachedCollection)) {
+      return true;
+    }
+    // Delete invalid cache
+    this.releaseReference(collection);
+    return false;
   }
 
   isItemModified(normalizedItem) {
     const cachedItem = this.get(normalizedItem);
     return !cachedItem || !isRioEntityUpdated(normalizedItem, cachedItem);
-  }
-
-  isItemCacheValid(normalizedItem) {
-    if (this.isItemModified(normalizedItem) ||
-      !this.areCachedItemRelationshipsValid(normalizedItem)) {
-      // Delete invalid cache
-      this.releaseReference(normalizedItem);
-      return false;
-    }
-    return true;
   }
 
   isCollectionModified(collection) {
