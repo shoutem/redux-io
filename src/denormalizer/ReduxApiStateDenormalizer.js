@@ -47,7 +47,7 @@ function createDescriptorCollection(collection, schema) {
 function createSingleDescriptor(single, schema) {
   const singleIsPrimitiveValue = _.isNumber(single) || _.isString(single);
   if (singleIsPrimitiveValue && !schema) {
-    throw Error('Cannot create primitive single descriptor, schema is not provided.!');
+    throw Error('Cannot create primitive one descriptor, schema is not provided.!');
   }
 
   if (singleIsPrimitiveValue) {
@@ -117,20 +117,37 @@ export default class ReduxApiStateDenormalizer extends ReduxDenormalizer {
   }
 
   /**
-   * Denormalize single RIO entity or id value.
-   * If single is primitive value, schema is required so itemDescriptor can be created.
+   * Denormalize RIO One entity or id value.
+   * If one is primitive value, schema is required so itemDescriptor can be created.
+   * When one is RIO reference, status of denormalized object is same as status of one reference,
+   * in other cases status is copied from items.
    * Storage is needed in ProvideStorage mode.
    *
-   * @param single - can be RIO single entity (with status) or id value
+   * @param one - can be RIO one entity (with status) or id value
    * @param storage (optional)
    * @param schema (optional)
    * @returns {{}}
    */
-  denormalizeOne(single, storage, schema) {
-    const itemDescriptor = createSingleDescriptor(single, schema);
-
+  denormalizeOne(one, storage, schema) {
+    const itemDescriptor = createSingleDescriptor(one, schema);
     // if storage is undefined, denormalizer is in Find storage mode
     this.updateStorageMap(storage);
+
+    if (_.isPlainObject(one)) {
+      // is RIO One reference
+      let denormalizedOne = this.cache.getValidOne(one);
+      if (!denormalizedOne) {
+        denormalizedOne = this.denormalizeItem(itemDescriptor);
+        // Append One status to denormalizedOne
+        // When One is RIO reference we want status of reference and not status of contained item.
+
+        cloneStatus(one, denormalizedOne);
+        this.cache.add(denormalizedOne);
+      }
+      return denormalizedOne;
+    }
+
+    // is Primitive value
     return this.denormalizeItem(itemDescriptor);
   }
 
