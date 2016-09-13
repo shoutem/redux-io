@@ -305,6 +305,53 @@ describe('ReduxApiStateDenormalizer', () => {
       assert.isObject(cachedDenormalizedData[STATUS]);
       assert.isObject(cachedDenormalizedData['type2.test'][STATUS]);
     });
+    it('gets object from cache when no relationship items in state', () => {
+      const denormalizer = new ReduxApiStateDenormalizer();
+      const storage = createSchemasMap(getStore(), createStorageMap());
+
+      const one = { value: 'type1Id4' };
+      one[STATUS] = { schema: 'type1', id: _.uniqueId(), modifiedTimestamp: 1 };
+
+      const denormalizedData =
+        denormalizer.denormalizeOne(one, storage);
+      const cachedDenormalizedData =
+        denormalizer.denormalizeOne(one, storage);
+
+      assert.isOk(cachedDenormalizedData === denormalizedData, 'didn\'t get cached item');
+      assert.isObject(cachedDenormalizedData[STATUS]);
+    });
+    it('doesn\'t get cached object when relationship is change and no rel item in state', () => {
+      const denormalizer = new ReduxApiStateDenormalizer();
+      const storage = createSchemasMap(getStore(), createStorageMap());
+      const modifiedStore = getStore();
+      modifiedStore.storage.type1.type1Id4.relationships.type1 = {
+        data: {
+          id: 'type1Id8', type: 'type1',
+        },
+      };
+      const modifiedStorage = createSchemasMap(modifiedStore, createStorageMap());
+
+      const one = { value: 'type1Id4' };
+      one[STATUS] = { schema: 'type1', id: _.uniqueId(), modifiedTimestamp: 1 };
+
+      const denormalizedData =
+        denormalizer.denormalizeOne(one, storage);
+      const cachedDenormalizedData =
+        denormalizer.denormalizeOne(one, modifiedStorage);
+
+      assert.isOk(cachedDenormalizedData !== denormalizedData, 'got cached item');
+      assert.isObject(cachedDenormalizedData[STATUS]);
+
+      const modifiedDenormalizedData = { ...denormalizedData };
+      modifiedDenormalizedData.type1 = {
+        id: 'type1Id8', type: 'type1',
+      };
+      assert.shallowDeepEqual(
+        modifiedDenormalizedData,
+        cachedDenormalizedData,
+        'one not denormalized correctly'
+      );
+    });
     it('returns new object when relationship changed', () => {
       const denormalizer = new ReduxApiStateDenormalizer();
       const store = getStore();
