@@ -64,6 +64,19 @@ export default class RioCache {
     }
   }
 
+  /**
+   * Get one reference from cache if valid
+   * @param one - RIO one reference
+   * @returns {*}
+   */
+  // eslint-disable-next-line consistent-return
+  getValidOne(one) {
+    const cachedOne = this.get(one);
+    if (this.isOneCacheValid(one, cachedOne)) {
+      return cachedOne;
+    }
+  }
+
   // eslint-disable-next-line consistent-return
   getValidCollection(descriptorCollection) {
     const cachedCollection = this.get(descriptorCollection);
@@ -79,6 +92,20 @@ export default class RioCache {
     }
     // Delete invalid cache
     this.releaseReference(normalizedItem);
+    return false;
+  }
+
+  isOneCacheValid(one, cachedOne) {
+    // Get real item to which One "points"
+    const oneItem = cachedOne && this.getNormalizedItem({ id: cachedOne.id, type: cachedOne.type });
+    if (
+      cachedOne && cachedOne &&
+      !isRioEntityUpdated(one, cachedOne) && this.isItemCacheValid(oneItem)
+    ) {
+      return true;
+    }
+    // Delete invalid cache
+    this.releaseReference(one);
     return false;
   }
 
