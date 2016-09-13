@@ -17,11 +17,11 @@ function isCacheValid(cachedModificationTime, currentModificationTime) {
   return cachedModificationTime >= currentModificationTime;
 }
 
-function isRioEntityUpdated(entity, cachedEntity) {
+function isRioReferenceChanged(entity, cachedEntity) {
   const cachedEntityModificationTime = getModificationTime(cachedEntity);
   const currentEntityModificationTime = getModificationTime(entity);
 
-  return isCacheValid(cachedEntityModificationTime, currentEntityModificationTime);
+  return !isCacheValid(cachedEntityModificationTime, currentEntityModificationTime);
 }
 
 function getJsonApiUniqueKey(item) {
@@ -108,7 +108,7 @@ export default class RioCache {
     const oneItem = cachedOne && this.getNormalizedItem({ id: cachedOne.id, type: cachedOne.type });
     if (
       cachedOne && cachedOne &&
-      !isRioEntityUpdated(one, cachedOne) && this.isItemCacheValid(oneItem)
+      !isRioReferenceChanged(one, cachedOne) && this.isItemCacheValid(oneItem)
     ) {
       return true;
     }
@@ -129,12 +129,12 @@ export default class RioCache {
 
   isItemModified(normalizedItem) {
     const cachedItem = this.get(normalizedItem);
-    return !cachedItem || !isRioEntityUpdated(normalizedItem, cachedItem);
+    return !cachedItem || isRioReferenceChanged(normalizedItem, cachedItem);
   }
 
   isCollectionModified(collection) {
     const cachedCollection = this.get(collection);
-    return !cachedCollection || !isRioEntityUpdated(collection, cachedCollection);
+    return !cachedCollection || isRioReferenceChanged(collection, cachedCollection);
   }
 
   /**
