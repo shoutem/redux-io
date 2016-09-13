@@ -45,9 +45,9 @@ describe('getCollection', () => {
     },
     topLocations: [1,3],
   };
-  initialData.locations[1][STATUS] = createStatus({id: _.uniqueId()})
-  initialData.locations[2][STATUS] = createStatus({id: _.uniqueId()})
-  initialData.locations[3][STATUS] = createStatus({id: _.uniqueId()})
+  initialData.locations[1][STATUS] = createStatus();
+  initialData.locations[2][STATUS] = createStatus();
+  initialData.locations[3][STATUS] = createStatus();
   const expectedDenormalizedTopLocations = [
     {
       id: 1,

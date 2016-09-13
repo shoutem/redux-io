@@ -109,10 +109,10 @@ const getStore = () => {
       },
     },
   };
-  store.storage.type1.type1Id1[STATUS] = createStatus({id: _.uniqueId()});
-  store.storage.type1.type1Id2[STATUS] = createStatus({id: _.uniqueId()});
-  store.storage.type1.type1Id3[STATUS] = createStatus({id: _.uniqueId()});
-  store.storage['type2.test'].type2Id1[STATUS] = createStatus({id: _.uniqueId()});
+  store.storage.type1.type1Id1[STATUS] = createStatus();
+  store.storage.type1.type1Id2[STATUS] = createStatus();
+  store.storage.type1.type1Id3[STATUS] = createStatus();
+  store.storage['type2.test'].type2Id1[STATUS] = createStatus();
   return store;
 };
 function getModifiedStore(store) {

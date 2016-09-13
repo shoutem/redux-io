@@ -27,10 +27,10 @@ class NormalizedData {
   }
 }
 
-const type1Id1Status = createStatus({ id: _.uniqueId() });
-const type1Id2Status = createStatus({ id: _.uniqueId() });
-const type1Id3Status = createStatus({ id: _.uniqueId() });
-const type2Id1Status = createStatus({ id: _.uniqueId() });
+const type1Id1Status = createStatus();
+const type1Id2Status = createStatus();
+const type1Id3Status = createStatus();
+const type2Id1Status = createStatus();
 
 const getNormalizedData = () => {
   const normalizedData = {
