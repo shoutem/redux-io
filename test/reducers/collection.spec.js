@@ -191,7 +191,7 @@ describe('Collection reducer', () => {
     expect(nextState[STATUS].busyStatus).to.eql(busyStatus.IDLE);
   });
 
-  it('re-populates list of indicies on fetch', () => {
+  it('re-populates list of indices on fetch', () => {
     const items = [
       { id: 1 },
       { id: 2 },
@@ -351,5 +351,30 @@ describe('Collection reducer', () => {
     expect(nextState[STATUS].schema).to.eql(schema);
     expect(nextState[STATUS].type).to.eql('collection');
     expect(nextState).to.shallowDeepEqual(customState);
+  });
+
+  it('invalidates collection', () => {
+    const initialState =  [
+      { id: 1 },
+      { id: 2 },
+    ];
+    const schema = 'schema_test';
+    const reducer = collection(schema, '', initialState);
+    deepFreeze(initialState);
+
+    const action = {
+      type: REFERENCE_STATUS,
+      meta: {
+        schema,
+        tag: '*',
+      },
+      payload: { validationStatus: validationStatus.INVALID },
+    };
+    const nextState = reducer(undefined, action);
+
+    expect(nextState[STATUS].validationStatus).to.eql(validationStatus.INVALID);
+
+    nextState[STATUS] = initialState[STATUS];
+    expect(nextState).to.deep.eql(initialState);
   });
 });

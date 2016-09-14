@@ -3,7 +3,7 @@ import {
   REFERENCE_STATUS,
 } from './../middleware';
 import {
-  validationStatus
+  validationStatus,
 } from './../status';
 
 export default function invalidate(schema) {
@@ -19,6 +19,6 @@ export default function invalidate(schema) {
     },
     payload: {
       validationStatus: validationStatus.INVALID,
-    }
+    },
   };
 }

@@ -110,7 +110,7 @@ export default function storage(schema, initialState = {}) {
         cloneStatus(newState, state);
         return newState;
       }
-      case OBJECT_REMOVING:  {
+      case OBJECT_REMOVING: {
         item[STATUS] = mergeItemStatus(
           currentItem,
           {
