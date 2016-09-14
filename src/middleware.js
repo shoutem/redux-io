@@ -344,6 +344,9 @@ export default store => next => action => {
     return next(action);
   }
 
+  //const standardizer = rio.getStandardizer(action.meta.source);
+  //standardizer.tra
+  // TODO: based on action.schema and action.source type acquire schema definition
   // TODO: add standardization of whole payload once we support json standardization
 
   const actions = [];
