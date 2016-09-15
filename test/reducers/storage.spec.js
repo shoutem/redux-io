@@ -411,27 +411,39 @@ describe('Storage reducer', () => {
     expect(nextStateItem).to.shallowDeepEqual(itemNew);
   });
 
-  it('removes item from state on object removing', () => {
+  it('sets item status to invalid on object removing', () => {
+    const itemToBeRemoved = { id: 1 };
     const initialState = {
-      1: { id: 1 },
+      [itemToBeRemoved.id]: itemToBeRemoved,
       2: { id: 2 },
+      3: { id: 3 },
     };
     const schema = 'schema_test';
+
+    const reducer = storage(schema, initialState);
+    deepFreeze(initialState);
+
     const action = {
       type: OBJECT_REMOVING,
-      payload: { id: 1 },
+      payload: { id: itemToBeRemoved.id },
       meta: {
         schema,
       },
     };
-    const reducer = storage(schema, initialState);
-    deepFreeze(initialState);
+
     const nextState = reducer(initialState, action);
+    deepFreeze(nextState);
+
+    const nextStateInvalidItem = nextState[itemToBeRemoved.id];
+    expect(nextStateInvalidItem[STATUS].validationStatus).to.eql(validationStatus.INVALID);
+
     const expectedState = {
+      [itemToBeRemoved.id]: { ...itemToBeRemoved, [STATUS]: nextStateInvalidItem[STATUS] },
       2: { id: 2 },
+      3: { id: 3 },
     };
 
-    expect(nextState).to.shallowDeepEqual(expectedState);
+    expect(nextState).to.eql(expectedState);
   });
 
   it('ignores custom action with correct meta schema but invalid item', () => {

@@ -40,6 +40,9 @@ export { updated };
 import clear from './actions/clear';
 export { clear };
 
+import invalidate from './actions/invalidate';
+export { invalidate };
+
 import { JSON_API_SOURCE } from './standardizers/json-api-standardizer';
 export { JSON_API_SOURCE };
 
