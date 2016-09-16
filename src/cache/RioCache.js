@@ -1,4 +1,4 @@
-import { getModificationTime, getId, getStatus} from '../status';
+import { getModificationTime, getId, getStatus } from '../status';
 import _ from 'lodash';
 
 function isItemInCollection(collection, item) {
