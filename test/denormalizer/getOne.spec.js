@@ -1,5 +1,4 @@
 /* eslint-disable no-unused-expressions */
-import _ from 'lodash';
 import { combineReducers } from 'redux';
 import sinon from 'sinon';
 import chai, { expect } from 'chai';
@@ -72,7 +71,6 @@ describe('getOne', () => {
   beforeEach(() => {
     sinon.spy(console, 'warn');
   });
-
 
   afterEach(() => {
     rio.clear();
