@@ -48,6 +48,7 @@ export default function find(schema, tag = '', params = {}, options = {}) {
     source: config.request.resourceType || JSON_API_SOURCE,
     schema: config.schema,
     tag,
+    params,
     options,
   };
 
