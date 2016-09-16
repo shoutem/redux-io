@@ -43,12 +43,19 @@ function isReference(reference) {
   return !!getStatus(reference);
 }
 
-function getJsonApiUniqueKey(item) {
+function getUniqueKey(item) {
   return _.isPlainObject(item) && item.id && item.type ? `${item.type}.${item.id}` : undefined;
 }
 
+/**
+ * RIO one and collection have their own unique id in status, items do not.
+ * We create unique key for item based on item id and type.
+ *
+ * @param reference
+ * @returns {*}
+ */
 function getReferenceUniqueKey(reference) {
-  return getId(reference) || getJsonApiUniqueKey(reference);
+  return getId(reference) || getUniqueKey(reference);
 }
 
 /**
