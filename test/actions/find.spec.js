@@ -69,6 +69,40 @@ describe('Find action creator', () => {
     expect(types[2].meta).to.deep.equal(expectedMeta);
   });
 
+  it('includes the find params in meta', () => {
+    const schemaConfig = {
+      schema: 'app.builder',
+      request: {
+        endpoint: 'api.test',
+        headers: {},
+      },
+    };
+
+    const params = {
+      param1: 'a',
+      param2: 'b',
+      nestedParam: {
+        simpleValue: 'val',
+        nestedChild: {
+          childValue: 'cval',
+        },
+      },
+    };
+
+    const action = find(schemaConfig, undefined, params);
+
+    expect(action[RSAA]).to.not.be.undefined;
+    expect(action[RSAA].types).to.not.be.undefined;
+
+    const types = action[RSAA].types;
+    expect(types[0].type).to.equal(LOAD_REQUEST);
+    expect(types[0].meta.params).to.deep.equal(params);
+    expect(types[1].type).to.equal(LOAD_SUCCESS);
+    expect(types[1].meta.params).to.deep.equal(params);
+    expect(types[2].type).to.equal(LOAD_ERROR);
+    expect(types[2].meta.params).to.deep.equal(params);
+  });
+
   it('creates a valid action with appendMode option', () => {
     const config = {
       headers: {
