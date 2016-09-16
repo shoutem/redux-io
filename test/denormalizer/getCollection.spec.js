@@ -35,12 +35,30 @@ describe('getCollection', () => {
           name: 'Zagreb',
         }
       },
+
       3: {
         id: 3,
         type: 'locations',
         attributes: {
           name: 'New York',
+        },
+        relationships: {
+          car: {
+            data: {
+              id: 1,
+              type: 'cars',
+            }
+          }
         }
+      },
+    },
+    cars: {
+      1: {
+        id: 1,
+        type: 'cars',
+        attributes: {
+          name: 'Golf',
+        },
       },
     },
     topLocations: [1,3],
@@ -58,6 +76,11 @@ describe('getCollection', () => {
       id: 3,
       type: 'locations',
       name: 'New York',
+      car: {
+        id: 1,
+        type: 'cars',
+        name: 'Golf',
+      }
     },
   ];
 
@@ -68,7 +91,7 @@ describe('getCollection', () => {
     });
     const testReducer = combineReducers({
       users: userReducer,
-      carsStorage: storage('cars'),
+      carsStorage: storage('cars', { ...initialData.cars }),
       topLocations: collection('locations', 'topLocations', [...initialData.topLocations]),
     });
 
