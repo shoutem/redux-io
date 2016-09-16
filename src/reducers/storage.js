@@ -112,7 +112,17 @@ export default function storage(schema, initialState = {}) {
         cloneStatus(newState, state);
         return newState;
       }
-      case OBJECT_REMOVING:
+      case OBJECT_REMOVING: {
+        item[STATUS] = mergeItemStatus(
+          currentItem,
+          {
+            validationStatus: validationStatus.INVALID,
+          }
+        );
+        const newState = { ...state, [item.id]: item };
+        cloneStatus(newState, state);
+        return newState;
+      }
       case OBJECT_REMOVED: {
         const newState = { ...state };
         delete newState[item.id];
