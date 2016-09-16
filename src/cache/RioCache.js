@@ -96,6 +96,8 @@ export default class RioCache {
     if (normalizedItem && this.isItemCacheValid(normalizedItem)) {
       return this.get(normalizedItem);
     }
+    // Delete invalid cache
+    this.delete(normalizedItem);
   }
 
   /**
@@ -109,6 +111,8 @@ export default class RioCache {
     if (this.isOneCacheValid(one, cachedOne)) {
       return cachedOne;
     }
+    // Delete invalid cache
+    this.delete(one);
   }
 
   // eslint-disable-next-line consistent-return
@@ -117,6 +121,8 @@ export default class RioCache {
     if (this.isCollectionCacheValid(descriptorCollection, cachedCollection)) {
       return cachedCollection;
     }
+    // Delete invalid cache
+    this.delete(descriptorCollection);
   }
 
   isItemCacheValid(normalizedItem) {
@@ -124,8 +130,6 @@ export default class RioCache {
       this.areCachedItemRelationshipsValid(normalizedItem)) {
       return true;
     }
-    // Delete invalid cache
-    this.delete(normalizedItem);
     return false;
   }
 
@@ -133,8 +137,6 @@ export default class RioCache {
     if (!this.isOneModified(one, cachedOne)) {
       return true;
     }
-    // Delete invalid cache
-    this.delete(one);
     return false;
   }
 
@@ -143,8 +145,6 @@ export default class RioCache {
       !this.areCollectionItemsChanged(collection, cachedCollection)) {
       return true;
     }
-    // Delete invalid cache
-    this.delete(collection);
     return false;
   }
 
