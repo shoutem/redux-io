@@ -58,6 +58,7 @@ describe('Find action creator', () => {
       source: JSON_API_SOURCE,
       schema,
       tag,
+      params: {},
       options: {},
     };
     expect(types[0].type).to.equal(LOAD_REQUEST);
@@ -97,6 +98,7 @@ describe('Find action creator', () => {
       source: JSON_API_SOURCE,
       schema,
       tag,
+      params: {},
       options: {
         appendMode: true,
       },
@@ -139,6 +141,7 @@ describe('Find action creator', () => {
       source: JSON_API_SOURCE,
       schema,
       tag,
+      params: {},
       options: {},
     };
     expect(types[0].type).to.equal(LOAD_REQUEST);
@@ -182,6 +185,7 @@ describe('Find action creator', () => {
       source: JSON_API_SOURCE,
       schema,
       tag,
+      params: {},
       options: {},
     };
     expect(types[0].type).to.equal(LOAD_REQUEST);
@@ -229,6 +233,7 @@ describe('Find action creator', () => {
       source: JSON_API_SOURCE,
       schema,
       tag,
+      params: {},
       options: {},
     };
     expect(types[0].type).to.equal(LOAD_REQUEST);
@@ -334,6 +339,7 @@ describe('Find action creator', () => {
       source: JSON_API_SOURCE,
       schema,
       tag,
+      params,
       options: {},
     };
     expect(types[0].type).to.equal(LOAD_REQUEST);
@@ -366,6 +372,7 @@ describe('Find action creator', () => {
       source: JSON_API_SOURCE,
       schema,
       tag,
+      params: {},
       options: {},
     };
 
