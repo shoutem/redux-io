@@ -32,6 +32,14 @@ describe('getOne', () => {
         type: 'locations',
         attributes: {
           name: 'Zagreb',
+        },
+        relationships: {
+          car: {
+            data: {
+              id: 1,
+              type: 'cars',
+            }
+          }
         }
       },
       3: {
@@ -40,6 +48,15 @@ describe('getOne', () => {
         attributes: {
           name: 'New York',
         }
+      },
+    },
+    cars: {
+      1: {
+        id: 1,
+        type: 'cars',
+        attributes: {
+          name: 'Golf',
+        },
       },
     },
     topLocation: { value: 1 },
@@ -60,7 +77,7 @@ describe('getOne', () => {
     });
     const testReducer = combineReducers({
       users: userReducer,
-      carsStorage: storage('cars'),
+      carsStorage: storage('cars', { ...initialData.cars }),
       topLocation: one('locations', 'topLocation', initialData.topLocation.value),
     });
 
@@ -85,6 +102,23 @@ describe('getOne', () => {
 
     const denormalizedTopLocation = getOne(state.topLocation, state);
     expect(denormalizedTopLocation).to.be.shallowDeepEqual(expectedDenormalizedTopLocation);
+  });
+
+  it('denormalize one with relationship', () => {
+    const state = initializeState();
+    const expectedData = {
+      id: 2,
+      type: 'locations',
+      name: 'Zagreb',
+      car: {
+        id: 1,
+        type: 'cars',
+        name: 'Golf',
+      }
+    };
+
+    const denormalizedLocation = getOne(2, state, 'locations');
+    expect(denormalizedLocation).to.be.shallowDeepEqual(expectedData);
   });
 
   it('denormalize primitive', () => {
