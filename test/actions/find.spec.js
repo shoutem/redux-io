@@ -58,6 +58,7 @@ describe('Find action creator', () => {
       source: JSON_API_SOURCE,
       schema,
       tag,
+      endpoint: config.endpoint,
       params: {},
       options: {},
     };
@@ -132,6 +133,7 @@ describe('Find action creator', () => {
       source: JSON_API_SOURCE,
       schema,
       tag,
+      endpoint: config.endpoint,
       params: {},
       options: {
         appendMode: true,
@@ -175,6 +177,7 @@ describe('Find action creator', () => {
       source: JSON_API_SOURCE,
       schema,
       tag,
+      endpoint: config.endpoint,
       params: {},
       options: {},
     };
@@ -219,6 +222,7 @@ describe('Find action creator', () => {
       source: JSON_API_SOURCE,
       schema,
       tag,
+      endpoint: config.endpoint,
       params: {},
       options: {},
     };
@@ -267,6 +271,7 @@ describe('Find action creator', () => {
       source: JSON_API_SOURCE,
       schema,
       tag,
+      endpoint: argSchemaConfig.request.endpoint,
       params: {},
       options: {},
     };
@@ -373,6 +378,7 @@ describe('Find action creator', () => {
       source: JSON_API_SOURCE,
       schema,
       tag,
+      endpoint: expectedEndpoint,
       params,
       options: {},
     };
@@ -402,13 +408,6 @@ describe('Find action creator', () => {
         },
       }],
     };
-    const expectedMeta = {
-      source: JSON_API_SOURCE,
-      schema,
-      tag,
-      params: {},
-      options: {},
-    };
 
     nock('http://api.server.local')
       .get('/apps')
@@ -424,6 +423,15 @@ describe('Find action creator', () => {
     const schemaConfig = {
       schema,
       request: config,
+    };
+
+    const expectedMeta = {
+      source: JSON_API_SOURCE,
+      schema,
+      tag,
+      endpoint: config.endpoint,
+      params: {},
+      options: {},
     };
 
     const action = find(schemaConfig, tag);

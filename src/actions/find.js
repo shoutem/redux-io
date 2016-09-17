@@ -44,16 +44,17 @@ export default function find(schema, tag = '', params = {}, options = {}) {
     throw new Error(`Invalid tag, "find" expected a string but got: ${JSON.stringify(tag)}`);
   }
 
+  const rsaaConfig = buildRSAAConfig(config);
+  const endpoint = buildEndpoint(rsaaConfig.endpoint, params);
+
   const meta = {
     source: config.request.resourceType || JSON_API_SOURCE,
     schema: config.schema,
     tag,
     params,
+    endpoint,
     options,
   };
-
-  const rsaaConfig = buildRSAAConfig(config);
-  const endpoint = buildEndpoint(rsaaConfig.endpoint, params);
 
   return {
     [RSAA]: {

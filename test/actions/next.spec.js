@@ -63,6 +63,7 @@ describe('Next action creator', () => {
       source: JSON_API_SOURCE,
       schema,
       tag,
+      endpoint: links.next,
       params: {},
       options: {
         appendMode: true,
