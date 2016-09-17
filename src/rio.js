@@ -33,7 +33,7 @@ export class Rio {
   getSchema(schema) {
     let config = this.schemaConfigs[schema];
     if (config) {
-      return config;
+      return _.cloneDeep(config);
     }
 
     this.schemaResolvers.forEach(resolver => {
@@ -45,7 +45,7 @@ export class Rio {
       return true;
     });
 
-    return config;
+    return _.cloneDeep(config);
   }
 
   /**
