@@ -15,6 +15,7 @@ import rio, {
   collection,
 } from '../../src';
 import { setStatus, updateStatus, getStatus } from '../../src/status';
+import { APPEND_MODE, RESOLVED_ENDPOINT } from '../../src/actions/find';
 
 describe('Next action creator', () => {
   const middlewares = [thunk, apiMiddleware, apiStateMiddleware];
@@ -66,7 +67,8 @@ describe('Next action creator', () => {
       endpoint: links.next,
       params: {},
       options: {
-        appendMode: true,
+        [APPEND_MODE]: true,
+        [RESOLVED_ENDPOINT]: true,
       },
     };
     expect(types[0].type).to.equal(LOAD_REQUEST);

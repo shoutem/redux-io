@@ -223,6 +223,43 @@ describe('Collection reducer', () => {
     expect(nextState).to.shallowDeepEqual(expectedState);
   });
 
+  it('saves the find params in the collection status on Fetch', () => {
+    const initialState = [];
+    const items = [
+      { id: 1 },
+      { id: 2 },
+    ];
+
+    const schema = 'schema_test';
+    const tag = 'tag_test';
+    const reducer = collection(schema, tag, initialState);
+    deepFreeze(initialState);
+
+    const params = {
+      param1: '1',
+      param2: '2,',
+      nestedParam: {
+        childParam: 'child',
+      },
+    };
+
+    const action = {
+      type: REFERENCE_FETCHED,
+      meta: {
+        schema,
+        tag,
+        params,
+      },
+      payload: items,
+    };
+
+    const nextState = reducer(undefined, action);
+    const expectedState = items.map(item => item.id);
+
+    expect(nextState[STATUS].params).to.deep.equal(params);
+    expect(nextState).to.shallowDeepEqual(expectedState);
+  });
+
   it('invalidates collection with broadcast status', () => {
     const items = [
       { id: 1 },
