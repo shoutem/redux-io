@@ -17,7 +17,7 @@ import {
   cloneStatus,
 } from './../status';
 
-export const STORAGE_TYPE = 'storage';
+export const STORAGE_TYPE = '@@redux-io/storage';
 
 function mergeItemStatus(currentItem, newStatus) {
   const currentStatus = (currentItem && currentItem[STATUS])

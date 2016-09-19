@@ -1,7 +1,7 @@
 import _ from 'lodash';
 import rio from '../rio';
 import { createSchemasMap } from './ReduxApiStateDenormalizer';
-import { resolveSchemaName } from './helpers/resolveSchemaName';
+import { resolveSchemaName } from '../schemaConfig';
 
 /**
  * Connects rio configurations with denormalizer to simplify denormalization
