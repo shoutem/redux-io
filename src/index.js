@@ -57,6 +57,9 @@ export {
 import { getCollection } from './denormalizer/getCollection';
 export { getCollection };
 
+import { getOne } from './denormalizer/getOne';
+export { getOne };
+
 export { normalizeItem, normalizeCollection } from './normalizer';
 
 export {

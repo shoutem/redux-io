@@ -97,6 +97,23 @@ const getStore = () => {
             },
           },
         },
+        type1Id4: {
+          id: 'type1Id4',
+          type: 'type1',
+          attributes: {name: 'type1Id4'},
+          relationships: {
+            type6: {
+              data: [
+                {id: 'type6Id1', type: 'type6'},
+              ],
+            },
+            type1: {
+              data: {
+                id: 'type1Id7', type: 'type1',
+              },
+            },
+          },
+        },
       },
       'type2.test': {
         type2Id1: {
@@ -109,10 +126,11 @@ const getStore = () => {
       },
     },
   };
-  store.storage.type1.type1Id1[STATUS] = createStatus({id: _.uniqueId()});
-  store.storage.type1.type1Id2[STATUS] = createStatus({id: _.uniqueId()});
-  store.storage.type1.type1Id3[STATUS] = createStatus({id: _.uniqueId()});
-  store.storage['type2.test'].type2Id1[STATUS] = createStatus({id: _.uniqueId()});
+  store.storage.type1.type1Id1[STATUS] = createStatus();
+  store.storage.type1.type1Id2[STATUS] = createStatus();
+  store.storage.type1.type1Id3[STATUS] = createStatus();
+  store.storage.type1.type1Id4[STATUS] = createStatus();
+  store.storage['type2.test'].type2Id1[STATUS] = createStatus();
   return store;
 };
 function getModifiedStore(store) {
@@ -135,12 +153,14 @@ describe('ReduxApiStateDenormalizer', () => {
   });
   describe('denormalizeOne', () => {
     it('denormalizes valid object relationships data', () => {
+      const one = { value: 'type1Id1' };
+      one[STATUS] = { schema: 'type1' };
       const denormalizer = new ReduxApiStateDenormalizer();
       const storage = createSchemasMap(getStore(), createStorageMap());
       const expectedData = {
         id: 'type1Id1',
         type: 'type1',
-        [STATUS]: storage['type1']['type1Id1'][STATUS],
+        [STATUS]: one[STATUS],
         name: 'type1Id1',
         'type2.test': {
           [STATUS]: storage['type2.test']['type2Id1'][STATUS],
@@ -172,10 +192,40 @@ describe('ReduxApiStateDenormalizer', () => {
         ],
       };
 
-      const single = { value: 'type1Id1' };
-      single[STATUS] = { schema: 'type1' };
       const denormalizedData =
-        mergeStatus(denormalizer.denormalizeOne(single, storage));
+        mergeStatus(denormalizer.denormalizeOne(one, storage));
+
+      assert.deepEqual(
+        denormalizedData,
+        expectedData,
+        'item not denormalized correctly'
+      );
+    });
+    it('denormalizes valid object with relationships items not in state', () => {
+      const one = { value: 'type1Id4' };
+      one[STATUS] = { schema: 'type1' };
+      const denormalizer = new ReduxApiStateDenormalizer();
+      const storage = createSchemasMap(getStore(), createStorageMap());
+      const expectedData = {
+        id: 'type1Id4',
+        type: 'type1',
+        [STATUS]: one[STATUS],
+        name: 'type1Id4',
+        type6: [
+          {
+            id: 'type6Id1',
+            type: 'type6',
+          },
+        ],
+        type1:{
+          id: 'type1Id7',
+          type: 'type1',
+        },
+      };
+
+
+      const denormalizedData =
+        mergeStatus(denormalizer.denormalizeOne(one, storage));
 
       assert.deepEqual(
         denormalizedData,
@@ -231,49 +281,96 @@ describe('ReduxApiStateDenormalizer', () => {
         'item not denormalized correctly'
       );
     });
-    it('throws error when denormalizing primitive single and no schema provided', () => {
+    it('throws error when denormalizing primitive one and no schema provided', () => {
       const denormalizer = new ReduxApiStateDenormalizer();
       const storage = createSchemasMap(getStore(), createStorageMap());
 
       assert.throws(() => {
         mergeStatus(denormalizer.denormalizeOne('type1Id1', storage));
-      }, 'Cannot create primitive single descriptor, schema is not provided.');
+      }, 'Cannot create primitive one descriptor, schema is not provided.');
     });
     it('gets object from cache', () => {
       const denormalizer = new ReduxApiStateDenormalizer();
       const storage = createSchemasMap(getStore(), createStorageMap());
 
-      const single = { value: 'type1Id1' };
-      single[STATUS] = { schema: 'type1' };
+      const one = { value: 'type1Id1' };
+      one[STATUS] = { schema: 'type1', id: _.uniqueId(), modifiedTimestamp: 1 };
 
       const denormalizedData =
-        denormalizer.denormalizeOne(single, storage);
+        denormalizer.denormalizeOne(one, storage);
       const cachedDenormalizedData =
-        denormalizer.denormalizeOne(single, storage);
+        denormalizer.denormalizeOne(one, storage);
 
       assert.isOk(cachedDenormalizedData === denormalizedData, 'didn\'t get cached item');
       assert.isObject(cachedDenormalizedData[STATUS]);
       assert.isObject(cachedDenormalizedData['type2.test'][STATUS]);
+    });
+    it('gets object from cache when no relationship items in state', () => {
+      const denormalizer = new ReduxApiStateDenormalizer();
+      const storage = createSchemasMap(getStore(), createStorageMap());
+
+      const one = { value: 'type1Id4' };
+      one[STATUS] = { schema: 'type1', id: _.uniqueId(), modifiedTimestamp: 1 };
+
+      const denormalizedData =
+        denormalizer.denormalizeOne(one, storage);
+      const cachedDenormalizedData =
+        denormalizer.denormalizeOne(one, storage);
+
+      assert.isOk(cachedDenormalizedData === denormalizedData, 'didn\'t get cached item');
+      assert.isObject(cachedDenormalizedData[STATUS]);
+    });
+    it('doesn\'t get cached object when relationship is change and no rel item in state', () => {
+      const denormalizer = new ReduxApiStateDenormalizer();
+      const storage = createSchemasMap(getStore(), createStorageMap());
+      const modifiedStore = getStore();
+      modifiedStore.storage.type1.type1Id4.relationships.type1 = {
+        data: {
+          id: 'type1Id8', type: 'type1',
+        },
+      };
+      const modifiedStorage = createSchemasMap(modifiedStore, createStorageMap());
+
+      const one = { value: 'type1Id4' };
+      one[STATUS] = { schema: 'type1', id: _.uniqueId(), modifiedTimestamp: 1 };
+
+      const denormalizedData =
+        denormalizer.denormalizeOne(one, storage);
+      const cachedDenormalizedData =
+        denormalizer.denormalizeOne(one, modifiedStorage);
+
+      assert.isOk(cachedDenormalizedData !== denormalizedData, 'got cached item');
+      assert.isObject(cachedDenormalizedData[STATUS]);
+
+      const modifiedDenormalizedData = { ...denormalizedData };
+      modifiedDenormalizedData.type1 = {
+        id: 'type1Id8', type: 'type1',
+      };
+      assert.shallowDeepEqual(
+        modifiedDenormalizedData,
+        cachedDenormalizedData,
+        'one not denormalized correctly'
+      );
     });
     it('returns new object when relationship changed', () => {
       const denormalizer = new ReduxApiStateDenormalizer();
       const store = getStore();
       let storage = createSchemasMap(store, createStorageMap());
 
-      const single = { value: 'type1Id1' };
-      single[STATUS] = { schema: 'type1' };
+      const one = { value: 'type1Id1' };
+      one[STATUS] = { schema: 'type1', id: _.uniqueId() };
 
-      const denormalizedData = mergeStatus(denormalizer.denormalizeOne(single, storage));
+      const denormalizedData = mergeStatus(denormalizer.denormalizeOne(one, storage));
 
       storage = createSchemasMap(getModifiedStore(store), createStorageMap());
 
       const notCachedDenormalizedData =
-        mergeStatus(denormalizer.denormalizeOne(single, storage));
+        mergeStatus(denormalizer.denormalizeOne(one, storage));
 
       const expectedData = {
         id: 'type1Id1',
         type: 'type1',
-        [STATUS]: storage['type1']['type1Id1'][STATUS],
+        [STATUS]: one[STATUS],
         name: 'type1Id1',
         'type2.test': {
           [STATUS]: storage['type2.test']['type2Id1'][STATUS],
@@ -315,9 +412,9 @@ describe('ReduxApiStateDenormalizer', () => {
     it('denormalize item which is not in state', () => {
       const denormalizer = new ReduxApiStateDenormalizer();
       const storage = createSchemasMap(getStore(), createStorageMap());
-      const single = { value: 'type1Id7' };
-      single[STATUS] = { schema: 'type1' };
-      const denormalizedData = denormalizer.denormalizeOne(single, storage);
+      const one = { value: 'type1Id7' };
+      one[STATUS] = { schema: 'type1' };
+      const denormalizedData = denormalizer.denormalizeOne(one, storage);
       const expectedData = {
         id: 'type1Id7',
         type: 'type1',

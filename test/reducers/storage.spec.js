@@ -683,6 +683,6 @@ describe('Storage reducer', () => {
     const nextState = reducer(initialState, action);
     expect(nextState).to.shallowDeepEqual({});
     expect(nextState[STATUS].schema).to.eql(schema);
-    expect(nextState[STATUS].type).to.eql('storage');
+    expect(nextState[STATUS].type).to.eql('@@redux-io/storage');
   });
 });
