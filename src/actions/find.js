@@ -8,6 +8,18 @@ import {
 import { JSON_API_SOURCE } from './..';
 import { buildEndpoint, resolveConfig } from './../schemaConfig';
 
+/**
+ * If this options key is set to true, the data will be
+ * appended to existing data in the state, instead of
+ * overwriting it.
+ */
+export const APPEND_MODE = 'appendMode';
+/**
+ * This options key indicates that the endpoint is already fully
+ * resolved and populated with action parameters.
+ */
+export const RESOLVED_ENDPOINT = 'resolvedEndpoint';
+
 function buildRSAAConfig(config) {
   const rsaaConfig = {
     endpoint: config.request.endpoint,
@@ -44,16 +56,18 @@ export default function find(schema, tag = '', params = {}, options = {}) {
     throw new Error(`Invalid tag, "find" expected a string but got: ${JSON.stringify(tag)}`);
   }
 
+  const rsaaConfig = buildRSAAConfig(config);
+  const isEndpointResolved = options[RESOLVED_ENDPOINT];
+  const endpoint = isEndpointResolved ? rsaaConfig.endpoint : buildEndpoint(rsaaConfig.endpoint, params);
+
   const meta = {
     source: config.request.resourceType || JSON_API_SOURCE,
     schema: config.schema,
     tag,
     params,
+    endpoint,
     options,
   };
-
-  const rsaaConfig = buildRSAAConfig(config);
-  const endpoint = buildEndpoint(rsaaConfig.endpoint, params);
 
   return {
     [RSAA]: {

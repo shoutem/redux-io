@@ -1,6 +1,6 @@
-import { getCollectionLink, APPEND_MODE } from '../reducers/collection';
+import { getCollectionLink, getCollectionParams } from '../reducers/collection';
 import { getStatus } from '../status';
-import find from './find';
+import find, { APPEND_MODE, RESOLVED_ENDPOINT } from './find';
 
 export const NO_MORE_RESULTS = '@@redux_io/NO_MORE_RESULTS';
 
@@ -27,5 +27,14 @@ export default function next(collection, appendMode = true) {
     },
     schema,
   };
-  return find(findConfig, tag, undefined, { [APPEND_MODE]: appendMode });
+
+  // We want to append the data to the data in the state, and we know that
+  // the URL in the config already contains all the necessary query parameters
+  // form the original request.
+  // The original parameters are included in this action as well because some
+  // reducers may use them to correctly process the request payload.
+  return find(findConfig, tag, getCollectionParams(collection), {
+    [APPEND_MODE]: appendMode,
+    [RESOLVED_ENDPOINT]: true,
+  });
 }

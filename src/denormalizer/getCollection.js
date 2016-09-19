@@ -9,9 +9,14 @@ import { resolveSchemaName } from '../schemaConfig';
  * @param state
  * @param collection
  * @param schema
- * @returns {{}}
+ * @returns {[]}
  */
 export function getCollection(collection, state, schema = '') {
+  if (!collection) {
+    // Handle undefined values reasonably
+    return [];
+  }
+
   if (!_.isArray(collection)) {
     throw new Error('Collection argument needs to be array.');
   }

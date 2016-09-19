@@ -23,7 +23,7 @@ describe('Rio', () => {
     rio.registerSchema(schemaConfig);
     const resolvedSchemaConfig = rio.getSchema(schema);
 
-    expect(resolvedSchemaConfig).to.equal(schemaConfig);
+    expect(resolvedSchemaConfig).to.deep.equal(schemaConfig);
   });
 
   it('register schema resolver', () => {
@@ -44,7 +44,30 @@ describe('Rio', () => {
         endpoint: `api.test.${schemaName}`,
         headers: {},
       },
-    }
+    };
+    expect(resolvedSchemaConfig).to.deep.equal(expectedSchemaConfig);
+  });
+
+  it('return schema config clone to the outside callers to prevent mutations', () => {
+    rio.registerSchema((schema) => ({
+      schema,
+      request: {
+        endpoint: `api.test.${schema}`,
+        headers: {},
+      },
+    }));
+
+    const schemaName = 'app.builder';
+    const resolvedSchemaConfig = rio.getSchema(schemaName);
+
+    const expectedSchemaConfig = {
+      schema: schemaName,
+      request: {
+        endpoint: `api.test.${schemaName}`,
+        headers: {},
+      },
+    };
+    expect(resolvedSchemaConfig).to.not.equal(expectedSchemaConfig);
     expect(resolvedSchemaConfig).to.deep.equal(expectedSchemaConfig);
   });
 

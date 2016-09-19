@@ -13,7 +13,7 @@ import {
   updateStatus,
   setStatus,
 } from './../status';
-export const APPEND_MODE = 'appendMode';
+import { APPEND_MODE } from '../actions/find';
 
 function isValid(action, schema, tag) {
   if (_.get(action, 'meta.schema') !== schema) {
@@ -47,6 +47,17 @@ function createDefaultStatus(schema, tag) {
 
 export function getCollectionLink(col, pointer) {
   return _.get(getStatus(col), ['links', pointer]);
+}
+
+/**
+ * Returns the collection (find) params that were used to fetch the
+ * collection data from the server.
+ *
+ * @param collection The collection value from the state.
+ * @returns {*} Collection params, params argument of the find action.
+ */
+export function getCollectionParams(collection) {
+  return _.get(getStatus(collection), 'params');
 }
 
 function handleReferencePayload(action, state = []) {
@@ -93,6 +104,7 @@ export default function collection(schema, tag = '', initialState = []) {
           {
             validationStatus: validationStatus.VALID,
             busyStatus: busyStatus.IDLE,
+            params: action.meta.params,
             error: false,
           }
         ));

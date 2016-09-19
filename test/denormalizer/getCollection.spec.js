@@ -131,6 +131,16 @@ describe('getCollection', () => {
     expect(denormalizedTopLocations).to.be.shallowDeepEqual(expectedDenormalizedTopLocations);
   });
 
+  it('denormalize undefined', () => {
+    const result = getCollection(undefined, {});
+    expect(result).to.deep.equal([]);
+  });
+
+  it('denormalize null', () => {
+    const result = getCollection(null, {});
+    expect(result).to.deep.equal([]);
+  });
+
   it('on invalid state throws appropriate error', () => {
     expect(() => getCollection(initialData.topLocations, '', 'locations'))
       .to.throw('State argument is invalid, should be an object.');
