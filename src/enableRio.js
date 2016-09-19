@@ -3,10 +3,11 @@ import { enableBatching } from 'redux-batched-actions';
 import rio from './rio';
 import { getStatus } from './status';
 import ReduxApiStateDenormalizer from './denormalizer/ReduxApiStateDenormalizer';
+import { STORAGE_TYPE } from './reducers/storage';
 
 function discoverSchemaPaths(obj, currentPath = [], discoveredPaths = {}) {
   const status = getStatus(obj);
-  if (status) {
+  if (status && status.type === STORAGE_TYPE) {
     // TODO: add validation if schema path are repeating to throw warning
     // eslint-disable-next-line no-param-reassign
     discoveredPaths[status.schema] = currentPath;

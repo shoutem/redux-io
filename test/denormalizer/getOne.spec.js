@@ -1,5 +1,4 @@
 /* eslint-disable no-unused-expressions */
-import _ from 'lodash';
 import { combineReducers } from 'redux';
 import sinon from 'sinon';
 import chai, { expect } from 'chai';
@@ -8,8 +7,8 @@ import { batchActions } from 'redux-batched-actions';
 import rio, {
   enableRio,
   storage,
-  collection,
-  getCollection,
+  one,
+  getOne,
 } from '../../src';
 import {
   STATUS,
@@ -18,7 +17,7 @@ import {
 
 chai.use(shallowDeepEqual);
 
-describe('getCollection', () => {
+describe('getOne', () => {
   const initialData = {
     locations: {
       1: {
@@ -33,14 +32,6 @@ describe('getCollection', () => {
         type: 'locations',
         attributes: {
           name: 'Zagreb',
-        }
-      },
-
-      3: {
-        id: 3,
-        type: 'locations',
-        attributes: {
-          name: 'New York',
         },
         relationships: {
           car: {
@@ -49,6 +40,13 @@ describe('getCollection', () => {
               type: 'cars',
             }
           }
+        }
+      },
+      3: {
+        id: 3,
+        type: 'locations',
+        attributes: {
+          name: 'New York',
         }
       },
     },
@@ -61,28 +59,16 @@ describe('getCollection', () => {
         },
       },
     },
-    topLocations: [1,3],
+    topLocation: { value: 1 },
   };
   initialData.locations[1][STATUS] = createStatus();
   initialData.locations[2][STATUS] = createStatus();
   initialData.locations[3][STATUS] = createStatus();
-  const expectedDenormalizedTopLocations = [
-    {
-      id: 1,
-      type: 'locations',
-      name: 'London',
-    },
-    {
-      id: 3,
-      type: 'locations',
-      name: 'New York',
-      car: {
-        id: 1,
-        type: 'cars',
-        name: 'Golf',
-      }
-    },
-  ];
+  const expectedDenormalizedTopLocation = {
+    id: 1,
+    type: 'locations',
+    name: 'London',
+  };
 
   const initializeState = () => {
     const userReducer = combineReducers({
@@ -92,7 +78,7 @@ describe('getCollection', () => {
     const testReducer = combineReducers({
       users: userReducer,
       carsStorage: storage('cars', { ...initialData.cars }),
-      topLocations: collection('locations', 'topLocations', [...initialData.topLocations]),
+      topLocation: one('locations', 'topLocation', initialData.topLocation.value),
     });
 
     const testBatchedReducer = enableRio(testReducer);
@@ -103,73 +89,76 @@ describe('getCollection', () => {
     sinon.spy(console, 'warn');
   });
 
-
   afterEach(() => {
     rio.clear();
     console.warn.restore();
   });
 
-  it('denormalize collection', () => {
+  it('denormalize one', () => {
     const state = initializeState();
 
-    expect(state.topLocations).to.shallowDeepEqual(initialData.topLocations);
+    expect(state.topLocation).to.shallowDeepEqual(initialData.topLocation);
     expect(state.users.locationsStorage).to.shallowDeepEqual(initialData.locations);
 
-    const denormalizedTopLocations = getCollection(state.topLocations, state);
-    expect(denormalizedTopLocations).to.have.length(2);
-    expect(denormalizedTopLocations).to.be.shallowDeepEqual(expectedDenormalizedTopLocations);
+    const denormalizedTopLocation = getOne(state.topLocation, state);
+    expect(denormalizedTopLocation).to.be.shallowDeepEqual(expectedDenormalizedTopLocation);
   });
 
-  it('denormalize array', () => {
+  it('denormalize one with relationship', () => {
+    const state = initializeState();
+    const expectedData = {
+      id: 2,
+      type: 'locations',
+      name: 'Zagreb',
+      car: {
+        id: 1,
+        type: 'cars',
+        name: 'Golf',
+      }
+    };
+
+    const denormalizedLocation = getOne(2, state, 'locations');
+    expect(denormalizedLocation).to.be.shallowDeepEqual(expectedData);
+  });
+
+  it('denormalize primitive', () => {
     const state = initializeState();
 
-    expect(state.topLocations).to.shallowDeepEqual(initialData.topLocations);
+    expect(state.topLocation).to.shallowDeepEqual(initialData.topLocation);
     expect(state.users.locationsStorage).to.shallowDeepEqual(initialData.locations);
 
-    const denormalizedTopLocations = getCollection(initialData.topLocations, state, 'locations');
-    expect(denormalizedTopLocations).to.have.length(2);
-    expect(denormalizedTopLocations).to.be.shallowDeepEqual(expectedDenormalizedTopLocations);
-  });
-
-  it('denormalize undefined', () => {
-    const result = getCollection(undefined, {});
-    expect(result).to.deep.equal([]);
-  });
-
-  it('denormalize null', () => {
-    const result = getCollection(null, {});
-    expect(result).to.deep.equal([]);
+    const denormalizedLocation = getOne(1, state, 'locations');
+    expect(denormalizedLocation).to.be.shallowDeepEqual(expectedDenormalizedTopLocation);
   });
 
   it('on invalid state throws appropriate error', () => {
-    expect(() => getCollection(initialData.topLocations, '', 'locations'))
+    expect(() => getOne(initialData.topLocation, '', 'locations'))
       .to.throw('State argument is invalid, should be an object.');
   });
 
   it('on invalid schema throws appropriate error', () => {
     const state = initializeState();
-    expect(() => getCollection(initialData.topLocations, state))
-    .to.throw(
+    expect(() => getOne(initialData.topLocation, state))
+      .to.throw(
       'Missing schema name in getCollection or getOne function. Schema needs to'
       + ' be defined in reference or as argument.'
     );
   });
 
-  it('on invalid collection throws appropriate error', () => {
+  it('on invalid one throws appropriate error', () => {
     const state = initializeState();
-    expect(() => getCollection({}, state))
-      .to.throw('Collection argument needs to be array.');
+    expect(() => getOne([], state))
+      .to.throw('One must be object or primitive value');
   });
 
-  it('warns that schema is defined in collection an via argument', () => {
+  it('warns that schema is defined in one an via argument', () => {
     const state = initializeState();
 
-    expect(state.topLocations).to.shallowDeepEqual(initialData.topLocations);
+    expect(state.topLocation).to.shallowDeepEqual(initialData.topLocation);
     expect(state.users.locationsStorage).to.shallowDeepEqual(initialData.locations);
 
-    const denormalizedTopLocations = getCollection(state.topLocations, state, 'locations');
-    expect(denormalizedTopLocations).to.have.length(2);
-    expect(denormalizedTopLocations).to.be.shallowDeepEqual(expectedDenormalizedTopLocations);
+    const denormalizedTopLocation = getOne(state.topLocation, state, 'locations');
+    expect(denormalizedTopLocation).to.be.shallowDeepEqual(expectedDenormalizedTopLocation);
 
     expect(console.warn.calledOnce).to.be.true;
     expect(console.warn.calledWith(
@@ -183,7 +172,7 @@ describe('getCollection', () => {
   it('on state without storage for requested schema', () => {
     const state = initializeState();
     const missingSchema = 'missing_schema';
-    expect(() => getCollection(initialData.topLocations, state, missingSchema))
+    expect(() => getOne(initialData.topLocation, state, missingSchema))
       .to.throw(`Storage for resolved schema ${missingSchema} doesn't exists in state.`);
   });
 });

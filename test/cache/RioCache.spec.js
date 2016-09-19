@@ -6,12 +6,6 @@ import {
 } from '../../src/status';
 import _ from 'lodash';
 
-function spread(obj) {
-  return {
-    ...obj,
-  }
-}
-
 class NormalizedData {
   constructor(normalizedData) {
     this.normalizedData = normalizedData;
@@ -27,10 +21,10 @@ class NormalizedData {
   }
 }
 
-const type1Id1Status = createStatus({ id: _.uniqueId() });
-const type1Id2Status = createStatus({ id: _.uniqueId() });
-const type1Id3Status = createStatus({ id: _.uniqueId() });
-const type2Id1Status = createStatus({ id: _.uniqueId() });
+const type1Id1Status = createStatus();
+const type1Id2Status = createStatus();
+const type1Id3Status = createStatus();
+const type2Id1Status = createStatus();
 
 const getNormalizedData = () => {
   const normalizedData = {
@@ -70,6 +64,23 @@ const getNormalizedData = () => {
         id: 'type1Id3',
         type: 'type1',
       },
+      type1Id4: {
+        id: 'type1Id4',
+        type: 'type1',
+        attributes: {name: 'type1Id4'},
+        relationships: {
+          type6: {
+            data: [
+              {id: 'type6Id1', type: 'type6'},
+            ],
+          },
+          type1: {
+            data: {
+              id: 'type1Id7', type: 'type1',
+            },
+          },
+        },
+      },
     },
     'type2.test': {
       type2Id1: {
@@ -89,10 +100,10 @@ const getNormalizedData = () => {
 };
 
 const getDenormalizedItems = () => {
-  const type1Id1DenormalizedStatus = spread(type1Id1Status);
-  const type1Id2DenormalizedStatus = spread(type1Id2Status);
-  const type1Id3DenormalizedStatus = spread(type1Id3Status);
-  const type2Id1DenormalizedStatus = spread(type2Id1Status);
+  const type1Id1DenormalizedStatus = { ...type1Id1Status };
+  const type1Id2DenormalizedStatus = { ...type1Id2Status };
+  const type1Id3DenormalizedStatus = { ...type1Id3Status };
+  const type2Id1DenormalizedStatus = { ...type2Id1Status };
 
   const type2Id1 = {
     id: 'type2Id1',
@@ -152,12 +163,12 @@ describe('RioCache', () => {
       const type = 'type';
 
       const reference = { id, type };
-      reference[STATUS] = { id: _.uniqueId(), modifiedTimestamp: 1 };
+      reference[STATUS] = { modifiedTimestamp: 1 };
 
       const cache = new RioCache(() => reference);
 
-      const denormalizedReference = {};
-      denormalizedReference[STATUS] = spread(reference[STATUS]);
+      const denormalizedReference = { ...reference };
+      denormalizedReference[STATUS] = { ...reference[STATUS] };
 
       cache.add(denormalizedReference);
 
@@ -171,19 +182,103 @@ describe('RioCache', () => {
       const type = 'type';
 
       const reference = { id, type };
-      reference[STATUS] = { id: _.uniqueId(), modifiedTimestamp: 1 };
+      reference[STATUS] = { modifiedTimestamp: 1 };
 
       const changedReference = { id, type };
       // simulate update - change modifiedTimestamp
       changedReference[STATUS] = { ...reference[STATUS], modifiedTimestamp: 2 };
 
       const denormalizedReference = {};
-      denormalizedReference[STATUS] = spread(reference[STATUS]);
+      denormalizedReference[STATUS] = { ...reference[STATUS] };
 
       const cache = new RioCache(() => changedReference);
       cache.add(denormalizedReference);
 
       assert.isUndefined(cache.getValidItem({ id, type }), 'returned some entity');
+    });
+  });
+  describe('getValidOne', () => {
+    it('returns cached one', () => {
+      const id = 1;
+      const type = 'type';
+
+      const item = { id, type };
+      item[STATUS] = { modifiedTimestamp: 1 };
+
+      const one = {};
+      one[STATUS] = { id: _.uniqueId(), modifiedTimestamp: 1 };
+
+      const cache = new RioCache((descriptor) => descriptor.id ? item : one);
+
+      const denormalizedOne = { ...item };
+      denormalizedOne[STATUS] = { ...one[STATUS] };
+
+      const denormalizedItem = { ...item };
+      denormalizedItem[STATUS] = { ...item[STATUS] };
+
+      cache.add(denormalizedOne);
+      cache.add(denormalizedItem);
+
+      assert.isOk(
+        denormalizedOne === cache.getValidOne(one)
+        , 'didn\'t return valid reference'
+      );
+    });
+    it('doesn\'t return cached one when one changed' , () => {
+      const id = 1;
+      const type = 'type';
+
+      const item = { id, type };
+      item[STATUS] = { modifiedTimestamp: 1 };
+
+      const one = {};
+      one[STATUS] = { id: _.uniqueId(), modifiedTimestamp: 1 };
+      const changedOne = {};
+      changedOne[STATUS] = {...one[STATUS], modifiedTimestamp: 2};
+
+      const cache = new RioCache((descriptor) => descriptor.id ? item : one);
+
+      const denormalizedOne = { ...item };
+      denormalizedOne[STATUS] = { ...one[STATUS] };
+
+      const denormalizedItem = { ...item };
+      denormalizedItem[STATUS] = { ...item[STATUS] };
+
+      cache.add(denormalizedOne);
+      cache.add(denormalizedItem);
+
+      assert.isOk(
+        denormalizedOne !== cache.getValidOne(changedOne)
+        , 'returned cached one'
+      );
+    });
+    it('doesn\'t return cached one when item modified' , () => {
+      const id = 1;
+      const type = 'type';
+
+      const item = { id, type };
+      item[STATUS] = { modifiedTimestamp: 1 };
+      const changedItem = {...item};
+      changedItem[STATUS] = {...item[STATUS], modifiedTimestamp: 2};
+
+      const one = {};
+      one[STATUS] = { id: _.uniqueId(), modifiedTimestamp: 1 };
+
+      const cache = new RioCache((descriptor) => descriptor.id ? changedItem : one);
+
+      const denormalizedOne = { ...item };
+      denormalizedOne[STATUS] = { ...one[STATUS] };
+
+      const denormalizedItem = { ...item };
+      denormalizedItem[STATUS] = { ...item[STATUS] };
+
+      cache.add(denormalizedOne);
+      cache.add(denormalizedItem);
+
+      assert.isOk(
+        denormalizedOne !== cache.getValidOne(one)
+        , 'returned cached one'
+      );
     });
   });
   describe('getValidCollection', () => {
@@ -202,12 +297,12 @@ describe('RioCache', () => {
       cache.add(item);
 
       const denormalizedReference = [{ id, type }];
-      denormalizedReference[STATUS] = spread(collection[STATUS]);
+      denormalizedReference[STATUS] = { ...collection[STATUS] };
 
       cache.add(denormalizedReference);
 
       const descriptorCollection = [{ id, type }];
-      descriptorCollection[STATUS] = spread(collection[STATUS]);
+      descriptorCollection[STATUS] = { ...collection[STATUS] };
 
       assert.isOk(
         denormalizedReference === cache.getValidCollection(descriptorCollection),
@@ -229,7 +324,7 @@ describe('RioCache', () => {
       cache.add(item);
 
       const denormalizedReference = [{ id, type }];
-      denormalizedReference[STATUS] = spread(collection[STATUS]);
+      denormalizedReference[STATUS] = { ...collection[STATUS] };
 
       cache.add(denormalizedReference);
 
@@ -261,12 +356,12 @@ describe('RioCache', () => {
       cache.add(item);
 
       const denormalizedReference = [{ id, type }];
-      denormalizedReference[STATUS] = spread(reference[STATUS]);
+      denormalizedReference[STATUS] = { ...reference[STATUS] };
 
       cache.add(denormalizedReference);
 
       const descriptorCollection = [{ id, type }];
-      descriptorCollection[STATUS] = spread(reference[STATUS]);
+      descriptorCollection[STATUS] = { ...reference[STATUS] };
 
       assert.isUndefined(
         cache.getValidCollection(descriptorCollection),

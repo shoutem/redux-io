@@ -6,25 +6,20 @@ import { resolveSchemaName } from '../schemaConfig';
 /**
  * Connects rio configurations with denormalizer to simplify denormalization
  * of normalized data in state.
+ * @param one - RIO one entity or primitive value
  * @param state
- * @param collection
  * @param schema
- * @returns {[]}
+ * @returns {{}}
  */
-export function getCollection(collection, state, schema = '') {
-  if (!collection) {
-    // Handle undefined values reasonably
-    return [];
-  }
-
-  if (!_.isArray(collection)) {
-    throw new Error('Collection argument needs to be array.');
+export function getOne(one, state, schema = '') {
+  if (!_.isPlainObject(one) && !_.isString(one) && !_.isNumber(one)) {
+    throw new Error('One must be object or primitive value.');
   }
   if (!_.isObject(state)) {
     throw new Error('State argument is invalid, should be an object.');
   }
 
-  const resolvedSchema = resolveSchemaName(collection, schema);
+  const resolvedSchema = resolveSchemaName(one, schema);
 
   const schemaPaths = rio.schemaPaths;
   if (!schemaPaths[resolvedSchema]) {
@@ -32,5 +27,5 @@ export function getCollection(collection, state, schema = '') {
   }
   const storageMap = createSchemasMap(state, schemaPaths);
 
-  return rio.denormalizer.denormalizeCollection(collection, storageMap, resolvedSchema);
+  return rio.denormalizer.denormalizeOne(one, storageMap, resolvedSchema);
 }

@@ -17,6 +17,8 @@ import {
   cloneStatus,
 } from './../status';
 
+export const STORAGE_TYPE = '@@redux-io/storage';
+
 function mergeItemStatus(currentItem, newStatus) {
   const currentStatus = (currentItem && currentItem[STATUS])
     ? currentItem[STATUS] : createStatus();
@@ -54,7 +56,7 @@ function patchItemInState(currentItem, patch, actionMeta) {
 function createDefaultStatus(schema) {
   return {
     schema,
-    type: 'storage',
+    type: STORAGE_TYPE,
     id: _.uniqueId(),
   };
 }
