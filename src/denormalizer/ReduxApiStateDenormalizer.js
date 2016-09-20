@@ -144,7 +144,7 @@ export default class ReduxApiStateDenormalizer extends ReduxDenormalizer {
   denormalizeOne(one, storage, schema) {
     if (!one) {
       // If one undefined we have nothing to do with it
-      return one;
+      return undefined;
     }
 
     const itemDescriptor = createSingleDescriptor(one, schema);
@@ -200,7 +200,7 @@ export default class ReduxApiStateDenormalizer extends ReduxDenormalizer {
   denormalizeCollection(collection, storage, schema) {
     if (!collection) {
       // If collection undefined we have nothing to do with it
-      return collection;
+      return undefined;
     }
 
     const descriptorCollection = createDescriptorCollection(collection, schema);

@@ -426,6 +426,12 @@ describe('ReduxApiStateDenormalizer', () => {
         'didn\'t return item descriptor'
       );
     });
+    it('return undefined if one is "false"', () => {
+      const denormalizer = new ReduxApiStateDenormalizer();
+      assert.isOk(denormalizer.denormalizeOne() === undefined, 'didn\'t return undefined');
+      assert.isOk(denormalizer.denormalizeOne(null) === undefined, 'didn\'t return undefined');
+      assert.isOk(denormalizer.denormalizeOne(false) === undefined, 'didn\'t return undefined');
+    });
   });
   describe('denormalizeCollection', () => {
     it('denormalizes valid object collection', () => {
@@ -573,6 +579,12 @@ describe('ReduxApiStateDenormalizer', () => {
 
       assert.isOk(cachedDenormalizedData !== denormalizedData, 'didn\'t create new reference');
       assert.isObject(cachedDenormalizedData[STATUS]);
+    });
+    it('return undefined if collection is "false"', () => {
+      const denormalizer = new ReduxApiStateDenormalizer();
+      assert.isOk(denormalizer.denormalizeCollection() === undefined, 'didn\'t return undefined');
+      assert.isOk(denormalizer.denormalizeCollection(null) === undefined, 'didn\'t return undefined');
+      assert.isOk(denormalizer.denormalizeCollection(false) === undefined, 'didn\'t return undefined');
     });
   });
 });
