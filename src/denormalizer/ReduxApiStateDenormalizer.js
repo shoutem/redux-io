@@ -142,6 +142,11 @@ export default class ReduxApiStateDenormalizer extends ReduxDenormalizer {
    * @returns {{}}
    */
   denormalizeOne(one, storage, schema) {
+    if (!one) {
+      // If one undefined we have nothing to do with it
+      return undefined;
+    }
+
     const itemDescriptor = createSingleDescriptor(one, schema);
     // if storage is undefined, denormalizer is in Find storage mode
     this.updateStorageMap(storage);
@@ -181,7 +186,6 @@ export default class ReduxApiStateDenormalizer extends ReduxDenormalizer {
     return mergedItem;
   }
 
-
   /**
    * Denormalize RIO collection or array of IDs.
    * If collection is not RIO collection but array of IDs,
@@ -194,6 +198,11 @@ export default class ReduxApiStateDenormalizer extends ReduxDenormalizer {
    * @returns {{}}
    */
   denormalizeCollection(collection, storage, schema) {
+    if (!collection) {
+      // If collection undefined we have nothing to do with it
+      return undefined;
+    }
+
     const descriptorCollection = createDescriptorCollection(collection, schema);
 
     let denormalizedCollection = this.cache.getValidCollection(descriptorCollection);
