@@ -114,6 +114,21 @@ const getStore = () => {
             },
           },
         },
+        type1Id5: {
+          id: 'type1Id5',
+          type: 'type1',
+          attributes: {name: 'type1Id4'},
+          relationships: {
+            type6: {
+              data: [
+                {id: 'type6Id1', type: 'type6'},
+              ],
+            },
+            type1: {
+              data: null,
+            },
+          },
+        },
       },
       'type2.test': {
         type2Id1: {
@@ -130,6 +145,7 @@ const getStore = () => {
   store.storage.type1.type1Id2[STATUS] = createStatus();
   store.storage.type1.type1Id3[STATUS] = createStatus();
   store.storage.type1.type1Id4[STATUS] = createStatus();
+  store.storage.type1.type1Id5[STATUS] = createStatus();
   store.storage['type2.test'].type2Id1[STATUS] = createStatus();
   return store;
 };
@@ -304,6 +320,20 @@ describe('ReduxApiStateDenormalizer', () => {
       assert.isOk(cachedDenormalizedData === denormalizedData, 'didn\'t get cached item');
       assert.isObject(cachedDenormalizedData[STATUS]);
       assert.isObject(cachedDenormalizedData['type2.test'][STATUS]);
+    });
+    it('gets object from cache with single relationship null', () => {
+      const denormalizer = new ReduxApiStateDenormalizer();
+      const storage = createSchemasMap(getStore(), createStorageMap());
+
+      const one = { value: 'type1Id5' };
+      one[STATUS] = { schema: 'type1', id: _.uniqueId(), modifiedTimestamp: 1 };
+
+      const denormalizedData =
+        denormalizer.denormalizeOne(one, storage);
+      const cachedDenormalizedData =
+        denormalizer.denormalizeOne(one, storage);
+
+      assert.isOk(cachedDenormalizedData === denormalizedData, 'didn\'t get cached item');
     });
     it('gets object from cache when no relationship items in state', () => {
       const denormalizer = new ReduxApiStateDenormalizer();

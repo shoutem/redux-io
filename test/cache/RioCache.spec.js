@@ -157,6 +157,52 @@ describe('RioCache', () => {
       assert.isUndefined(cache.get(reference), 'returned something from cache');
     });
   });
+  describe('isSingleRelationshipModified', () => {
+    it('is modified', () => {
+      const id = 1;
+      const type = 'type';
+      const reference = { id, type };
+      reference[STATUS] = { modifiedTimestamp: 1 };
+      const cachedReference = { ...reference };
+      const nullReference = {};
+
+      const cache = new RioCache(() => reference);
+      cache.add();
+
+      assert.isOk(
+          cache.isSingleRelationshipModified(nullReference, cachedReference),
+          'not modified'
+        );
+        assert.isOk(
+          cache.isSingleRelationshipModified(reference, nullReference),
+          'not modified'
+        );
+        assert.isOk(
+          cache.isSingleRelationshipModified(nullReference, cachedReference),
+          'not modified'
+        );
+      });
+      it('is not modified', () => {
+        const id = 1;
+        const type = 'type';
+        const reference = { id, type };
+        reference[STATUS] = { modifiedTimestamp: 1 };
+        const cachedReference = { ...reference };
+        const nullReference = {};
+
+        const cache = new RioCache(() => reference);
+        cache.add();
+
+        assert.isOk(
+          cache.isSingleRelationshipModified(nullReference, nullReference),
+          'not modified'
+        );
+        assert.isOk(
+          cache.isSingleRelationshipModified(reference, cachedReference),
+          'not modified'
+        );
+      });
+  });
   describe('getValidItem', () => {
     it('returns unchanged item', () => {
       const id = 1;

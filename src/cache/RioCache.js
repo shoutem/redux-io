@@ -168,6 +168,20 @@ export default class RioCache {
   }
 
   /**
+   * @param relationship
+   * @param cachedRelationship
+   * @returns {boolean}
+   */
+  isSingleRelationshipModified(relationship, cachedRelationship) {
+    if (!relationship) {
+      return relationship !== cachedRelationship;
+    }
+
+    const relationshipItem = this.getValidItem(relationship);
+    return !relationshipItem || relationshipItem !== cachedRelationship;
+  }
+
+  /**
    * Takes collection of item descriptors and check if cached collection items match current items
    *
    * @param descriptorCollection
@@ -206,7 +220,7 @@ export default class RioCache {
     const cachedRelationship = cachedItem[relationshipName];
 
     if (isSingleRelation(relationship)) {
-      return !this.getValidItem(relationship);
+      return this.isSingleRelationshipModified(relationship, cachedRelationship);
     } else if (isCollection(relationship)) {
       return this.areCollectionItemsChanged(relationship, cachedRelationship);
     }
