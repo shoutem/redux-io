@@ -168,11 +168,6 @@ export default class RioCache {
   }
 
   /**
-   * Single relationship is changed if
-   *  there was no relationship and now there is
-   *  relationship item it self is changed
-   *  related to different item then before
-   *
    * @param relationship
    * @param cachedRelationship
    * @returns {boolean}
