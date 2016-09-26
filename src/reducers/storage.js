@@ -119,6 +119,7 @@ export default function storage(schema, initialState = {}) {
           currentItem,
           {
             validationStatus: validationStatus.INVALID,
+            busyStatus: busyStatus.BUSY,
           }
         );
         const newState = { ...state, [newItem.id]: newItem };
