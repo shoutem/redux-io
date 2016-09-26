@@ -114,7 +114,7 @@ export default function storage(schema, initialState = {}) {
         return newState;
       }
       case OBJECT_REMOVING: {
-        const newItem = { ...item };
+        const newItem = { ...currentItem };
         newItem[STATUS] = mergeItemStatus(
           currentItem,
           {
