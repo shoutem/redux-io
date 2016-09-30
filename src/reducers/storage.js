@@ -29,7 +29,7 @@ function mergeItemStatus(currentItem, newStatus) {
   );
 }
 
-function patchItemInState(currentItem, patch, actionMeta) {
+function patchItemInState(currentItem, patch) {
   const newItem = {
     id: currentItem.id,
     type: currentItem.type,
@@ -42,14 +42,7 @@ function patchItemInState(currentItem, patch, actionMeta) {
       ...patch.relationships,
     },
   };
-  setStatus(newItem, mergeItemStatus(
-    currentItem,
-    {
-      validationStatus: validationStatus.INVALID,
-      busyStatus: busyStatus.BUSY,
-      transformation: actionMeta.transformation,
-    }
-  ));
+  cloneStatus(currentItem, newItem);
   return newItem;
 }
 
@@ -92,7 +85,14 @@ export default function storage(schema, initialState = {}) {
         if (!currentItem) {
           return state;
         }
-        const patchedItem = patchItemInState(currentItem, item, action.meta);
+        const patchedItem = patchItemInState(currentItem, item);
+        patchedItem[STATUS] = mergeItemStatus(
+          currentItem,
+          {
+            validationStatus: validationStatus.INVALID,
+            busyStatus: busyStatus.BUSY,
+          }
+        );
         const newState = { ...state, [item.id]: patchedItem };
         cloneStatus(newState, state);
         return newState;
@@ -113,13 +113,15 @@ export default function storage(schema, initialState = {}) {
         return newState;
       }
       case OBJECT_REMOVING: {
-        item[STATUS] = mergeItemStatus(
+        const newItem = { ...currentItem };
+        newItem[STATUS] = mergeItemStatus(
           currentItem,
           {
             validationStatus: validationStatus.INVALID,
+            busyStatus: busyStatus.BUSY,
           }
         );
-        const newState = { ...state, [item.id]: item };
+        const newState = { ...state, [newItem.id]: newItem };
         cloneStatus(newState, state);
         return newState;
       }
