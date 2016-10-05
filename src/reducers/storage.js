@@ -91,6 +91,7 @@ export default function storage(schema, initialState = {}) {
           {
             validationStatus: validationStatus.INVALID,
             busyStatus: busyStatus.BUSY,
+            transformation: action.meta.transformation,
           }
         );
         const newState = { ...state, [item.id]: patchedItem };
