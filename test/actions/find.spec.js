@@ -61,6 +61,7 @@ describe('Find action creator', () => {
       endpoint: config.endpoint,
       params: {},
       options: {},
+      timestamp: types[0].meta.timestamp,
     };
     expect(types[0].type).to.equal(LOAD_REQUEST);
     expect(types[0].meta).to.deep.equal(expectedMeta);
@@ -138,6 +139,7 @@ describe('Find action creator', () => {
       options: {
         appendMode: true,
       },
+      timestamp: types[0].meta.timestamp,
     };
     expect(types[0].type).to.equal(LOAD_REQUEST);
     expect(types[0].meta).to.deep.equal(expectedMeta);
@@ -180,6 +182,7 @@ describe('Find action creator', () => {
       endpoint: config.endpoint,
       params: {},
       options: {},
+      timestamp: types[0].meta.timestamp,
     };
     expect(types[0].type).to.equal(LOAD_REQUEST);
     expect(types[0].meta).to.deep.equal(expectedMeta);
@@ -225,6 +228,7 @@ describe('Find action creator', () => {
       endpoint: config.endpoint,
       params: {},
       options: {},
+      timestamp: types[0].meta.timestamp,
     };
     expect(types[0].type).to.equal(LOAD_REQUEST);
     expect(types[0].meta).to.deep.equal(expectedMeta);
@@ -274,6 +278,7 @@ describe('Find action creator', () => {
       endpoint: argSchemaConfig.request.endpoint,
       params: {},
       options: {},
+      timestamp: types[0].meta.timestamp,
     };
     expect(types[0].type).to.equal(LOAD_REQUEST);
     expect(types[0].meta).to.deep.equal(expectedMeta);
@@ -381,6 +386,7 @@ describe('Find action creator', () => {
       endpoint: expectedEndpoint,
       params,
       options: {},
+      timestamp: types[0].meta.timestamp,
     };
     expect(types[0].type).to.equal(LOAD_REQUEST);
     expect(types[0].meta).to.deep.equal(expectedMeta);
@@ -446,7 +452,10 @@ describe('Find action creator', () => {
 
         const actionCollStatus = batchedActionsRequest[0];
         expect(actionCollStatus.type).to.equal(REFERENCE_STATUS);
-        expect(actionCollStatus.meta).to.deep.equal({ ...expectedMeta });
+        expect(actionCollStatus.meta).to.deep.equal({
+          ...expectedMeta,
+          timestamp: actionCollStatus.meta.timestamp,
+        });
         const expectedCollStatusPayload = { busyStatus: busyStatus.BUSY };
         expect(actionCollStatus.payload).to.deep.equal(expectedCollStatusPayload);
 
@@ -456,17 +465,27 @@ describe('Find action creator', () => {
 
         const actionObjFetched = batchedActionsSuccess[0];
         expect(actionObjFetched.type).to.equal(OBJECT_FETCHED);
-        expect(actionObjFetched.meta).to.deep.equal({ ...expectedMeta, transformation: {} });
+        expect(actionObjFetched.meta).to.deep.equal({
+          ...expectedMeta,
+          transformation: {},
+          timestamp: actionObjFetched.meta.timestamp,
+        });
         expect(actionObjFetched.payload).to.deep.equal(expectedPayload.data[0]);
 
         const actionCollFetched = batchedActionsSuccess[2];
         expect(actionCollFetched.type).to.equal(REFERENCE_FETCHED);
-        expect(actionCollFetched.meta).to.deep.equal({ ...expectedMeta });
+        expect(actionCollFetched.meta).to.deep.equal({
+          ...expectedMeta,
+          timestamp: actionCollFetched.meta.timestamp,
+        });
         expect(actionCollFetched.payload).to.deep.equal(expectedPayload.data);
 
         const successAction = performedActions[3];
         expect(successAction.type).to.equal(LOAD_SUCCESS);
-        expect(successAction.meta).to.deep.equal(expectedMeta);
+        expect(successAction.meta).to.deep.equal({
+          ...expectedMeta,
+          timestamp: successAction.meta.timestamp,
+        });
         expect(successAction.payload).to.deep.equal(expectedPayload);
       }).then(done).catch(done);
   });

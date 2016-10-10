@@ -56,11 +56,12 @@ describe('Create action creator', () => {
     expect(action[RSAA].body).to.equal(expectedBody);
     expect(action[RSAA].types).to.not.be.undefined;
 
+    const types = action[RSAA].types;
     const expectedMeta = {
       source: JSON_API_SOURCE,
       schema,
+      timestamp: types[0].meta.timestamp,
     };
-    const types = action[RSAA].types;
     expect(types[0].type).to.equal(CREATE_REQUEST);
     expect(types[0].meta).to.deep.equal(expectedMeta);
     expect(types[1].type).to.equal(CREATE_SUCCESS);
@@ -94,11 +95,13 @@ describe('Create action creator', () => {
     expect(action[RSAA].body).to.equal(item);
     expect(action[RSAA].types).to.not.be.undefined;
 
+    const types = action[RSAA].types;
     const expectedMeta = {
       source: JSON_API_SOURCE,
       schema,
+      timestamp: types[0].meta.timestamp,
     };
-    const types = action[RSAA].types;
+
     expect(types[0].type).to.equal(CREATE_REQUEST);
     expect(types[0].meta).to.deep.equal(expectedMeta);
     expect(types[1].type).to.equal(CREATE_SUCCESS);
@@ -131,11 +134,13 @@ describe('Create action creator', () => {
     expect(action[RSAA].body).to.equal(JSON.stringify({ data: item }));
     expect(action[RSAA].types).to.not.be.undefined;
 
+    const types = action[RSAA].types;
     const expectedMeta = {
       source: JSON_API_SOURCE,
       schema,
+      timestamp: types[0].meta.timestamp,
     };
-    const types = action[RSAA].types;
+
     expect(types[0].type).to.equal(CREATE_REQUEST);
     expect(types[0].meta).to.deep.equal(expectedMeta);
     expect(types[1].type).to.equal(CREATE_SUCCESS);
@@ -247,8 +252,11 @@ describe('Create action creator', () => {
 
         const actionCollStatusBusy = batchedActionsRequest[0];
         expect(actionCollStatusBusy.type).to.equal(REFERENCE_STATUS);
-        expect(actionCollStatusBusy.meta)
-          .to.deep.equal({ ...expectedMeta, tag: '*' });
+        expect(actionCollStatusBusy.meta).to.deep.equal({
+          ...expectedMeta,
+          tag: '*',
+          timestamp: actionCollStatusBusy.meta.timestamp,
+        });
         const expectedCollStatusBusyPayload = {
           busyStatus: busyStatus.BUSY,
           validationStatus: validationStatus.INVALID,
@@ -261,12 +269,20 @@ describe('Create action creator', () => {
 
         const actionObjCreated = batchedActionsSuccess[0];
         expect(actionObjCreated.type).to.equal(OBJECT_CREATED);
-        expect(actionObjCreated.meta).to.deep.equal({ ...expectedMeta, transformation: {} });
+        expect(actionObjCreated.meta).to.deep.equal({
+          ...expectedMeta,
+          transformation: {},
+          timestamp: actionObjCreated.meta.timestamp,
+        });
         expect(actionObjCreated.payload).to.deep.equal(expectedPayload.data);
 
         const actionCollStatus = batchedActionsSuccess[1];
         expect(actionCollStatus.type).to.equal(REFERENCE_STATUS);
-        expect(actionCollStatus.meta).to.deep.equal({ ...expectedMeta, tag: '*' });
+        expect(actionCollStatus.meta).to.deep.equal({
+          ...expectedMeta,
+          tag: '*',
+          timestamp: actionCollStatus.meta.timestamp,
+        });
         const expectedCollStatusPayload = {
           validationStatus: validationStatus.INVALID,
           busyStatus: busyStatus.IDLE,
@@ -275,7 +291,10 @@ describe('Create action creator', () => {
 
         const successAction = performedActions[3];
         expect(successAction.type).to.equal(CREATE_SUCCESS);
-        expect(successAction.meta).to.deep.equal(expectedMeta);
+        expect(successAction.meta).to.deep.equal({
+          ...expectedMeta,
+          timestamp: successAction.meta.timestamp,
+        });
         expect(successAction.payload).to.deep.equal(expectedPayload);
       }).then(done).catch(done);
   });

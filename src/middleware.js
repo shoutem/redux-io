@@ -38,7 +38,6 @@ export const OBJECT_REMOVED = '@@redux_io/OBJECT_REMOVED';
 export const OBJECT_ERROR = '@@redux_io/OBJECT_ERROR';
 export const COLLECTION_ERROR = '@@redux_io/COLLECTION_ERROR';
 
-
 const actionsWithoutPayload = new Set([
   REMOVE_SUCCESS,
   LOAD_REQUEST,
@@ -54,6 +53,31 @@ const actionsWithTags = new Set([
   LOAD_SUCCESS,
   LOAD_ERROR,
 ]);
+
+const outDateableActions = {
+  [LOAD_SUCCESS]: LOAD_SUCCESS,
+  [CREATE_SUCCESS]: CREATE_SUCCESS,
+  [UPDATE_SUCCESS]: UPDATE_SUCCESS,
+  [REMOVE_SUCCESS]: REMOVE_SUCCESS,
+};
+
+const timestamps = {};
+function markChange(action) {
+  const { schema, timestamp } = action.meta;
+  timestamps[schema] = timestamp;
+}
+function isOutdated(action) {
+  const { schema, timestamp } = action.meta;
+
+  if (!outDateableActions[action.type]) {
+    return false;
+  }
+  if (!timestamps[schema]) {
+    return false;
+  }
+
+  return timestamps[schema] > timestamp;
+}
 
 function makeErrorAction(actionType, errorPayload) {
   return {
@@ -164,6 +188,7 @@ const actionHandlers = {
   [CREATE_REQUEST]: (action, data, dispatch) => {
     // Change collection status to busy and invalid to prevent fetching.
     const schema = action.meta.schema;
+    markChange(action);
     dispatch(makeIndexAction(
       action,
       REFERENCE_STATUS,
@@ -199,6 +224,7 @@ const actionHandlers = {
     // Change collection status to busy and invalid to prevent fetching and because of
     // local changes in storage state with updated item.
     const schema = action.meta.schema;
+    markChange(action);
     dispatch(makeIndexAction(
       action,
       REFERENCE_STATUS,
@@ -235,6 +261,7 @@ const actionHandlers = {
     // Change collections status to busy and invalid because of removing item in
     // local storage state
     const schema = action.meta.schema;
+    markChange(action);
     dispatch(makeIndexAction(
       action,
       REFERENCE_STATUS,
@@ -341,6 +368,9 @@ function saveLinks(action, dispatch) {
 export default store => next => action => {
   // Validate action, if not valid pass
   if (!isValidAction(action)) {
+    return next(action);
+  }
+  if (isOutdated(action)) {
     return next(action);
   }
 

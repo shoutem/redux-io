@@ -20,6 +20,7 @@ describe('Invalidate action creator', () => {
       }
     };
     const invalidateAction = invalidate('schema_test');
+    action.meta.timestamp = invalidateAction.meta.timestamp;
 
     expect(invalidateAction).to.deep.equal(action);
   });

@@ -1,3 +1,4 @@
+import _ from 'lodash';
 import { expect } from 'chai';
 import configureMockStore from 'redux-mock-store';
 import thunk from 'redux-thunk';
@@ -1115,4 +1116,204 @@ describe('Json api middleware', () => {
     }).then(done).catch(done);
   });
 
+  it('ignores obsolete updated action', done => {
+    const schema = 'schema_test';
+    const expectedPayload = {
+      data: [{
+        type: schema,
+        id: '1',
+        attributes: {
+          name: 'Test1',
+        },
+      }],
+    };
+    const expectedMeta = {
+      source: JSON_API_SOURCE,
+      schema,
+      tag: '',
+    };
+
+    const mockUpdateRequestActionFirst = {
+      type: UPDATE_REQUEST,
+      meta: {
+        ...expectedMeta,
+        timestamp: 1,
+      },
+      payload: expectedPayload,
+    };
+    const mockUpdateSuccessActionFirst = {
+      type: UPDATE_SUCCESS,
+      meta: {
+        ...expectedMeta,
+        timestamp: 1,
+      },
+      payload: expectedPayload,
+    };
+
+    const mockUpdateRequestActionSecond = {
+      type: UPDATE_REQUEST,
+      meta: {
+        ...expectedMeta,
+        timestamp: 2,
+      },
+      payload: expectedPayload,
+    };
+    const mockUpdateSuccessActionSecond = {
+      type: UPDATE_SUCCESS,
+      meta: {
+        ...expectedMeta,
+        timestamp: 2,
+      },
+      payload: expectedPayload,
+    };
+
+    const store = mockStore({});
+    _.delay(() => store.dispatch(actionPromise(mockUpdateRequestActionFirst)).then(() => {
+      const performedActions = store.getActions();
+      store.clearActions();
+      expect(performedActions).to.have.lengthOf(2);
+    }), 0);
+    _.delay(() => store.dispatch(actionPromise(mockUpdateRequestActionSecond)).then(() => {
+      const performedActions = store.getActions();
+      store.clearActions();
+      expect(performedActions).to.have.lengthOf(2);
+    }), 50);
+    _.delay(() => store.dispatch(actionPromise(mockUpdateSuccessActionFirst)).then(() => {
+      const performedActions = store.getActions();
+      store.clearActions();
+      expect(performedActions).to.have.lengthOf(1);
+    }), 100);
+    _.delay(() => store.dispatch(actionPromise(mockUpdateSuccessActionSecond)).then(() => {
+      const performedActions = store.getActions();
+      store.clearActions();
+      expect(performedActions).to.have.lengthOf(2);
+    }).then(done).catch(done), 150);
+  });
+
+  it('ignores obsolete loaded action', done => {
+    const schema = 'schema_test';
+    const expectedPayload = {
+      data: [{
+        type: schema,
+        id: '1',
+        attributes: {
+          name: 'Test1',
+        },
+      }],
+    };
+    const expectedMeta = {
+      source: JSON_API_SOURCE,
+      schema,
+      tag: '',
+    };
+
+    const mockUpdateRequestActionFirst = {
+      type: UPDATE_REQUEST,
+      meta: {
+        ...expectedMeta,
+        timestamp: 1,
+      },
+      payload: expectedPayload,
+    };
+    const mockUpdateSuccessActionFirst = {
+      type: UPDATE_SUCCESS,
+      meta: {
+        ...expectedMeta,
+        timestamp: 1,
+      },
+      payload: expectedPayload,
+    };
+
+    const mockUpdateRequestActionSecond = {
+      type: UPDATE_REQUEST,
+      meta: {
+        ...expectedMeta,
+        timestamp: 3,
+      },
+      payload: expectedPayload,
+    };
+    const mockUpdateSuccessActionSecond = {
+      type: UPDATE_SUCCESS,
+      meta: {
+        ...expectedMeta,
+        timestamp: 3,
+      },
+      payload: expectedPayload,
+    };
+
+    const mockFindRequestActionFirst = {
+      type: LOAD_REQUEST,
+      meta: {
+        ...expectedMeta,
+        timestamp: 2,
+      },
+    };
+    const mockFindSuccessActionFirst = {
+      type: LOAD_SUCCESS,
+      meta: {
+        ...expectedMeta,
+        timestamp: 2,
+      },
+      payload: expectedPayload,
+    };
+
+    const mockFindRequestActionSecond = {
+      type: LOAD_REQUEST,
+      meta: {
+        ...expectedMeta,
+        timestamp: 4,
+      },
+    };
+    const mockFindSuccessActionSecond = {
+      type: LOAD_SUCCESS,
+      meta: {
+        ...expectedMeta,
+        timestamp: 4,
+      },
+      payload: expectedPayload,
+    };
+
+    const store = mockStore({});
+
+    _.delay(() => store.dispatch(actionPromise(mockUpdateRequestActionFirst)).then(() => {
+      const performedActions = store.getActions();
+      store.clearActions();
+      expect(performedActions).to.have.lengthOf(2);
+    }), 0);
+    _.delay(() => store.dispatch(actionPromise(mockUpdateSuccessActionFirst)).then(() => {
+      const performedActions = store.getActions();
+      store.clearActions();
+      expect(performedActions).to.have.lengthOf(2);
+    }), 50);
+    _.delay(() => store.dispatch(actionPromise(mockFindRequestActionFirst)).then(() => {
+      const performedActions = store.getActions();
+      store.clearActions();
+      expect(performedActions).to.have.lengthOf(2);
+    }), 100);
+    _.delay(() => store.dispatch(actionPromise(mockUpdateRequestActionSecond)).then(() => {
+      const performedActions = store.getActions();
+      store.clearActions();
+      expect(performedActions).to.have.lengthOf(2);
+    }), 150);
+    _.delay(() => store.dispatch(actionPromise(mockFindSuccessActionFirst)).then(() => {
+      const performedActions = store.getActions();
+      store.clearActions();
+      expect(performedActions).to.have.lengthOf(1);
+    }), 200);
+    _.delay(() => store.dispatch(actionPromise(mockUpdateSuccessActionSecond)).then(() => {
+      const performedActions = store.getActions();
+      store.clearActions();
+      expect(performedActions).to.have.lengthOf(2);
+    }), 250);
+    _.delay(() => store.dispatch(actionPromise(mockFindRequestActionSecond)).then(() => {
+      const performedActions = store.getActions();
+      store.clearActions();
+      expect(performedActions).to.have.lengthOf(2);
+    }), 300);
+    _.delay(() => store.dispatch(actionPromise(mockFindSuccessActionSecond)).then(() => {
+      const performedActions = store.getActions();
+      store.clearActions();
+      expect(performedActions).to.have.lengthOf(2);
+    }).then(done).catch(done), 350);
+  });
 });

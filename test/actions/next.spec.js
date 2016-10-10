@@ -70,6 +70,7 @@ describe('Next action creator', () => {
         [APPEND_MODE]: true,
         [RESOLVED_ENDPOINT]: true,
       },
+      timestamp: types[0].meta.timestamp,
     };
     expect(types[0].type).to.equal(LOAD_REQUEST);
     expect(types[0].meta).to.deep.equal(expectedMeta);

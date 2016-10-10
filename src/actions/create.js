@@ -45,6 +45,7 @@ export default function create(config, schema, item = null) {
   const meta = {
     source: JSON_API_SOURCE,
     schema,
+    timestamp: Date.now(),
   };
 
   return {

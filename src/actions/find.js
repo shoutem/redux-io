@@ -58,7 +58,9 @@ export default function find(schema, tag = '', params = {}, options = {}) {
 
   const rsaaConfig = buildRSAAConfig(config);
   const isEndpointResolved = options[RESOLVED_ENDPOINT];
-  const endpoint = isEndpointResolved ? rsaaConfig.endpoint : buildEndpoint(rsaaConfig.endpoint, params);
+  const endpoint = isEndpointResolved
+    ? rsaaConfig.endpoint
+    : buildEndpoint(rsaaConfig.endpoint, params);
 
   const meta = {
     source: config.request.resourceType || JSON_API_SOURCE,
@@ -67,6 +69,7 @@ export default function find(schema, tag = '', params = {}, options = {}) {
     params,
     endpoint,
     options,
+    timestamp: Date.now(),
   };
 
   return {

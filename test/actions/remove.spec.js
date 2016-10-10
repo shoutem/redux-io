@@ -46,12 +46,13 @@ describe('Delete action creator', () => {
     expect(action[RSAA].headers).to.equal(config.headers);
     expect(action[RSAA].types).to.not.be.undefined;
 
+    const types = action[RSAA].types;
     const expectedMeta = {
       source: JSON_API_SOURCE,
       schema,
+      timestamp: types[0].meta.timestamp,
     };
 
-    const types = action[RSAA].types;
     expect(types[0].type).to.equal(REMOVE_REQUEST);
     expect(types[0].meta).to.deep.equal(expectedMeta);
     expect(types[1].type).to.equal(REMOVE_SUCCESS);
@@ -129,7 +130,7 @@ describe('Delete action creator', () => {
         const actionCollBusyRequest = batchedRemovingActions.payload[0];
         expect(actionCollBusyRequest.type).to.equal(REFERENCE_STATUS);
         expect(actionCollBusyRequest.meta)
-          .to.deep.equal({ ...expectedMeta, tag: '*' });
+          .to.deep.equal({ ...expectedMeta, tag: '*', timestamp: actionCollBusyRequest.meta.timestamp });
         const expectedCollBusyStatusPayload = {
           validationStatus: validationStatus.INVALID,
           busyStatus: busyStatus.BUSY,
@@ -138,18 +139,30 @@ describe('Delete action creator', () => {
 
         const actionObjDeleting = batchedRemovingActions.payload[1];
         expect(actionObjDeleting.type).to.equal(OBJECT_REMOVING);
-        expect(actionObjDeleting.meta).to.deep.equal({ ...expectedMeta, transformation: {} });
+        expect(actionObjDeleting.meta).to.deep.equal({
+          ...expectedMeta,
+          transformation: {},
+          timestamp: actionObjDeleting.meta.timestamp
+        });
 
         expect(performedActions[1].type).to.equal(REMOVE_REQUEST);
 
         const batchedRemovedActions = performedActions[2];
         const actionObjRemoved = batchedRemovedActions.payload[0];
         expect(actionObjRemoved.type).to.equal(OBJECT_REMOVED);
-        expect(actionObjRemoved.meta).to.deep.equal({ ...expectedMeta, transformation: {} });
+        expect(actionObjRemoved.meta).to.deep.equal({
+          ...expectedMeta,
+          transformation: {},
+          timestamp: actionObjRemoved.meta.timestamp
+        });
 
         const actionCollStatus = batchedRemovedActions.payload[1];
         expect(actionCollStatus.type).to.equal(REFERENCE_STATUS);
-        expect(actionCollStatus.meta).to.deep.equal({ ...expectedMeta, tag: '*' });
+        expect(actionCollStatus.meta).to.deep.equal({
+          ...expectedMeta,
+          tag: '*',
+          timestamp: actionCollStatus.meta.timestamp
+        });
         const expectedCollStatusPayload = {
           validationStatus: validationStatus.INVALID,
           busyStatus: busyStatus.IDLE,
@@ -158,7 +171,10 @@ describe('Delete action creator', () => {
 
         const successAction = performedActions[3];
         expect(successAction.type).to.equal(REMOVE_SUCCESS);
-        expect(successAction.meta).to.deep.equal(expectedMeta);
+        expect(successAction.meta).to.deep.equal({
+          ...expectedMeta,
+          timestamp: successAction.meta.timestamp,
+        });
       }).then(done).catch(done);
   });
 });

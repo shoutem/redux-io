@@ -35,6 +35,7 @@ export default function remove(config, schema, item) {
   const meta = {
     source: JSON_API_SOURCE,
     schema,
+    timestamp: Date.now(),
   };
 
   return {

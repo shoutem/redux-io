@@ -19,6 +19,7 @@ export default function next(collection, appendMode = true) {
       type: NO_MORE_RESULTS,
       schema,
       tag,
+      timestamp: Date.now(),
     };
   }
   const findConfig = {

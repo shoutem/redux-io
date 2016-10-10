@@ -25,6 +25,7 @@ export default function loaded(payload, schema, tag = '') {
       source: JSON_API_SOURCE,
       schema,
       tag,
+      timestamp: Date.now(),
     },
   };
 }

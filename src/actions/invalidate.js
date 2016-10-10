@@ -16,6 +16,7 @@ export default function invalidate(schema) {
     meta: {
       schema,
       tag: '*',
+      timestamp: Date.now(),
     },
     payload: {
       validationStatus: validationStatus.INVALID,

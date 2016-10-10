@@ -35,6 +35,7 @@ export default function update(config, schema, item) {
   const meta = {
     source: JSON_API_SOURCE,
     schema,
+    timestamp: Date.now(),
   };
 
   return {

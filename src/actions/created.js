@@ -21,6 +21,7 @@ export default function created(payload, schema) {
     meta: {
       source: JSON_API_SOURCE,
       schema,
+      timestamp: Date.now(),
     },
   };
 }

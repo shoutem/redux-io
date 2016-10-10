@@ -27,6 +27,7 @@ describe('Updated action creator', () => {
       },
     };
     const updateSuccessAction = updated(item, schema);
+    action.meta.timestamp = updateSuccessAction.meta.timestamp;
 
     expect(updateSuccessAction).to.deep.equal(action);
   });

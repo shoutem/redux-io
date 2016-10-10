@@ -50,6 +50,7 @@ describe('Update action creator', () => {
     const expectedMeta = {
       source: JSON_API_SOURCE,
       schema,
+      timestamp: types[0].meta.timestamp,
     };
     expect(types[0].type).to.equal(UPDATE_REQUEST);
     expect(types[0].meta).to.deep.equal(expectedMeta);
@@ -133,7 +134,7 @@ describe('Update action creator', () => {
         const actionCollStatusBusy = batchedUpdatingActions.payload[0];
         expect(actionCollStatusBusy.type).to.equal(REFERENCE_STATUS);
         expect(actionCollStatusBusy.meta)
-          .to.deep.equal({ ...expectedMeta, tag: '*' });
+          .to.deep.equal({ ...expectedMeta, tag: '*', timestamp: actionCollStatusBusy.meta.timestamp });
         const expectedCollStatusBusyPayload = {
           busyStatus: busyStatus.BUSY,
           validationStatus: validationStatus.INVALID,
@@ -142,24 +143,38 @@ describe('Update action creator', () => {
 
         const actionObjUpdating = batchedUpdatingActions.payload[1];
         expect(actionObjUpdating.type).to.equal(OBJECT_UPDATING);
-        expect(actionObjUpdating.meta).to.deep.equal({ ...expectedMeta, transformation: {} });
+        expect(actionObjUpdating.meta).to.deep.equal({
+          ...expectedMeta,
+          transformation: {},
+          timestamp: actionObjUpdating.meta.timestamp
+        });
         expect(actionObjUpdating.payload).to.deep.equal(item);
 
         const actionUpdateRequest = performedActions[1];
         expect(actionUpdateRequest.type).to.equal(UPDATE_REQUEST);
-        expect(actionUpdateRequest.meta).to.deep.equal(expectedMeta);
+        expect(actionUpdateRequest.meta).to.deep.equal({
+          ...expectedMeta,
+          timestamp: actionUpdateRequest.meta.timestamp,
+        });
         expect(actionUpdateRequest.payload).to.deep.equal(expectedPayload);
 
         const batchedUpdatedActions = performedActions[2];
         const actionObjUpdated = batchedUpdatedActions.payload[0];
         expect(actionObjUpdated.type).to.equal(OBJECT_UPDATED);
-        expect(actionObjUpdated.meta).to.deep.equal({ ...expectedMeta, transformation: {} });
+        expect(actionObjUpdated.meta).to.deep.equal({
+          ...expectedMeta,
+          transformation: {},
+          timestamp: actionObjUpdated.meta.timestamp,
+        });
         expect(actionObjUpdated.payload).to.deep.equal(expectedPayload.data);
 
         const actionCollStatusIdle = batchedUpdatedActions.payload[1];
         expect(actionCollStatusIdle.type).to.equal(REFERENCE_STATUS);
-        expect(actionCollStatusIdle.meta)
-          .to.deep.equal({ ...expectedMeta, tag: '*' });
+        expect(actionCollStatusIdle.meta).to.deep.equal({
+          ...expectedMeta,
+          tag: '*',
+          timestamp: actionObjUpdated.meta.timestamp,
+        });
         const expectedCollStatusIdlePayload = {
           busyStatus: busyStatus.IDLE,
           validationStatus: validationStatus.INVALID,
@@ -168,7 +183,10 @@ describe('Update action creator', () => {
 
         const successAction = performedActions[3];
         expect(successAction.type).to.equal(UPDATE_SUCCESS);
-        expect(successAction.meta).to.deep.equal(expectedMeta);
+        expect(successAction.meta).to.deep.equal({
+          ...expectedMeta,
+          timestamp: successAction.meta.timestamp,
+        });
         expect(successAction.payload).to.deep.equal(expectedPayload);
       }).then(done).catch(done);
   });

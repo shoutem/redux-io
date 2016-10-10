@@ -29,6 +29,7 @@ describe('Loaded action creator', () => {
       },
     };
     const loadSuccessAction = loaded(item, schema, tag);
+    action.meta.timestamp = loadSuccessAction.meta.timestamp;
 
     expect(loadSuccessAction).to.deep.equal(action);
   });

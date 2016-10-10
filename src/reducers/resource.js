@@ -62,7 +62,7 @@ function canHandleAction(action, schema) {
 }
 
 /**
- * Resource reducer saves any payload received with action into state, overwritting
+ * Resource reducer saves any payload received with action into state, overwriting
  * previous state. This reducer doesn't require rio middleware, and only depends on
  * rio action and redux-api-middleware.
  * @param schema is name of schema that describes data for which resource reducer
