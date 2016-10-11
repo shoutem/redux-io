@@ -7,6 +7,7 @@ import {
   validationStatus,
   busyStatus,
 } from './status';
+import Outdated from './outdated';
 
 export const CREATE_REQUEST = '@@redux_io/CREATE_REQUEST';
 export const CREATE_SUCCESS = '@@redux_io/CREATE_SUCCESS';
@@ -54,30 +55,7 @@ const actionsWithTags = new Set([
   LOAD_ERROR,
 ]);
 
-const outDateableActions = {
-  [LOAD_SUCCESS]: LOAD_SUCCESS,
-  [CREATE_SUCCESS]: CREATE_SUCCESS,
-  [UPDATE_SUCCESS]: UPDATE_SUCCESS,
-  [REMOVE_SUCCESS]: REMOVE_SUCCESS,
-};
-
-const timestamps = {};
-function markChange(action) {
-  const { schema, timestamp } = action.meta;
-  timestamps[schema] = timestamp;
-}
-function isOutdated(action) {
-  const { schema, timestamp } = action.meta;
-
-  if (!outDateableActions[action.type]) {
-    return false;
-  }
-  if (!timestamps[schema]) {
-    return false;
-  }
-
-  return timestamps[schema] > timestamp;
-}
+const outdated = new Outdated();
 
 function makeErrorAction(actionType, errorPayload) {
   return {
@@ -188,7 +166,6 @@ const actionHandlers = {
   [CREATE_REQUEST]: (action, data, dispatch) => {
     // Change collection status to busy and invalid to prevent fetching.
     const schema = action.meta.schema;
-    markChange(action);
     dispatch(makeIndexAction(
       action,
       REFERENCE_STATUS,
@@ -224,7 +201,6 @@ const actionHandlers = {
     // Change collection status to busy and invalid to prevent fetching and because of
     // local changes in storage state with updated item.
     const schema = action.meta.schema;
-    markChange(action);
     dispatch(makeIndexAction(
       action,
       REFERENCE_STATUS,
@@ -261,7 +237,6 @@ const actionHandlers = {
     // Change collections status to busy and invalid because of removing item in
     // local storage state
     const schema = action.meta.schema;
-    markChange(action);
     dispatch(makeIndexAction(
       action,
       REFERENCE_STATUS,
@@ -370,9 +345,11 @@ export default store => next => action => {
   if (!isValidAction(action)) {
     return next(action);
   }
-  if (isOutdated(action)) {
+
+  if (outdated.isOutdated(action)) {
     return next(action);
   }
+  outdated.reportChange(action);
 
   // TODO: add standardization of whole payload once we support json standardization
 

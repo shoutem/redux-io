@@ -24,9 +24,10 @@ export const createStatus = (description = {}) => (
   }
 );
 
-export const updateStatus = (status, update) => (
-  _.merge({}, status, update, { modifiedTimestamp: Date.now() })
-);
+export const updateStatus = (status, update, markChange = true) => {
+  const timestamp = markChange ? { modifiedTimestamp: Date.now() } : {};
+  return _.merge({}, status, update, timestamp);
+};
 
 export const setStatus = (obj, status) => {
   if (_.has(obj, STATUS)) {
@@ -41,12 +42,11 @@ export const setStatus = (obj, status) => {
   }
 };
 
-export const cloneStatus = (sourceObject, destinationObject) => {
+export const cloneStatus = (sourceObject, destinationObject, markChange = false) => {
   if (!sourceObject[STATUS]) {
     return;
   }
-  // eslint-disable-next-line no-param-reassign
-  setStatus(destinationObject, _.merge({}, sourceObject[STATUS]));
+  setStatus(destinationObject, updateStatus(sourceObject[STATUS], {}, markChange));
 };
 
 function statusProp(obj, prop) {

@@ -14,7 +14,6 @@ import {
   REMOVE_ERROR,
   REFERENCE_CLEAR,
 } from './../middleware';
-
 import {
   STATUS,
   validationStatus,
@@ -23,6 +22,7 @@ import {
   updateStatus,
   setStatus,
 } from './../status';
+import Outdated from './../outdated';
 
 function createDefaultStatus(schema) {
   return updateStatus(
@@ -73,10 +73,16 @@ function canHandleAction(action, schema) {
 export default function resource(schema, initialState = {}) {
   // eslint-disable-next-line no-param-reassign
   setStatus(initialState, createDefaultStatus(schema));
+  const outdated = new Outdated();
+
   return (state = initialState, action) => {
     if (!canHandleAction(action, schema)) {
       return state;
     }
+    if (outdated.isOutdated(action)) {
+      return state;
+    }
+    outdated.reportChange(action);
 
     const payload = action.payload;
     const needsPayload = !actionsWithoutPayload.has(action.type);
