@@ -5,7 +5,6 @@ import { RSAA, apiMiddleware } from 'redux-api-middleware';
 import configureMockStore from 'redux-mock-store';
 import thunk from 'redux-thunk';
 import rio, {
-  find,
   LOAD_REQUEST,
   LOAD_SUCCESS,
   LOAD_ERROR,
@@ -18,6 +17,7 @@ import rio, {
 import {
   busyStatus,
 } from '../../src/status';
+import  { find } from '../../src/actions/find';
 
 describe('Find action creator', () => {
   const middlewares = [thunk, apiMiddleware, apiStateMiddleware];

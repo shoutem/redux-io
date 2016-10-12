@@ -5,7 +5,6 @@ import { RSAA, apiMiddleware } from 'redux-api-middleware';
 import configureMockStore from 'redux-mock-store';
 import thunk from 'redux-thunk';
 import {
-  create,
   CREATE_REQUEST,
   CREATE_SUCCESS,
   CREATE_ERROR,
@@ -18,6 +17,7 @@ import {
   validationStatus,
   busyStatus,
 } from '../../src/status';
+import  { create } from '../../src/actions/create';
 
 describe('Create action creator', () => {
   const middlewares = [thunk, apiMiddleware, apiStateMiddleware];

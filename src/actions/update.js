@@ -6,6 +6,7 @@ import {
   UPDATE_ERROR,
 } from './../middleware';
 import { JSON_API_SOURCE } from './..';
+import thunkAction from './_thunkAction';
 
 /**
  * Action creator used to update item on api (POST). Tag is not needed because all collections
@@ -18,7 +19,7 @@ import { JSON_API_SOURCE } from './..';
  * @param item holds object that you want to pass to api
  * @returns {{}}
  */
-export default function update(config, schema, item) {
+export function update(config, schema, item) {
   if (!_.isObject(config)) {
     throw new TypeError('Config isn\'t object.');
   }
@@ -63,3 +64,5 @@ export default function update(config, schema, item) {
     },
   };
 }
+
+export default thunkAction(update);

@@ -1,9 +1,9 @@
 import { expect } from 'chai';
 import {
   UPDATE_SUCCESS,
-  updated,
   JSON_API_SOURCE,
 } from '../../src';
+import  { updated } from '../../src/actions/updated';
 
 describe('Updated action creator', () => {
   it('updated valid action', () => {

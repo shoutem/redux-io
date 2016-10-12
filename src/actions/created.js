@@ -3,8 +3,9 @@ import {
   CREATE_SUCCESS,
 } from './../middleware';
 import { JSON_API_SOURCE } from './..';
+import thunkAction from './_thunkAction';
 
-export default function created(payload, schema) {
+export function created(payload, schema) {
   if (!_.isPlainObject(payload)) {
     throw new Error('Invalid payload type.');
   }
@@ -25,3 +26,5 @@ export default function created(payload, schema) {
     },
   };
 }
+
+export default thunkAction(created);

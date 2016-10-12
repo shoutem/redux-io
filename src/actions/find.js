@@ -7,6 +7,7 @@ import {
 } from './../middleware';
 import { JSON_API_SOURCE } from './..';
 import { buildEndpoint, resolveConfig } from './../schemaConfig';
+import thunkAction from './_thunkAction';
 
 /**
  * If this options key is set to true, the data will be
@@ -46,7 +47,7 @@ function buildRSAAConfig(config) {
  * as query params key=value
  * @returns action
  */
-export default function find(schema, tag = '', params = {}, options = {}) {
+export function find(schema, tag = '', params = {}, options = {}) {
   const config = resolveConfig(schema);
   if (!config) {
     const schemaName = schema && _.isObject(schema) ? schema.schema : schema;
@@ -94,3 +95,5 @@ export default function find(schema, tag = '', params = {}, options = {}) {
     },
   };
 }
+
+export default thunkAction(find);

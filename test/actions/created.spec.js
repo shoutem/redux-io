@@ -1,9 +1,9 @@
 import { expect } from 'chai';
 import {
   CREATE_SUCCESS,
-  created,
   JSON_API_SOURCE,
 } from '../../src';
+import  { created } from '../../src/actions/created';
 
 describe('Created action creator', () => {
   it('creates valid action', () => {

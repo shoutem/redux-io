@@ -6,6 +6,7 @@ import {
   REMOVE_ERROR,
 } from './../middleware';
 import { JSON_API_SOURCE } from './..';
+import thunkAction from './_thunkAction';
 
 /**
  * Action creator used to delete item on api (DELETE). Tag is not needed because all collection
@@ -18,7 +19,7 @@ import { JSON_API_SOURCE } from './..';
  * @param item to remove/delete
  * @returns {{}}
  */
-export default function remove(config, schema, item) {
+export function remove(config, schema, item) {
   if (!_.isObject(config)) {
     throw new TypeError('Config isn\'t object.');
   }
@@ -61,3 +62,5 @@ export default function remove(config, schema, item) {
     },
   };
 }
+
+export default thunkAction(remove);

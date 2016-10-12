@@ -6,7 +6,6 @@ import configureMockStore from 'redux-mock-store';
 import thunk from 'redux-thunk';
 import { NO_MORE_RESULTS } from '../../src/actions/next';
 import rio, {
-  next,
   LOAD_REQUEST,
   LOAD_SUCCESS,
   LOAD_ERROR,
@@ -16,6 +15,7 @@ import rio, {
 } from '../../src';
 import { setStatus, updateStatus, getStatus } from '../../src/status';
 import { APPEND_MODE, RESOLVED_ENDPOINT } from '../../src/actions/find';
+import  { next } from '../../src/actions/next';
 
 describe('Next action creator', () => {
   const middlewares = [thunk, apiMiddleware, apiStateMiddleware];

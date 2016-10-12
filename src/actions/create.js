@@ -6,6 +6,7 @@ import {
   CREATE_ERROR,
 } from './../middleware';
 import { JSON_API_SOURCE } from './..';
+import thunkAction from './_thunkAction';
 
 /**
  * Action creator used to create item on api (POST). Tag is not needed because all collection
@@ -15,9 +16,9 @@ import { JSON_API_SOURCE } from './..';
  * allowing full customization expect types part of configuration
  * @param schema defines what reducers will listen for creation of new item
  * @param item holds object that you want to pass to api
- * @returns {{}}
+ * @returns {function}
  */
-export default function create(config, schema, item = null) {
+export function create(config, schema, item = null) {
   if (!_.isObject(config)) {
     throw new TypeError('Config isn\'t an object.');
   }
@@ -70,3 +71,5 @@ export default function create(config, schema, item = null) {
     },
   };
 }
+
+export default thunkAction(create);

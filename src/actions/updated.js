@@ -3,8 +3,9 @@ import {
   UPDATE_SUCCESS,
 } from './../middleware';
 import { JSON_API_SOURCE } from './..';
+import thunkAction from './_thunkAction';
 
-export default function updated(payload, schema) {
+export function updated(payload, schema) {
   if (!_.isPlainObject(payload)) {
     throw new Error('Invalid payload type.');
   }
@@ -30,3 +31,5 @@ export default function updated(payload, schema) {
     },
   };
 }
+
+export default thunkAction(updated);

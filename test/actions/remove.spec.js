@@ -5,7 +5,6 @@ import { RSAA, apiMiddleware } from 'redux-api-middleware';
 import configureMockStore from 'redux-mock-store';
 import thunk from 'redux-thunk';
 import {
-  remove,
   REMOVE_REQUEST,
   REMOVE_SUCCESS,
   REMOVE_ERROR,
@@ -19,6 +18,7 @@ import {
   validationStatus,
   busyStatus,
 } from '../../src/status';
+import  { remove } from '../../src/actions/remove';
 
 describe('Delete action creator', () => {
   const middlewares = [thunk, apiMiddleware, apiStateMiddleware];
