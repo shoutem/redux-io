@@ -13,7 +13,7 @@ import {
   REMOVE_SUCCESS,
   REMOVE_ERROR,
   REFERENCE_CLEAR,
-} from './../middleware';
+} from './../consts';
 import {
   STATUS,
   validationStatus,

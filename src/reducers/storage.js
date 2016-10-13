@@ -6,7 +6,7 @@ import {
   OBJECT_UPDATED,
   OBJECT_REMOVING,
   OBJECT_REMOVED,
-} from './../middleware';
+} from './../consts';
 import {
   STATUS,
   validationStatus,

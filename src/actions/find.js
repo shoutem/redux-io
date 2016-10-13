@@ -4,7 +4,7 @@ import {
   LOAD_REQUEST,
   LOAD_SUCCESS,
   LOAD_ERROR,
-} from './../middleware';
+} from './../consts';
 import { JSON_API_SOURCE } from './..';
 import { buildEndpoint, resolveConfig } from './../schemaConfig';
 import thunkAction from './_thunkAction';

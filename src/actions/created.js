@@ -1,7 +1,7 @@
 import _ from 'lodash';
 import {
   CREATE_SUCCESS,
-} from './../middleware';
+} from './../consts';
 import { JSON_API_SOURCE } from './..';
 import thunkAction from './_thunkAction';
 

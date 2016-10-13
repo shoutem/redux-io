@@ -6,7 +6,7 @@ import {
   CREATE_REQUEST,
   UPDATE_REQUEST,
   REMOVE_REQUEST,
-} from './middleware';
+} from './consts';
 
 const outDateableActions = {
   [LOAD_SUCCESS]: LOAD_SUCCESS,

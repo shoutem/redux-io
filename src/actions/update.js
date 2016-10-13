@@ -4,7 +4,7 @@ import {
   UPDATE_REQUEST,
   UPDATE_SUCCESS,
   UPDATE_ERROR,
-} from './../middleware';
+} from './../consts';
 import { JSON_API_SOURCE } from './..';
 import thunkAction from './_thunkAction';
 

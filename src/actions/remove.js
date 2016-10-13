@@ -4,7 +4,7 @@ import {
   REMOVE_REQUEST,
   REMOVE_SUCCESS,
   REMOVE_ERROR,
-} from './../middleware';
+} from './../consts';
 import { JSON_API_SOURCE } from './..';
 import thunkAction from './_thunkAction';
 

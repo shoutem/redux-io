@@ -84,7 +84,7 @@ export {
   REFERENCE_FETCHED,
   REFERENCE_STATUS,
   REFERENCE_CLEAR,
-} from './middleware';
+} from './consts';
 
 export {
   isValid,

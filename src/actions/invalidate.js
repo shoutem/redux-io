@@ -1,7 +1,7 @@
 import _ from 'lodash';
 import {
   REFERENCE_STATUS,
-} from './../middleware';
+} from './../consts';
 import {
   validationStatus,
 } from './../status';

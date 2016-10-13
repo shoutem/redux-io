@@ -3,7 +3,7 @@ import {
   REFERENCE_FETCHED,
   REFERENCE_STATUS,
   REFERENCE_CLEAR,
-} from './../middleware';
+} from './../consts';
 import {
   STATUS,
   validationStatus,
