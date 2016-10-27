@@ -3,7 +3,7 @@ import {
   CREATE_SUCCESS,
   JSON_API_SOURCE,
 } from '../../src';
-import  { created } from '../../src/actions/created';
+import created from '../../src/actions/created';
 
 describe('Created action creator', () => {
   it('creates valid action', () => {

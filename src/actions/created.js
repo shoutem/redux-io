@@ -3,9 +3,8 @@ import {
   CREATE_SUCCESS,
 } from './../consts';
 import { JSON_API_SOURCE } from './..';
-import thunkAction from './_thunkAction';
 
-export function created(payload, schema) {
+export default function created(payload, schema) {
   if (!_.isPlainObject(payload)) {
     throw new Error('Invalid payload type.');
   }
@@ -26,5 +25,3 @@ export function created(payload, schema) {
     },
   };
 }
-
-export default thunkAction(created);

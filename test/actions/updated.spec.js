@@ -3,7 +3,7 @@ import {
   UPDATE_SUCCESS,
   JSON_API_SOURCE,
 } from '../../src';
-import  { updated } from '../../src/actions/updated';
+import updated from '../../src/actions/updated';
 
 describe('Updated action creator', () => {
   it('updated valid action', () => {

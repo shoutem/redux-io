@@ -1,6 +1,6 @@
 import { expect } from 'chai';
 import { REFERENCE_CLEAR } from '../../src';
-import  { clear } from '../../src/actions/clear';
+import  clear from '../../src/actions/clear';
 
 describe('Clear action creator', () => {
   it('creates valid action', () => {

@@ -269,6 +269,7 @@ describe('Collection reducer', () => {
     const schema = 'schema_test';
     const tag = 'tag_value';
     const reducer = collection(schema, tag, initialState);
+    initialState[STATUS].validationStatus = validationStatus.VALID;
     deepFreeze(initialState);
 
     const action = {
@@ -397,6 +398,31 @@ describe('Collection reducer', () => {
     ];
     const schema = 'schema_test';
     const reducer = collection(schema, '', initialState);
+    initialState[STATUS].validationStatus = validationStatus.VALID;
+    deepFreeze(initialState);
+
+    const action = {
+      type: REFERENCE_STATUS,
+      meta: {
+        schema,
+        tag: '*',
+      },
+      payload: { validationStatus: validationStatus.INVALID },
+    };
+    const nextState = reducer(undefined, action);
+    expect(nextState[STATUS].validationStatus).to.eql(validationStatus.INVALID);
+
+    nextState[STATUS] = initialState[STATUS];
+    expect(nextState).to.deep.eql(initialState);
+  });
+
+  it('cannot invalidate un-initialized collection', () => {
+    const initialState =  [
+      { id: 1 },
+      { id: 2 },
+    ];
+    const schema = 'schema_test';
+    const reducer = collection(schema, '', initialState);
     deepFreeze(initialState);
 
     const action = {
@@ -409,7 +435,7 @@ describe('Collection reducer', () => {
     };
     const nextState = reducer(undefined, action);
 
-    expect(nextState[STATUS].validationStatus).to.eql(validationStatus.INVALID);
+    expect(nextState[STATUS].validationStatus).to.eql(validationStatus.NONE);
 
     nextState[STATUS] = initialState[STATUS];
     expect(nextState).to.deep.eql(initialState);

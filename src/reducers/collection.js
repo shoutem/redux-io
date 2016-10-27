@@ -12,6 +12,7 @@ import {
   createStatus,
   updateStatus,
   setStatus,
+  isInitialized,
 } from './../status';
 import { APPEND_MODE } from '../actions/find';
 
@@ -124,10 +125,32 @@ export default function collection(schema, tag = '', initialState = []) {
       }
       case REFERENCE_STATUS: {
         const newState = [...state];
+        const statusChange = action.payload;
+
         setStatus(newState, updateStatus(
           state[STATUS],
-          action.payload
+          {
+            ...statusChange,
+          }
         ));
+
+        // un-initialized collection should stay un-initialized on invalidation
+        if (statusChange.validationStatus !== validationStatus.INVALID) {
+          return newState;
+        }
+        if (isInitialized(state)) {
+          return newState;
+        }
+
+        // in case of invalidation of un-initialized collection return validation
+        // status to un-initialized
+        setStatus(newState, updateStatus(
+          newState[STATUS],
+          {
+            validationStatus: validationStatus.NONE,
+          }
+        ));
+
         return newState;
       }
       default: {

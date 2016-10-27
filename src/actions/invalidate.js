@@ -5,9 +5,8 @@ import {
 import {
   validationStatus,
 } from './../status';
-import thunkAction from './_thunkAction';
 
-export function invalidate(schema) {
+export default function invalidate(schema) {
   if (!_.isString(schema)) {
     throw new Error(`Invalid schema, "invalidate" expected a string but got: ${JSON.stringify(schema)}`);
   }
@@ -23,5 +22,3 @@ export function invalidate(schema) {
     },
   };
 }
-
-export default thunkAction(invalidate);

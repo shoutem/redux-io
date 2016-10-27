@@ -3,7 +3,7 @@ import { REFERENCE_STATUS } from '../../src';
 import {
   validationStatus
 } from '../../src/status';
-import { invalidate } from '../../src/actions/invalidate';
+import invalidate from '../../src/actions/invalidate';
 
 describe('Invalidate action creator', () => {
   it('creates valid action', () => {

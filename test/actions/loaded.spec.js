@@ -3,7 +3,7 @@ import {
   LOAD_SUCCESS,
   JSON_API_SOURCE,
 } from '../../src';
-import  { loaded } from '../../src/actions/loaded';
+import loaded from '../../src/actions/loaded';
 
 describe('Loaded action creator', () => {
   it('creates valid action', () => {
