@@ -60,7 +60,7 @@ function createDefaultStatus(schema) {
  */
 export default function one(schema, tag = '', initialValue = '') {
   if (tag === '*') {
-    throw new Error('Tag value \'*\' is reserved for redux-api-state and cannot be used.');
+    throw new Error('Tag value \'*\' is reserved for redux-io and cannot be used.');
   }
   // eslint-disable-next-line no-param-reassign
   const initialState = { value: initialValue };

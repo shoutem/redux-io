@@ -232,7 +232,7 @@ describe('One reducer', () => {
     const schema = 'schema_test';
     const tag = '*';
     expect(() => one(schema, tag, initialValue))
-      .to.throw('Tag value \'*\' is reserved for redux-api-state and cannot be used.');
+      .to.throw('Tag value \'*\' is reserved for redux-io and cannot be used.');
   });
 
   it('clears one', () => {
