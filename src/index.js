@@ -60,6 +60,9 @@ export { getCollection };
 import { getOne } from './denormalizer/getOne';
 export { getOne };
 
+import { createCacheSettings, isCacheValid } from './cache/timeCache';
+export { createCacheSettings, isCacheValid };
+
 export { normalizeItem, normalizeCollection } from './normalizer';
 
 export {
