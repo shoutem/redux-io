@@ -332,7 +332,7 @@ describe('Collection reducer', () => {
     const schema = 'schema_test';
     const tag = '*';
     expect(() => collection(schema, tag, initialState))
-      .to.throw('Tag value \'*\' is reserved for redux-api-state and cannot be used.');
+      .to.throw('Tag value \'*\' is reserved for redux-io and cannot be used.');
   });
 
   it('clears collection', () => {
@@ -439,5 +439,17 @@ describe('Collection reducer', () => {
 
     nextState[STATUS] = initialState[STATUS];
     expect(nextState).to.deep.eql(initialState);
+  });
+
+  it('sets collection additional settings to status', () => {
+    const settingValue = 1000;
+    const reducer = collection('schema', 'tag', undefined, { setting: settingValue });
+    const state = reducer(undefined, {});
+    const collectionStatus = state[STATUS];
+    expect(collectionStatus.setting).to.equal(settingValue);
+    expect(collectionStatus.id).to.be.ok;
+    expect(collectionStatus.tag).to.be.ok;
+    expect(collectionStatus.schema).to.be.ok;
+    expect(collectionStatus.type).to.be.ok;
   });
 });
