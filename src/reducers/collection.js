@@ -85,6 +85,7 @@ function handleReferencePayload(action, state = []) {
  * of data.
  * @param initialState is initial state of reducer, can be array or object.
  * @param settings - optional status data, must be object.
+ *  RIO settings { expirationTime: milliseconds }
  * @returns {Function}
  */
 export default function collection(schema, tag = '', initialState = [], settings = {}) {

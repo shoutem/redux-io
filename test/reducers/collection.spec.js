@@ -441,7 +441,7 @@ describe('Collection reducer', () => {
     expect(nextState).to.deep.eql(initialState);
   });
 
-  it('sets collection additional settings to status', () => {
+  it('sets additional settings to status', () => {
     const settingValue = 1000;
     const reducer = collection('schema', 'tag', undefined, { setting: settingValue });
     const state = reducer(undefined, {});
