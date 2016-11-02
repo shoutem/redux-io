@@ -324,7 +324,7 @@ describe('Status metadata', () => {
       it('return false for valid cache', () => {
         const expirationTime = 1000;
         const reducer =
-          collection('schema', 'tag', undefined, { expirationTime });
+          collection('schema', 'tag', { expirationTime });
         const state = reducer(undefined, {});
         const stateStatus = state[STATUS];
         stateStatus.modificationTimestamp = Date.now();
@@ -333,7 +333,7 @@ describe('Status metadata', () => {
       it('return true for invalid cache', () => {
         const expirationTime = 1000;
         const reducer =
-          collection('schema', 'tag', undefined, { expirationTime });
+          collection('schema', 'tag', { expirationTime });
         const state = reducer(undefined, {});
         const stateStatus = state[STATUS];
         // Fake modification like it is past expirationTime

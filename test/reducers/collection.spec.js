@@ -37,7 +37,7 @@ describe('Collection reducer', () => {
 
     const schema = 'schema_test';
     const tag = 'tag_test';
-    const reducer = collection(schema, tag, initialState);
+    const reducer = collection(schema, tag, undefined, initialState);
     deepFreeze(initialState);
 
     const action = {
@@ -121,7 +121,7 @@ describe('Collection reducer', () => {
     ];
     const schema = 'schema_test';
     const tag = 'tag_test';
-    const reducer = collection(schema, tag, initialState);
+    const reducer = collection(schema, tag, undefined, initialState);
     deepFreeze(initialState);
 
     const action = {
@@ -147,7 +147,7 @@ describe('Collection reducer', () => {
     ];
     const schema = 'schema_test';
     const tag = 'tag_test';
-    const reducer = collection(schema, tag, initialState);
+    const reducer = collection(schema, tag, undefined, initialState);
     deepFreeze(initialState);
 
     const action = {
@@ -173,7 +173,7 @@ describe('Collection reducer', () => {
     ];
     const schema = 'schema_test';
     const tag = 'tag_test';
-    const reducer = collection(schema, tag, initialState);
+    const reducer = collection(schema, tag, undefined, initialState);
     deepFreeze(initialState);
 
     const action = {
@@ -199,7 +199,7 @@ describe('Collection reducer', () => {
     const initialState = items;
     const schema = 'schema_test';
     const tag = 'tag_test';
-    const reducer = collection(schema, tag, initialState);
+    const reducer = collection(schema, tag, undefined, initialState);
     deepFreeze(initialState);
 
     const itemsNew = [
@@ -232,7 +232,7 @@ describe('Collection reducer', () => {
 
     const schema = 'schema_test';
     const tag = 'tag_test';
-    const reducer = collection(schema, tag, initialState);
+    const reducer = collection(schema, tag, undefined, initialState);
     deepFreeze(initialState);
 
     const params = {
@@ -268,7 +268,7 @@ describe('Collection reducer', () => {
     const initialState = items;
     const schema = 'schema_test';
     const tag = 'tag_value';
-    const reducer = collection(schema, tag, initialState);
+    const reducer = collection(schema, tag, undefined, initialState);
     initialState[STATUS].validationStatus = validationStatus.VALID;
     deepFreeze(initialState);
 
@@ -298,9 +298,9 @@ describe('Collection reducer', () => {
     const initialState = items;
     const schema = 'schema_test';
     const tag = 'tag_test';
-    const reducer = collection(schema, tag, initialState);
+    const reducer = collection(schema, tag, undefined, initialState);
     const otherTag = 'other_tag';
-    const otherReducer = collection(schema, otherTag, initialState);
+    const otherReducer = collection(schema, otherTag, undefined, initialState);
     deepFreeze(initialState);
 
     const action = {
@@ -331,7 +331,7 @@ describe('Collection reducer', () => {
     const initialState = items;
     const schema = 'schema_test';
     const tag = '*';
-    expect(() => collection(schema, tag, initialState))
+    expect(() => collection(schema, tag, undefined, initialState))
       .to.throw('Tag value \'*\' is reserved for redux-io and cannot be used.');
   });
 
@@ -352,7 +352,7 @@ describe('Collection reducer', () => {
       },
     };
 
-    const reducer = collection(schema, tag, initialState);
+    const reducer = collection(schema, tag, undefined, initialState);
     deepFreeze(initialState);
     const nextState = reducer(undefined, action);
 
@@ -369,7 +369,7 @@ describe('Collection reducer', () => {
     ];
     const schema = 'schema_test';
     const tag = 'tag_test';
-    const reducer = collection(schema, tag, initialState);
+    const reducer = collection(schema, tag, undefined, initialState);
     deepFreeze(initialState);
 
     const action = {
@@ -397,7 +397,7 @@ describe('Collection reducer', () => {
       { id: 2 },
     ];
     const schema = 'schema_test';
-    const reducer = collection(schema, '', initialState);
+    const reducer = collection(schema, '', undefined, initialState);
     initialState[STATUS].validationStatus = validationStatus.VALID;
     deepFreeze(initialState);
 
@@ -422,7 +422,7 @@ describe('Collection reducer', () => {
       { id: 2 },
     ];
     const schema = 'schema_test';
-    const reducer = collection(schema, '', initialState);
+    const reducer = collection(schema, '', undefined, initialState);
     deepFreeze(initialState);
 
     const action = {
@@ -443,7 +443,7 @@ describe('Collection reducer', () => {
 
   it('sets additional settings to status', () => {
     const settingValue = 1000;
-    const reducer = collection('schema', 'tag', undefined, { setting: settingValue });
+    const reducer = collection('schema', 'tag', { setting: settingValue });
     const state = reducer(undefined, {});
     const collectionStatus = state[STATUS];
     expect(collectionStatus.setting).to.equal(settingValue);
