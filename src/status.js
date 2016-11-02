@@ -73,3 +73,13 @@ export const shouldRefresh = (obj, ignoreError = false) =>
   !isValid(obj) && !isBusy(obj) && (!isError(obj) || ignoreError);
 
 export const getId = obj => statusProp(obj, 'id');
+
+export function isExpired(reference) {
+  const { expirationTime, modificationTimestamp } = getStatus(reference);
+  if (!expirationTime) {
+    console.warn('You are validating Cache reference without configured expirationTime.', reference);
+    return true;
+  }
+  const referenceLifetime = Date.now() - modificationTimestamp;
+  return expirationTime < referenceLifetime;
+}
