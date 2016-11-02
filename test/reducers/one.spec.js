@@ -284,4 +284,14 @@ describe('One reducer', () => {
     expect(nextState[STATUS].schema).to.eql(schema);
     expect(nextState[STATUS].type).to.eql('one');
   });
+  it('sets additional settings to status', () => {
+    const settingValue = 1000;
+    const reducer = one('schema', undefined, undefined, { setting: settingValue });
+    const state = reducer(undefined, {});
+    const oneStatus = state[STATUS];
+    expect(oneStatus.setting).to.equal(settingValue);
+    expect(oneStatus.id).to.be.ok;
+    expect(oneStatus.schema).to.be.ok;
+    expect(oneStatus.type).to.be.ok;
+  });
 });
