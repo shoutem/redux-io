@@ -83,12 +83,12 @@ function handleReferencePayload(action, state = []) {
  * rio action. Tag enable to have multiple collections for same schema. It's important
  * if you want to have normalized state and instances in one place, but different collections
  * of data.
- * @param initialState is initial state of reducer, can be array or object.
  * @param settings - optional status data, must be object.
  *  RIO settings { expirationTime: milliseconds }
+ * @param initialState is initial state of reducer, can be array or object.
  * @returns {Function}
  */
-export default function collection(schema, tag = '', initialState = [], settings = {}) {
+export default function collection(schema, tag = '', settings = {}, initialState = []) {
   if (tag === '*') {
     throw new Error('Tag value \'*\' is reserved for redux-io and cannot be used.');
   }
