@@ -84,7 +84,7 @@ function handleReferencePayload(action, state = []) {
  * if you want to have normalized state and instances in one place, but different collections
  * of data.
  * @param settings - optional status data, must be object.
- *  RIO settings { expirationTime: milliseconds }
+ *  RIO settings { expirationTime: seconds }
  * @param initialState is initial state of reducer, can be array or object.
  * @returns {Function}
  */
