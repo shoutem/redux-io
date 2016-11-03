@@ -322,22 +322,31 @@ describe('Status metadata', () => {
   describe('Time Cache', () => {
     describe('isExpired', () => {
       it('return false for valid cache', () => {
-        const expirationTime = 1000;
-        const reducer =
-          collection('schema', 'tag', { expirationTime });
+        const expirationTime = 60;
+        const reducer = collection('schema', 'tag', { expirationTime });
         const state = reducer(undefined, {});
         const stateStatus = state[STATUS];
         stateStatus.modificationTimestamp = Date.now();
         expect(isExpired(state)).to.not.be.ok;
       });
       it('return true for invalid cache', () => {
-        const expirationTime = 1000;
-        const reducer =
-          collection('schema', 'tag', { expirationTime });
+        const expirationTime = 60;
+        const reducer = collection('schema', 'tag', { expirationTime });
         const state = reducer(undefined, {});
         const stateStatus = state[STATUS];
         // Fake modification like it is past expirationTime
-        stateStatus.modificationTimestamp = Date.now() - (expirationTime + 1);
+        // Convert expirationTime to milliseconds (multiply with 1000)
+        stateStatus.modificationTimestamp = Date.now() - (expirationTime * 1000 + 1);
+        expect(isExpired(state)).to.be.ok;
+      });
+      it('expects expirationTime in milliseconds', () => {
+        const expirationTime = 60;
+        const reducer = collection('schema', 'tag', { expirationTime });
+        const state = reducer(undefined, {});
+        const stateStatus = state[STATUS];
+        stateStatus.modificationTimestamp = Date.now() - (expirationTime * 1000);
+        expect(isExpired(state)).to.be.not.ok;
+        stateStatus.modificationTimestamp = Date.now() - (expirationTime * 1000 + 1);
         expect(isExpired(state)).to.be.ok;
       });
     });
