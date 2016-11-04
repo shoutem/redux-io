@@ -152,6 +152,39 @@ describe('Status metadata', () => {
     expect(shouldRefresh(obj)).to.be.true;
   });
 
+  it('shouldRefresh returns false if not valid but not expired', () => {
+    const expirationTime = 60;
+    const status = updateStatus(
+      createStatus(),
+      {
+        busyStatus: busyStatus.IDLE,
+        validationStatus: validationStatus.INVALID,
+        expirationTime,
+      }
+    );
+    const obj = {};
+    setStatus(obj, status);
+
+    expect(shouldRefresh(obj)).to.be.false;
+  });
+
+  it('shouldRefresh returns true if not valid and expired', () => {
+    const expirationTime = 60;
+    const status = updateStatus(
+      createStatus(),
+      {
+        busyStatus: busyStatus.IDLE,
+        validationStatus: validationStatus.INVALID,
+        expirationTime,
+      }
+    );
+    status.modifiedTimestamp = Date.now() - (expirationTime * 1000 + 10);
+    const obj = {};
+    setStatus(obj, status);
+
+    expect(shouldRefresh(obj)).to.be.true;
+  });
+
   it('shouldRefresh returns correct value on busy,invalid', () => {
     const status = updateStatus(
       createStatus(),
@@ -319,14 +352,14 @@ describe('Status metadata', () => {
     expect(newObj[STATUS]).to.be.undefined;
   });
 
-  describe('Time Cache', () => {
+  describe('Expiration', () => {
     describe('isExpired', () => {
       it('return false for valid cache', () => {
         const expirationTime = 60;
         const reducer = collection('schema', 'tag', { expirationTime });
         const state = reducer(undefined, {});
         const stateStatus = state[STATUS];
-        stateStatus.modificationTimestamp = Date.now();
+        stateStatus.modifiedTimestamp = Date.now();
         expect(isExpired(state)).to.not.be.ok;
       });
       it('return true for invalid cache', () => {
@@ -336,7 +369,7 @@ describe('Status metadata', () => {
         const stateStatus = state[STATUS];
         // Fake modification like it is past expirationTime
         // Convert expirationTime to milliseconds (multiply with 1000)
-        stateStatus.modificationTimestamp = Date.now() - (expirationTime * 1000 + 1);
+        stateStatus.modifiedTimestamp = Date.now() - (expirationTime * 1000 + 1);
         expect(isExpired(state)).to.be.ok;
       });
       it('expects expirationTime in milliseconds', () => {
@@ -344,9 +377,9 @@ describe('Status metadata', () => {
         const reducer = collection('schema', 'tag', { expirationTime });
         const state = reducer(undefined, {});
         const stateStatus = state[STATUS];
-        stateStatus.modificationTimestamp = Date.now() - (expirationTime * 1000);
+        stateStatus.modifiedTimestamp = Date.now() - (expirationTime * 1000);
         expect(isExpired(state)).to.be.not.ok;
-        stateStatus.modificationTimestamp = Date.now() - (expirationTime * 1000 + 1);
+        stateStatus.modifiedTimestamp = Date.now() - (expirationTime * 1000 + 1);
         expect(isExpired(state)).to.be.ok;
       });
     });
