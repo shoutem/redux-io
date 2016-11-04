@@ -75,7 +75,7 @@ export const shouldRefresh = (obj, ignoreError = false) => {
     return isExpired(obj) && noError;
   }
   return !isValid(obj) && !isBusy(obj) && noError;
-}
+};
 
 export const getId = obj => statusProp(obj, 'id');
 
