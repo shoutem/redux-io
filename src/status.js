@@ -90,7 +90,7 @@ export function isExpired(reference) {
     return false;
   }
   const referenceLifetime = Date.now() - modifiedTimestamp;
-  // TODO(Braco)
+  // TODO
   // When `expiration` becomes rio plugin, save milliseconds in the status to avoid conversation
   return expirationTime * 1000 < referenceLifetime;
 }
