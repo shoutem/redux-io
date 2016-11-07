@@ -1,6 +1,7 @@
 /* eslint-disable no-unused-expressions */
 import { expect } from 'chai';
 import deepFreeze from 'deep-freeze';
+import sinon from 'sinon';
 import {
   createStatus,
   updateStatus,
@@ -361,6 +362,20 @@ describe('Status metadata', () => {
         const stateStatus = state[STATUS];
         stateStatus.modifiedTimestamp = Date.now();
         expect(isExpired(state)).to.not.be.ok;
+      });
+      it('return false when no expirationTime defined', () => {
+        sinon.spy(console, 'warn');
+
+        const reducer = collection('schema', 'tag');
+        const state = reducer(undefined, {});
+        const stateStatus = state[STATUS];
+        stateStatus.modifiedTimestamp = Date.now();
+
+        expect(isExpired(state)).to.not.be.ok;
+        // Warning will be shown if checking expiration on object that doesn't have it
+        expect(console.warn.calledOnce).to.ok;
+
+        console.warn.restore();
       });
       it('return true for invalid cache', () => {
         const expirationTime = 60;

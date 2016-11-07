@@ -87,7 +87,7 @@ export function isExpired(reference) {
   const { expirationTime, modifiedTimestamp } = getStatus(reference);
   if (!expirationTime) {
     console.warn('You are validating Cache reference without configured expirationTime.', reference);
-    return true;
+    return false;
   }
   const referenceLifetime = Date.now() - modifiedTimestamp;
   // TODO(Braco)
