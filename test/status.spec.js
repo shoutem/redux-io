@@ -153,7 +153,7 @@ describe('Status metadata', () => {
     expect(shouldRefresh(obj)).to.be.true;
   });
 
-  it('shouldRefresh returns false if not valid but not expired', () => {
+  it('shouldRefresh returns true if not valid and not expired', () => {
     const expirationTime = 60;
     const status = updateStatus(
       createStatus(),
@@ -166,7 +166,7 @@ describe('Status metadata', () => {
     const obj = {};
     setStatus(obj, status);
 
-    expect(shouldRefresh(obj)).to.be.false;
+    expect(shouldRefresh(obj)).to.be.true;
   });
 
   it('shouldRefresh returns true if not valid and expired', () => {
