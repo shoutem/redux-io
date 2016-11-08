@@ -8,25 +8,24 @@ function objectToArray(object) {
 
 /**
  * Restore RIO STATUS to transformed subState.
- * @param serializedSubstate
- * @param transformedSubstate
+ * @param transformedSubstate Serializable data
+ * @param revertedSubstate Originally formatted data
  */
-function restoreStatus(serializedSubstate, transformedSubstate) {
-  const status = _.isPlainObject(serializedSubstate) && serializedSubstate[STATUS];
+function restoreStatus(transformedSubstate, revertedSubstate) {
+  const status = _.isPlainObject(transformedSubstate) && transformedSubstate[STATUS];
   if (status) {
-    delete transformedSubstate[STATUS];
-    setStatus(transformedSubstate, status);
+    delete revertedSubstate[STATUS];
+    setStatus(revertedSubstate, status);
   }
 }
 
 
 /**
- * Creates deep copy of given substate and restores
- * serialization related data (serialization type).
- * @param substate
+ * Creates deep copy of given substate and restores it to original form.
+ * @param substate Serializable data
  * @returns {*}
  */
-function transformSubstate(substate) {
+function revertTransformedSubstate(substate) {
   if (_.isPlainObject(substate)) {
     if (substate[TYPE_KEY] === ARRAY_TYPE) {
       // Transform "array object" back to array as it was before serialization
@@ -38,14 +37,14 @@ function transformSubstate(substate) {
 }
 
 /**
- * Deserialize persisted state.
+ * Revert trasnformed (serializable) state.
  * Main function is to transform "array objects" to arrays and restore status as it was.
  * @param state Stringifiable state
  * @returns {object} Deserialized state
  */
 export function fromSerializableFormat(state) {
   return _.reduce(state, (result, substate, substateKey) => {
-    let newSubstate = transformSubstate(substate);
+    let newSubstate = revertTransformedSubstate(substate);
 
     restoreStatus(substate, newSubstate);
 

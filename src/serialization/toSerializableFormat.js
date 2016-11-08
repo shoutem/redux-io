@@ -10,8 +10,8 @@ function arrayToObject(arr, initialAttributes = {}) {
 }
 
 /**
- * Save RIO STATUS to reserved transformedNewSubstate property
- * from which deserializer can restore it.
+ * Save RIO STATUS as enumerable property
+ * from which can be restored.
  * @param substate
  * @param transformedNewSubstate
  */
@@ -24,7 +24,7 @@ function saveStatus(substate, transformedNewSubstate) {
 
 /**
  * Creates deep copy of given substate and saves
- * serialization related data (serialization type).
+ * transformation related data (type).
  * @param substate
  * @returns {*}
  */
@@ -40,8 +40,8 @@ function transformSubstate(substate) {
 }
 
 /**
- * Serialize state so it can be stringified.
- * Saves STATUS into enumerable property and transforms arrays into "array objects".
+ * Transform state so it can be stringified.
+ * Saves STATUS as enumerable property and transforms arrays into "array objects".
  * @param state
  * @returns {*}
  */
