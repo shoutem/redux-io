@@ -31,7 +31,7 @@ describe('One reducer', () => {
 
     const schema = 'schema_test';
     const tag = 'tag_test';
-    const reducer = one(schema, tag, initialValue);
+    const reducer = one(schema, tag, undefined, initialValue);
     deepFreeze(initialValue);
 
     const action = {
@@ -83,7 +83,7 @@ describe('One reducer', () => {
     ];
     const schema = 'schema_test';
     const tag = 'tag_test';
-    const reducer = one(schema, tag, initialValue);
+    const reducer = one(schema, tag, undefined, initialValue);
     deepFreeze(initialValue);
 
     const action = {
@@ -108,7 +108,7 @@ describe('One reducer', () => {
     ];
     const schema = 'schema_test';
     const tag = 'tag_test';
-    const reducer = one(schema, tag, initialValue);
+    const reducer = one(schema, tag, undefined, initialValue);
     deepFreeze(initialValue);
 
     const action = {
@@ -133,7 +133,7 @@ describe('One reducer', () => {
     ];
     const schema = 'schema_test';
     const tag = 'tag_test';
-    const reducer = one(schema, tag, initialValue);
+    const reducer = one(schema, tag, undefined, initialValue);
     deepFreeze(initialValue);
 
     const action = {
@@ -155,7 +155,7 @@ describe('One reducer', () => {
     const initialValue = 1;
     const schema = 'schema_test';
     const tag = 'tag_test';
-    const reducer = one(schema, tag, initialValue);
+    const reducer = one(schema, tag, undefined, initialValue);
     deepFreeze(initialValue);
 
     const itemsNew = [
@@ -180,7 +180,7 @@ describe('One reducer', () => {
     const initialValue = 1;
     const schema = 'schema_test';
     const tag = 'tag_value';
-    const reducer = one(schema, tag, initialValue);
+    const reducer = one(schema, tag, undefined, initialValue);
     deepFreeze(initialValue);
 
     const action = {
@@ -202,9 +202,9 @@ describe('One reducer', () => {
     const initialValue = 1;
     const schema = 'schema_test';
     const tag = 'tag_test';
-    const reducer = one(schema, tag, initialValue);
+    const reducer = one(schema, tag, undefined, initialValue);
     const otherTag = 'other_tag';
-    const otherReducer = one(schema, otherTag, initialValue);
+    const otherReducer = one(schema, otherTag, undefined, initialValue);
     deepFreeze(initialValue);
 
     const action = {
@@ -231,8 +231,8 @@ describe('One reducer', () => {
     const initialValue = 1;
     const schema = 'schema_test';
     const tag = '*';
-    expect(() => one(schema, tag, initialValue))
-      .to.throw('Tag value \'*\' is reserved for redux-api-state and cannot be used.');
+    expect(() => one(schema, tag, undefined, initialValue))
+      .to.throw('Tag value \'*\' is reserved for redux-io and cannot be used.');
   });
 
   it('clears one', () => {
@@ -248,7 +248,7 @@ describe('One reducer', () => {
       },
     };
 
-    const reducer = one(schema, tag, initialValue);
+    const reducer = one(schema, tag, undefined, initialValue);
     deepFreeze(initialValue);
     const nextState = reducer(undefined, action);
 
@@ -264,7 +264,7 @@ describe('One reducer', () => {
     ];
     const schema = 'schema_test';
     const tag = 'tag_test';
-    const reducer = one(schema, tag, initialValue);
+    const reducer = one(schema, tag, undefined, initialValue);
     deepFreeze(initialValue);
 
     const action = {
@@ -283,5 +283,15 @@ describe('One reducer', () => {
     expect(nextState[STATUS].busyStatus).to.eql(busyStatus.IDLE);
     expect(nextState[STATUS].schema).to.eql(schema);
     expect(nextState[STATUS].type).to.eql('one');
+  });
+  it('sets additional settings to status', () => {
+    const settingValue = 1000;
+    const reducer = one('schema', undefined, { setting: settingValue });
+    const state = reducer(undefined, {});
+    const oneStatus = state[STATUS];
+    expect(oneStatus.setting).to.equal(settingValue);
+    expect(oneStatus.id).to.be.ok;
+    expect(oneStatus.schema).to.be.ok;
+    expect(oneStatus.type).to.be.ok;
   });
 });

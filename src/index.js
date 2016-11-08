@@ -94,6 +94,7 @@ export {
   shouldRefresh,
   getTransformation,
   cloneStatus,
+  isExpired,
 } from './status';
 
 import { enableRio } from './enableRio';

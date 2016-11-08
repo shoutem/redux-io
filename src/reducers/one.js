@@ -31,10 +31,11 @@ function isValid(action, schema, tag) {
   return true;
 }
 
-function createDefaultStatus(schema) {
+function createDefaultStatus(schema, settings = {}) {
   return updateStatus(
     createStatus(),
     {
+      ...settings,
       schema,
       type: 'one',
       id: _.uniqueId(),
@@ -55,16 +56,18 @@ function createDefaultStatus(schema) {
  * rio action. Tag enable to have multiple collections for same schema. It's important
  * if you want to have normalized state and instances in one place, but different
  * collections of data.
+ * @param settings - optional status data, must be object.
+ *  RIO settings { expirationTime: seconds }
  * @param initialState is initial state of reducer, can be array or object.
  * @returns {Function}
  */
-export default function one(schema, tag = '', initialValue = '') {
+export default function one(schema, tag = '', settings = {}, initialValue = '') {
   if (tag === '*') {
-    throw new Error('Tag value \'*\' is reserved for redux-api-state and cannot be used.');
+    throw new Error('Tag value \'*\' is reserved for redux-io and cannot be used.');
   }
   // eslint-disable-next-line no-param-reassign
   const initialState = { value: initialValue };
-  setStatus(initialState, createDefaultStatus(schema));
+  setStatus(initialState, createDefaultStatus(schema, settings));
   return (state = initialState, action) => {
     if (!isValid(action, schema, tag)) {
       return state;
@@ -110,7 +113,7 @@ export default function one(schema, tag = '', initialValue = '') {
           return state;
         }
         const newState = { value: state.value ? state.value : initialValue };
-        setStatus(newState, createDefaultStatus(schema));
+        setStatus(newState, createDefaultStatus(schema, settings));
         return newState;
       }
     }

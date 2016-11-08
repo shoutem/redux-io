@@ -1,6 +1,7 @@
 /* eslint-disable no-unused-expressions */
 import { expect } from 'chai';
 import deepFreeze from 'deep-freeze';
+import sinon from 'sinon';
 import {
   createStatus,
   updateStatus,
@@ -14,7 +15,9 @@ import {
   STATUS,
   cloneStatus,
   setStatus,
+  isExpired,
 } from '../src/status';
+import collection from '../src/reducers/collection';
 
 describe('Status metadata', () => {
   it('initial status', () => {
@@ -144,6 +147,39 @@ describe('Status metadata', () => {
         validationStatus: validationStatus.INVALID,
       }
     );
+    const obj = {};
+    setStatus(obj, status);
+
+    expect(shouldRefresh(obj)).to.be.true;
+  });
+
+  it('shouldRefresh returns true if not valid and not expired', () => {
+    const expirationTime = 60;
+    const status = updateStatus(
+      createStatus(),
+      {
+        busyStatus: busyStatus.IDLE,
+        validationStatus: validationStatus.INVALID,
+        expirationTime,
+      }
+    );
+    const obj = {};
+    setStatus(obj, status);
+
+    expect(shouldRefresh(obj)).to.be.true;
+  });
+
+  it('shouldRefresh returns true if not valid and expired', () => {
+    const expirationTime = 60;
+    const status = updateStatus(
+      createStatus(),
+      {
+        busyStatus: busyStatus.IDLE,
+        validationStatus: validationStatus.INVALID,
+        expirationTime,
+      }
+    );
+    status.modifiedTimestamp = Date.now() - (expirationTime * 1000 + 10);
     const obj = {};
     setStatus(obj, status);
 
@@ -317,4 +353,50 @@ describe('Status metadata', () => {
     expect(newObj[STATUS]).to.be.undefined;
   });
 
+  describe('Expiration', () => {
+    describe('isExpired', () => {
+      it('return false for valid cache', () => {
+        const expirationTime = 60;
+        const reducer = collection('schema', 'tag', { expirationTime });
+        const state = reducer(undefined, {});
+        const stateStatus = state[STATUS];
+        stateStatus.modifiedTimestamp = Date.now();
+        expect(isExpired(state)).to.not.be.ok;
+      });
+      it('return false when no expirationTime defined', () => {
+        sinon.spy(console, 'warn');
+
+        const reducer = collection('schema', 'tag');
+        const state = reducer(undefined, {});
+        const stateStatus = state[STATUS];
+        stateStatus.modifiedTimestamp = Date.now();
+
+        expect(isExpired(state)).to.not.be.ok;
+        // Warning will be shown if checking expiration on object that doesn't have it
+        expect(console.warn.calledOnce).to.ok;
+
+        console.warn.restore();
+      });
+      it('return true for invalid cache', () => {
+        const expirationTime = 60;
+        const reducer = collection('schema', 'tag', { expirationTime });
+        const state = reducer(undefined, {});
+        const stateStatus = state[STATUS];
+        // Fake modification like it is past expirationTime
+        // Convert expirationTime to milliseconds (multiply with 1000)
+        stateStatus.modifiedTimestamp = Date.now() - (expirationTime * 1000 + 1);
+        expect(isExpired(state)).to.be.ok;
+      });
+      it('expects expirationTime in milliseconds', () => {
+        const expirationTime = 60;
+        const reducer = collection('schema', 'tag', { expirationTime });
+        const state = reducer(undefined, {});
+        const stateStatus = state[STATUS];
+        stateStatus.modifiedTimestamp = Date.now() - (expirationTime * 1000);
+        expect(isExpired(state)).to.be.not.ok;
+        stateStatus.modifiedTimestamp = Date.now() - (expirationTime * 1000 + 1);
+        expect(isExpired(state)).to.be.ok;
+      });
+    });
+  });
 });

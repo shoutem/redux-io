@@ -92,7 +92,7 @@ describe('getCollection', () => {
     const testReducer = combineReducers({
       users: userReducer,
       carsStorage: storage('cars', { ...initialData.cars }),
-      topLocations: collection('locations', 'topLocations', [...initialData.topLocations]),
+      topLocations: collection('locations', 'topLocations', undefined, [...initialData.topLocations]),
     });
 
     const testBatchedReducer = enableRio(testReducer);
