@@ -76,11 +76,16 @@ export const shouldRefresh = (obj, ignoreError = false) => {
 export const getId = obj => statusProp(obj, 'id');
 
 export function isExpired(reference) {
-  const { expirationTime, modifiedTimestamp } = getStatus(reference);
-  if (!expirationTime) {
-    console.warn('You are validating Cache reference without configured expirationTime.', reference);
+  const status = getStatus(reference);
+  if (!status) {
     return false;
   }
+
+  const { expirationTime, modifiedTimestamp } = status;
+  if (!expirationTime) {
+    return false;
+  }
+
   const referenceLifetime = Date.now() - modifiedTimestamp;
   // TODO
   // When `expiration` becomes rio plugin, save milliseconds in the status to avoid conversation
