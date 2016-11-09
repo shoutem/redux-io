@@ -369,6 +369,18 @@ describe('Status metadata', () => {
         stateStatus.modifiedTimestamp = Date.now();
         expect(isExpired(state)).to.not.be.ok;
       });
+      it('return false for non rio reference', () => {
+        expect(isExpired({})).to.not.be.ok;
+        expect(isExpired(undefined)).to.not.be.ok;
+      });
+      it('return false for valid cache', () => {
+        const expirationTime = 60;
+        const reducer = collection('schema', 'tag', { expirationTime });
+        const state = reducer(undefined, {});
+        const stateStatus = state[STATUS];
+        stateStatus.modifiedTimestamp = Date.now();
+        expect(isExpired(state)).to.not.be.ok;
+      });
       it('return false when no expirationTime defined', () => {
         const reducer = collection('schema', 'tag');
         const state = reducer(undefined, {});
