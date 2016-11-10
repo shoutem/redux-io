@@ -19,7 +19,6 @@ function restoreStatus(transformedSubstate, revertedSubstate) {
   }
 }
 
-
 /**
  * Creates deep copy of given substate and restores it to original form.
  * @param substate Serializable data

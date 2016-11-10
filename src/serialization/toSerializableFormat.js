@@ -5,7 +5,9 @@ import { getStatus, STATUS } from '../status';
 function arrayToObject(arr, initialAttributes = {}) {
   return {
     ...initialAttributes,
-    arr,
+    // Destructed to lose non enumerable properties
+    // Non enumerable properties should be copied elsewhere
+    arr: [...arr],
   };
 }
 
@@ -31,7 +33,8 @@ function saveStatus(substate, transformedNewSubstate) {
 function transformSubstate(substate) {
   if (_.isPlainObject(substate)) {
     return toSerializableFormat(substate);
-  } else if (_.isArray(substate)) {
+  } else if (_.isArray(substate) && substate[STATUS]) {
+    // Used for collections
     // Transform array into structure that reverse transformation expects
     // JSON.stringify does not know how to stringify array attributes
     return arrayToObject(substate, { [TYPE_KEY]: ARRAY_TYPE });

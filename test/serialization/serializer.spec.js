@@ -1,5 +1,6 @@
 import { assert } from 'chai';
-import { toSerializableFormat, TYPE_KEY, ARRAY_TYPE } from '../../src/serialization';
+import { toSerializableFormat } from '../../src/serialization';
+import { TYPE_KEY, ARRAY_TYPE } from '../../src/serialization/type';
 import { STATUS } from '../../src/status';
 
 describe('toSerializableFormat', () => {
@@ -17,16 +18,37 @@ describe('toSerializableFormat', () => {
     assert.deepEqual(serializedState.storage[STATUS], status);
   });
 
-  it('transform array to object array', () => {
+  it('transform array with status to object array', () => {
+    const status = {
+      testNumber: 1,
+      testString: 'Test'
+    };
+    const arr = [1,2,3];
+    const arrWithStatus = [...arr];
+    arrWithStatus[STATUS] = status;
+    const state = {
+      arrWithStatus,
+    };
+    const expectedSerializedState = {
+      arrWithStatus: {
+        arr,
+        [TYPE_KEY]: ARRAY_TYPE,
+        [STATUS]: status,
+      },
+    };
+    const serializedState = toSerializableFormat(state);
+    assert.deepEqual(serializedState.arrWithStatus, expectedSerializedState.arrWithStatus);
+  });
+
+  it('leave array without status as array', () => {
     const state = {
       arr: [1,2,3],
     };
     const expectedSerializedState = {
       arr: state.arr,
-      [TYPE_KEY]: ARRAY_TYPE,
     };
     const serializedState = toSerializableFormat(state);
-    assert.deepEqual(serializedState.arr, expectedSerializedState);
+    assert.deepEqual(serializedState.arr, expectedSerializedState.arr);
   });
 
   it('saves collection status to object array', () => {
@@ -44,11 +66,16 @@ describe('toSerializableFormat', () => {
   });
 
   it('doesn\'t change objects values', () => {
+    const arr = [1,2,3];
+    const status = { a: 1 };
+    const arrWithStatus = [...arr];
+    arrWithStatus[STATUS] = status;
     const state = {
       storage: {
         a: 1,
       },
       b: ['a', 1],
+      arrWithStatus,
       c: 2,
       d: 'string',
     };
@@ -56,9 +83,11 @@ describe('toSerializableFormat', () => {
       storage: {
         a: 1,
       },
-      b: {
-        arr: state.b,
+      b: state.b,
+      arrWithStatus: {
+        arr,
         [TYPE_KEY]: ARRAY_TYPE,
+        [STATUS]: status,
       },
       c: 2,
       d: 'string',
@@ -68,11 +97,15 @@ describe('toSerializableFormat', () => {
   });
 
   it('creates JSON.stringifiable object', () => {
+    const arrWithStatus = [1, 2];
+    const status = { a: 1 };
+    arrWithStatus[STATUS] = status;
     const state = {
       storage: {
         a: 1,
       },
       b: ['a', 1],
+      arrWithStatus,
       c: 2,
       d: 'string',
     };
