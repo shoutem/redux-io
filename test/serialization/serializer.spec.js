@@ -16,6 +16,7 @@ describe('toSerializableFormat', () => {
     const serializedState = toSerializableFormat(state);
     assert.deepEqual(serializedState.storage[STATUS], status);
   });
+
   it('transform array to object array', () => {
     const state = {
       arr: [1,2,3],
@@ -27,6 +28,7 @@ describe('toSerializableFormat', () => {
     const serializedState = toSerializableFormat(state);
     assert.deepEqual(serializedState.arr, expectedSerializedState);
   });
+
   it('saves collection status to object array', () => {
     const status = {
       testNumber: 1,
@@ -40,6 +42,7 @@ describe('toSerializableFormat', () => {
     const serializedState = toSerializableFormat(state);
     assert.deepEqual(serializedState.collection[STATUS], status);
   });
+
   it('doesn\'t change objects values', () => {
     const state = {
       storage: {
@@ -63,6 +66,7 @@ describe('toSerializableFormat', () => {
     const serializedState = toSerializableFormat(state);
     assert.deepEqual(serializedState, expectedSerializedData);
   });
+
   it('creates JSON.stringifiable object', () => {
     const state = {
       storage: {

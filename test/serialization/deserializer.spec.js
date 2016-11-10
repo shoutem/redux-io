@@ -20,6 +20,7 @@ describe('fromSerializableFormat', () => {
     const deserializedState = fromSerializableFormat(serializedState);
     assert.deepEqual(deserializedState.storage[STATUS], status);
   });
+
   it('transform "object array" to array', () => {
     const state = {
       arr: [1,2,3],
@@ -28,6 +29,7 @@ describe('fromSerializableFormat', () => {
     const deserializedState = fromSerializableFormat(serializedState);
     assert.deepEqual(state, deserializedState);
   });
+
   it('restore object array status', () => {
     const status = {
       testNumber: 1,
@@ -42,6 +44,7 @@ describe('fromSerializableFormat', () => {
     const deserializedState = fromSerializableFormat(serializedState);
     assert.deepEqual(deserializedState.collection[STATUS], status);
   });
+
   it('doesn\'t change objects', () => {
     const state = {
       storage: {
