@@ -8,9 +8,9 @@ const thunkAction = actionFn => (...args) => {
           return;
         }
         resolve(resolvedAction);
-      })
+      }, reject)
     ))
-  )
+  );
 };
 
 export default thunkAction;
