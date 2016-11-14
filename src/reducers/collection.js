@@ -163,17 +163,17 @@ export default function collection(schema, tag = '', settings = {}, initialState
         return newState;
       }
       case CHECK_EXPIRATION: {
-        if (isExpired(state)) {
-          const newState = [...state];
-          setStatus(newState, updateStatus(
-            state[STATUS],
-            {
-              validationStatus: validationStatus.INVALID,
-            }
-          ));
-          return newState;
+        if (!isExpired(state)) {
+          return state;
         }
-        return state;
+        const newState = [...state];
+        setStatus(newState, updateStatus(
+          state[STATUS],
+          {
+            validationStatus: validationStatus.INVALID,
+          }
+        ));
+        return newState;
       }
       default: {
         if (state[STATUS]) {
