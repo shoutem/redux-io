@@ -25,5 +25,7 @@ export const OBJECT_CREATED = '@@redux_io/OBJECT_CREATED';
 export const OBJECT_REMOVING = '@@redux_io/OBJECT_REMOVING';
 export const OBJECT_REMOVED = '@@redux_io/OBJECT_REMOVED';
 
+export const CHECK_EXPIRATION = '@@redux_io/CHECK_EXPIRATION';
+
 export const OBJECT_ERROR = '@@redux_io/OBJECT_ERROR';
 export const COLLECTION_ERROR = '@@redux_io/COLLECTION_ERROR';

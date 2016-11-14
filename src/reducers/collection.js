@@ -3,6 +3,7 @@ import {
   REFERENCE_FETCHED,
   REFERENCE_STATUS,
   REFERENCE_CLEAR,
+  CHECK_EXPIRATION,
 } from './../consts';
 import {
   STATUS,
@@ -13,10 +14,15 @@ import {
   updateStatus,
   setStatus,
   isInitialized,
+  isExpired,
 } from './../status';
 import { APPEND_MODE } from '../actions/find';
 
-function isValid(action, schema, tag) {
+function isValidAction(action, schema, tag) {
+  if (_.get(action, 'type') === CHECK_EXPIRATION) {
+    return true;
+  }
+
   if (_.get(action, 'meta.schema') !== schema) {
     return false;
   }
@@ -96,7 +102,7 @@ export default function collection(schema, tag = '', settings = {}, initialState
   setStatus(initialState, createDefaultStatus(schema, tag, settings));
   // TODO-vedran: refactor status into context={status, config}
   return (state = initialState, action) => {
-    if (!isValid(action, schema, tag)) {
+    if (!isValidAction(action, schema, tag)) {
       return state;
     }
 
@@ -154,6 +160,19 @@ export default function collection(schema, tag = '', settings = {}, initialState
           }
         ));
 
+        return newState;
+      }
+      case CHECK_EXPIRATION: {
+        if (!isExpired(state)) {
+          return state;
+        }
+        const newState = [...state];
+        setStatus(newState, updateStatus(
+          state[STATUS],
+          {
+            validationStatus: validationStatus.INVALID,
+          }
+        ));
         return newState;
       }
       default: {

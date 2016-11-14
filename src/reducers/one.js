@@ -3,6 +3,7 @@ import {
   REFERENCE_FETCHED,
   REFERENCE_STATUS,
   REFERENCE_CLEAR,
+  CHECK_EXPIRATION,
 } from './../consts';
 import {
   STATUS,
@@ -11,9 +12,14 @@ import {
   createStatus,
   updateStatus,
   setStatus,
+  isExpired,
 } from './../status';
 
-function isValid(action, schema, tag) {
+function isValidAction(action, schema, tag) {
+  if (_.get(action, 'type') === CHECK_EXPIRATION) {
+    return true;
+  }
+
   if (_.get(action, 'meta.schema') !== schema) {
     return false;
   }
@@ -69,7 +75,7 @@ export default function one(schema, tag = '', settings = {}, initialValue = '') 
   const initialState = { value: initialValue };
   setStatus(initialState, createDefaultStatus(schema, settings));
   return (state = initialState, action) => {
-    if (!isValid(action, schema, tag)) {
+    if (!isValidAction(action, schema, tag)) {
       return state;
     }
 
@@ -105,6 +111,19 @@ export default function one(schema, tag = '', settings = {}, initialValue = '') 
         setStatus(newState, updateStatus(
             state[STATUS],
             action.payload
+        ));
+        return newState;
+      }
+      case CHECK_EXPIRATION: {
+        if (!isExpired(state)) {
+          return state;
+        }
+        const newState = { value: state.value };
+        setStatus(newState, updateStatus(
+          state[STATUS],
+          {
+            validationStatus: validationStatus.INVALID,
+          }
         ));
         return newState;
       }

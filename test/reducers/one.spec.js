@@ -2,6 +2,7 @@ import { expect } from 'chai';
 import deepFreeze from 'deep-freeze';
 import {
   one,
+  checkExpiration,
   REFERENCE_FETCHED,
   REFERENCE_CLEAR,
   REFERENCE_STATUS,
@@ -11,6 +12,7 @@ import {
   validationStatus,
   busyStatus,
   createStatus,
+  setStatus,
 } from '../../src/status';
 
 describe('One reducer', () => {
@@ -284,6 +286,7 @@ describe('One reducer', () => {
     expect(nextState[STATUS].schema).to.eql(schema);
     expect(nextState[STATUS].type).to.eql('one');
   });
+
   it('sets additional settings to status', () => {
     const settingValue = 1000;
     const reducer = one('schema', undefined, { setting: settingValue });
@@ -293,5 +296,61 @@ describe('One reducer', () => {
     expect(oneStatus.id).to.be.ok;
     expect(oneStatus.schema).to.be.ok;
     expect(oneStatus.type).to.be.ok;
+  });
+
+  describe('CHECK_EXPIRATION', () => {
+    it('change one validationStatus to invalid if expired', () => {
+      const expirationTime = 1;
+      const schema = 'schema_test';
+      const tag = 'tag_test';
+      const reducer = one(schema, tag, { expirationTime }, 1);
+
+      const state = reducer(undefined, undefined);
+      // Fake modification
+      state[STATUS].modifiedTimestamp = Date.now() - (expirationTime * 1000 + 1);
+
+      const action = checkExpiration();
+      const nextState = reducer(state, action);
+
+      expect(nextState[STATUS].validationStatus).to.eql(validationStatus.INVALID);
+      expect(nextState === state).to.be.not.ok;
+    });
+
+    it('does not change anything beside validationStatus if invalid', () => {
+      const expirationTime = 1;
+      const schema = 'schema_test';
+      const tag = 'tag_test';
+      const reducer = one(schema, tag, { expirationTime }, 1);
+
+      const state = reducer(undefined, undefined);
+      // Fake modification
+      state[STATUS].modifiedTimestamp = Date.now() - (expirationTime * 1000 + 1);
+
+      const action = checkExpiration();
+      const nextState = reducer(state, action);
+
+      const expectedState = { ...state };
+      setStatus(expectedState, {
+        ...state[STATUS],
+        // Validation status gets updated
+        validationStatus: validationStatus.INVALID
+      });
+
+      expect(nextState).to.eql(expectedState);
+    });
+
+    it('does not create new reference if not expired', () => {
+      const expirationTime = 10;
+      const schema = 'schema_test';
+      const tag = 'tag_test';
+      const reducer = one(schema, tag, { expirationTime }, 1);
+
+      const state = reducer(undefined, undefined);
+
+      const action = checkExpiration();
+      const nextState = reducer(state, action);
+
+      expect(state === nextState).to.be.ok;
+    });
   });
 });
