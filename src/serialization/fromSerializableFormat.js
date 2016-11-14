@@ -8,46 +8,46 @@ function objectToArray(object) {
 
 /**
  * Restore RIO STATUS to transformed subState.
- * @param transformedSubstate Serializable data
- * @param revertedSubstate Originally formatted data
+ * @param serializableSubState
+ * @param originalSubState
  */
-function restoreStatus(transformedSubstate, revertedSubstate) {
-  const status = _.isPlainObject(transformedSubstate) && transformedSubstate[STATUS];
+function restoreStatus(serializableSubState, originalSubState) {
+  const status = _.isPlainObject(serializableSubState) && serializableSubState[STATUS];
   if (status) {
-    delete revertedSubstate[STATUS];
-    setStatus(revertedSubstate, status);
+    delete originalSubState[STATUS]; // Delete enumerable status
+    setStatus(originalSubState, status); // Set non enumerable status
   }
 }
 
 /**
  * Creates deep copy of given substate and restores it to original form.
- * @param substate Serializable data
+ * @param serializableSubState
  * @returns {*}
  */
-function revertTransformedSubstate(substate) {
-  if (_.isPlainObject(substate)) {
-    if (substate[TYPE_KEY] === ARRAY_TYPE) {
+function revertTransformedSubstate(serializableSubState) {
+  if (_.isPlainObject(serializableSubState)) {
+    if (serializableSubState[TYPE_KEY] === ARRAY_TYPE) {
       // Transform "array object" back to array as it was before serialization
-      return objectToArray(substate);
+      return objectToArray(serializableSubState);
     }
-    return fromSerializableFormat(substate);
+    return fromSerializableFormat(serializableSubState);
   }
-  return substate;
+  return serializableSubState;
 }
 
 /**
  * Revert trasnformed (serializable) state.
  * Main function is to transform "array objects" to arrays and restore status as it was.
- * @param state Stringifiable state
- * @returns {object} Deserialized state
+ * @param serializableState
+ * @returns {object} Original state
  */
-export function fromSerializableFormat(state) {
-  return _.reduce(state, (result, substate, substateKey) => {
-    let newSubstate = revertTransformedSubstate(substate);
+export function fromSerializableFormat(serializableState) {
+  return _.reduce(serializableState, (originalState, serializableSubState, subStateKey) => {
+    const originalSubState = revertTransformedSubstate(serializableSubState);
 
-    restoreStatus(substate, newSubstate);
+    restoreStatus(serializableSubState, originalSubState);
 
-    result[substateKey] = newSubstate;
-    return result;
+    originalState[subStateKey] = originalSubState;
+    return originalState;
   }, {});
 }

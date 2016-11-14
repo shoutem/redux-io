@@ -15,31 +15,31 @@ function arrayToObject(arr, initialAttributes = {}) {
  * Save RIO STATUS as enumerable property
  * from which can be restored.
  * @param substate
- * @param transformedNewSubstate
+ * @param serializableState
  */
-function saveStatus(substate, transformedNewSubstate) {
-  const status = getStatus(substate);
+function saveStatus(originalState, serializableState) {
+  const status = getStatus(originalState);
   if (status) {
-    transformedNewSubstate[STATUS] = status;
+    serializableState[STATUS] = status;
   }
 }
 
 /**
  * Creates deep copy of given substate and saves
  * transformation related data (type).
- * @param substate
+ * @param originalSubState
  * @returns {*}
  */
-function transformSubstate(substate) {
-  if (_.isPlainObject(substate)) {
-    return toSerializableFormat(substate);
-  } else if (_.isArray(substate) && substate[STATUS]) {
+function transformSubstate(originalSubState) {
+  if (_.isPlainObject(originalSubState)) {
+    return toSerializableFormat(originalSubState);
+  } else if (_.isArray(originalSubState) && originalSubState[STATUS]) {
     // Used for collections
     // Transform array into structure that reverse transformation expects
     // JSON.stringify does not know how to stringify array attributes
-    return arrayToObject(substate, { [TYPE_KEY]: ARRAY_TYPE });
+    return arrayToObject(originalSubState, { [TYPE_KEY]: ARRAY_TYPE });
   }
-  return substate;
+  return originalSubState;
 }
 
 /**
@@ -49,13 +49,13 @@ function transformSubstate(substate) {
  * @returns {*}
  */
 export function toSerializableFormat(state) {
-  return _.reduce(state, (result, substate, substateKey) => {
-    const newSubstate = transformSubstate(substate);
+  return _.reduce(state, (serializableState, substate, subStateKey) => {
+    const serializableSubState = transformSubstate(substate);
 
     // Status is not enumerable property so we have take care for it separately
-    saveStatus(substate, newSubstate);
+    saveStatus(substate, serializableSubState);
 
-    result[substateKey] = newSubstate;
-    return result;
+    serializableState[subStateKey] = serializableSubState;
+    return serializableState;
   }, {});
 }
