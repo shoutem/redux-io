@@ -3,6 +3,9 @@ import rio from '../rio';
 import { createSchemasMap } from './ReduxApiStateDenormalizer';
 import { resolveSchemaName } from '../schemaConfig';
 
+const emptyArray = [];
+Object.freeze(emptyArray);
+
 /**
  * Connects rio configurations with denormalizer to simplify denormalization
  * of normalized data in state.
@@ -14,7 +17,8 @@ import { resolveSchemaName } from '../schemaConfig';
 export function getCollection(collection, state, schema = '') {
   if (!collection) {
     // Handle undefined values reasonably
-    return [];
+    // Always return same reference.
+    return emptyArray;
   }
 
   if (!_.isArray(collection)) {

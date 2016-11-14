@@ -136,6 +136,17 @@ describe('getCollection', () => {
     expect(result).to.deep.equal([]);
   });
 
+  it('returns same reference for undefined', () => {
+    const firstSelect = getCollection(undefined, {});
+    const secondSelect = getCollection(undefined, {});
+    expect(firstSelect === secondSelect).to.be.ok;
+  });
+
+  it('freezes empty collection', () => {
+    const emptyCollection = getCollection(undefined, {});
+    expect(() => emptyCollection.push(1)).to.throw('Can\'t add property');
+  });
+
   it('denormalize null', () => {
     const result = getCollection(null, {});
     expect(result).to.deep.equal([]);

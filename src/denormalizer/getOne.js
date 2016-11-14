@@ -3,6 +3,9 @@ import rio from '../rio';
 import { createSchemasMap } from './ReduxApiStateDenormalizer';
 import { resolveSchemaName } from '../schemaConfig';
 
+const emptyObject = {};
+Object.freeze(emptyObject);
+
 /**
  * Connects rio configurations with denormalizer to simplify denormalization
  * of normalized data in state.
@@ -12,6 +15,10 @@ import { resolveSchemaName } from '../schemaConfig';
  * @returns {{}}
  */
 export function getOne(one, state, schema = '') {
+  if ((_.isUndefined(one) || _.isNull(one))) {
+    // Always return same reference.
+    return emptyObject;
+  }
   if (!_.isPlainObject(one) && !_.isString(one) && !_.isNumber(one)) {
     throw new Error('One must be object or primitive value.');
   }

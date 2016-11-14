@@ -131,6 +131,22 @@ describe('getOne', () => {
     expect(denormalizedLocation).to.be.shallowDeepEqual(expectedDenormalizedTopLocation);
   });
 
+  it('denormalize undefined', () => {
+    const result = getOne(undefined, {});
+    expect(result).to.deep.equal({});
+  });
+
+  it('returns same reference for undefined', () => {
+    const firstSelect = getOne(undefined, {});
+    const secondSelect = getOne(undefined, {});
+    expect(firstSelect === secondSelect).to.be.ok;
+  });
+
+  it('freezes empty one', () => {
+    const emptyCollection = getOne(undefined, {});
+    expect(() => emptyCollection.test = 1).to.throw('Can\'t add property');
+  });
+
   it('on invalid state throws appropriate error', () => {
     expect(() => getOne(initialData.topLocation, '', 'locations'))
       .to.throw('State argument is invalid, should be an object.');
