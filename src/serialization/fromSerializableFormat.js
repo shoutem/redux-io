@@ -36,7 +36,7 @@ function revertTransformedSubstate(serializableSubState) {
 }
 
 /**
- * Revert trasnformed (serializable) state.
+ * Revert transformed (serializable) state.
  * Main function is to transform "array objects" to arrays and restore status as it was.
  * @param serializableState
  * @returns {object} Original state
