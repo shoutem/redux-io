@@ -36,10 +36,6 @@ export function create(config, schema, item = null) {
     }
     body = JSON.stringify({ data: item });
   } else {
-    // we expect a body property in the config if the item is not supplied
-    if (!config.body) {
-      throw new Error('Item is missing in method argument and in config.body');
-    }
     body = config.body;
   }
 
