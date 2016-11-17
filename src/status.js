@@ -70,7 +70,7 @@ export const getModificationTime = obj => statusProp(obj, 'modifiedTimestamp');
 export const isError = obj => !!(statusProp(obj, 'error'));
 
 export const shouldRefresh = (obj, ignoreError = false) => {
-  return (isExpired(obj) || !isValid(obj)) && !isBusy(obj) && (!isError(obj) || ignoreError);
+  return (!isValid(obj) || isExpired(obj)) && !isBusy(obj) && (!isError(obj) || ignoreError);
 };
 
 export const getId = obj => statusProp(obj, 'id');
