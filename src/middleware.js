@@ -51,6 +51,35 @@ const actionsWithTags = new Set([
 
 const outdated = new Outdated();
 
+// Helpers object makes testing easier,
+// function references need to be preserved so that Sinon can spy them.
+export const helpers = {
+  /**
+   * Handled failed redux-api-middleware request.
+   *
+   * @param action
+   * @param dispatch
+   * @returns {*}
+   */
+  handleFailedRequest(action, dispatch) {
+    const errorAction = requestErrorActionsMap[action.type];
+
+    if (!errorAction) {
+      console.warn(`Can not handle failed request for action type ${action.type}.`);
+      return action;
+    }
+
+    // Update reference status for corresponding error action
+    actionHandlers[errorAction](action, undefined, dispatch);
+
+    const schema = _.get(action, 'meta.schema');
+    const tag = _.get(action, 'meta.tag');
+
+    // Return error action in the actions chain.
+    return makeIndexAction(action, errorAction, action.payload, schema, tag);
+  }
+};
+
 /**
  * Map of all possible REQUEST action types and
  * it corresponding ERROR action types.
@@ -62,28 +91,6 @@ const requestErrorActionsMap = {
   [UPDATE_REQUEST]: UPDATE_ERROR,
   [REMOVE_REQUEST]: REMOVE_ERROR,
 };
-
-/**
- * Handled failed redux-api-middleware request.
- *
- * @param action
- * @param dispatch
- * @returns {*}
- */
-function handleFailedRequest(action, dispatch) {
-  const errorAction = requestErrorActionsMap[action.type];
-
-  if (!errorAction) {
-    console.warn(`Can not handle failed request for action type ${action.type}.`);
-    return action;
-  }
-
-  // Update reference status for corresponding error action
-  actionHandlers[errorAction](action, undefined, dispatch);
-
-  // Return error action in the actions chain.
-  return makeIndexAction(action, errorAction, action.payload, _.get(action, 'meta.schema'));
-}
 
 function makeErrorAction(actionType, errorPayload) {
   return {
@@ -391,7 +398,7 @@ export default store => next => action => {
   // Find handler for supported action type to make appropriate logic
 
   if (action.error) {
-    return next(handleFailedRequest(action, dispatch));
+    return next(helpers.handleFailedRequest(action, dispatch));
   }
 
   const data = getData(action.payload);
