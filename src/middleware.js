@@ -137,10 +137,13 @@ const actionHandlers = {
   [LOAD_SUCCESS]: (action, data, dispatch) => {
     // Dispatch objects to storages and collection with specific tag
     const { schema, tag } = action.meta;
+
     data.map(item => dispatch(makeObjectAction(action, OBJECT_FETCHED, item)));
     // TODO: once when we support findOne action and single reducer, REFERENCE_FETCHED
     // should trigger only for collections
     dispatch(makeIndexAction(action, REFERENCE_FETCHED, data, schema, tag));
+
+    saveLinks(action, dispatch);
   },
   [LOAD_ERROR]: (action, data, dispatch) => {
     // Invalidate and idle collection on error
@@ -326,9 +329,6 @@ const getLinks = payload => {
 };
 
 function saveLinks(action, dispatch) {
-  if (action.type !== LOAD_SUCCESS) {
-    return;
-  }
   const { schema, tag } = action.meta;
   const links = getLinks(action.payload);
   dispatch(makeIndexAction(action, REFERENCE_STATUS, { links }, schema, tag));
@@ -357,8 +357,6 @@ export default store => next => action => {
   // Find handler for supported action type to make appropriate logic
   const data = getData(action.payload);
   actionHandlers[action.type](action, data, dispatch);
-
-  saveLinks(action, dispatch);
 
   if (!_.isEmpty(actions)) {
     store.dispatch(batchActions(actions));
