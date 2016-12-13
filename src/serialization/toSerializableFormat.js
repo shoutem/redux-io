@@ -36,7 +36,7 @@ function transformSubstate(originalSubState) {
   } else if (_.isArray(originalSubState) && originalSubState[STATUS]) {
     // Transform array into format that reverse transformation expects.
     // JSON.stringify only serialize array items, it does not serialize
-    // additional array properties this is used to save those properties.
+    // additional array properties, this is used to save those properties.
     // It is important because RIO adds STATUS property to collections.
     return arrayToObject(originalSubState, { [TYPE_KEY]: ARRAY_TYPE });
   }
