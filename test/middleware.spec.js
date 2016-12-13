@@ -27,12 +27,13 @@ import {
   JSON_API_SOURCE,
 } from '../src';
 import {
-} from '../src/middleware';
-import {
   validationStatus,
   busyStatus,
   STATUS,
 } from '../src/status';
+
+import { helpers as middlewareHelpers, makeIndexAction } from '../src/middleware';
+const { handleFailedRequest } = middlewareHelpers;
 
 describe('Json api middleware', () => {
   let mockStore = configureMockStore([thunk, apiStateMiddleware]);
@@ -1315,5 +1316,96 @@ describe('Json api middleware', () => {
       store.clearActions();
       expect(performedActions).to.have.lengthOf(2);
     }).then(done).catch(done), 350);
+  });
+  describe('handleFailedRequest', () => {
+    it('handles failed LOAD_REQUEST', () => {
+      const fakeDispatch = function () {
+        console.log(arguments)
+      };
+      const spyDispatch = sinon.spy(fakeDispatch);
+      const schema = 'test';
+      const tag = 'tag';
+
+      const failedLoadRequestAction = {
+        error: true,
+        type: LOAD_REQUEST,
+        payload: 'error test',
+        meta: {
+          schema,
+          tag,
+        },
+      };
+
+      const loadErrorAction = handleFailedRequest(failedLoadRequestAction, spyDispatch);
+
+      const expectedLoadErrorAction = makeIndexAction(
+        failedLoadRequestAction,
+        LOAD_ERROR,
+        failedLoadRequestAction.payload,
+        failedLoadRequestAction.meta.schema,
+        failedLoadRequestAction.meta.tag
+      );
+
+      const expectedDispatchAction = makeIndexAction(
+        failedLoadRequestAction,
+        REFERENCE_STATUS,
+        {
+          busyStatus: busyStatus.IDLE,
+          validationStatus: validationStatus.INVALID,
+          error: true,
+        },
+        schema,
+        tag
+      );
+
+      expect(spyDispatch.calledOnce).to.be.true;
+      expect(spyDispatch.calledWith(expectedDispatchAction)).to.be.true;
+      expect(loadErrorAction).to.deep.equal(expectedLoadErrorAction);
+    });
+    it('leaves unknown failed request and warns', () => {
+      const fakeDispatch = function () {};
+      const spyDispatch = sinon.spy(fakeDispatch);
+      const warningSpy = sinon.spy(console, 'warn');
+
+      const failedLoadRequestAction = {
+        error: true,
+        type: 'unknown request type',
+        payload: 'error test',
+        meta: {
+          schema: 'test',
+          tag: 'test',
+        },
+      };
+
+      const unhandledFailedRequest = handleFailedRequest(failedLoadRequestAction, spyDispatch);
+
+      expect(spyDispatch.called).to.be.false;
+      expect(warningSpy.calledOnce).to.be.true;
+      expect(unhandledFailedRequest === failedLoadRequestAction).to.be.true;
+    });
+    it('is called for failed request', done => {
+      const store = mockStore({});
+      const handleFailedRequestSpy = sinon.spy(middlewareHelpers, 'handleFailedRequest');
+      const failedLoadRequestAction = {
+        error: true,
+        type: LOAD_REQUEST,
+        payload: 'error test',
+        meta: {
+          source: 'json-api',
+          schema: 'failedRequestSchema',
+          tag: 'test',
+        },
+      };
+
+      store.dispatch(actionPromise(failedLoadRequestAction))
+        .then(() => {
+          console.log(handleFailedRequestSpy.callCount)
+          expect(handleFailedRequestSpy.calledOnce).to.be.true;
+          done();
+        })
+        .catch((err) => {
+          console.log(err);
+        })
+    });
   });
 });
