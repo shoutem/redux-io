@@ -84,7 +84,7 @@ function handleFailedRequest(action, dispatch) {
 
 /**
  * Handle any request related action and dispatch corresponding state updating actions.
- * Handle action in such a way to add batched action to update state data and/or status.
+ * Add batched actions to update state data and/or status.
  * @param action
  * @param dispatch
  */
