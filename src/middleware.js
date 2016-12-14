@@ -49,7 +49,55 @@ const actionsWithTags = new Set([
   LOAD_ERROR,
 ]);
 
+/**
+ * Map of all possible REQUEST action types and
+ * it corresponding ERROR action types.
+ * @type {{}}
+ */
+const requestErrorActionsMap = {
+  [LOAD_REQUEST]: LOAD_ERROR,
+  [CREATE_REQUEST]: CREATE_ERROR,
+  [UPDATE_REQUEST]: UPDATE_ERROR,
+  [REMOVE_REQUEST]: REMOVE_ERROR,
+};
+
 const outdated = new Outdated();
+
+/**
+ * Handled failed redux-api-middleware request.
+ *
+ * @param action
+ * @param dispatch
+ * @returns {*}
+ */
+function handleFailedRequest(action, dispatch) {
+  const errorAction = requestErrorActionsMap[action.type];
+
+  if (!errorAction) {
+    console.warn(`Can not handle failed request for action type ${action.type}.`);
+    return;
+  }
+
+  // Update reference status for corresponding error action
+  actionHandlers[errorAction](action, undefined, dispatch);
+}
+
+/**
+ * Handle any request related action and dispatch corresponding state updating actions.
+ * Add batched actions to update state data and/or status.
+ * @param action
+ * @param dispatch
+ */
+function handleNetworkAction(action, dispatch) {
+  // First dispatch included objects
+  const included = getIncluded(action.payload);
+  included.map(item => dispatch(makeObjectAction(action, OBJECT_FETCHED, item)));
+
+
+  const data = getData(action.payload);
+  // Find handler for supported action type to make appropriate logic
+  actionHandlers[action.type](action, data, dispatch);
+}
 
 function makeErrorAction(actionType, errorPayload) {
   return {
@@ -137,10 +185,13 @@ const actionHandlers = {
   [LOAD_SUCCESS]: (action, data, dispatch) => {
     // Dispatch objects to storages and collection with specific tag
     const { schema, tag } = action.meta;
+
     data.map(item => dispatch(makeObjectAction(action, OBJECT_FETCHED, item)));
     // TODO: once when we support findOne action and single reducer, REFERENCE_FETCHED
     // should trigger only for collections
     dispatch(makeIndexAction(action, REFERENCE_FETCHED, data, schema, tag));
+
+    saveLinks(action, dispatch);
   },
   [LOAD_ERROR]: (action, data, dispatch) => {
     // Invalidate and idle collection on error
@@ -326,9 +377,6 @@ const getLinks = payload => {
 };
 
 function saveLinks(action, dispatch) {
-  if (action.type !== LOAD_SUCCESS) {
-    return;
-  }
   const { schema, tag } = action.meta;
   const links = getLinks(action.payload);
   dispatch(makeIndexAction(action, REFERENCE_STATUS, { links }, schema, tag));
@@ -350,15 +398,12 @@ export default store => next => action => {
   const actions = [];
   const dispatch = dispatchAction => actions.push(dispatchAction);
 
-  // First dispatch included objects
-  const included = getIncluded(action.payload);
-  included.map(item => dispatch(makeObjectAction(action, OBJECT_FETCHED, item)));
-
-  // Find handler for supported action type to make appropriate logic
-  const data = getData(action.payload);
-  actionHandlers[action.type](action, data, dispatch);
-
-  saveLinks(action, dispatch);
+  if (action.error) {
+    // Request which thrown an error
+    handleFailedRequest(action, dispatch);
+  } else {
+    handleNetworkAction(action, dispatch);
+  }
 
   if (!_.isEmpty(actions)) {
     store.dispatch(batchActions(actions));
