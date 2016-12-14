@@ -32,9 +32,6 @@ import {
   STATUS,
 } from '../src/status';
 
-import { helpers as middlewareHelpers, makeIndexAction } from '../src/middleware';
-const { handleFailedRequest } = middlewareHelpers;
-
 describe('Json api middleware', () => {
   let mockStore = configureMockStore([thunk, apiStateMiddleware]);
   const actionPromise = action => dispatch => (
@@ -1317,95 +1314,42 @@ describe('Json api middleware', () => {
       expect(performedActions).to.have.lengthOf(2);
     }).then(done).catch(done), 350);
   });
-  describe('handleFailedRequest', () => {
-    it('handles failed LOAD_REQUEST', () => {
-      const fakeDispatch = function () {
-        console.log(arguments)
-      };
-      const spyDispatch = sinon.spy(fakeDispatch);
-      const schema = 'test';
-      const tag = 'tag';
+  it('handleFailedRequest', done => {
+    const schema = 'schema_test';
+    const tag = 'tag_test';
+    const expectedMeta = {
+      source: JSON_API_SOURCE,
+      schema,
+      tag,
+    };
 
-      const failedLoadRequestAction = {
-        error: true,
-        type: LOAD_REQUEST,
-        payload: 'error test',
-        meta: {
-          schema,
-          tag,
-        },
-      };
+    const mockErrorAction = {
+      type: LOAD_REQUEST,
+      meta: expectedMeta,
+      error: true,
+    };
 
-      const loadErrorAction = handleFailedRequest(failedLoadRequestAction, spyDispatch);
+    const store = mockStore({});
+    store.dispatch(actionPromise(mockErrorAction))
+      .then(() => {
+        const performedActions = store.getActions();
+        expect(performedActions).to.have.length(2);
 
-      const expectedLoadErrorAction = makeIndexAction(
-        failedLoadRequestAction,
-        LOAD_ERROR,
-        failedLoadRequestAction.payload,
-        failedLoadRequestAction.meta.schema,
-        failedLoadRequestAction.meta.tag
-      );
+        const batchedActions = performedActions[0].payload;
 
-      const expectedDispatchAction = makeIndexAction(
-        failedLoadRequestAction,
-        REFERENCE_STATUS,
-        {
+        const actionCollStatus = batchedActions[0];
+        expect(actionCollStatus.type).to.equal(REFERENCE_STATUS);
+        expect(actionCollStatus.meta).to.deep.equal(expectedMeta);
+        const expectedCollStatusPayload = {
           busyStatus: busyStatus.IDLE,
           validationStatus: validationStatus.INVALID,
           error: true,
-        },
-        schema,
-        tag
-      );
+        };
+        expect(actionCollStatus.payload).to.deep.equal(expectedCollStatusPayload);
 
-      expect(spyDispatch.calledOnce).to.be.true;
-      expect(spyDispatch.calledWith(expectedDispatchAction)).to.be.true;
-      expect(loadErrorAction).to.deep.equal(expectedLoadErrorAction);
-    });
-    it('leaves unknown failed request and warns', () => {
-      const fakeDispatch = function () {};
-      const spyDispatch = sinon.spy(fakeDispatch);
-      const warningSpy = sinon.spy(console, 'warn');
-
-      const failedLoadRequestAction = {
-        error: true,
-        type: 'unknown request type',
-        payload: 'error test',
-        meta: {
-          schema: 'test',
-          tag: 'test',
-        },
-      };
-
-      const unhandledFailedRequest = handleFailedRequest(failedLoadRequestAction, spyDispatch);
-
-      expect(spyDispatch.called).to.be.false;
-      expect(warningSpy.calledOnce).to.be.true;
-      expect(unhandledFailedRequest === failedLoadRequestAction).to.be.true;
-    });
-    it('is called for failed request', done => {
-      const store = mockStore({});
-      const handleFailedRequestSpy = sinon.spy(middlewareHelpers, 'handleFailedRequest');
-      const failedLoadRequestAction = {
-        error: true,
-        type: LOAD_REQUEST,
-        payload: 'error test',
-        meta: {
-          source: 'json-api',
-          schema: 'failedRequestSchema',
-          tag: 'test',
-        },
-      };
-
-      store.dispatch(actionPromise(failedLoadRequestAction))
-        .then(() => {
-          console.log(handleFailedRequestSpy.callCount)
-          expect(handleFailedRequestSpy.calledOnce).to.be.true;
-          done();
-        })
-        .catch((err) => {
-          console.log(err);
-        })
-    });
+        const requestAction = performedActions[1];
+        expect(requestAction.type).to.equal(LOAD_REQUEST);
+        expect(requestAction.meta).to.deep.equal(expectedMeta);
+      }).then(done).catch(done);
   });
 });
