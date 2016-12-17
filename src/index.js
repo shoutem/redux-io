@@ -103,9 +103,5 @@ export {
 import { enableRio } from './enableRio';
 export { enableRio };
 
-import mergeReducers from './reducers/mergeReducers';
-import chainReducers from './reducers/chainReducers';
-export { mergeReducers, chainReducers };
-
 import rio from './rio';
 export default rio;
