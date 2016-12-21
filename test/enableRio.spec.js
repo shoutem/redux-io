@@ -8,7 +8,6 @@ import rio, {
   enableRio,
   storage,
   collection,
-  chainReducers,
   ReduxApiStateDenormalizer,
 } from '../src';
 
