@@ -1,4 +1,6 @@
-redux-api-state
+[![npm version](https://badge.fury.io/js/%40shoutem%2Fredux-io.svg)](https://badge.fury.io/js/%40shoutem%2Fredux-io)
+
+redux-io
 ====================
 
 Library for easy data managing between api and redux store. Comes with action creators, reducers, and middleware.
