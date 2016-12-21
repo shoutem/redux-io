@@ -88,32 +88,4 @@ describe('EnableRio reducer', () => {
     expect(rio.denormalizer).to.be.an.instanceof(ReduxApiStateDenormalizer);
     expect(rio.schemaPaths).to.deep.equal(expectedSchemaPaths);
   });
-
-  it('has a valid discovery of storage map with chainReducers', () => {
-    const userReducer = combineReducers({
-      locationsStorage: storage('locations'),
-      interestsStorage: storage('interests'),
-    });
-
-    const testReducer = combineReducers({
-      users: userReducer,
-      carsStorage: chainReducers([
-        storage('cars'),
-        (state, action) => state,
-      ]),
-    });
-
-    const expectedSchemaPaths = {
-      'locations': ['users', 'locationsStorage'],
-      'interests': ['users', 'interestsStorage'],
-      'cars': ['carsStorage']
-    };
-
-    const testBatchedReducer = enableRio(testReducer);
-    const state = testBatchedReducer(undefined, batchActions([{}]));
-
-    expect(state).to.shallowDeepEqual({});
-    expect(rio.denormalizer).to.be.an.instanceof(ReduxApiStateDenormalizer);
-    expect(rio.schemaPaths).to.deep.equal(expectedSchemaPaths);
-  });
 });
