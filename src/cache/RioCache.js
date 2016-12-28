@@ -15,14 +15,16 @@ function isCollection(entity) {
 
 /**
  * Compare cached entity modification time with current.
- * If any argument is not provided, cache will be considered invalid.
+ * It is not expected to require older version of references then current in the state,
+ * thus if modification time is not strictly equal it is considered different.
+ * This is preliminary change to get cache work as it will with reference comparator.
  *
  * @param cachedModificationTime
  * @param currentModificationTime
  * @returns {boolean}
  */
 function isCacheValid(cachedModificationTime, currentModificationTime) {
-  return cachedModificationTime >= currentModificationTime;
+  return cachedModificationTime === currentModificationTime;
 }
 
 /**
