@@ -29,7 +29,8 @@ function isCacheValid(cachedModificationTime, currentModificationTime) {
 
 /**
  * Compare references modification time to see if current reference is newer then cache.
- * If any argument is not RIO reference, function will mark reference as changed.
+ * Reference is considered changed when not strictly equal. If both references are not RIO they are
+ * considered unchanged, this are most often descriptors. Use RIO cache only with RIO references.
  * @param reference
  * @param cachedReference
  * @returns {boolean}
@@ -152,10 +153,6 @@ export default class RioCache {
 
   isItemModified(normalizedItem) {
     const cachedItem = this.get(normalizedItem);
-    if (!isReference(normalizedItem)) {
-      // Usually when normalizedItem is not reference it is only item descriptor
-      return !_.isEqual(normalizedItem, cachedItem);
-    }
     return !cachedItem || isReferenceChanged(normalizedItem, cachedItem);
   }
 
