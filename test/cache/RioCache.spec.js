@@ -204,7 +204,7 @@ describe('RioCache', () => {
       });
   });
   describe('getValidItem', () => {
-    it('returns unchanged item', () => {
+    it('returns cached item', () => {
       const id = 1;
       const type = 'type';
 
@@ -219,6 +219,21 @@ describe('RioCache', () => {
       cache.add(denormalizedReference);
 
       assert.isOk(denormalizedReference === cache.getValidItem({
+          id,
+          type
+        }), 'didn\'t return valid reference');
+    });
+    it('returns cached item for item descriptor', () => {
+      const id = 1;
+      const type = 'type';
+
+      const reference = { id, type };
+
+      const cache = new RioCache(() => ({ id, type }));
+
+      cache.add(reference);
+
+      assert.isOk(reference === cache.getValidItem({
           id,
           type
         }), 'didn\'t return valid reference');
@@ -241,6 +256,21 @@ describe('RioCache', () => {
       cache.add(denormalizedReference);
 
       assert.isUndefined(cache.getValidItem({ id, type }), 'returned some entity');
+    });
+    it('returns cached item when non rio object required even if changed', () => {
+      const id = 1;
+      const type = 'type';
+
+      const reference = { id, type, attr: 1 };
+
+      const cache = new RioCache(() => ({ id, type, attr: 2 }));
+
+      cache.add(reference);
+
+      assert.isOk(reference === cache.getValidItem({
+          id,
+          type
+        }), 'didn\'t return valid reference');
     });
   });
   describe('getValidOne', () => {
@@ -328,7 +358,7 @@ describe('RioCache', () => {
     });
   });
   describe('getValidCollection', () => {
-    it('returns unchanged collection', () => {
+    it('returns cached collection', () => {
       const id = 1;
       const schema = 'type';
       const type = schema;
@@ -416,7 +446,7 @@ describe('RioCache', () => {
     });
   });
   describe('areCollectionItemsChanged', () => {
-    it('confirms that collection is unchanged', () => {
+    it('confirms that collection is cached', () => {
       const normalizedData = new NormalizedData(getNormalizedData());
       const cache = new RioCache(normalizedData.getNormalizedItem);
       const denormalizedItems = getDenormalizedItems();
@@ -540,7 +570,7 @@ describe('RioCache', () => {
     });
   });
   describe('areItemRelationshipsValid', () => {
-    it('confirms that unchanged relationships are valid', () => {
+    it('confirms that cached relationships are valid', () => {
       const normalizedData = new NormalizedData(getNormalizedData());
       const cache = new RioCache(normalizedData.getNormalizedItem);
       const denormalizedItems = getDenormalizedItems();
@@ -583,7 +613,7 @@ describe('RioCache', () => {
 
         assert.isNotOk(
           cache.areCachedItemRelationshipsValid(normalizedItemType1Id1),
-          'item relationships marked as valid (unchanged)'
+          'item relationships marked as valid (cached)'
         );
       });
     });
@@ -610,7 +640,7 @@ describe('RioCache', () => {
 
         assert.isNotOk(
           cache.areCachedItemRelationshipsValid(normalizedItemType1Id1),
-          'item relationships marked as valid (unchanged)'
+          'item relationships marked as valid (cached)'
         );
       });
     });

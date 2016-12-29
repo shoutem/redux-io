@@ -15,19 +15,22 @@ function isCollection(entity) {
 
 /**
  * Compare cached entity modification time with current.
- * If any argument is not provided, cache will be considered invalid.
+ * It is not expected to require older version of references then current in the state,
+ * thus if modification time is not strictly equal it is considered different.
+ * This is preliminary change to get cache work as it will with reference comparator.
  *
  * @param cachedModificationTime
  * @param currentModificationTime
  * @returns {boolean}
  */
 function isCacheValid(cachedModificationTime, currentModificationTime) {
-  return cachedModificationTime >= currentModificationTime;
+  return cachedModificationTime === currentModificationTime;
 }
 
 /**
  * Compare references modification time to see if current reference is newer then cache.
- * If any argument is not RIO reference, function will mark reference as changed.
+ * Reference is considered changed when not strictly equal. If both references are not RIO they are
+ * considered unchanged, this are most often descriptors. Use RIO cache only with RIO references.
  * @param reference
  * @param cachedReference
  * @returns {boolean}
@@ -39,12 +42,14 @@ export function isReferenceChanged(reference, cachedReference) {
   return !isCacheValid(cachedReferenceModificationTime, currentReferenceModificationTime);
 }
 
-function isReference(reference) {
-  return !!getStatus(reference);
+function getUniqueKey(item) {
+  return _.isPlainObject(item) && isKeyValid(item.id) && isKeyValid(item.type) ?
+    `${item.type}.${item.id}` :
+    undefined;
 }
 
-function getUniqueKey(item) {
-  return _.isPlainObject(item) && item.id && item.type ? `${item.type}.${item.id}` : undefined;
+function isKeyValid(key) {
+  return _.isNumber(key) || _.isString(key);
 }
 
 /**
@@ -54,7 +59,7 @@ function getUniqueKey(item) {
  * @param reference
  * @returns {*}
  */
-function getReferenceUniqueKey(reference) {
+export function getReferenceUniqueKey(reference) {
   return getId(reference) || getUniqueKey(reference);
 }
 
@@ -65,6 +70,7 @@ function getReferenceUniqueKey(reference) {
 export default class RioCache {
   constructor(getNormalizedItem) {
     this.cache = {};
+    // It is expected to return descriptor for items that can't be found.
     this.getNormalizedItem = getNormalizedItem;
   }
 
@@ -82,7 +88,7 @@ export default class RioCache {
 
   add(reference) {
     const referenceKey = getReferenceUniqueKey(reference);
-    if (!referenceKey) {
+    if (!isKeyValid(referenceKey)) {
       // If provided entity is not RIO reference, it can not be cached
       return reference;
     }
@@ -150,10 +156,6 @@ export default class RioCache {
 
   isItemModified(normalizedItem) {
     const cachedItem = this.get(normalizedItem);
-    if (!isReference(normalizedItem)) {
-      // Usually when normalizedItem is not reference it is only item descriptor
-      return !_.isEqual(normalizedItem, cachedItem);
-    }
     return !cachedItem || isReferenceChanged(normalizedItem, cachedItem);
   }
 

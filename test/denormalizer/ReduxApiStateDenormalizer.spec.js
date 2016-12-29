@@ -321,6 +321,48 @@ describe('ReduxApiStateDenormalizer', () => {
       assert.isObject(cachedDenormalizedData[STATUS]);
       assert.isObject(cachedDenormalizedData['type2.test'][STATUS]);
     });
+    it('gets object from cache for unexisting item ', () => {
+      const denormalizer = new ReduxApiStateDenormalizer();
+      const storage = createSchemasMap(getStore(), createStorageMap());
+
+      const one = { value: 'unexisting' };
+      one[STATUS] = { schema: 'type1', id: _.uniqueId(), modifiedTimestamp: 1 };
+
+      const denormalizedData =
+        denormalizer.denormalizeOne(one, storage);
+      const cachedDenormalizedData =
+        denormalizer.denormalizeOne(one, storage);
+
+      assert.isOk(cachedDenormalizedData === denormalizedData, 'didn\'t get cached item');
+    });
+    it('gets object from cache for unexisting item with empty string (false) ID', () => {
+      const denormalizer = new ReduxApiStateDenormalizer();
+      const storage = createSchemasMap(getStore(), createStorageMap());
+
+      const one = { value: '' };
+      one[STATUS] = { schema: 'type1', id: _.uniqueId(), modifiedTimestamp: 1 };
+
+      const denormalizedData =
+        denormalizer.denormalizeOne(one, storage);
+      const cachedDenormalizedData =
+        denormalizer.denormalizeOne(one, storage);
+
+      assert.isOk(cachedDenormalizedData === denormalizedData, 'didn\'t get cached item');
+    });
+    it('gets object from cache for unexisting item with ID 0 (false)', () => {
+      const denormalizer = new ReduxApiStateDenormalizer();
+      const storage = createSchemasMap(getStore(), createStorageMap());
+
+      const one = { value: 0 };
+      one[STATUS] = { schema: 'type1', id: _.uniqueId(), modifiedTimestamp: 1 };
+
+      const denormalizedData =
+        denormalizer.denormalizeOne(one, storage);
+      const cachedDenormalizedData =
+        denormalizer.denormalizeOne(one, storage);
+
+      assert.isOk(cachedDenormalizedData === denormalizedData, 'didn\'t get cached item');
+    });
     it('gets object from cache with single relationship null', () => {
       const denormalizer = new ReduxApiStateDenormalizer();
       const storage = createSchemasMap(getStore(), createStorageMap());
