@@ -70,7 +70,7 @@ export function getReferenceUniqueKey(reference) {
 export default class RioCache {
   constructor(getNormalizedItem) {
     this.cache = {};
-    // It is expected to return descriptor for items it can not found.
+    // It is expected to return descriptor for items that can't be found.
     this.getNormalizedItem = getNormalizedItem;
   }
 
