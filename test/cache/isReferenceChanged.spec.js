@@ -23,10 +23,17 @@ describe('isReferenceChanged', () => {
 
     assert.isOk(isReferenceChanged(reference, cachedReference), 'reference marked unchanged');
   });
-  it('returns false for descriptor', () => {
-    const descriptor = {};
-    const cachedDescriptor = {};
+  it('returns true when compering non rio and rio reference', () => {
+    const reference = {};
+    reference[STATUS] = { modifiedTimestamp: 1 };
+    const cachedNonRioRef = {};
 
-    assert.isNotOk(isReferenceChanged(descriptor, cachedDescriptor), 'descriptor marked changed');
+    assert.isOk(isReferenceChanged(reference, cachedNonRioRef), 'ref marked unchanged');
+  });
+  it('returns false for non Rio objects', () => {
+    const nonRioRef = {};
+    const cachedNonRioRef = {};
+
+    assert.isNotOk(isReferenceChanged(nonRioRef, cachedNonRioRef), 'ref marked changed');
   });
 });
