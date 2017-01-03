@@ -29,3 +29,9 @@ export const CHECK_EXPIRATION = '@@redux_io/CHECK_EXPIRATION';
 
 export const OBJECT_ERROR = '@@redux_io/OBJECT_ERROR';
 export const COLLECTION_ERROR = '@@redux_io/COLLECTION_ERROR';
+
+/**
+ * This options key indicates that the endpoint is already fully
+ * resolved and populated with action parameters.
+ */
+export const RESOLVED_ENDPOINT = 'resolvedEndpoint';

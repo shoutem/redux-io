@@ -60,6 +60,9 @@ describe('Create action creator', () => {
     const expectedMeta = {
       source: JSON_API_SOURCE,
       schema,
+      endpoint: config.endpoint,
+      params: {},
+      options: {},
       timestamp: types[0].meta.timestamp,
     };
     expect(types[0].type).to.equal(CREATE_REQUEST);
@@ -99,6 +102,9 @@ describe('Create action creator', () => {
     const expectedMeta = {
       source: JSON_API_SOURCE,
       schema,
+      endpoint: config.endpoint,
+      params: {},
+      options: {},
       timestamp: types[0].meta.timestamp,
     };
 
@@ -138,9 +144,60 @@ describe('Create action creator', () => {
     const expectedMeta = {
       source: JSON_API_SOURCE,
       schema,
+      endpoint: config.endpoint,
+      params: {},
+      options: {},
       timestamp: types[0].meta.timestamp,
     };
 
+    expect(types[0].type).to.equal(CREATE_REQUEST);
+    expect(types[0].meta).to.deep.equal(expectedMeta);
+    expect(types[1].type).to.equal(CREATE_SUCCESS);
+    expect(types[1].meta).to.deep.equal(expectedMeta);
+  });
+
+  it('creates a valid action with valid endpoint with filled params', () => {
+    const schema = 'schema_test';
+    const item = {
+      schema,
+      id: '1',
+      attributes: {
+        name: 'Test1',
+      },
+    };
+    const config = {
+      headers: {
+        'Content-Type': 'application/vnd.api+json',
+      },
+      endpoint: 'api.test/{param1}/{param2}/abc',
+    };
+
+    const params = {
+      param1: 'a',
+      param2: 'b',
+      q1: 'c',
+      q2: 'd',
+    };
+
+    const action = create(config, schema, item, params);
+
+    const expectedEndpoint = 'api.test/a/b/abc?q1=c&q2=d';
+    expect(action[RSAA]).to.not.be.undefined;
+    expect(action[RSAA].method).to.equal('POST');
+    expect(action[RSAA].endpoint).to.equal(expectedEndpoint);
+    expect(action[RSAA].headers).to.deep.equal(config.headers);
+    expect(action[RSAA].body).to.equal(JSON.stringify({ data: item }));
+    expect(action[RSAA].types).to.not.be.undefined;
+
+    const types = action[RSAA].types;
+    const expectedMeta = {
+      source: JSON_API_SOURCE,
+      schema,
+      endpoint: expectedEndpoint,
+      params,
+      options: {},
+      timestamp: types[0].meta.timestamp,
+    };
     expect(types[0].type).to.equal(CREATE_REQUEST);
     expect(types[0].meta).to.deep.equal(expectedMeta);
     expect(types[1].type).to.equal(CREATE_SUCCESS);
@@ -219,10 +276,6 @@ describe('Create action creator', () => {
         },
       },
     };
-    const expectedMeta = {
-      source: JSON_API_SOURCE,
-      schema,
-    };
 
     const item = {
       schema,
@@ -239,6 +292,14 @@ describe('Create action creator', () => {
         'Content-Type': 'application/vnd.api+json',
       },
       endpoint: 'http://api.server.local/apps',
+    };
+
+    const expectedMeta = {
+      source: JSON_API_SOURCE,
+      endpoint: config.endpoint,
+      params: {},
+      options: {},
+      schema,
     };
 
     const action = create(config, schema, item);

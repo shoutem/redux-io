@@ -4,8 +4,10 @@ import {
   CREATE_REQUEST,
   CREATE_SUCCESS,
   CREATE_ERROR,
+  RESOLVED_ENDPOINT,
 } from './../consts';
 import { JSON_API_SOURCE } from './..';
+import { buildEndpoint } from './../schemaConfig';
 import thunkAction from './_thunkAction';
 
 /**
@@ -18,7 +20,7 @@ import thunkAction from './_thunkAction';
  * @param item holds object that you want to pass to api
  * @returns {function}
  */
-export function create(config, schema, item = null) {
+export function create(config, schema, item = null, params = {}, options = {}) {
   if (!_.isObject(config)) {
     throw new TypeError('Config isn\'t an object.');
   }
@@ -39,9 +41,17 @@ export function create(config, schema, item = null) {
     body = config.body;
   }
 
+  const isEndpointResolved = options[RESOLVED_ENDPOINT];
+  const endpoint = isEndpointResolved
+    ? config.endpoint
+    : buildEndpoint(config.endpoint, params);
+
   const meta = {
     source: JSON_API_SOURCE,
     schema,
+    params,
+    endpoint,
+    options,
     timestamp: Date.now(),
   };
 
@@ -49,6 +59,7 @@ export function create(config, schema, item = null) {
     [RSAA]: {
       method: 'POST',
       ...config,
+      endpoint,
       body,
       types: [
         {

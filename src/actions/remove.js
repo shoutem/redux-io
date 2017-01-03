@@ -4,8 +4,10 @@ import {
   REMOVE_REQUEST,
   REMOVE_SUCCESS,
   REMOVE_ERROR,
+  RESOLVED_ENDPOINT,
 } from './../consts';
 import { JSON_API_SOURCE } from './..';
+import { buildEndpoint } from './../schemaConfig';
 import thunkAction from './_thunkAction';
 
 /**
@@ -19,7 +21,7 @@ import thunkAction from './_thunkAction';
  * @param item to remove/delete
  * @returns {{}}
  */
-export function remove(config, schema, item) {
+export function remove(config, schema, item, params = {}, options = {}) {
   if (!_.isObject(config)) {
     throw new TypeError('Config isn\'t object.');
   }
@@ -33,9 +35,17 @@ export function remove(config, schema, item) {
     throw new Error('Item isn\'t object.');
   }
 
+  const isEndpointResolved = options[RESOLVED_ENDPOINT];
+  const endpoint = isEndpointResolved
+    ? config.endpoint
+    : buildEndpoint(config.endpoint, params);
+
   const meta = {
     source: JSON_API_SOURCE,
     schema,
+    params,
+    endpoint,
+    options,
     timestamp: Date.now(),
   };
 
@@ -43,6 +53,7 @@ export function remove(config, schema, item) {
     [RSAA]: {
       method: 'DELETE',
       ...config,
+      endpoint,
       types: [
         {
           type: REMOVE_REQUEST,

@@ -50,6 +50,9 @@ describe('Update action creator', () => {
     const expectedMeta = {
       source: JSON_API_SOURCE,
       schema,
+      endpoint: config.endpoint,
+      params: {},
+      options: {},
       timestamp: types[0].meta.timestamp,
     };
     expect(types[0].type).to.equal(UPDATE_REQUEST);
@@ -59,6 +62,48 @@ describe('Update action creator', () => {
     expect(types[1].meta).to.deep.equal(expectedMeta);
     expect(types[2].type).to.equal(UPDATE_ERROR);
     expect(types[2].meta).to.deep.equal(expectedMeta);
+  });
+
+  it('creates a valid action with valid endpoint with filled params', () => {
+    const schema = 'app.builder';
+    const item = { id: 1 };
+
+    const config = {
+      headers: {
+        'Content-Type': 'application/vnd.api+json',
+      },
+      endpoint: 'api.test/{param1}/{param2}/abc',
+    };
+
+    const params = {
+      param1: 'a',
+      param2: 'b',
+      q1: 'c',
+      q2: 'd',
+    };
+
+    const action = update(config, schema, item, params);
+
+    const expectedEndpoint = 'api.test/a/b/abc?q1=c&q2=d';
+    expect(action[RSAA]).to.not.be.undefined;
+    expect(action[RSAA].method).to.equal('PATCH');
+    expect(action[RSAA].endpoint).to.equal(expectedEndpoint);
+    expect(action[RSAA].headers).to.deep.equal(config.headers);
+    expect(action[RSAA].types).to.not.be.undefined;
+
+    const types = action[RSAA].types;
+    const expectedMeta = {
+      source: JSON_API_SOURCE,
+      schema,
+      endpoint: expectedEndpoint,
+      params,
+      options: {},
+      timestamp: types[0].meta.timestamp,
+    };
+    expect(types[0].type).to.equal(UPDATE_REQUEST);
+    expect(types[0].meta).to.deep.equal(expectedMeta);
+    expect(types[1].type).to.equal(UPDATE_SUCCESS);
+    expect(types[1].meta).to.deep.equal(expectedMeta);
   });
 
   it('throws exception on invalid action with null config', () => {
@@ -102,10 +147,6 @@ describe('Update action creator', () => {
   it('produces valid storage and collection actions', done => {
     const schema = 'schema_test';
     const item = { id: 2, type: schema };
-    const expectedMeta = {
-      source: JSON_API_SOURCE,
-      schema,
-    };
     const expectedPayload = {
       data: item,
     };
@@ -119,6 +160,14 @@ describe('Update action creator', () => {
         'Content-Type': 'application/vnd.api+json',
       },
       endpoint: 'http://api.server.local/apps/1',
+    };
+
+    const expectedMeta = {
+      source: JSON_API_SOURCE,
+      schema,
+      endpoint: config.endpoint,
+      params: {},
+      options: {},
     };
 
     const action = update(config, schema, item);
