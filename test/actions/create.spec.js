@@ -37,6 +37,11 @@ describe('Create action creator', () => {
     };
 
     const schema = 'schema_test';
+    const schemaConfig = {
+      schema,
+      request: config,
+    };
+
     const item = {
       schema,
       id: '1',
@@ -44,12 +49,13 @@ describe('Create action creator', () => {
         name: 'Test1',
       },
     };
-    const action = create(config, schema, item);
+
+    const action = create(schemaConfig, item);
 
     expect(action[RSAA]).to.not.be.undefined;
     expect(action[RSAA].method).to.equal('POST');
     expect(action[RSAA].endpoint).to.equal(config.endpoint);
-    expect(action[RSAA].headers).to.equal(config.headers);
+    expect(action[RSAA].headers).to.deep.equal(config.headers);
     const expectedBody = JSON.stringify({
       data: item,
     });
@@ -89,13 +95,19 @@ describe('Create action creator', () => {
       endpoint: 'api.test',
       body: item,
     };
-    const action = create(config, schema);
+
+    const schemaConfig = {
+      schema,
+      request: config,
+    };
+
+    const action = create(schemaConfig);
 
     expect(action[RSAA]).to.not.be.undefined;
     expect(action[RSAA].method).to.equal('POST');
     expect(action[RSAA].endpoint).to.equal(config.endpoint);
-    expect(action[RSAA].headers).to.equal(config.headers);
-    expect(action[RSAA].body).to.equal(item);
+    expect(action[RSAA].headers).to.deep.equal(config.headers);
+    expect(action[RSAA].body).to.deep.equal(item);
     expect(action[RSAA].types).to.not.be.undefined;
 
     const types = action[RSAA].types;
@@ -131,12 +143,17 @@ describe('Create action creator', () => {
       body: item,
     };
 
-    const action = create(config, schema, item);
+    const schemaConfig = {
+      schema,
+      request: config,
+    };
+
+    const action = create(schemaConfig, item);
 
     expect(action[RSAA]).to.not.be.undefined;
     expect(action[RSAA].method).to.equal('POST');
     expect(action[RSAA].endpoint).to.equal(config.endpoint);
-    expect(action[RSAA].headers).to.equal(config.headers);
+    expect(action[RSAA].headers).to.deep.equal(config.headers);
     expect(action[RSAA].body).to.equal(JSON.stringify({ data: item }));
     expect(action[RSAA].types).to.not.be.undefined;
 
@@ -172,6 +189,11 @@ describe('Create action creator', () => {
       endpoint: 'api.test/{param1}/{param2}/abc',
     };
 
+    const schemaConfig = {
+      schema,
+      request: config,
+    };
+
     const params = {
       param1: 'a',
       param2: 'b',
@@ -179,7 +201,7 @@ describe('Create action creator', () => {
       q2: 'd',
     };
 
-    const action = create(config, schema, item, params);
+    const action = create(schemaConfig, item, params);
 
     const expectedEndpoint = 'api.test/a/b/abc?q1=c&q2=d';
     expect(action[RSAA]).to.not.be.undefined;
@@ -204,21 +226,7 @@ describe('Create action creator', () => {
     expect(types[1].meta).to.deep.equal(expectedMeta);
   });
 
-  it('throws exception on action with undefined config', () => {
-    const config = undefined;
-
-    const schema = 'schema_test';
-    const item = {
-      schema,
-      id: '1',
-      attributes: {
-        name: 'Test1',
-      },
-    };
-    expect(() => create(config, schema, item)).to.throw('Config isn\'t an object.');
-  });
-
-  it('throws exception on action with invalid schema', () => {
+  it('throws exception on action with schema configuration is invalid', () => {
     const config = {
       headers: {
         'Content-Type': 'application/vnd.api+json',
@@ -226,15 +234,18 @@ describe('Create action creator', () => {
       endpoint: 'api.test',
     };
 
-    const schema = '';
-    const item = {
-      schema,
-      id: '1',
-      attributes: {
-        name: 'Test1',
-      },
+    const schemaConfig = {
+      request: config,
     };
-    expect(() => create(config, schema, item)).to.throw('Empty schema string.');
+
+    expect(() => create(schemaConfig)).to.throw(
+      'Schema configuration is invalid. Error:'
+      + ' [{"code":"OBJECT_MISSING_REQUIRED_PROPERTY","params":'
+      + '["schema"],"message":"Missing required pr'
+      + 'operty: schema","path":"#/"}]. Invalid schema config:'
+      + ' {"request":{"headers":{"Content-Type":'
+      + '"application/vnd.api+json"},"endpoint":"api.test"}}'
+    );
   });
 
   it('throws exception on action with invalid item', () => {
@@ -246,8 +257,12 @@ describe('Create action creator', () => {
     };
 
     const schema = 'app.builder';
+    const schemaConfig = {
+      schema,
+      request: config,
+    };
     const item = 2;
-    expect(() => create(config, schema, item))
+    expect(() => create(schemaConfig, item))
       .to.throw('Item is not valid in method argument');
   });
 
@@ -260,7 +275,11 @@ describe('Create action creator', () => {
     };
 
     const schema = 'app.builder';
-    expect(() => create(config, schema))
+    const schemaConfig = {
+      schema,
+      request: config,
+    };
+    expect(() => create(schemaConfig))
       .to.not.throw('Item is missing in method argument and in config.body');
   });
 
@@ -294,6 +313,11 @@ describe('Create action creator', () => {
       endpoint: 'http://api.server.local/apps',
     };
 
+    const schemaConfig = {
+      schema,
+      request: config,
+    };
+
     const expectedMeta = {
       source: JSON_API_SOURCE,
       endpoint: config.endpoint,
@@ -302,7 +326,7 @@ describe('Create action creator', () => {
       schema,
     };
 
-    const action = create(config, schema, item);
+    const action = create(schemaConfig, item);
     const store = mockStore({});
     store.dispatch(action)
       .then(() => {

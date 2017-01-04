@@ -37,13 +37,19 @@ describe('Delete action creator', () => {
       endpoint: 'api.test',
     };
     const schema = 'app.builder';
+
+    const schemaConfig = {
+      schema,
+      request: config,
+    };
+
     const item = { id: 1 };
-    const action = remove(config, schema, item);
+    const action = remove(schemaConfig, item);
 
     expect(action[RSAA]).to.not.be.undefined;
     expect(action[RSAA].method).to.equal('DELETE');
     expect(action[RSAA].endpoint).to.equal(config.endpoint);
-    expect(action[RSAA].headers).to.equal(config.headers);
+    expect(action[RSAA].headers).to.deep.equal(config.headers);
     expect(action[RSAA].types).to.not.be.undefined;
 
     const types = action[RSAA].types;
@@ -75,6 +81,11 @@ describe('Delete action creator', () => {
       endpoint: 'api.test/{param1}/{param2}/abc',
     };
 
+    const schemaConfig = {
+      schema,
+      request: config,
+    };
+
     const params = {
       param1: 'a',
       param2: 'b',
@@ -82,7 +93,7 @@ describe('Delete action creator', () => {
       q2: 'd',
     };
 
-    const action = remove(config, schema, item, params);
+    const action = remove(schemaConfig, item, params);
 
     const expectedEndpoint = 'api.test/a/b/abc?q1=c&q2=d';
     expect(action[RSAA]).to.not.be.undefined;
@@ -106,30 +117,28 @@ describe('Delete action creator', () => {
     expect(types[1].meta).to.deep.equal(expectedMeta);
   });
 
-  it('throws exception on invalid action with null config', () => {
-    const config = null;
-    const schema = 'app.builder';
-    const item = {};
-    expect(() => remove(config, schema, item)).to.throw('Config isn\'t object.');
-  });
-
-  it('throws exception on invalid action with string config', () => {
-    const config = '';
-    const schema = 'app.builder';
-    const item = {};
-    expect(() => remove(config, schema, item)).to.throw('Config isn\'t object.');
-  });
-
-  it('throws exception on invalid action with invalid schema', () => {
+  it('throws exception on action with schema configuration is invalid', () => {
     const config = {
       headers: {
         'Content-Type': 'application/vnd.api+json',
       },
       endpoint: 'api.test',
     };
-    const schema = '';
+
     const item = {};
-    expect(() => remove(config, schema, item)).to.throw('Empty schema string.');
+
+    const schemaConfig = {
+      request: config,
+    };
+
+    expect(() => remove(schemaConfig, item)).to.throw(
+      'Schema configuration is invalid. Error:'
+      + ' [{"code":"OBJECT_MISSING_REQUIRED_PROPERTY","params":'
+      + '["schema"],"message":"Missing required pr'
+      + 'operty: schema","path":"#/"}]. Invalid schema config:'
+      + ' {"request":{"headers":{"Content-Type":'
+      + '"application/vnd.api+json"},"endpoint":"api.test"}}'
+    );
   });
 
   it('throws exception on invalid action with invalid item', () => {
@@ -140,8 +149,12 @@ describe('Delete action creator', () => {
       endpoint: 'api.test',
     };
     const schema = 'app.builder';
+    const schemaConfig = {
+      schema,
+      request: config,
+    };
     const item = 0;
-    expect(() => remove(config, schema, item)).to.throw('Item isn\'t object.');
+    expect(() => remove(schemaConfig, item)).to.throw('Item isn\'t object.');
   });
 
   it('produces valid storage and collection actions', done => {
@@ -159,6 +172,11 @@ describe('Delete action creator', () => {
       endpoint: 'http://api.server.local/apps/1',
     };
 
+    const schemaConfig = {
+      schema,
+      request: config,
+    };
+
     const expectedMeta = {
       source: JSON_API_SOURCE,
       schema,
@@ -167,7 +185,7 @@ describe('Delete action creator', () => {
       options: {},
     };
 
-    const action = remove(config, schema, item);
+    const action = remove(schemaConfig, item);
 
     const store = mockStore({});
     store.dispatch(action)
