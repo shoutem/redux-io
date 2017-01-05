@@ -4,7 +4,6 @@ import {
   CREATE_REQUEST,
   CREATE_SUCCESS,
   CREATE_ERROR,
-  RESOLVED_ENDPOINT,
 } from './../consts';
 import { JSON_API_SOURCE } from './..';
 import {
@@ -38,10 +37,7 @@ export function create(schema, item = null, params = {}, options = {}) {
   }
 
   const rsaaConfig = buildRSAAConfig(config);
-  const isEndpointResolved = options[RESOLVED_ENDPOINT];
-  const endpoint = isEndpointResolved
-    ? rsaaConfig.endpoint
-    : buildEndpoint(rsaaConfig.endpoint, params);
+  const endpoint = buildEndpoint(rsaaConfig.endpoint, params, options);
 
   let body = null;
   if (item !== null) {

@@ -248,6 +248,13 @@ describe('Create action creator', () => {
     );
   });
 
+  it('throws exception on action with schema undefined', () => {
+    const schemaConfig = 'schema_test';
+    expect(() => create(schemaConfig)).to.throw(
+      'Couldn\'t resolve schema schema_test in function find.'
+    );
+  });
+
   it('throws exception on action with invalid item', () => {
     const config = {
       headers: {

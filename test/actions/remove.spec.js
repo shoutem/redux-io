@@ -141,6 +141,13 @@ describe('Delete action creator', () => {
     );
   });
 
+  it('throws exception on action with schema undefined', () => {
+    const schemaConfig = 'schema_test';
+    expect(() => remove(schemaConfig)).to.throw(
+      'Couldn\'t resolve schema schema_test in function find.'
+    );
+  });
+
   it('throws exception on invalid action with invalid item', () => {
     const config = {
       headers: {

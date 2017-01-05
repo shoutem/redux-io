@@ -4,7 +4,6 @@ import {
   UPDATE_REQUEST,
   UPDATE_SUCCESS,
   UPDATE_ERROR,
-  RESOLVED_ENDPOINT,
 } from './../consts';
 import { JSON_API_SOURCE } from './..';
 import {
@@ -41,10 +40,7 @@ export function update(schema, item, params = {}, options = {}) {
   }
 
   const rsaaConfig = buildRSAAConfig(config);
-  const isEndpointResolved = options[RESOLVED_ENDPOINT];
-  const endpoint = isEndpointResolved
-    ? rsaaConfig.endpoint
-    : buildEndpoint(rsaaConfig.endpoint, params);
+  const endpoint = buildEndpoint(rsaaConfig.endpoint, params, options);
 
   const meta = {
     source: config.request.resourceType || JSON_API_SOURCE,
