@@ -6,7 +6,11 @@ import {
   LOAD_ERROR,
 } from './../consts';
 import { JSON_API_SOURCE } from './..';
-import { buildEndpoint, resolveConfig } from './../schemaConfig';
+import {
+  buildEndpoint,
+  resolveConfig,
+  buildRSAAConfig
+} from './../schemaConfig';
 import thunkAction from './_thunkAction';
 
 /**
@@ -15,23 +19,7 @@ import thunkAction from './_thunkAction';
  * overwriting it.
  */
 export const APPEND_MODE = 'appendMode';
-/**
- * This options key indicates that the endpoint is already fully
- * resolved and populated with action parameters.
- */
-export const RESOLVED_ENDPOINT = 'resolvedEndpoint';
 
-function buildRSAAConfig(config) {
-  const rsaaConfig = {
-    endpoint: config.request.endpoint,
-    headers: config.request.headers,
-    types: config.request.types,
-    method: config.request.method,
-    body: config.request.body,
-  };
-
-  return _.omitBy(rsaaConfig, _.isNil);
-}
 /**
  * Action creator used to fetch data from api (GET).
  * @param schema can be name of schema or schema configuration. In both cases
@@ -58,10 +46,7 @@ export function find(schema, tag = '', params = {}, options = {}) {
   }
 
   const rsaaConfig = buildRSAAConfig(config);
-  const isEndpointResolved = options[RESOLVED_ENDPOINT];
-  const endpoint = isEndpointResolved
-    ? rsaaConfig.endpoint
-    : buildEndpoint(rsaaConfig.endpoint, params);
+  const endpoint = buildEndpoint(rsaaConfig.endpoint, params, options);
 
   const meta = {
     source: config.request.resourceType || JSON_API_SOURCE,

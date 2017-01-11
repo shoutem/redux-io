@@ -54,7 +54,12 @@ describe('thunkActions', () => {
       endpoint: 'http://api.server.local/apps',
     };
 
-    const action = create(config, schema, item);
+    const schemaConfig = {
+      schema,
+      request: config,
+    };
+
+    const action = create(schemaConfig, item);
 
     const success = sinon.spy();
     const error = sinon.spy();
@@ -104,7 +109,12 @@ describe('thunkActions', () => {
       endpoint: 'http://api.server.local/apps',
     };
 
-    const action = create(config, schema, item);
+    const schemaConfig = {
+      schema,
+      request: config,
+    };
+
+    const action = create(schemaConfig, item);
 
     const success = sinon.spy();
     const error = sinon.spy();

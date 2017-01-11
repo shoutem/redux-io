@@ -1,6 +1,7 @@
 import _ from 'lodash';
 import ZSchema from 'z-schema';
 import { getStatus } from './status';
+import { RESOLVED_ENDPOINT } from './consts';
 import rio from './rio';
 
 const validator = new ZSchema();
@@ -84,13 +85,36 @@ export function resolveConfig(schema) {
 }
 
 /**
+ * Creates new config with data pulled out from config request,
+ * @param config
+ * @returns config
+ */
+export function buildRSAAConfig(config) {
+  const rsaaConfig = {
+    endpoint: config.request.endpoint,
+    headers: config.request.headers,
+    types: config.request.types,
+    method: config.request.method,
+    body: config.request.body,
+  };
+
+  return _.omitBy(rsaaConfig, _.isNil);
+}
+
+/**
  * Replace endpoint placeholders '{key}' with corresponding value of key in params dict.
  * Unused params are resolved into query params as 'key=value' pairs and concatenated to endpoint
  * @param endpoint
  * @param params
+ * @param options
  * @returns {string}
  */
-export function buildEndpoint(endpoint, params) {
+export function buildEndpoint(endpoint, params, options) {
+  const isEndpointResolved = options[RESOLVED_ENDPOINT];
+  if (isEndpointResolved) {
+    return endpoint;
+  }
+
   const usedParams = [];
   const paramEndpoint = endpoint.replace(/{(\w+)}/g, (match, key) => {
     usedParams.push(key);

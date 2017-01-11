@@ -6,28 +6,38 @@ import {
   CREATE_ERROR,
 } from './../consts';
 import { JSON_API_SOURCE } from './..';
+import {
+  buildEndpoint,
+  resolveConfig,
+  buildRSAAConfig
+} from './../schemaConfig';
 import thunkAction from './_thunkAction';
 
 /**
  * Action creator used to create item on api (POST). Tag is not needed because all collection
  * with configured schema value as in argument of create will be invalidated upon successful
  * action of creating item on api.
- * @param config based on RSAA configuration from redux-api-middleware,
- * allowing full customization expect types part of configuration
- * @param schema defines what reducers will listen for creation of new item
+ * @param schema can be name of schema or schema configuration. In both cases
+ * rio resolves schema with registered schema configurations, and in case of schema
+ * configuration passed in argument it merges two configuration objects. Schema configuration
+ * object holds config.request attribute which is configuration based on RSAA
+ * configuration from redux-api-middleware, allowing full customization expect types
+ * part of configuration.
  * @param item holds object that you want to pass to api
+ * @param params to be resolved in schema configuration endpoint. Params are first resolved
+ * in endpoint if endpoint holds exact keys {param}, rest of params are resolved
+ * as query params key=value
  * @returns {function}
  */
-export function create(config, schema, item = null) {
-  if (!_.isObject(config)) {
-    throw new TypeError('Config isn\'t an object.');
+export function create(schema, item = null, params = {}, options = {}) {
+  const config = resolveConfig(schema);
+  if (!config) {
+    const schemaName = schema && _.isObject(schema) ? schema.schema : schema;
+    throw new Error(`Couldn't resolve schema ${schemaName} in function find.`);
   }
-  if (!_.isString(schema)) {
-    throw new Error(`Invalid schema, "create" expected a string but got: ${JSON.stringify(schema)}`);
-  }
-  if (_.isEmpty(schema)) {
-    throw new Error('Empty schema string.');
-  }
+
+  const rsaaConfig = buildRSAAConfig(config);
+  const endpoint = buildEndpoint(rsaaConfig.endpoint, params, options);
 
   let body = null;
   if (item !== null) {
@@ -36,19 +46,23 @@ export function create(config, schema, item = null) {
     }
     body = JSON.stringify({ data: item });
   } else {
-    body = config.body;
+    body = rsaaConfig.body;
   }
 
   const meta = {
-    source: JSON_API_SOURCE,
-    schema,
+    source: config.request.resourceType || JSON_API_SOURCE,
+    schema: config.schema,
+    params,
+    endpoint,
+    options,
     timestamp: Date.now(),
   };
 
   return {
     [RSAA]: {
       method: 'POST',
-      ...config,
+      ...rsaaConfig,
+      endpoint,
       body,
       types: [
         {
