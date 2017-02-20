@@ -3,36 +3,71 @@
 redux-io
 ====================
 
-Library for easy data managing between api and redux store. Comes with action creators, reducers, and middleware.
+`redux-io` is library for data management of network data in `redux` and ease of data use in `react`. Consists of
+middleware, reducers, action creators and helpers that provide:
 
-## Table of contents
+- [JSON-API](http://jsonapi.org/)
+- normalized data in `redux`
+- async CRUD operations with `redux` actions
+- optimistic updates of redux
+- denormalizing data for easier use in `react`
+- data caching and supported compatibility with `reselect`
+- simple and expandable network resource configuration
+- data status, error handling and monitoring operations
+- [SOON] JSON payloads with normalizr schemas
 
-1. [Introduction](#introduction)
-  - [A simple example](#a-simple-example)
-2. [Installation](#installation)
-3. [Usage](#usage)
-  - [Defining the API call](#defining-the-api-call)
-  - [Defining the store reducers](#defining-the-store-reducers)
-  - [Actions without API calls](#actions-without-api-calls)
-5. [History](#history)
-6. [Tests](#tests)
-7. [License](License)
-8. [Acknowledgements](Acknowledgements)
+## Motivation
 
-## Introduction
+Redux is a great library, but it’s not a framework. It’s based on simple concepts that enable the freedom to build,
+but without clear patterns. But how are you going to manage network data and organize it in store, make async requests,
+normalize data, handle errors, cache data, monitor data statuses? At Shoutem we developed platform based on `react`
+ecosystem in which we use `redux` for managing data. We learned a lot about problems and discovered practices that give
+answers to above questions. All that is used in development of `redux-io` library that we use everyday and enables us
+powerful data management.
 
-Library consists of middleware, reducers and action creators that enable simple handling of data in CRUD operations
-with API. Library uses [redux-api-middleware](http://www.test.com) for async api calls. Action creators and middleware
-are wrapping redux-api-middleware, allowing you to have same experience as with using redux-api-middleware. Read more
-about using [redux-api-middleware](http://www.test.com).
+## Documentation
 
-All you need to do is use `find` or `create` action creators to dispatch API calls, and use `storage` and `collection`
-reducers to handle data in the redux state.
+- [API Reference](https://github.com/shoutem/redux-io/tree/develop/docs/api)
 
-### A simple example
+## Getting started
+
+Install `redux-io`:
+
+```
+$ npm install --save @shoutem/redux-io
+```
+
+Import middlewares `apiMiddleware`, `apiStateMiddleware` and add them to your `createStore` in `applyMiddleware`
+function from `redux`. We are internally using [`redux-api-middleware@2.0.0-beta.1`]
+(https://github.com/agraboso/redux-api-middleware/tree/next) as library for async network requests,
+so that is the reason you need to add both middlewares respectively. 
+
+Example:
+
+```js
+import { applyMiddleware, compose, createStore } from 'redux';
+import { apiMiddleware } from 'redux-api-middleware';
+import { apiStateMiddleware } from '@shoutem/redux-io';
+import createLogger from 'redux-logger';
+import thunk from 'redux-thunk';
+import reducer from './reducers'
+
+const logger = createLogger();
+
+const store = createStore(
+  reducer,
+  applyMiddleware(thunk, apiMiddleware, apiStateMiddleware, logger)
+);
+```
+
+And you are ready to start organizing state, configuring network resources, manage data with actions and use them in
+react components. Next section gives short intro in usage of redux-io in most common use cases.
+
+## Usage
 
 For example, you have [json-api](http://jsonapi.org/) API endpoint that enables you to fetch items of type `acme.items`.
-You want to get most popular items, so endpoint `http://api.test.com/items?sort=relevance` returns you list of items sorted by popularity:
+You want to get most popular items, so endpoint `http://api.test.com/items?sort=relevance` returns you list of items
+sorted by popularity:
 
 ```json
 {
@@ -57,7 +92,7 @@ You want to get most popular items, so endpoint `http://api.test.com/items?sort=
 ```
 
 First you want to configure where fetched data will be placed in your state. Use `storage` as a normal reducer to define
-where in your state are instances of objects , and 'collection' reducer to set place in the state for list holding ids
+where in your state are instances of objects, and `collection` reducer to set place in the state for list holding ids
 of items that are popular. You are probably asking why do you need those two reducers, but idea is to keep data in redux
 state normalized. Normalization instances needs to be in one place in the state. However, you can reference it from
 mutliple parts in the state.
@@ -131,150 +166,12 @@ state: {
 }
 ```
 
-## Installation
-
-`redux-api-state` is available on [npm](https://www.npmjs.com/package/redux-api-state).
-
-```
-$ npm install redux-api-state --save
-```
-
-**Apply it to the store after redux-api-middleware**. For more information (for example, on how to add several
-middlewares), consult the [Redux documentation](http://redux.js.org).
-
-```js
-import { apiMiddleware } from 'redux-api-middleware';
-import { apiStateMiddleware } from 'redux-api-state';
-
-...
-applyMiddleware(apiMiddleware, apiStateMiddleware)(store);
-...
-```
-
-## Usage
-
-### Defining the API call
-
-#### `find(config, schema, tag='')`
-Action creator used to fetch data from api (GET). Config argument is based on CALL_API configuration from
-redux-api-middleware, allowing full customization expect types part of the configuration. Find function expects
-schema name of data which correspond with storage reducer with same schema value. Tag argument is optional, but when
-used allows your collection with same tag value to respond to the received data.
-##### `config`
-An object that is based on redux-api-middleware [CALL_API] configuration. You can configure it as you like, but `types`
-will be overwritten by `find`.
-##### `schema`
-Type of data you are fetching must be defined in api endpoint json-api as a data type. It must correspond with `storage`
-`schema` argument so `redux-api-state` can place fetched data into the right location in the redux state.
-##### `tag`
-Use it to connect action with `collection` reducer. Ids of fetched data will be placed in collections with the same `tag`
-value. The tag should be unique per `collection`. The tag is an optional argument, for cases when you don't need
-collection in the state.
-
-#### `create(config, schema, item)`
-Action creator used to create an item on api (POST). Config argument is based on CALL_API configuration from
-redux-api-middleware, allowing full customization expect types part of the configuration. Create function expects
-schema name of data which correspond with storage reducer with the same schema value. Item argument holds the object that
-you want to create on api. The tag is not needed because all collections with the same schema will be invalidated upon
-the successful action of creating an item on api.
-##### `config`
-An object that is based on redux-api-middleware [CALL_API] configuration. You can configure it as you like, but `types`
-will be overwritten by `find`.
-##### `schema`
-Type of data you are fetching must be defined in the api endpoint json-api as a data type. Must correspond with `storage`
-`schema` argument so `redux-api-state` can place fetched data into the right location in the redux state.
-##### `item`
-Plain JS object you wish to create on API endpoint.
-
-### Defining the store reducers
-#### `storage(schema, initialState={})`
-Storage is generic storage reducer that enables the creation of typed storage reducers that are handling specific
-OBJECT_ type actions. Holds map of objects, where `key` is object id and `value` instance of an object. You should hold
-all objects of one schema in one storage. On fetch and create storage will always merge new object into existing map,
-overwriting possible existing object.
-##### `schema`
-Type of data that is stored in the map. Based on schema `storage` will be held responsible for handling dispatched
-actions from `redux-api-state`.
-##### `initialState`
-If you are passing custom initial state, you should create a map where `key` is object id and `value` instance of
-an object.
-
-#### `collection(schema, tag, initialState=[])`
-Collection is generic collection reducer that enables creating typed & named collection reducers that are handling
-specific
-COLLECTION_ type actions with a specific tag. Holds list of object ids. You should hold all ids of one schema with the
-unique tag in one collection. On fetch collection will always overwrite existing state with data in action, and on
-create it will reset state to initial state (empty list).
-##### `schema`
-Type of data which ids are stored in the list. Based on schema `collection` will be held responsible for handling
-dispatched actions from `redux-api-state`.
-##### `tag`
-The tag is a custom string that defines `collection` responsibility of handling action dispatched from
-`redux-api-state`. Only if schema and tag are equal as in the dispatched action, `collection` will process action.
-Tag value pairs action creators like `find` with `collection`.
-##### `initialState`
-If you are passing custom initial state, you should create list holding ids of objects.
-
-### Custom api calls
-
-Write your custom api calls...
-
-### Actions without API calls
-You can use actions that bypass redux-api-middleware and api calls. It's appropriate if you already have data and need to
-put them into state via `storage` and `collection` reducers.
-
-#### `loaded(payload, tag = '')`
-Action creator used to store payload not fetched with `find` action creator. Loaded expects payload to be the json-api data type.
-Its `data.type` is later used as `schema` in corespondention with storage and/or collection reducers. 
-Tag argument is optional, but when used allows your collection with same tag value to respond to the received data.
-##### `payload`
-Required argument which is an object of the json-api type where its type would be used as `schema` meta parameter in
-LOAD_SUCCESS and OBJECT_FETCHED action types.
-##### `tag`
-Use it to connect action with `collection` reducer. Ids of fetched data will be placed in collections with the same `tag`
-value. The tag should be unique per `collection`. The tag is an optional argument, for cases when you don't need
-collection in the state.
-
-## Reference
-
-### Exports
-
-The following objects are exported by `redux-api-state`.
-
-#### `apiStateMiddleware`
-
-The Redux api state middleware itself.
-
-#### `storage(schema, initialState={})`
-
-A reducer for storing object instances of the specific schema.
-
-#### `collection(schema, tag, initialState=[])`
-
-A reducer for holding object ids for specific schema and tag.
-
-#### `find(config, schema, tag='')`
-
-Action creator for fetching data from API. Based on redux-api-middleware `CALL_API`.
-
-#### `create(config, schema, item)`
-
-Action creator for creating data on API. Based on redux-api-middleware `CALL_API`.
-
-####  `loaded(payload, tag = '')`
-
-Action creator for passing payload directly to redux-api-state, without API calls.
-
 ## Tests
 
 ```
 $ npm install && npm test
 ```
 
-## License
-
-MIT
-
 ## Acknowledgements
 
-The package is based on ideas from [Željko Rumenjak](https://github.com/zrumenjak).
+The package is based on concepts from [Željko Rumenjak](https://github.com/zrumenjak).
