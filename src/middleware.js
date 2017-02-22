@@ -8,6 +8,7 @@ import {
   busyStatus,
 } from './status';
 import Outdated from './outdated';
+import { JSON_API_SOURCE } from './standardizers/json-api-standardizer';
 import {
   LOAD_REQUEST,
   LOAD_SUCCESS,
@@ -62,42 +63,6 @@ const requestErrorActionsMap = {
 };
 
 const outdated = new Outdated();
-
-/**
- * Handled failed redux-api-middleware request.
- *
- * @param action
- * @param dispatch
- * @returns {*}
- */
-function handleFailedRequest(action, dispatch) {
-  const errorAction = requestErrorActionsMap[action.type];
-
-  if (!errorAction) {
-    console.warn(`Can not handle failed request for action type ${action.type}.`);
-    return;
-  }
-
-  // Update reference status for corresponding error action
-  actionHandlers[errorAction](action, undefined, dispatch);
-}
-
-/**
- * Handle any request related action and dispatch corresponding state updating actions.
- * Add batched actions to update state data and/or status.
- * @param action
- * @param dispatch
- */
-function handleNetworkAction(action, dispatch) {
-  // First dispatch included objects
-  const included = getIncluded(action.payload);
-  included.map(item => dispatch(makeObjectAction(action, OBJECT_FETCHED, item)));
-
-
-  const data = getData(action.payload);
-  // Find handler for supported action type to make appropriate logic
-  actionHandlers[action.type](action, data, dispatch);
-}
 
 function makeErrorAction(actionType, errorPayload) {
   return {
@@ -316,6 +281,10 @@ const actionHandlers = {
   },
 };
 
+function shouldContainPayload(action) {
+  return !(actionsWithoutPayload.has(action.type) || _.get(action, 'meta.response.status') === 204);
+}
+
 function isValidAction(action) {
   if (!actionHandlers[action.type]) {
     // we are not responsible for handling action
@@ -342,12 +311,16 @@ function isValidAction(action) {
     return false;
   }
   // Validate payload for payload-specific action, ignore others
-  if (!actionsWithoutPayload.has(action.type)
-    && !_.has(action, 'payload.data')) {
-    // TODO: move this into standardizer specific area once json standardization
-    // is supported
-    console.error('Payload Data is invalid, expecting payload.data.');
-    return false;
+  if (shouldContainPayload(action)) {
+    // TODO: move this into standardizer specific area once json standardization is supported
+    if (!_.has(action, 'payload')) {
+      console.error('Response should contain payload.');
+      return false;
+    }
+    if (meta.source === JSON_API_SOURCE && !_.has(action, 'payload.data')) {
+      console.error(`${JSON_API_SOURCE} response should contain payload.data.`);
+      return false;
+    }
   }
   // Validate tag for tag-specific action, ignore others
   if (actionsWithTags.has(action.type)
@@ -363,9 +336,11 @@ const getData = payload => {
   const data = payload && payload.data || [];
   return [].concat(data);
 };
+
 const getIncluded = payload => (
   _.get(payload, 'included', [])
 );
+
 const getLinks = payload => {
   const links = _.get(payload, 'links', {});
   return {
@@ -380,6 +355,42 @@ function saveLinks(action, dispatch) {
   const { schema, tag } = action.meta;
   const links = getLinks(action.payload);
   dispatch(makeIndexAction(action, REFERENCE_STATUS, { links }, schema, tag));
+}
+
+/**
+ * Handled failed redux-api-middleware request.
+ *
+ * @param action
+ * @param dispatch
+ * @returns {*}
+ */
+function handleFailedRequest(action, dispatch) {
+  const errorAction = requestErrorActionsMap[action.type];
+
+  if (!errorAction) {
+    console.warn(`Can not handle failed request for action type ${action.type}.`);
+    return;
+  }
+
+  // Update reference status for corresponding error action
+  actionHandlers[errorAction](action, undefined, dispatch);
+}
+
+/**
+ * Handle any request related action and dispatch corresponding state updating actions.
+ * Add batched actions to update state data and/or status.
+ * @param action
+ * @param dispatch
+ */
+function handleNetworkAction(action, dispatch) {
+  // First dispatch included objects
+  const included = getIncluded(action.payload);
+  included.map(item => dispatch(makeObjectAction(action, OBJECT_FETCHED, item)));
+
+
+  const data = getData(action.payload);
+  // Find handler for supported action type to make appropriate logic
+  actionHandlers[action.type](action, data, dispatch);
 }
 
 export default store => next => action => {

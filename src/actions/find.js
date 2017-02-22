@@ -9,9 +9,10 @@ import { JSON_API_SOURCE } from './..';
 import {
   buildEndpoint,
   resolveConfig,
-  buildRSAAConfig
+  buildRSAAConfig,
 } from './../schemaConfig';
 import thunkAction from './_thunkAction';
+import { extendMetaWithResponse } from './_rsaa';
 
 /**
  * If this options key is set to true, the data will be
@@ -70,11 +71,11 @@ export function find(schema, tag = '', params = {}, options = {}) {
         },
         {
           type: LOAD_SUCCESS,
-          meta,
+          meta: extendMetaWithResponse(meta),
         },
         {
           type: LOAD_ERROR,
-          meta,
+          meta: extendMetaWithResponse(meta),
         },
       ],
     },
@@ -82,3 +83,4 @@ export function find(schema, tag = '', params = {}, options = {}) {
 }
 
 export default thunkAction(find);
+

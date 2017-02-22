@@ -61,13 +61,18 @@ describe('Delete action creator', () => {
       options: {},
       timestamp: types[0].meta.timestamp,
     };
+    const expectedResponseMeta = {
+      ...expectedMeta,
+      response: { status: 200},
+    };
+    const metaResponse = [{}, {}, { status: 200 }];
 
     expect(types[0].type).to.equal(REMOVE_REQUEST);
     expect(types[0].meta).to.deep.equal(expectedMeta);
     expect(types[1].type).to.equal(REMOVE_SUCCESS);
-    expect(types[1].meta).to.deep.equal(expectedMeta);
+    expect(types[1].meta(...metaResponse)).to.deep.equal(expectedResponseMeta);
     expect(types[2].type).to.equal(REMOVE_ERROR);
-    expect(types[2].meta).to.deep.equal(expectedMeta);
+    expect(types[2].meta(...metaResponse)).to.deep.equal(expectedResponseMeta);
   });
 
   it('creates a valid action with valid endpoint with filled params', () => {
@@ -111,10 +116,16 @@ describe('Delete action creator', () => {
       options: {},
       timestamp: types[0].meta.timestamp,
     };
+    const expectedResponseMeta = {
+      ...expectedMeta,
+      response: { status: 200},
+    };
+    const metaResponse = [{}, {}, { status: 200 }];
+
     expect(types[0].type).to.equal(REMOVE_REQUEST);
     expect(types[0].meta).to.deep.equal(expectedMeta);
     expect(types[1].type).to.equal(REMOVE_SUCCESS);
-    expect(types[1].meta).to.deep.equal(expectedMeta);
+    expect(types[1].meta(...metaResponse)).to.deep.equal(expectedResponseMeta);
   });
 
   it('throws exception on action with schema configuration is invalid', () => {
@@ -227,7 +238,8 @@ describe('Delete action creator', () => {
         expect(actionObjRemoved.meta).to.deep.equal({
           ...expectedMeta,
           transformation: {},
-          timestamp: actionObjRemoved.meta.timestamp
+          timestamp: actionObjRemoved.meta.timestamp,
+          response: { status: 200 },
         });
 
         const actionCollStatus = batchedRemovedActions.payload[1];
@@ -235,7 +247,8 @@ describe('Delete action creator', () => {
         expect(actionCollStatus.meta).to.deep.equal({
           ...expectedMeta,
           tag: '*',
-          timestamp: actionCollStatus.meta.timestamp
+          timestamp: actionCollStatus.meta.timestamp,
+          response: { status: 200 },
         });
         const expectedCollStatusPayload = {
           validationStatus: validationStatus.INVALID,
@@ -248,6 +261,7 @@ describe('Delete action creator', () => {
         expect(successAction.meta).to.deep.equal({
           ...expectedMeta,
           timestamp: successAction.meta.timestamp,
+          response: { status: 200 },
         });
       }).then(done).catch(done);
   });

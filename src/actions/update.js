@@ -9,9 +9,10 @@ import { JSON_API_SOURCE } from './..';
 import {
   buildEndpoint,
   resolveConfig,
-  buildRSAAConfig
+  buildRSAAConfig,
 } from './../schemaConfig';
 import thunkAction from './_thunkAction';
+import { extendMetaWithResponse } from './_rsaa';
 
 /**
  * Action creator used to update item on api (POST). Tag is not needed because all collections
@@ -67,11 +68,11 @@ export function update(schema, item, params = {}, options = {}) {
         },
         {
           type: UPDATE_SUCCESS,
-          meta,
+          meta: extendMetaWithResponse(meta),
         },
         {
           type: UPDATE_ERROR,
-          meta,
+          meta: extendMetaWithResponse(meta),
         },
       ],
     },

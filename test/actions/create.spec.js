@@ -71,12 +71,18 @@ describe('Create action creator', () => {
       options: {},
       timestamp: types[0].meta.timestamp,
     };
+    const expectedResponseMeta = {
+      ...expectedMeta,
+      response: { status: 200},
+    };
+    const metaResponse = [{}, {}, { status: 200 }];
+
     expect(types[0].type).to.equal(CREATE_REQUEST);
     expect(types[0].meta).to.deep.equal(expectedMeta);
     expect(types[1].type).to.equal(CREATE_SUCCESS);
-    expect(types[1].meta).to.deep.equal(expectedMeta);
+    expect(types[1].meta(...metaResponse)).to.deep.equal(expectedResponseMeta);
     expect(types[2].type).to.equal(CREATE_ERROR);
-    expect(types[2].meta).to.deep.equal(expectedMeta);
+    expect(types[2].meta(...metaResponse)).to.deep.equal(expectedResponseMeta);
   });
 
   it('creates a valid action with item in config', () => {
@@ -119,11 +125,16 @@ describe('Create action creator', () => {
       options: {},
       timestamp: types[0].meta.timestamp,
     };
+    const expectedResponseMeta = {
+      ...expectedMeta,
+      response: { status: 200},
+    };
+    const metaResponse = [{}, {}, { status: 200 }];
 
     expect(types[0].type).to.equal(CREATE_REQUEST);
     expect(types[0].meta).to.deep.equal(expectedMeta);
     expect(types[1].type).to.equal(CREATE_SUCCESS);
-    expect(types[1].meta).to.deep.equal(expectedMeta);
+    expect(types[1].meta(...metaResponse)).to.deep.equal(expectedResponseMeta);
   });
 
   it('creates a valid action with item in argument has priority over item in config.body', () => {
@@ -166,11 +177,16 @@ describe('Create action creator', () => {
       options: {},
       timestamp: types[0].meta.timestamp,
     };
+    const expectedResponseMeta = {
+      ...expectedMeta,
+      response: { status: 200},
+    };
+    const metaResponse = [{}, {}, { status: 200 }];
 
     expect(types[0].type).to.equal(CREATE_REQUEST);
     expect(types[0].meta).to.deep.equal(expectedMeta);
     expect(types[1].type).to.equal(CREATE_SUCCESS);
-    expect(types[1].meta).to.deep.equal(expectedMeta);
+    expect(types[1].meta(...metaResponse)).to.deep.equal(expectedResponseMeta);
   });
 
   it('creates a valid action with valid endpoint with filled params', () => {
@@ -220,10 +236,16 @@ describe('Create action creator', () => {
       options: {},
       timestamp: types[0].meta.timestamp,
     };
+    const expectedResponseMeta = {
+      ...expectedMeta,
+      response: { status: 200},
+    };
+    const metaResponse = [{}, {}, { status: 200 }];
+
     expect(types[0].type).to.equal(CREATE_REQUEST);
     expect(types[0].meta).to.deep.equal(expectedMeta);
     expect(types[1].type).to.equal(CREATE_SUCCESS);
-    expect(types[1].meta).to.deep.equal(expectedMeta);
+    expect(types[1].meta(...metaResponse)).to.deep.equal(expectedResponseMeta);
   });
 
   it('throws exception on action with schema configuration is invalid', () => {
@@ -332,6 +354,10 @@ describe('Create action creator', () => {
       options: {},
       schema,
     };
+    const expectedResponseMeta = {
+      ...expectedMeta,
+      response: { status: 200},
+    };
 
     const action = create(schemaConfig, item);
     const store = mockStore({});
@@ -362,7 +388,7 @@ describe('Create action creator', () => {
         const actionObjCreated = batchedActionsSuccess[0];
         expect(actionObjCreated.type).to.equal(OBJECT_CREATED);
         expect(actionObjCreated.meta).to.deep.equal({
-          ...expectedMeta,
+          ...expectedResponseMeta,
           transformation: {},
           timestamp: actionObjCreated.meta.timestamp,
         });
@@ -371,7 +397,7 @@ describe('Create action creator', () => {
         const actionCollStatus = batchedActionsSuccess[1];
         expect(actionCollStatus.type).to.equal(REFERENCE_STATUS);
         expect(actionCollStatus.meta).to.deep.equal({
-          ...expectedMeta,
+          ...expectedResponseMeta,
           tag: '*',
           timestamp: actionCollStatus.meta.timestamp,
         });
@@ -384,7 +410,7 @@ describe('Create action creator', () => {
         const successAction = performedActions[3];
         expect(successAction.type).to.equal(CREATE_SUCCESS);
         expect(successAction.meta).to.deep.equal({
-          ...expectedMeta,
+          ...expectedResponseMeta,
           timestamp: successAction.meta.timestamp,
         });
         expect(successAction.payload).to.deep.equal(expectedPayload);
