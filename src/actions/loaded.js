@@ -12,7 +12,9 @@ export default function loaded(payload, schema, tag = '') {
     throw new Error('Missing payload data property.');
   }
   if (!_.isString(schema)) {
-    throw new Error(`Invalid schema, "loaded" expected a string but got: ${JSON.stringify(schema)}`);
+    throw new Error(
+      `Invalid schema, "loaded" expected a string but got: ${JSON.stringify(schema)}`
+    );
   }
   if (!_.isString(tag)) {
     throw new Error(`Invalid tag, "loaded" expected a string but got: ${JSON.stringify(tag)}`);

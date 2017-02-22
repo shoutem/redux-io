@@ -135,6 +135,31 @@ export function makeObjectAction(sourceAction, actionType, item) {
   };
 }
 
+const getData = payload => {
+  const data = payload && payload.data || [];
+  return [].concat(data);
+};
+
+const getIncluded = payload => (
+  _.get(payload, 'included', [])
+);
+
+const getLinks = payload => {
+  const links = _.get(payload, 'links', {});
+  return {
+    prev: links.prev || null,
+    next: links.next || null,
+    self: links.self || null,
+    last: links.last || null,
+  };
+};
+
+function saveLinks(action, dispatch) {
+  const { schema, tag } = action.meta;
+  const links = getLinks(action.payload);
+  dispatch(makeIndexAction(action, REFERENCE_STATUS, { links }, schema, tag));
+}
+
 const actionHandlers = {
   [LOAD_REQUEST]: (action, data, dispatch) => {
     // Make collection busy to prevent multiple requests
@@ -330,31 +355,6 @@ function isValidAction(action) {
   }
 
   return true;
-}
-
-const getData = payload => {
-  const data = payload && payload.data || [];
-  return [].concat(data);
-};
-
-const getIncluded = payload => (
-  _.get(payload, 'included', [])
-);
-
-const getLinks = payload => {
-  const links = _.get(payload, 'links', {});
-  return {
-    prev: links.prev || null,
-    next: links.next || null,
-    self: links.self || null,
-    last: links.last || null,
-  };
-};
-
-function saveLinks(action, dispatch) {
-  const { schema, tag } = action.meta;
-  const links = getLinks(action.payload);
-  dispatch(makeIndexAction(action, REFERENCE_STATUS, { links }, schema, tag));
 }
 
 /**

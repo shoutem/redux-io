@@ -69,12 +69,6 @@ export const getModificationTime = obj => statusProp(obj, 'modifiedTimestamp');
 
 export const isError = obj => !!(statusProp(obj, 'error'));
 
-export const shouldRefresh = (obj, ignoreError = false) => {
-  return (!isValid(obj) || isExpired(obj)) && !isBusy(obj) && (!isError(obj) || ignoreError);
-};
-
-export const getId = obj => statusProp(obj, 'id');
-
 export function isExpired(reference) {
   const status = getStatus(reference);
   if (!status) {
@@ -87,7 +81,13 @@ export function isExpired(reference) {
   }
 
   const referenceLifetime = Date.now() - modifiedTimestamp;
-  // TODO
-  // When `expiration` becomes rio plugin, save milliseconds in the status to avoid conversation
+  // TODO: When `expiration` becomes rio plugin, save milliseconds in
+  // the status to avoid conversation
   return expirationTime * 1000 < referenceLifetime;
 }
+
+export const shouldRefresh = (obj, ignoreError = false) => (
+  (!isValid(obj) || isExpired(obj)) && !isBusy(obj) && (!isError(obj) || ignoreError)
+);
+
+export const getId = obj => statusProp(obj, 'id');

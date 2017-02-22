@@ -64,6 +64,7 @@ export function getCollectionLink(col, pointer) {
  * @param collection The collection value from the state.
  * @returns {*} Collection params, params argument of the find action.
  */
+// eslint-disable-next-line no-shadow
 export function getCollectionParams(collection) {
   return _.get(getStatus(collection), 'params');
 }

@@ -1,5 +1,5 @@
 import _ from 'lodash';
-import { STATUS_KEY, TYPE_KEY, ARRAY_TYPE } from './type';
+import { TYPE_KEY, ARRAY_TYPE } from './type';
 import { setStatus, STATUS } from '../status';
 
 function objectToArray(object) {
@@ -14,6 +14,7 @@ function objectToArray(object) {
 function restoreStatus(serializableSubState, originalSubState) {
   const status = _.isPlainObject(serializableSubState) && serializableSubState[STATUS];
   if (status) {
+    // eslint-disable-next-line no-param-reassign
     delete originalSubState[STATUS]; // Delete enumerable status
     setStatus(originalSubState, status); // Set non enumerable status
   }
@@ -30,6 +31,7 @@ function revertTransformedSubstate(serializableSubState) {
       // Transform "array object" back to array as it was before serialization
       return objectToArray(serializableSubState);
     }
+    // eslint-disable-next-line no-use-before-define
     return fromSerializableFormat(serializableSubState);
   }
   return serializableSubState;
@@ -47,6 +49,7 @@ export function fromSerializableFormat(serializableState) {
 
     restoreStatus(serializableSubState, originalSubState);
 
+    // eslint-disable-next-line no-param-reassign
     originalState[subStateKey] = originalSubState;
     return originalState;
   }, {});
