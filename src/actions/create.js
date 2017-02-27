@@ -9,9 +9,10 @@ import { JSON_API_SOURCE } from './..';
 import {
   buildEndpoint,
   resolveConfig,
-  buildRSAAConfig
+  buildRSAAConfig,
 } from './../schemaConfig';
 import thunkAction from './_thunkAction';
+import { extendMetaWithResponse } from './_rsaa';
 
 /**
  * Action creator used to create item on api (POST). Tag is not needed because all collection
@@ -71,11 +72,11 @@ export function create(schema, item = null, params = {}, options = {}) {
         },
         {
           type: CREATE_SUCCESS,
-          meta,
+          meta: extendMetaWithResponse(meta),
         },
         {
           type: CREATE_ERROR,
-          meta,
+          meta: extendMetaWithResponse(meta),
         },
       ],
     },

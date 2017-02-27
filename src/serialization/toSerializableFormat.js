@@ -20,6 +20,7 @@ function arrayToObject(arr, initialAttributes = {}) {
 function saveStatus(originalState, serializableState) {
   const status = getStatus(originalState);
   if (status) {
+    // eslint-disable-next-line no-param-reassign
     serializableState[STATUS] = status;
   }
 }
@@ -32,6 +33,7 @@ function saveStatus(originalState, serializableState) {
  */
 function transformSubstate(originalSubState) {
   if (_.isPlainObject(originalSubState)) {
+    // eslint-disable-next-line  no-use-before-define
     return toSerializableFormat(originalSubState);
   } else if (_.isArray(originalSubState) && originalSubState[STATUS]) {
     // Transform array into format that reverse transformation expects.
@@ -56,6 +58,7 @@ export function toSerializableFormat(state) {
     // Status is not enumerable property so we have take care for it separately
     saveStatus(substate, serializableSubState);
 
+    // eslint-disable-next-line no-param-reassign
     serializableState[subStateKey] = serializableSubState;
     return serializableState;
   }, {});

@@ -8,7 +8,9 @@ import {
 
 export default function invalidate(schema) {
   if (!_.isString(schema)) {
-    throw new Error(`Invalid schema, "invalidate" expected a string but got: ${JSON.stringify(schema)}`);
+    throw new Error(
+      `Invalid schema, "invalidate" expected a string but got: ${JSON.stringify(schema)}`
+    );
   }
 
   return {

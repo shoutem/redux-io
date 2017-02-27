@@ -63,12 +63,18 @@ describe('Find action creator', () => {
       options: {},
       timestamp: types[0].meta.timestamp,
     };
+    const expectedResponseMeta = {
+      ...expectedMeta,
+      response: { status: 200},
+    };
+    const metaResponse = [{}, {}, { status: 200 }];
+
     expect(types[0].type).to.equal(LOAD_REQUEST);
     expect(types[0].meta).to.deep.equal(expectedMeta);
     expect(types[1].type).to.equal(LOAD_SUCCESS);
-    expect(types[1].meta).to.deep.equal(expectedMeta);
+    expect(types[1].meta(...metaResponse)).to.deep.equal(expectedResponseMeta);
     expect(types[2].type).to.equal(LOAD_ERROR);
-    expect(types[2].meta).to.deep.equal(expectedMeta);
+    expect(types[2].meta(...metaResponse)).to.deep.equal(expectedResponseMeta);
   });
 
   it('includes the find params in meta', () => {
@@ -95,14 +101,15 @@ describe('Find action creator', () => {
 
     expect(action[RSAA]).to.not.be.undefined;
     expect(action[RSAA].types).to.not.be.undefined;
+    const metaResponse = [{}, {}, { status: 200 }];
 
     const types = action[RSAA].types;
     expect(types[0].type).to.equal(LOAD_REQUEST);
     expect(types[0].meta.params).to.deep.equal(params);
     expect(types[1].type).to.equal(LOAD_SUCCESS);
-    expect(types[1].meta.params).to.deep.equal(params);
+    expect(types[1].meta(...metaResponse).params).to.deep.equal(params);
     expect(types[2].type).to.equal(LOAD_ERROR);
-    expect(types[2].meta.params).to.deep.equal(params);
+    expect(types[2].meta(...metaResponse).params).to.deep.equal(params);
   });
 
   it('creates a valid action with appendMode option', () => {
@@ -141,12 +148,18 @@ describe('Find action creator', () => {
       },
       timestamp: types[0].meta.timestamp,
     };
+    const expectedResponseMeta = {
+      ...expectedMeta,
+      response: { status: 200},
+    };
+    const metaResponse = [{}, {}, { status: 200 }];
+
     expect(types[0].type).to.equal(LOAD_REQUEST);
     expect(types[0].meta).to.deep.equal(expectedMeta);
     expect(types[1].type).to.equal(LOAD_SUCCESS);
-    expect(types[1].meta).to.deep.equal(expectedMeta);
+    expect(types[1].meta(...metaResponse)).to.deep.equal(expectedResponseMeta);
     expect(types[2].type).to.equal(LOAD_ERROR);
-    expect(types[2].meta).to.deep.equal(expectedMeta);
+    expect(types[2].meta(...metaResponse)).to.deep.equal(expectedResponseMeta);
   });
 
   it('creates a valid action with predefined config', () => {
@@ -184,12 +197,18 @@ describe('Find action creator', () => {
       options: {},
       timestamp: types[0].meta.timestamp,
     };
+    const expectedResponseMeta = {
+      ...expectedMeta,
+      response: { status: 200},
+    };
+    const metaResponse = [{}, {}, { status: 200 }];
+
     expect(types[0].type).to.equal(LOAD_REQUEST);
     expect(types[0].meta).to.deep.equal(expectedMeta);
     expect(types[1].type).to.equal(LOAD_SUCCESS);
-    expect(types[1].meta).to.deep.equal(expectedMeta);
+    expect(types[1].meta(...metaResponse)).to.deep.equal(expectedResponseMeta);
     expect(types[2].type).to.equal(LOAD_ERROR);
-    expect(types[2].meta).to.deep.equal(expectedMeta);
+    expect(types[2].meta(...metaResponse)).to.deep.equal(expectedResponseMeta);
   });
 
   it('creates a valid action with predefined config overriding find defaults', () => {
@@ -230,12 +249,18 @@ describe('Find action creator', () => {
       options: {},
       timestamp: types[0].meta.timestamp,
     };
+    const expectedResponseMeta = {
+      ...expectedMeta,
+      response: { status: 200},
+    };
+    const metaResponse = [{}, {}, { status: 200 }];
+
     expect(types[0].type).to.equal(LOAD_REQUEST);
     expect(types[0].meta).to.deep.equal(expectedMeta);
     expect(types[1].type).to.equal(LOAD_SUCCESS);
-    expect(types[1].meta).to.deep.equal(expectedMeta);
+    expect(types[1].meta(...metaResponse)).to.deep.equal(expectedResponseMeta);
     expect(types[2].type).to.equal(LOAD_ERROR);
-    expect(types[2].meta).to.deep.equal(expectedMeta);
+    expect(types[2].meta(...metaResponse)).to.deep.equal(expectedResponseMeta);
   });
 
   it('creates a valid action with merged config', () => {
@@ -280,12 +305,18 @@ describe('Find action creator', () => {
       options: {},
       timestamp: types[0].meta.timestamp,
     };
+    const expectedResponseMeta = {
+      ...expectedMeta,
+      response: { status: 200},
+    };
+    const metaResponse = [{}, {}, { status: 200 }];
+
     expect(types[0].type).to.equal(LOAD_REQUEST);
     expect(types[0].meta).to.deep.equal(expectedMeta);
     expect(types[1].type).to.equal(LOAD_SUCCESS);
-    expect(types[1].meta).to.deep.equal(expectedMeta);
+    expect(types[1].meta(...metaResponse)).to.deep.equal(expectedResponseMeta);
     expect(types[2].type).to.equal(LOAD_ERROR);
-    expect(types[2].meta).to.deep.equal(expectedMeta);
+    expect(types[2].meta(...metaResponse)).to.deep.equal(expectedResponseMeta);
   });
 
   it('creates a invalid action with missing registered schema', () => {
@@ -388,12 +419,18 @@ describe('Find action creator', () => {
       options: {},
       timestamp: types[0].meta.timestamp,
     };
+    const expectedResponseMeta = {
+      ...expectedMeta,
+      response: { status: 200},
+    };
+    const metaResponse = [{}, {}, { status: 200 }];
+
     expect(types[0].type).to.equal(LOAD_REQUEST);
     expect(types[0].meta).to.deep.equal(expectedMeta);
     expect(types[1].type).to.equal(LOAD_SUCCESS);
-    expect(types[1].meta).to.deep.equal(expectedMeta);
+    expect(types[1].meta(...metaResponse)).to.deep.equal(expectedResponseMeta);
     expect(types[2].type).to.equal(LOAD_ERROR);
-    expect(types[2].meta).to.deep.equal(expectedMeta);
+    expect(types[2].meta(...metaResponse)).to.deep.equal(expectedResponseMeta);
   });
 
   it('produces valid storage and collection actions', done => {
@@ -439,6 +476,11 @@ describe('Find action creator', () => {
       params: {},
       options: {},
     };
+    const expectedResponseMeta = {
+      ...expectedMeta,
+      response: { status: 200},
+    };
+    const metaResponse = [{}, {}, { status: 200 }];
 
     const action = find(schemaConfig, tag);
 
@@ -466,7 +508,7 @@ describe('Find action creator', () => {
         const actionObjFetched = batchedActionsSuccess[0];
         expect(actionObjFetched.type).to.equal(OBJECT_FETCHED);
         expect(actionObjFetched.meta).to.deep.equal({
-          ...expectedMeta,
+          ...expectedResponseMeta,
           transformation: {},
           timestamp: actionObjFetched.meta.timestamp,
         });
@@ -475,7 +517,7 @@ describe('Find action creator', () => {
         const actionCollFetched = batchedActionsSuccess[2];
         expect(actionCollFetched.type).to.equal(REFERENCE_FETCHED);
         expect(actionCollFetched.meta).to.deep.equal({
-          ...expectedMeta,
+          ...expectedResponseMeta,
           timestamp: actionCollFetched.meta.timestamp,
         });
         expect(actionCollFetched.payload).to.deep.equal(expectedPayload.data);
@@ -483,7 +525,7 @@ describe('Find action creator', () => {
         const successAction = performedActions[3];
         expect(successAction.type).to.equal(LOAD_SUCCESS);
         expect(successAction.meta).to.deep.equal({
-          ...expectedMeta,
+          ...expectedResponseMeta,
           timestamp: successAction.meta.timestamp,
         });
         expect(successAction.payload).to.deep.equal(expectedPayload);

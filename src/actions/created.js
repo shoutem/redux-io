@@ -12,7 +12,9 @@ export default function created(payload, schema) {
     throw new Error('Missing payload data property.');
   }
   if (!_.isString(schema)) {
-    throw new Error(`Invalid schema, "created" expected a string but got: ${JSON.stringify(schema)}`);
+    throw new Error(
+      `Invalid schema, "created" expected a string but got: ${JSON.stringify(schema)}`
+    );
   }
 
   return {

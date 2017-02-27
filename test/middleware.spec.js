@@ -1090,9 +1090,38 @@ describe('Json api middleware', () => {
     }).then(done).catch(done);
   });
 
-  it('writes error to console and ignores action if action have empty payload', done => {
+  it('writes error to console and ignores action if action have no payload', done => {
     const tag = 'tag_test';
     const schema = 'schema_test';
+
+    const expectedMeta = {
+      source: JSON_API_SOURCE,
+      schema,
+      tag,
+    };
+
+    const mockSuccessAction = {
+      type: LOAD_SUCCESS,
+      meta: expectedMeta,
+    };
+
+    const store = mockStore({});
+    store.dispatch(actionPromise(mockSuccessAction)).then(() => {
+      const performedActions = store.getActions();
+      expect(performedActions).to.have.length(1);
+
+      const requestAction = performedActions[0];
+      expect(requestAction.type).to.equal(LOAD_SUCCESS);
+
+      expect(console.error.calledOnce).to.be.true;
+      expect(console.error.calledWith('Response should contain payload.')).to.be.true;
+    }).then(done).catch(done);
+  });
+
+  it('writes error to console and ignores action if action response is json-api without payload.data', done => {
+    const tag = 'tag_test';
+    const schema = 'schema_test';
+
     const expectedPayload = {};
 
     const expectedMeta = {
@@ -1116,7 +1145,7 @@ describe('Json api middleware', () => {
       expect(requestAction.type).to.equal(LOAD_SUCCESS);
 
       expect(console.error.calledOnce).to.be.true;
-      expect(console.error.calledWith('Payload Data is invalid, expecting payload.data.')).to.be.true;
+      expect(console.error.calledWith(`${JSON_API_SOURCE} response should contain payload.data.`)).to.be.true;
     }).then(done).catch(done);
   });
 
@@ -1352,6 +1381,46 @@ describe('Json api middleware', () => {
       expect(performedActions).to.have.lengthOf(2);
     }).then(done).catch(done), 350);
   });
+
+  it('produces valid actions for action without content (204)', done => {
+    const schema = 'schema_test';
+
+    const expectedMeta = {
+      source: JSON_API_SOURCE,
+      schema,
+      tag: '',
+      response: { status: 204 },
+    };
+
+    const mockSuccessAction = {
+      type: CREATE_SUCCESS,
+      meta: expectedMeta,
+    };
+
+    const store = mockStore({});
+    store.dispatch(actionPromise(mockSuccessAction))
+      .then(() => {
+        const performedActions = store.getActions();
+        expect(performedActions).to.have.length(2);
+
+        const batchedActions = performedActions[0].payload;
+
+        const actionCollStatus = batchedActions[0];
+        expect(actionCollStatus.type).to.equal(REFERENCE_STATUS);
+        expect(actionCollStatus.meta).to.deep.equal({ ...expectedMeta, tag: '*' });
+        const expectedCollStatusPayload = {
+          validationStatus: validationStatus.INVALID,
+          busyStatus: busyStatus.IDLE,
+        };
+        expect(actionCollStatus.payload).to.deep.equal(expectedCollStatusPayload);
+
+        const successAction = performedActions[1];
+        expect(successAction.type).to.equal(CREATE_SUCCESS);
+        expect(successAction.meta).to.deep.equal(expectedMeta);
+        expect(successAction.payload).to.be.undefined;
+      }).then(done).catch(done);
+  });
+
   describe('handleFailedRequest', () => {
     it('LOAD_REQUEST', done => {
       const schema = 'schema_test';

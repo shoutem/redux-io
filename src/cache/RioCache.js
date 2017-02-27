@@ -1,4 +1,4 @@
-import { getModificationTime, getId, getStatus } from '../status';
+import { getModificationTime, getId } from '../status';
 import _ from 'lodash';
 
 function isItemInCollection(collection, item) {
@@ -11,6 +11,10 @@ function isSingleRelation(relationshipData) {
 
 function isCollection(entity) {
   return _.isArray(entity);
+}
+
+function isKeyValid(key) {
+  return _.isNumber(key) || _.isString(key);
 }
 
 /**
@@ -46,10 +50,6 @@ function getUniqueKey(item) {
   return _.isPlainObject(item) && isKeyValid(item.id) && isKeyValid(item.type) ?
     `${item.type}.${item.id}` :
     undefined;
-}
-
-function isKeyValid(key) {
-  return _.isNumber(key) || _.isString(key);
 }
 
 /**

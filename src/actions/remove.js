@@ -9,9 +9,10 @@ import { JSON_API_SOURCE } from './..';
 import {
   buildEndpoint,
   resolveConfig,
-  buildRSAAConfig
+  buildRSAAConfig,
 } from './../schemaConfig';
 import thunkAction from './_thunkAction';
+import { extendMetaWithResponse } from './_rsaa';
 
 /**
  * Action creator used to delete item on api (DELETE). Tag is not needed because all collection
@@ -64,12 +65,12 @@ export function remove(schema, item, params = {}, options = {}) {
         },
         {
           type: REMOVE_SUCCESS,
-          meta,
+          meta: extendMetaWithResponse(meta),
           payload: () => ({ data: item }),
         },
         {
           type: REMOVE_ERROR,
-          meta,
+          meta: extendMetaWithResponse(meta),
         },
       ],
     },

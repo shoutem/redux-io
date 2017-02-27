@@ -72,12 +72,18 @@ describe('Next action creator', () => {
       },
       timestamp: types[0].meta.timestamp,
     };
+    const expectedResponseMeta = {
+      ...expectedMeta,
+      response: { status: 200},
+    };
+    const metaResponse = [{}, {}, { status: 200 }];
+
     expect(types[0].type).to.equal(LOAD_REQUEST);
     expect(types[0].meta).to.deep.equal(expectedMeta);
     expect(types[1].type).to.equal(LOAD_SUCCESS);
-    expect(types[1].meta).to.deep.equal(expectedMeta);
+    expect(types[1].meta(...metaResponse)).to.deep.equal(expectedResponseMeta);
     expect(types[2].type).to.equal(LOAD_ERROR);
-    expect(types[2].meta).to.deep.equal(expectedMeta);
+    expect(types[2].meta(...metaResponse)).to.deep.equal(expectedResponseMeta);
   });
 
   it('creates NO_MORE_ITEMS action', () => {

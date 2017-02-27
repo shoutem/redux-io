@@ -61,13 +61,19 @@ describe('Update action creator', () => {
       options: {},
       timestamp: types[0].meta.timestamp,
     };
+    const expectedResponseMeta = {
+      ...expectedMeta,
+      response: { status: 200},
+    };
+    const metaResponse = [{}, {}, { status: 200 }];
+
     expect(types[0].type).to.equal(UPDATE_REQUEST);
     expect(types[0].meta).to.deep.equal(expectedMeta);
     expect(types[0].payload).to.deep.equal({ data: item });
     expect(types[1].type).to.equal(UPDATE_SUCCESS);
-    expect(types[1].meta).to.deep.equal(expectedMeta);
+    expect(types[1].meta(...metaResponse)).to.deep.equal(expectedResponseMeta);
     expect(types[2].type).to.equal(UPDATE_ERROR);
-    expect(types[2].meta).to.deep.equal(expectedMeta);
+    expect(types[2].meta(...metaResponse)).to.deep.equal(expectedResponseMeta);
   });
 
   it('creates a valid action with valid endpoint with filled params', () => {
@@ -111,10 +117,16 @@ describe('Update action creator', () => {
       options: {},
       timestamp: types[0].meta.timestamp,
     };
+    const expectedResponseMeta = {
+      ...expectedMeta,
+      response: { status: 200},
+    };
+    const metaResponse = [{}, {}, { status: 200 }];
+
     expect(types[0].type).to.equal(UPDATE_REQUEST);
     expect(types[0].meta).to.deep.equal(expectedMeta);
     expect(types[1].type).to.equal(UPDATE_SUCCESS);
-    expect(types[1].meta).to.deep.equal(expectedMeta);
+    expect(types[1].meta(...metaResponse)).to.deep.equal(expectedResponseMeta);
   });
 
   it('throws exception on action with schema configuration is invalid', () => {
@@ -241,6 +253,7 @@ describe('Update action creator', () => {
           ...expectedMeta,
           transformation: {},
           timestamp: actionObjUpdated.meta.timestamp,
+          response: { status: 200 },
         });
         expect(actionObjUpdated.payload).to.deep.equal(expectedPayload.data);
 
@@ -250,6 +263,7 @@ describe('Update action creator', () => {
           ...expectedMeta,
           tag: '*',
           timestamp: actionObjUpdated.meta.timestamp,
+          response: { status: 200 },
         });
         const expectedCollStatusIdlePayload = {
           busyStatus: busyStatus.IDLE,
@@ -262,6 +276,7 @@ describe('Update action creator', () => {
         expect(successAction.meta).to.deep.equal({
           ...expectedMeta,
           timestamp: successAction.meta.timestamp,
+          response: { status: 200 },
         });
         expect(successAction.payload).to.deep.equal(expectedPayload);
       }).then(done).catch(done);
