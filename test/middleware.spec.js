@@ -342,15 +342,9 @@ describe('Json api middleware', () => {
         };
         expect(actionCollStatusBusy.payload).to.deep.equal(expectedCollStatusBusyPayload);
 
-        const actionObjUpdating = batchedActions[1];
-        expect(actionObjUpdating.type).to.equal(OBJECT_UPDATING);
-        expect(actionObjUpdating.meta).to.deep.equal({ ...expectedMeta, transformation: {} });
-        expect(actionObjUpdating.payload).to.deep.equal(expectedPayload.data[0]);
-
         const actionUpdateRequest = performedActions[1];
         expect(actionUpdateRequest.type).to.equal(UPDATE_REQUEST);
         expect(actionUpdateRequest.meta).to.deep.equal(expectedMeta);
-        expect(actionUpdateRequest.payload).to.deep.equal(expectedPayload);
       }).then(done).catch(done);
   });
 

@@ -38,6 +38,7 @@ const actionsWithoutPayload = new Set([
   REMOVE_SUCCESS,
   LOAD_REQUEST,
   CREATE_REQUEST,
+  UPDATE_REQUEST,
   LOAD_ERROR,
   CREATE_ERROR,
   UPDATE_ERROR,
@@ -242,7 +243,6 @@ const actionHandlers = {
       { validationStatus: validationStatus.INVALID, busyStatus: busyStatus.BUSY },
       schema
     ));
-    data.map(item => dispatch(makeObjectAction(action, OBJECT_UPDATING, item)));
   },
   [UPDATE_SUCCESS]: (action, data, dispatch) => {
     // Dispatch updated objects from and change collections status to idle & invalid

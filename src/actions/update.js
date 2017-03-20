@@ -69,7 +69,6 @@ export function update(schema, item = null, params = {}, options = {}) {
         {
           type: UPDATE_REQUEST,
           meta,
-          payload: { data: item },
         },
         {
           type: UPDATE_SUCCESS,
