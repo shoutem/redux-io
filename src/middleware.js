@@ -57,9 +57,13 @@ const actionsWithTags = new Set([
  */
 const requestErrorActionsMap = {
   [LOAD_REQUEST]: LOAD_ERROR,
+  [LOAD_ERROR]: LOAD_ERROR,
   [CREATE_REQUEST]: CREATE_ERROR,
+  [CREATE_ERROR]: CREATE_ERROR,
   [UPDATE_REQUEST]: UPDATE_ERROR,
+  [UPDATE_ERROR]: UPDATE_ERROR,
   [REMOVE_REQUEST]: REMOVE_ERROR,
+  [REMOVE_ERROR]: REMOVE_ERROR,
 };
 
 const outdated = new Outdated();
