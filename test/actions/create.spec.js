@@ -312,6 +312,26 @@ describe('Create action creator', () => {
       .to.not.throw('Item is missing in method argument and in config.body');
   });
 
+  it('uses body from config if the item is missing', () => {
+    const config = {
+      headers: {
+        'Content-Type': 'application/vnd.api+json',
+      },
+      body: 'Body',
+      endpoint: 'api.test',
+    };
+
+    const schema = 'app.builder';
+    const schemaConfig = {
+      schema,
+      request: config,
+    };
+
+    const action = create(schemaConfig);
+
+    expect(action[RSAA].body).to.equal(config.body);
+  });
+
   it('produces valid storage and collection actions', done => {
     const schema = 'schema_test';
     const expectedPayload = {
