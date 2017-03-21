@@ -69,6 +69,7 @@ describe('Update action creator', () => {
 
     expect(types[0].type).to.equal(UPDATE_REQUEST);
     expect(types[0].meta).to.deep.equal(expectedMeta);
+    expect(types[0].payload).to.deep.equal({ data: item });
     expect(types[1].type).to.equal(UPDATE_SUCCESS);
     expect(types[1].meta(...metaResponse)).to.deep.equal(expectedResponseMeta);
     expect(types[2].type).to.equal(UPDATE_ERROR);
@@ -128,33 +129,6 @@ describe('Update action creator', () => {
     expect(types[1].meta(...metaResponse)).to.deep.equal(expectedResponseMeta);
   });
 
-   it('creates a valid action where item in argument has priority over item in config.body', () => {
-    const schema = 'schema_test';
-    const item = {
-      schema,
-      id: '1',
-      attributes: {
-        name: 'Test1',
-      },
-    };
-    const config = {
-      headers: {
-        'Content-Type': 'application/vnd.api+json',
-      },
-      endpoint: 'api.test',
-      body: 'Body',
-    };
-
-    const schemaConfig = {
-      schema,
-      request: config,
-    };
-
-    const action = update(schemaConfig, item);
-
-    expect(action[RSAA].body).to.equal(JSON.stringify({ data: item }));
-  });
-
   it('throws exception on action with schema configuration is invalid', () => {
     const config = {
       headers: {
@@ -202,6 +176,23 @@ describe('Update action creator', () => {
 
     const item = 0;
     expect(() => update(schemaConfig, item)).to.throw('Item is not valid in method argument');
+  });
+
+  it('does not throw exception on action with missing item', () => {
+    const config = {
+      headers: {
+        'Content-Type': 'application/vnd.api+json',
+      },
+      endpoint: 'api.test',
+    };
+
+    const schema = 'app.builder';
+    const schemaConfig = {
+      schema,
+      request: config,
+    };
+    expect(() => update(schemaConfig))
+      .to.not.throw('Item is missing in method argument and in config.body');
   });
 
   it('uses body from config if the item is missing', () => {
@@ -275,12 +266,22 @@ describe('Update action creator', () => {
         };
         expect(actionCollStatusBusy.payload).to.deep.equal(expectedCollStatusBusyPayload);
 
+        const actionObjUpdating = batchedUpdatingActions.payload[1];
+        expect(actionObjUpdating.type).to.equal(OBJECT_UPDATING);
+        expect(actionObjUpdating.meta).to.deep.equal({
+          ...expectedMeta,
+          transformation: {},
+          timestamp: actionObjUpdating.meta.timestamp
+        });
+        expect(actionObjUpdating.payload).to.deep.equal(item);
+
         const actionUpdateRequest = performedActions[1];
         expect(actionUpdateRequest.type).to.equal(UPDATE_REQUEST);
         expect(actionUpdateRequest.meta).to.deep.equal({
           ...expectedMeta,
           timestamp: actionUpdateRequest.meta.timestamp,
         });
+        expect(actionUpdateRequest.payload).to.deep.equal(expectedPayload);
 
         const batchedUpdatedActions = performedActions[2];
         const actionObjUpdated = batchedUpdatedActions.payload[0];
