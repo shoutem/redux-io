@@ -101,7 +101,7 @@ export default function collection(schema, tag = '', settings = {}, initialState
   }
   // eslint-disable-next-line no-param-reassign
   setStatus(initialState, createDefaultStatus(schema, tag, settings));
-  // TODO-vedran: refactor status into context={status, config}
+  // TODO: refactor status into context={status, config}
   return (state = initialState, action) => {
     if (!isValidAction(action, schema, tag)) {
       return state;
