@@ -51,11 +51,11 @@ const actionsWithTags = new Set([
 ]);
 
 /**
- * Map of all possible REQUEST action types and
- * it corresponding ERROR action types.
+ * Map used to resolve actions in case action.error = true to appropriate ERROR actions
+ * for RIO to be able to dispatch actions for reducers.
  * @type {{}}
  */
-const requestErrorActionsMap = {
+const errorActionsMap = {
   [LOAD_REQUEST]: LOAD_ERROR,
   [LOAD_ERROR]: LOAD_ERROR,
   [CREATE_REQUEST]: CREATE_ERROR,
@@ -369,7 +369,7 @@ function isValidAction(action) {
  * @returns {*}
  */
 function handleFailedRequest(action, dispatch) {
-  const errorAction = requestErrorActionsMap[action.type];
+  const errorAction = errorActionsMap[action.type];
 
   if (!errorAction) {
     console.warn(`Can not handle failed request for action type ${action.type}.`);
