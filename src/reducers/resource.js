@@ -50,6 +50,10 @@ function createNewState(state) {
   return _.isArray(state) ? [...state] : { ...state };
 }
 
+function updateState(state, updates) {
+  return { ...state, ...updates };
+}
+
 function createEmptyState(state) {
   return _.isArray(state) ? [] : {};
 }
@@ -103,7 +107,10 @@ export default function resource(schema, initialState = {}) {
         return newState;
       }
       case UPDATE_REQUEST: {
-        const newState = createNewState(payload);
+        const makeOptimisticUpdates = _.get(action, 'meta.options.makeOptimisticUpdates');
+        const newState = makeOptimisticUpdates ?
+          updateState(state, payload.data) : createNewState(payload);
+
         setStatus(newState, updateStatus(
           state[STATUS],
           {
