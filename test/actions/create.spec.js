@@ -308,8 +308,7 @@ describe('Create action creator', () => {
       schema,
       request: config,
     };
-    expect(() => create(schemaConfig))
-      .to.not.throw('Item is missing in method argument and in config.body');
+    expect(() => create(schemaConfig)).to.not.throw();
   });
 
   it('uses body from config if the item is missing', () => {

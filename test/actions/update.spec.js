@@ -129,6 +129,33 @@ describe('Update action creator', () => {
     expect(types[1].meta(...metaResponse)).to.deep.equal(expectedResponseMeta);
   });
 
+  it('creates a valid action where item in argument has priority over item in config.body', () => {
+    const schema = 'schema_test';
+    const item = {
+      schema,
+      id: '1',
+      attributes: {
+        name: 'Test1',
+      },
+    };
+    const config = {
+      headers: {
+        'Content-Type': 'application/vnd.api+json',
+      },
+      endpoint: 'api.test',
+      body: 'Body',
+    };
+
+    const schemaConfig = {
+      schema,
+      request: config,
+    };
+
+    const action = update(schemaConfig, item);
+
+    expect(action[RSAA].body).to.equal(JSON.stringify({ data: item }));
+  });
+
   it('throws exception on action with schema configuration is invalid', () => {
     const config = {
       headers: {
@@ -192,7 +219,7 @@ describe('Update action creator', () => {
       request: config,
     };
     expect(() => update(schemaConfig))
-      .to.not.throw('Item is missing in method argument and in config.body');
+      .to.not.throw();
   });
 
   it('uses body from config if the item is missing', () => {
