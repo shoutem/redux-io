@@ -1421,8 +1421,8 @@ describe('Json api middleware', () => {
       }).then(done).catch(done);
   });
 
-  describe('handleFailedRequest', () => {
-    it('LOAD_REQUEST', done => {
+  describe('handling of action with error flag', () => {
+    it('on LOAD_REQUEST', done => {
       const schema = 'schema_test';
       const tag = 'tag_test';
       const expectedMeta = {
@@ -1460,7 +1460,45 @@ describe('Json api middleware', () => {
           expect(requestAction.meta).to.deep.equal(expectedMeta);
         }).then(done).catch(done);
     });
-    it('REMOVE_REQUEST', done => {
+    it('on LOAD_REQUEST', done => {
+      const schema = 'schema_test';
+      const tag = 'tag_test';
+      const expectedMeta = {
+        source: JSON_API_SOURCE,
+        schema,
+        tag,
+      };
+
+      const mockErrorAction = {
+        type: LOAD_ERROR,
+        meta: expectedMeta,
+        error: true,
+      };
+
+      const store = mockStore({});
+      store.dispatch(actionPromise(mockErrorAction))
+        .then(() => {
+          const performedActions = store.getActions();
+          expect(performedActions).to.have.length(2);
+
+          const batchedActions = performedActions[0].payload;
+
+          const actionCollStatus = batchedActions[0];
+          expect(actionCollStatus.type).to.equal(REFERENCE_STATUS);
+          expect(actionCollStatus.meta).to.deep.equal(expectedMeta);
+          const expectedCollStatusPayload = {
+            busyStatus: busyStatus.IDLE,
+            validationStatus: validationStatus.INVALID,
+            error: true,
+          };
+          expect(actionCollStatus.payload).to.deep.equal(expectedCollStatusPayload);
+
+          const requestAction = performedActions[1];
+          expect(requestAction.type).to.equal(LOAD_ERROR);
+          expect(requestAction.meta).to.deep.equal(expectedMeta);
+        }).then(done).catch(done);
+    });
+    it('on REMOVE_REQUEST', done => {
       const schema = 'schema_test';
       const deletedItem = {
         type: schema,
@@ -1474,7 +1512,7 @@ describe('Json api middleware', () => {
         schema,
         tag: '',
       };
-      const mockSuccessAction = {
+      const mockErrorAction = {
         type: REMOVE_REQUEST,
         meta: expectedMeta,
         payload: expectedPayload,
@@ -1482,7 +1520,7 @@ describe('Json api middleware', () => {
       };
 
       const store = mockStore({});
-      store.dispatch(actionPromise(mockSuccessAction))
+      store.dispatch(actionPromise(mockErrorAction))
         .then(() => {
           const performedActions = store.getActions();
           expect(performedActions).to.have.length(2);
@@ -1503,7 +1541,50 @@ describe('Json api middleware', () => {
           expect(successAction.meta).to.deep.equal(expectedMeta);
         }).then(done).catch(done);
     });
-    it('CREATE_REQUEST', done => {
+    it('on REMOVE_ERROR', done => {
+      const schema = 'schema_test';
+      const deletedItem = {
+        type: schema,
+        id: '1',
+      };
+
+      const expectedPayload = { data: deletedItem };
+
+      const expectedMeta = {
+        source: JSON_API_SOURCE,
+        schema,
+        tag: '',
+      };
+      const mockErrorAction = {
+        type: REMOVE_ERROR,
+        meta: expectedMeta,
+        payload: expectedPayload,
+        error: true,
+      };
+
+      const store = mockStore({});
+      store.dispatch(actionPromise(mockErrorAction))
+        .then(() => {
+          const performedActions = store.getActions();
+          expect(performedActions).to.have.length(2);
+
+          const batchedActions = performedActions[0].payload;
+
+          const actionCollRequest = batchedActions[0];
+          expect(actionCollRequest.type).to.equal(REFERENCE_STATUS);
+          expect(actionCollRequest.meta).to.deep.equal({ ...expectedMeta, tag: '*' });
+          const expectedCollStatusPayload = {
+            validationStatus: validationStatus.INVALID,
+            busyStatus: busyStatus.IDLE,
+          };
+          expect(actionCollRequest.payload).to.deep.equal(expectedCollStatusPayload);
+
+          const successAction = performedActions[1];
+          expect(successAction.type).to.equal(REMOVE_ERROR);
+          expect(successAction.meta).to.deep.equal(expectedMeta);
+        }).then(done).catch(done);
+    });
+    it('on CREATE_REQUEST', done => {
       const schema = 'schema_test';
       const tag = 'tag_test';
       const expectedMeta = {
@@ -1540,7 +1621,44 @@ describe('Json api middleware', () => {
           expect(requestAction.meta).to.deep.equal(expectedMeta);
         }).then(done).catch(done);
     });
-    it('UPDATE_REQUEST', done => {
+    it('on CREATE_ERROR', done => {
+      const schema = 'schema_test';
+      const tag = 'tag_test';
+      const expectedMeta = {
+        source: JSON_API_SOURCE,
+        schema,
+        tag,
+      };
+
+      const mockErrorAction = {
+        type: CREATE_ERROR,
+        meta: expectedMeta,
+        error: true,
+      };
+
+      const store = mockStore({});
+      store.dispatch(actionPromise(mockErrorAction))
+        .then(() => {
+          const performedActions = store.getActions();
+          expect(performedActions).to.have.length(2);
+
+          const batchedActions = performedActions[0].payload;
+
+          const actionCollStatus = batchedActions[0];
+          expect(actionCollStatus.type).to.equal(REFERENCE_STATUS);
+          expect(actionCollStatus.meta).to.deep.equal({ ...expectedMeta, tag: '*' });
+          const expectedCollStatusPayload = {
+            busyStatus: busyStatus.IDLE,
+            validationStatus: validationStatus.INVALID,
+          };
+          expect(actionCollStatus.payload).to.deep.equal(expectedCollStatusPayload);
+
+          const requestAction = performedActions[1];
+          expect(requestAction.type).to.equal(CREATE_ERROR);
+          expect(requestAction.meta).to.deep.equal(expectedMeta);
+        }).then(done).catch(done);
+    });
+    it('on UPDATE_REQUEST', done => {
       const schema = 'schema_test';
       const expectedPayload = {
         data: [{
@@ -1557,7 +1675,7 @@ describe('Json api middleware', () => {
         tag: '',
       };
 
-      const mockSuccessAction = {
+      const mockErrorAction = {
         type: UPDATE_REQUEST,
         meta: expectedMeta,
         payload: expectedPayload,
@@ -1565,7 +1683,7 @@ describe('Json api middleware', () => {
       };
 
       const store = mockStore({});
-      store.dispatch(actionPromise(mockSuccessAction))
+      store.dispatch(actionPromise(mockErrorAction))
         .then(() => {
           const performedActions = store.getActions();
           expect(performedActions).to.have.length(2);
@@ -1586,6 +1704,55 @@ describe('Json api middleware', () => {
           expect(actionUpdateRequest.type).to.equal(UPDATE_REQUEST);
           expect(actionUpdateRequest.meta).to.deep.equal(expectedMeta);
           expect(actionUpdateRequest.payload).to.deep.equal(expectedPayload);
-        }).then(done).catch(done);    });
+        }).then(done).catch(done);
+    });
+    it('on UPDATE_ERROR', done => {
+      const schema = 'schema_test';
+      const expectedPayload = {
+        data: [{
+          type: schema,
+          id: '1',
+          attributes: {
+            name: 'Test1',
+          },
+        }],
+      };
+      const expectedMeta = {
+        source: JSON_API_SOURCE,
+        schema,
+        tag: '',
+      };
+
+      const mockErrorAction = {
+        type: UPDATE_ERROR,
+        meta: expectedMeta,
+        payload: expectedPayload,
+        error: true,
+      };
+
+      const store = mockStore({});
+      store.dispatch(actionPromise(mockErrorAction))
+        .then(() => {
+          const performedActions = store.getActions();
+          expect(performedActions).to.have.length(2);
+
+          const batchedActions = performedActions[0].payload;
+
+          const actionCollStatusBusy = batchedActions[0];
+          expect(actionCollStatusBusy.type).to.equal(REFERENCE_STATUS);
+          expect(actionCollStatusBusy.meta)
+            .to.deep.equal({ ...expectedMeta, tag: '*' });
+          const expectedCollStatusBusyPayload = {
+            busyStatus: busyStatus.IDLE,
+            validationStatus: validationStatus.INVALID,
+          };
+          expect(actionCollStatusBusy.payload).to.deep.equal(expectedCollStatusBusyPayload);
+
+          const actionUpdateRequest = performedActions[1];
+          expect(actionUpdateRequest.type).to.equal(UPDATE_ERROR);
+          expect(actionUpdateRequest.meta).to.deep.equal(expectedMeta);
+          expect(actionUpdateRequest.payload).to.deep.equal(expectedPayload);
+        }).then(done).catch(done);
+    });
   });
 });
