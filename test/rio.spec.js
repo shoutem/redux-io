@@ -26,6 +26,49 @@ describe('Rio', () => {
     expect(resolvedSchemaConfig).to.deep.equal(schemaConfig);
   });
 
+  it('register schema object with actions', () => {
+    const config = {
+      headers: {
+        'Content-Type': 'application/vnd.api+json',
+      },
+      endpoint: 'api.test',
+    };
+    const schema = 'app.builder';
+    const actions = {
+      get: {
+        request: {
+          method: 'GET',
+        },
+      },
+      create: {
+        request: {
+          method: 'POST',
+        },
+      },
+      update: {
+        request: {
+          method: 'PATCH',
+        },
+      },
+      remove: {
+        request: {
+          method: 'DELETE',
+        },
+      },
+    };
+
+    const schemaConfig = {
+      schema,
+      request: config,
+      actions,
+    };
+
+    rio.registerSchema(schemaConfig);
+    const resolvedSchemaConfig = rio.getSchema(schema);
+
+    expect(resolvedSchemaConfig).to.deep.equal(schemaConfig);
+  });
+
   it('register schema resolver', () => {
     rio.registerSchema((schema) => ({
       schema,
