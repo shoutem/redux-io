@@ -129,6 +129,33 @@ describe('Update action creator', () => {
     expect(types[1].meta(...metaResponse)).to.deep.equal(expectedResponseMeta);
   });
 
+  it('creates a valid action where item in argument has priority over item in config.body', () => {
+    const schema = 'schema_test';
+    const item = {
+      schema,
+      id: '1',
+      attributes: {
+        name: 'Test1',
+      },
+    };
+    const config = {
+      headers: {
+        'Content-Type': 'application/vnd.api+json',
+      },
+      endpoint: 'api.test',
+      body: 'Body',
+    };
+
+    const schemaConfig = {
+      schema,
+      request: config,
+    };
+
+    const action = update(schemaConfig, item);
+
+    expect(action[RSAA].body).to.equal(JSON.stringify({ data: item }));
+  });
+
   it('throws exception on action with schema configuration is invalid', () => {
     const config = {
       headers: {
@@ -175,7 +202,44 @@ describe('Update action creator', () => {
     };
 
     const item = 0;
-    expect(() => update(schemaConfig, item)).to.throw('Item isn\'t object.');
+    expect(() => update(schemaConfig, item)).to.throw('Item is not valid in method argument');
+  });
+
+  it('does not throw exception on action with missing item', () => {
+    const config = {
+      headers: {
+        'Content-Type': 'application/vnd.api+json',
+      },
+      endpoint: 'api.test',
+    };
+
+    const schema = 'app.builder';
+    const schemaConfig = {
+      schema,
+      request: config,
+    };
+    expect(() => update(schemaConfig))
+      .to.not.throw();
+  });
+
+  it('uses body from config if the item is missing', () => {
+    const config = {
+      headers: {
+        'Content-Type': 'application/vnd.api+json',
+      },
+      body: 'Body',
+      endpoint: 'api.test',
+    };
+
+    const schema = 'app.builder';
+    const schemaConfig = {
+      schema,
+      request: config,
+    };
+
+    const action = update(schemaConfig);
+
+    expect(action[RSAA].body).to.equal(config.body);
   });
 
   it('produces valid storage and collection actions', done => {

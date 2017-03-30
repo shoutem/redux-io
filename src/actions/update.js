@@ -30,18 +30,25 @@ import { extendMetaWithResponse } from './_rsaa';
  * as query params key=value
  * @returns {{}}
  */
-export function update(schema, item, params = {}, options = {}) {
+export function update(schema, item = null, params = {}, options = {}) {
   const config = resolveConfig(schema);
   if (!config) {
     const schemaName = schema && _.isObject(schema) ? schema.schema : schema;
     throw new Error(`Couldn't resolve schema ${schemaName} in function find.`);
   }
-  if (!_.isObject(item)) {
-    throw new Error('Item isn\'t object.');
-  }
 
   const rsaaConfig = buildRSAAConfig(config);
   const endpoint = buildEndpoint(rsaaConfig.endpoint, params, options);
+
+  let body = null;
+  if (item !== null) {
+    if (!_.isObject(item)) {
+      throw new Error('Item is not valid in method argument');
+    }
+    body = JSON.stringify({ data: item });
+  } else {
+    body = rsaaConfig.body;
+  }
 
   const meta = {
     source: config.request.resourceType || JSON_API_SOURCE,
@@ -57,9 +64,7 @@ export function update(schema, item, params = {}, options = {}) {
       method: 'PATCH',
       ...rsaaConfig,
       endpoint,
-      body: JSON.stringify({
-        data: item,
-      }),
+      body,
       types: [
         {
           type: UPDATE_REQUEST,
