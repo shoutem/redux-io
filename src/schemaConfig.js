@@ -128,7 +128,6 @@ export function buildEndpoint(endpoint, params, options) {
   return `${paramEndpoint}?${queryParams.join('&')}`;
 }
 
-
 export function resolveSchemaName(reference, schema) {
   const referenceSchema = _.get(getStatus(reference), 'schema');
 
