@@ -103,6 +103,7 @@ export function buildRSAAConfig(config) {
 
 /**
  * Replace endpoint placeholders '{key}' with corresponding value of key in params dict.
+ * Existing endpoint query params are updated from received params object.
  * Unused params are resolved into query params as 'key=value' pairs and concatenated to endpoint
  * @param endpoint
  * @param params
