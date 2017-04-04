@@ -1,6 +1,7 @@
 import { getCollectionLink, getCollectionParams } from '../reducers/collection';
 import { getStatus } from '../status';
-import { find, APPEND_MODE, RESOLVED_ENDPOINT } from './find';
+import { find, APPEND_MODE } from './find';
+import { RESOLVED_ENDPOINT } from '../consts';
 import thunkAction from './_thunkAction';
 
 export const NO_MORE_RESULTS = '@@redux_io/NO_MORE_RESULTS';
