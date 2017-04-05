@@ -98,6 +98,5 @@ describe('Next action creator', () => {
     expect(action.type).to.equal(NO_MORE_RESULTS);
     expect(action.schema).to.equal(schema);
     expect(action.tag).to.equal(tag);
-
   });
 });
