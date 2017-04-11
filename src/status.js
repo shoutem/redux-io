@@ -55,6 +55,8 @@ function statusProp(obj, prop) {
 
 export const getStatus = obj => _.get(obj, [STATUS]);
 
+export const hasStatus = obj => _.has(obj, [STATUS]);
+
 export const getTransformation = obj => statusProp(obj, 'transformation');
 
 export const isValid = obj =>

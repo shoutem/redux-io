@@ -98,6 +98,7 @@ export {
   getTransformation,
   cloneStatus,
   isExpired,
+  hasStatus,
 } from './status';
 
 import { enableRio } from './enableRio';

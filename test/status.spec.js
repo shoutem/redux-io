@@ -15,6 +15,7 @@ import {
   cloneStatus,
   setStatus,
   isExpired,
+  hasStatus,
 } from '../src/status';
 import collection from '../src/reducers/collection';
 
@@ -25,6 +26,7 @@ describe('Status metadata', () => {
 
     expect(isValid(obj)).to.be.false;
     expect(isBusy(obj)).to.be.false;
+    expect(hasStatus(obj)).to.be.true;
   });
 
   it('isValid returns correct value on valid', () => {
@@ -357,6 +359,19 @@ describe('Status metadata', () => {
 
     expect(counter).to.be.eql(3);
     expect(newObj[STATUS]).to.be.undefined;
+    expect(hasStatus(newObj)).to.be.false;
+  });
+
+  it('hasStatus returns correct values', () => {
+    const obj = { a: 1, b: 2 };
+    expect (hasStatus(obj)).to.be.false;
+
+    setStatus(obj, createStatus());
+    expect (hasStatus(obj)).to.be.true;
+
+    expect (hasStatus(undefined)).to.be.false;
+    expect (hasStatus(null)).to.be.false;
+    expect (hasStatus('primitive')).to.be.false;
   });
 
   describe('Expiration', () => {
