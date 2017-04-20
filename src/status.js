@@ -50,7 +50,8 @@ export const cloneStatus = (sourceObject, destinationObject, markChange = false)
 };
 
 function statusProp(obj, prop) {
-  return _.get(obj, [STATUS, prop]);
+  const value = _.get(obj, [STATUS, prop]);
+  return value;
 }
 
 export const getStatus = obj => _.get(obj, [STATUS]);
@@ -93,3 +94,8 @@ export const shouldRefresh = (obj, ignoreError = false) => (
 );
 
 export const getId = obj => statusProp(obj, 'id');
+
+export const hasNext = obj => {
+  const { next } = statusProp(obj, 'links');
+  return !!next;
+};

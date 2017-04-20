@@ -87,6 +87,7 @@ export {
   REFERENCE_FETCHED,
   REFERENCE_STATUS,
   REFERENCE_CLEAR,
+  RESOLVED_ENDPOINT,
 } from './consts';
 
 export {
@@ -99,6 +100,7 @@ export {
   cloneStatus,
   isExpired,
   hasStatus,
+  hasNext,
 } from './status';
 
 import { enableRio } from './enableRio';
