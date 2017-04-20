@@ -445,6 +445,15 @@ describe('Status metadata', () => {
         expect(hasNext(obj)).to.be.true;
       });
 
+      it('Returns false when links doesn\'t exist', () => {
+        const status = updateStatus(
+          createStatus(),
+        );
+        const obj = {};
+        setStatus(obj, status);
+
+        expect(hasNext(obj)).to.be.false;
+      });
 
       it('Returns false when next link doesn\'t exist', () => {
         const status = updateStatus(
