@@ -50,8 +50,11 @@ export const cloneStatus = (sourceObject, destinationObject, markChange = false)
 };
 
 function statusProp(obj, prop) {
-  const value = _.get(obj, [STATUS, prop]);
-  return value;
+  if (typeof prop === 'string') {
+    // eslint-disable-next-line no-param-reassign
+    prop = [prop];
+  }
+  return _.get(obj, [STATUS, ...prop]);
 }
 
 export const getStatus = obj => _.get(obj, [STATUS]);
@@ -95,7 +98,4 @@ export const shouldRefresh = (obj, ignoreError = false) => (
 
 export const getId = obj => statusProp(obj, 'id');
 
-export const hasNext = obj => {
-  const { next } = statusProp(obj, 'links');
-  return !!next;
-};
+export const hasNext = obj => !!statusProp(obj, ['links', 'next']);
