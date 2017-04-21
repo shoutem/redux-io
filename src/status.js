@@ -50,11 +50,8 @@ export const cloneStatus = (sourceObject, destinationObject, markChange = false)
 };
 
 function statusProp(obj, prop) {
-  if (typeof prop === 'string') {
-    // eslint-disable-next-line no-param-reassign
-    prop = [prop];
-  }
-  return _.get(obj, [STATUS, ...prop]);
+  const propPath = _.isArray(prop) ? prop : [prop];
+  return _.get(obj, [STATUS, ...propPath]);
 }
 
 export const getStatus = obj => _.get(obj, [STATUS]);
