@@ -16,6 +16,7 @@ import {
   setStatus,
   isExpired,
   hasStatus,
+  hasNext,
 } from '../src/status';
 import collection from '../src/reducers/collection';
 
@@ -423,6 +424,50 @@ describe('Status metadata', () => {
         expect(isExpired(state)).to.be.not.ok;
         stateStatus.modifiedTimestamp = Date.now() - (expirationTime * 1000 + 1);
         expect(isExpired(state)).to.be.ok;
+      });
+    });
+  });
+
+  describe('Links', () => {
+    describe('hasNext', () => {
+      it('Returns true when next link exists', () => {
+        const status = updateStatus(
+          createStatus(),
+          {
+            links: {
+              next: 'http://link-to-next',
+            },
+          },
+        );
+        const obj = {};
+        setStatus(obj, status);
+
+        expect(hasNext(obj)).to.be.true;
+      });
+
+      it('Returns false when links doesn\'t exist', () => {
+        const status = updateStatus(
+          createStatus(),
+        );
+        const obj = {};
+        setStatus(obj, status);
+
+        expect(hasNext(obj)).to.be.false;
+      });
+
+      it('Returns false when next link doesn\'t exist', () => {
+        const status = updateStatus(
+          createStatus(),
+          {
+            links: {
+              next: null,
+            },
+          },
+        );
+        const obj = {};
+        setStatus(obj, status);
+
+        expect(hasNext(obj)).to.be.false;
       });
     });
   });
