@@ -14,7 +14,8 @@ import rio, {
   collection,
 } from '../../src';
 import { setStatus, updateStatus, getStatus } from '../../src/status';
-import { APPEND_MODE, RESOLVED_ENDPOINT } from '../../src/actions/find';
+import { APPEND_MODE } from '../../src/actions/find';
+import { RESOLVED_ENDPOINT } from '../../src/consts';
 import  { next } from '../../src/actions/next';
 
 describe('Next action creator', () => {
@@ -97,6 +98,5 @@ describe('Next action creator', () => {
     expect(action.type).to.equal(NO_MORE_RESULTS);
     expect(action.schema).to.equal(schema);
     expect(action.tag).to.equal(tag);
-
   });
 });

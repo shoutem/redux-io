@@ -1,7 +1,7 @@
 const thunkAction = actionFn => (...args) => {
   const action = actionFn(...args);
-  return dispatch => (
-    new Promise((resolve, reject) => (
+  return dispatch => {
+    const promise = new Promise((resolve, reject) => (
       dispatch(action).then(resolvedAction => {
         if (resolvedAction.error) {
           reject(resolvedAction);
@@ -9,8 +9,11 @@ const thunkAction = actionFn => (...args) => {
         }
         resolve(resolvedAction);
       }, reject)
-    ))
-  );
+    ));
+
+    promise.catch(console.log);
+    return promise;
+  };
 };
 
 export default thunkAction;
