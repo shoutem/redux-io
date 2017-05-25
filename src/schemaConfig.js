@@ -39,6 +39,9 @@ const schemaDefinition = {
         'headers',
       ],
     },
+    actions: {
+      type: 'object',
+    },
   },
   additionalProperties: false,
   required: [
