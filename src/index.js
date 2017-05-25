@@ -95,6 +95,7 @@ export {
   isBusy,
   isError,
   isInitialized,
+  shouldLoad,
   shouldRefresh,
   getTransformation,
   cloneStatus,

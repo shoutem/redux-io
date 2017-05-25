@@ -96,3 +96,28 @@ export const shouldRefresh = (obj, ignoreError = false) => (
 export const getId = obj => statusProp(obj, 'id');
 
 export const hasNext = obj => !!statusProp(obj, ['links', 'next']);
+
+/**
+ * Checks whether a load is needed for selected propName on given set of new and current props.
+ * @param nextProps New props
+ * @param props Current props
+ * @param propName Prop to check
+ * @param ignoreError flag indicating whether shouldRefresh function returns 'true' for
+ * objects in error
+ */
+export const shouldLoad = (nextProps, props, propName, ignoreError = false) => {
+  if (!nextProps || !propName) {
+    throw Error('Invalid shouldLoad call. Check provided arguments.');
+  }
+
+  const prop = _.get(props, propName);
+  const nextProp = _.get(nextProps, propName);
+
+  // if both props point to same object, nothing has changed
+  if (nextProp && nextProp === prop) {
+    return false;
+  }
+
+  // finally check whether refresh is needed
+  return shouldRefresh(nextProp, ignoreError);
+};
