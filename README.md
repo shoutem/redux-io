@@ -129,7 +129,7 @@ Upon dispatch, `find` will configure action by redux-api-middleware specificatio
 2. Make GET request on http://api.test.com/items?sort=relevance
 3. If request is successful dispatch SUCCESS action
 
-You can see that it is by `redux-api-middleware` [lifecycle](www.test.com). After which redux-api-state will listen on
+You can see that it is by `redux-api-middleware` [lifecycle](https://github.com/agraboso/redux-api-middleware#lifecycle). After which redux-api-state will listen on
 SUCCESS action and will act as:
 
 1. Validate SUCCESS action
