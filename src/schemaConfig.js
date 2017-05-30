@@ -106,6 +106,7 @@ export function buildRSAAConfig(config) {
 
 /**
  * Replace endpoint placeholders '{key}' with corresponding value of key in params dict.
+ * Existing endpoint query params are updated from received params object.
  * Unused params are resolved into query params as 'key=value' pairs and concatenated to endpoint
  * @param endpoint
  * @param params
@@ -117,14 +118,37 @@ export function buildEndpoint(endpoint, params, options) {
   if (isEndpointResolved) {
     return endpoint;
   }
-
   const usedParams = [];
-  const paramEndpoint = endpoint.replace(/{(\w+)}/g, (match, key) => {
+  let paramEndpoint = endpoint.replace(/{(\w+)}/g, (match, key) => {
     usedParams.push(key);
     return params[key];
   });
-  const unusedParamKeys = _.difference(Object.keys(params), usedParams);
-  const queryParams = unusedParamKeys.map(key => `${key}=${params[key]}`);
+
+  const existingParams = {};
+  let queryString = '';
+
+  if (paramEndpoint.indexOf('?') > -1) {
+    queryString = paramEndpoint.substr(paramEndpoint.indexOf('?') + 1);
+    paramEndpoint = paramEndpoint.substring(0, endpoint.indexOf('?'));
+  }
+
+  queryString.replace(/([^=&]+)=([^&]*)/g, (m, key, value) => {
+    existingParams[decodeURIComponent(key)] = decodeURIComponent(value);
+  });
+// eslint-disable-next-line prefer-const
+  let queryParams = Object.keys(existingParams).map(key => {
+    if (params[key]) {
+      return `${key}=${params[key]}`;
+    }
+    return `${key}=${existingParams[key]}`;
+  });
+  const unusedParamKeys = _.difference(
+    Object.keys(params),
+    usedParams,
+    Object.keys(existingParams)
+  );
+  const unusedParams = unusedParamKeys.map(key => `${key}=${params[key]}`);
+  _.merge(queryParams, unusedParams);
   if (_.isEmpty(queryParams)) {
     return paramEndpoint;
   }
