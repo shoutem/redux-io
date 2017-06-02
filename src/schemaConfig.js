@@ -1,5 +1,6 @@
 import _ from 'lodash';
 import ZSchema from 'z-schema';
+import UriTemplate from 'urijs/src/URITemplate';
 import { getStatus } from './status';
 import { RESOLVED_ENDPOINT } from './consts';
 import rio from './rio';
@@ -112,23 +113,13 @@ export function buildRSAAConfig(config) {
  * @param options
  * @returns {string}
  */
-export function buildEndpoint(endpoint, params, options) {
+export function buildEndpoint(endpoint, params = {}, options = {}) {
   const isEndpointResolved = options[RESOLVED_ENDPOINT];
   if (isEndpointResolved) {
     return endpoint;
   }
 
-  const usedParams = [];
-  const paramEndpoint = endpoint.replace(/{(\w+)}/g, (match, key) => {
-    usedParams.push(key);
-    return params[key];
-  });
-  const unusedParamKeys = _.difference(Object.keys(params), usedParams);
-  const queryParams = unusedParamKeys.map(key => `${key}=${params[key]}`);
-  if (_.isEmpty(queryParams)) {
-    return paramEndpoint;
-  }
-  return `${paramEndpoint}?${queryParams.join('&')}`;
+  return new UriTemplate(endpoint).expand(params);
 }
 
 export function resolveSchemaName(reference, schema) {

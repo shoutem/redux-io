@@ -84,7 +84,7 @@ describe('Update action creator', () => {
       headers: {
         'Content-Type': 'application/vnd.api+json',
       },
-      endpoint: 'api.test/{param1}/{param2}/abc',
+      endpoint: 'api.test/{param1}/{param2}/abc{?q1,q2}',
     };
 
     const schemaConfig = {
