@@ -7,7 +7,7 @@ import {
 describe('Build endpoint', () => {
   it('static', () => {
     const endpoint = 'http://new.shoutem.com';
-    const params = { test: 1};
+    const params = { test: 1 };
 
     const expectedEndpoint = 'http://new.shoutem.com';
     const builtEndpoint = buildEndpoint(endpoint, params);
@@ -17,7 +17,7 @@ describe('Build endpoint', () => {
 
   it('with segment param', () => {
     const endpoint = 'http://new.shoutem.com/{x}';
-    const params = { x: 1};
+    const params = { x: 1 };
 
     const expectedEndpoint = 'http://new.shoutem.com/1';
     const builtEndpoint = buildEndpoint(endpoint, params);
@@ -36,7 +36,7 @@ describe('Build endpoint', () => {
 
   it('static with segment param', () => {
     const endpoint = 'http://new.shoutem.com';
-    const params = { x: 1};
+    const params = { x: 1 };
 
     const expectedEndpoint = 'http://new.shoutem.com';
     const builtEndpoint = buildEndpoint(endpoint, params);
@@ -46,7 +46,7 @@ describe('Build endpoint', () => {
 
   it('with query params', () => {
     const endpoint = 'http://new.shoutem.com{?q1,q2}';
-    const params = { q1: 1, q2: 2};
+    const params = { q1: 1, q2: 2 };
 
     const expectedEndpoint = 'http://new.shoutem.com?q1=1&q2=2';
     const builtEndpoint = buildEndpoint(endpoint, params);
