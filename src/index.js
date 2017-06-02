@@ -87,6 +87,7 @@ export {
   REFERENCE_FETCHED,
   REFERENCE_STATUS,
   REFERENCE_CLEAR,
+  RESOLVED_ENDPOINT,
 } from './consts';
 
 export {
@@ -94,10 +95,13 @@ export {
   isBusy,
   isError,
   isInitialized,
+  shouldLoad,
   shouldRefresh,
   getTransformation,
   cloneStatus,
   isExpired,
+  hasStatus,
+  hasNext,
 } from './status';
 
 import { enableRio } from './enableRio';

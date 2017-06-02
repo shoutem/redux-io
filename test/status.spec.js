@@ -15,6 +15,8 @@ import {
   cloneStatus,
   setStatus,
   isExpired,
+  hasStatus,
+  hasNext,
 } from '../src/status';
 import collection from '../src/reducers/collection';
 
@@ -25,6 +27,7 @@ describe('Status metadata', () => {
 
     expect(isValid(obj)).to.be.false;
     expect(isBusy(obj)).to.be.false;
+    expect(hasStatus(obj)).to.be.true;
   });
 
   it('isValid returns correct value on valid', () => {
@@ -357,6 +360,19 @@ describe('Status metadata', () => {
 
     expect(counter).to.be.eql(3);
     expect(newObj[STATUS]).to.be.undefined;
+    expect(hasStatus(newObj)).to.be.false;
+  });
+
+  it('hasStatus returns correct values', () => {
+    const obj = { a: 1, b: 2 };
+    expect (hasStatus(obj)).to.be.false;
+
+    setStatus(obj, createStatus());
+    expect (hasStatus(obj)).to.be.true;
+
+    expect (hasStatus(undefined)).to.be.false;
+    expect (hasStatus(null)).to.be.false;
+    expect (hasStatus('primitive')).to.be.false;
   });
 
   describe('Expiration', () => {
@@ -408,6 +424,50 @@ describe('Status metadata', () => {
         expect(isExpired(state)).to.be.not.ok;
         stateStatus.modifiedTimestamp = Date.now() - (expirationTime * 1000 + 1);
         expect(isExpired(state)).to.be.ok;
+      });
+    });
+  });
+
+  describe('Links', () => {
+    describe('hasNext', () => {
+      it('Returns true when next link exists', () => {
+        const status = updateStatus(
+          createStatus(),
+          {
+            links: {
+              next: 'http://link-to-next',
+            },
+          },
+        );
+        const obj = {};
+        setStatus(obj, status);
+
+        expect(hasNext(obj)).to.be.true;
+      });
+
+      it('Returns false when links doesn\'t exist', () => {
+        const status = updateStatus(
+          createStatus(),
+        );
+        const obj = {};
+        setStatus(obj, status);
+
+        expect(hasNext(obj)).to.be.false;
+      });
+
+      it('Returns false when next link doesn\'t exist', () => {
+        const status = updateStatus(
+          createStatus(),
+          {
+            links: {
+              next: null,
+            },
+          },
+        );
+        const obj = {};
+        setStatus(obj, status);
+
+        expect(hasNext(obj)).to.be.false;
       });
     });
   });
