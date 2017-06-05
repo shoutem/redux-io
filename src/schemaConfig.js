@@ -1,5 +1,6 @@
 import _ from 'lodash';
 import ZSchema from 'z-schema';
+import Uri from 'urijs';
 import { getStatus } from './status';
 import { RESOLVED_ENDPOINT } from './consts';
 import rio from './rio';
@@ -112,7 +113,7 @@ export function buildRSAAConfig(config) {
  * @param options
  * @returns {string}
  */
-export function buildEndpoint(endpoint, params, options) {
+export function buildEndpoint(endpoint, params = {}, options = {}) {
   const isEndpointResolved = options[RESOLVED_ENDPOINT];
   if (isEndpointResolved) {
     return endpoint;
@@ -121,14 +122,18 @@ export function buildEndpoint(endpoint, params, options) {
   const usedParams = [];
   const paramEndpoint = endpoint.replace(/{(\w+)}/g, (match, key) => {
     usedParams.push(key);
-    return params[key];
+    return _.get(params, [key], '');
   });
+
   const unusedParamKeys = _.difference(Object.keys(params), usedParams);
-  const queryParams = unusedParamKeys.map(key => `${key}=${params[key]}`);
-  if (_.isEmpty(queryParams)) {
-    return paramEndpoint;
-  }
-  return `${paramEndpoint}?${queryParams.join('&')}`;
+  const queryParams = _.zipObject(
+    unusedParamKeys,
+    _.map(unusedParamKeys, key => params[key])
+  );
+
+  return new Uri(paramEndpoint)
+    .query(queryParams)
+    .toString();
 }
 
 export function resolveSchemaName(reference, schema) {
