@@ -63,4 +63,14 @@ describe('Build endpoint', () => {
 
     expect(builtEndpoint).to.be.equal(expectedEndpoint);
   });
+
+  it('with query key', () => {
+    const endpoint = 'http://new.shoutem.com';
+    const params = { 'x[]': 2 };
+
+    const expectedEndpoint = 'http://new.shoutem.com/?x%5B%5D=2';
+    const builtEndpoint = buildEndpoint(endpoint, params);
+
+    expect(builtEndpoint).to.be.equal(expectedEndpoint);
+  });
 });
