@@ -125,11 +125,7 @@ export function buildEndpoint(endpoint, params = {}, options = {}) {
     return _.get(params, [key], '');
   });
 
-  const unusedParamKeys = _.difference(Object.keys(params), usedParams);
-  const queryParams = _.zipObject(
-    unusedParamKeys,
-    _.map(unusedParamKeys, key => params[key])
-  );
+  const queryParams = _.omit(params, usedParams);
 
   return new Uri(paramEndpoint)
     .query(queryParams)
