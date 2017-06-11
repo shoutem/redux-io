@@ -17,7 +17,7 @@ of data in redux state. This section documents the complete redux-io API.
 * [update(config, schema, item)](update.md)
 * [remove(config, schema, item)](remove.md)
 * [next(collection, appendMode = true)](next.md)
-* [crated(payload, schema)](created.md)
+* [created(payload, schema)](created.md)
 * [loaded(payload, schema)](loaded.md)
 * [updated(payload, schema)](updated.md)
 * [removed(payload, schema)](removed.md)
