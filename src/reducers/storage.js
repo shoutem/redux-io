@@ -86,50 +86,50 @@ export default function storage(schema, initialState = {}) {
           return state;
         }
         const patchedItem = patchItemInState(currentItem, item);
-        patchedItem[STATUS] = mergeItemStatus(
+        setStatus(patchedItem, mergeItemStatus(
           currentItem,
           {
             validationStatus: validationStatus.INVALID,
             busyStatus: busyStatus.BUSY,
             transformation: action.meta.transformation,
           }
-        );
+        ));
         const newState = { ...state, [item.id]: patchedItem };
-        cloneStatus(newState, state);
+        cloneStatus(state, newState);
         return newState;
       }
       case OBJECT_FETCHED:
       case OBJECT_CREATED:
       case OBJECT_UPDATED: {
-        item[STATUS] = mergeItemStatus(
+        setStatus(item, mergeItemStatus(
           currentItem,
           {
             validationStatus: validationStatus.VALID,
             busyStatus: busyStatus.IDLE,
             transformation: action.meta.transformation,
           }
-        );
+        ));
         const newState = { ...state, [item.id]: item };
-        cloneStatus(newState, state);
+        cloneStatus(state, newState);
         return newState;
       }
       case OBJECT_REMOVING: {
         const newItem = { ...currentItem };
-        newItem[STATUS] = mergeItemStatus(
+        setStatus(newItem, mergeItemStatus(
           currentItem,
           {
             validationStatus: validationStatus.INVALID,
             busyStatus: busyStatus.BUSY,
           }
-        );
+        ));
         const newState = { ...state, [newItem.id]: newItem };
-        cloneStatus(newState, state);
+        cloneStatus(state, newState);
         return newState;
       }
       case OBJECT_REMOVED: {
         const newState = { ...state };
         delete newState[item.id];
-        cloneStatus(newState, state);
+        cloneStatus(state, newState);
         return newState;
       }
       default: {
@@ -137,7 +137,7 @@ export default function storage(schema, initialState = {}) {
           return state;
         }
         const newState = { ...state };
-        cloneStatus(newState, state);
+        setStatus(state, createDefaultStatus(schema));
         return newState;
       }
     }

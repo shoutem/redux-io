@@ -436,6 +436,7 @@ describe('Storage reducer', () => {
 
     const nextStateInvalidItem = nextState[itemToBeRemoved.id];
     expect(nextStateInvalidItem[STATUS].validationStatus).to.eql(validationStatus.INVALID);
+    expect(nextStateInvalidItem[STATUS].busyStatus).to.eql(busyStatus.BUSY);
 
     const expectedState = {
       [itemToBeRemoved.id]: { ...itemToBeRemoved, [STATUS]: nextStateInvalidItem[STATUS] },
@@ -443,7 +444,7 @@ describe('Storage reducer', () => {
       3: { id: 3 },
     };
 
-    expect(nextState).to.eql(expectedState);
+    expect(nextState).to.shallowDeepEqual(expectedState);
   });
 
   it('ignores custom action with correct meta schema but invalid item', () => {
