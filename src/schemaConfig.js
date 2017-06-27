@@ -125,10 +125,17 @@ export function buildEndpoint(endpoint, params = {}, options = {}) {
     return _.get(params, [key], '');
   });
 
-  const queryParams = _.omit(params, usedParams);
+  const unusedQueryParams = _.omit(params, usedParams);
 
-  return new Uri(paramEndpoint)
-    .query(queryParams)
+  const paramEndpointUri = new Uri(paramEndpoint);
+
+  const resolvedQueryParams = {
+    ...paramEndpointUri.query(true),
+    ...unusedQueryParams,
+  }
+
+  return paramEndpointUri
+    .query(resolvedQueryParams)
     .toString();
 }
 

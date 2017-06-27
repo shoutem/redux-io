@@ -73,4 +73,34 @@ describe('Build endpoint', () => {
 
     expect(builtEndpoint).to.be.equal(expectedEndpoint);
   });
+
+  it('with query key and endpoint with already defined query', () => {
+    const endpoint = 'http://new.shoutem.com?a=2';
+    const params = { 'x[]': 2 };
+
+    const expectedEndpoint = 'http://new.shoutem.com/?a=2&x%5B%5D=2';
+    const builtEndpoint = buildEndpoint(endpoint, params);
+
+    expect(builtEndpoint).to.be.equal(expectedEndpoint);
+  });
+
+  it('with query key and endpoint with already defined query with same key', () => {
+    const endpoint = 'http://new.shoutem.com?x=1';
+    const params = { 'x': 2 };
+
+    const expectedEndpoint = 'http://new.shoutem.com/?x=2';
+    const builtEndpoint = buildEndpoint(endpoint, params);
+
+    expect(builtEndpoint).to.be.equal(expectedEndpoint);
+  });
+
+  it('with empty params and endpoint with already defined query with same key', () => {
+    const endpoint = 'http://new.shoutem.com?x=1';
+    const params = {};
+
+    const expectedEndpoint = 'http://new.shoutem.com/?x=1';
+    const builtEndpoint = buildEndpoint(endpoint, params);
+
+    expect(builtEndpoint).to.be.equal(expectedEndpoint);
+  });
 });
