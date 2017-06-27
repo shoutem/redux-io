@@ -32,10 +32,7 @@ function saveStatus(originalState, serializableState) {
  * @returns {*}
  */
 function transformSubstate(originalSubState) {
-  if (_.isArray(originalSubState)) {
-    if (!originalSubState[STATUS]) {
-      return originalSubState;
-    }
+  if (_.isArray(originalSubState) && originalSubState[STATUS]) {
     // Transform array into format that reverse transformation expects.
     // JSON.stringify only serialize array items, it does not serialize
     // additional array properties, this is used to save those properties.
