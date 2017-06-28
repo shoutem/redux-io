@@ -38,7 +38,7 @@ function transformSubstate(originalSubState) {
     // additional array properties, this is used to save those properties.
     // It is important because RIO adds STATUS property to collections.
     return arrayToObject(originalSubState, { [TYPE_KEY]: ARRAY_TYPE });
-  } else if (_.isPlainObject(originalSubState)) {
+  } else if (_.isObjectLike(originalSubState)) {
     // eslint-disable-next-line  no-use-before-define
     return toSerializableFormat(originalSubState);
   }
@@ -52,6 +52,8 @@ function transformSubstate(originalSubState) {
  * @returns {*}
  */
 export function toSerializableFormat(state) {
+  const accumulator = _.isArray(state) ? [] : {};
+
   return _.reduce(state, (serializableState, substate, subStateKey) => {
     const serializableSubState = transformSubstate(substate);
 
@@ -61,5 +63,5 @@ export function toSerializableFormat(state) {
     // eslint-disable-next-line no-param-reassign
     serializableState[subStateKey] = serializableSubState;
     return serializableState;
-  }, {});
+  }, accumulator);
 }
