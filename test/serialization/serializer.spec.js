@@ -1,4 +1,5 @@
 import { assert } from 'chai';
+import _ from 'lodash';
 import { toSerializableFormat } from '../../src/serialization';
 import { TYPE_KEY, ARRAY_TYPE } from '../../src/serialization/type';
 import { STATUS } from '../../src/status';
@@ -49,6 +50,25 @@ describe('toSerializableFormat', () => {
     };
     const serializedState = toSerializableFormat(state);
     assert.deepEqual(serializedState.arr, expectedSerializedState.arr);
+  });
+
+  it('leave ordinary array as is, regardless of depth', () => {
+    const state = [
+      [
+        [1, 2, 3],
+        [4, 5, 6],
+        [7, 8, 9],
+      ],
+      [
+        [10, 11, 12],
+        [13, 14, 15],
+        [16, 17, 18],
+      ],
+    ];
+    const expectedSerializedState = _.cloneDeep(state);
+
+    const serializedState = toSerializableFormat(state);
+    assert.deepEqual(serializedState, expectedSerializedState);
   });
 
   it('saves collection status to object array', () => {
