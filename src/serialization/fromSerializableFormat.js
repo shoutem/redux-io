@@ -33,6 +33,9 @@ function revertTransformedSubstate(serializableSubState) {
     }
     // eslint-disable-next-line no-use-before-define
     return fromSerializableFormat(serializableSubState);
+  } else if (_.isArray(serializableSubState)) {
+    // eslint-disable-next-line no-use-before-define
+    return fromSerializableFormat(serializableSubState);
   }
   return serializableSubState;
 }
@@ -44,6 +47,8 @@ function revertTransformedSubstate(serializableSubState) {
  * @returns {object} Original state
  */
 export function fromSerializableFormat(serializableState) {
+  const accumulator = _.isArray(serializableState) ? [] : {};
+
   return _.reduce(serializableState, (originalState, serializableSubState, subStateKey) => {
     const originalSubState = revertTransformedSubstate(serializableSubState);
 
@@ -52,5 +57,5 @@ export function fromSerializableFormat(serializableState) {
     // eslint-disable-next-line no-param-reassign
     originalState[subStateKey] = originalSubState;
     return originalState;
-  }, {});
+  }, accumulator);
 }
