@@ -65,6 +65,8 @@ export { getOne };
 
 export { normalizeItem, normalizeCollection } from './normalizer';
 
+export { RioStateSerializer } from './serialization';
+
 export {
   LOAD_REQUEST,
   LOAD_SUCCESS,
