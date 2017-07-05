@@ -13,11 +13,13 @@ function objectToArray(object) {
  */
 function restoreStatus(serializableSubState, originalSubState) {
   const status = _.isPlainObject(serializableSubState) && serializableSubState[STATUS];
-  if (status) {
-    // eslint-disable-next-line no-param-reassign
-    delete originalSubState[STATUS]; // Delete enumerable status
-    setStatus(originalSubState, status); // Set non enumerable status
+  if (!status) {
+    return;
   }
+
+  // eslint-disable-next-line no-param-reassign
+  delete originalSubState[STATUS]; // Delete enumerable status
+  setStatus(originalSubState, status); // Set non enumerable status
 }
 
 /**
@@ -47,9 +49,19 @@ function revertTransformedSubstate(serializableSubState) {
  * @returns {object} Original state
  */
 export function fromSerializableFormat(serializableState) {
-  const accumulator = _.isArray(serializableState) ? [] : {};
+  let serializableState2 = serializableState;
+  if (_.isPlainObject(serializableState)) {
+    if (serializableState[TYPE_KEY] === ARRAY_TYPE) {
+      // Transform "array object" back to array as it was before serialization
+      serializableState2 = objectToArray(serializableState);
+      restoreStatus(serializableState, serializableState2);
+    }
+  }
 
-  return _.reduce(serializableState, (originalState, serializableSubState, subStateKey) => {
+  const accumulator = _.isArray(serializableState2) ? [] : {};
+  restoreStatus(serializableState, accumulator);
+
+  return _.reduce(serializableState2, (originalState, serializableSubState, subStateKey) => {
     const originalSubState = revertTransformedSubstate(serializableSubState);
 
     restoreStatus(serializableSubState, originalSubState);

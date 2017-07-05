@@ -52,9 +52,19 @@ function transformSubstate(originalSubState) {
  * @returns {*}
  */
 export function toSerializableFormat(state) {
-  const accumulator = _.isArray(state) ? [] : {};
+  let state2 = state;
+  if (_.isArray(state) && state[STATUS]) {
+    // Transform array into format that reverse transformation expects.
+    // JSON.stringify only serialize array items, it does not serialize
+    // additional array properties, this is used to save those properties.
+    // It is important because RIO adds STATUS property to collections.
+    state2 = arrayToObject(state, { [TYPE_KEY]: ARRAY_TYPE });
+    saveStatus(state, state2);
+  }
 
-  return _.reduce(state, (serializableState, substate, subStateKey) => {
+  const accumulator = _.isArray(state2) ? [] : {};
+
+  return _.reduce(state2, (serializableState, substate, subStateKey) => {
     const serializableSubState = transformSubstate(substate);
 
     // Status is not enumerable property so we have take care for it separately
