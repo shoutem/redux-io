@@ -28,17 +28,14 @@ function restoreStatus(serializableSubState, originalSubState) {
  * @returns {*}
  */
 function revertTransformedSubstate(serializableSubState) {
-  if (_.isPlainObject(serializableSubState)) {
-    if (serializableSubState[TYPE_KEY] === ARRAY_TYPE) {
-      // Transform "array object" back to array as it was before serialization
-      return objectToArray(serializableSubState);
-    }
-    // eslint-disable-next-line no-use-before-define
-    return fromSerializableFormat(serializableSubState);
-  } else if (_.isArray(serializableSubState)) {
-    // eslint-disable-next-line no-use-before-define
-    return fromSerializableFormat(serializableSubState);
+  if (
+    _.isPlainObject(serializableSubState) &&
+    serializableSubState[TYPE_KEY] === ARRAY_TYPE
+  ) {
+    // Transform "array object" back to array as it was before serialization
+    return objectToArray(serializableSubState);
   }
+
   return serializableSubState;
 }
 
@@ -49,22 +46,16 @@ function revertTransformedSubstate(serializableSubState) {
  * @returns {object} Original state
  */
 export function fromSerializableFormat(serializableState) {
-  let serializableState2 = serializableState;
-  if (_.isPlainObject(serializableState)) {
-    if (serializableState[TYPE_KEY] === ARRAY_TYPE) {
-      // Transform "array object" back to array as it was before serialization
-      serializableState2 = objectToArray(serializableState);
-      restoreStatus(serializableState, serializableState2);
-    }
+  if (!_.isObjectLike(serializableState)) {
+    return serializableState;
   }
 
-  const accumulator = _.isArray(serializableState2) ? [] : {};
+  const revertedState = revertTransformedSubstate(serializableState);
+  const accumulator = _.isArray(revertedState) ? [] : {};
   restoreStatus(serializableState, accumulator);
 
-  return _.reduce(serializableState2, (originalState, serializableSubState, subStateKey) => {
-    const originalSubState = revertTransformedSubstate(serializableSubState);
-
-    restoreStatus(serializableSubState, originalSubState);
+  return _.reduce(revertedState, (originalState, serializableSubState, subStateKey) => {
+    const originalSubState = fromSerializableFormat(serializableSubState);
 
     // eslint-disable-next-line no-param-reassign
     originalState[subStateKey] = originalSubState;

@@ -38,9 +38,6 @@ function transformSubstate(originalSubState) {
     // additional array properties, this is used to save those properties.
     // It is important because RIO adds STATUS property to collections.
     return arrayToObject(originalSubState, { [TYPE_KEY]: ARRAY_TYPE });
-  } else if (_.isObjectLike(originalSubState)) {
-    // eslint-disable-next-line  no-use-before-define
-    return toSerializableFormat(originalSubState);
   }
   return originalSubState;
 }
@@ -52,23 +49,16 @@ function transformSubstate(originalSubState) {
  * @returns {*}
  */
 export function toSerializableFormat(state) {
-  let state2 = state;
-  if (_.isArray(state) && state[STATUS]) {
-    // Transform array into format that reverse transformation expects.
-    // JSON.stringify only serialize array items, it does not serialize
-    // additional array properties, this is used to save those properties.
-    // It is important because RIO adds STATUS property to collections.
-    state2 = arrayToObject(state, { [TYPE_KEY]: ARRAY_TYPE });
-    saveStatus(state, state2);
+  if (!_.isObjectLike(state)) {
+    return state;
   }
 
-  const accumulator = _.isArray(state2) ? [] : {};
+  const transformedState = transformSubstate(state);
+  const accumulator = _.isArray(transformedState) ? [] : {};
+  saveStatus(state, accumulator);
 
-  return _.reduce(state2, (serializableState, substate, subStateKey) => {
-    const serializableSubState = transformSubstate(substate);
-
-    // Status is not enumerable property so we have take care for it separately
-    saveStatus(substate, serializableSubState);
+  return _.reduce(transformedState, (serializableState, substate, subStateKey) => {
+    const serializableSubState = toSerializableFormat(substate);
 
     // eslint-disable-next-line no-param-reassign
     serializableState[subStateKey] = serializableSubState;
