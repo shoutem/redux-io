@@ -5,6 +5,7 @@ import {
   toSerializableFormat,
 } from '../../src/serialization';
 import { STATUS } from '../../src/status';
+import deepFreeze from 'deep-freeze';
 
 describe('fromSerializableFormat', () => {
   it('restores status from serialized data', () => {
@@ -41,6 +42,10 @@ describe('fromSerializableFormat', () => {
     const state = {
       collection,
     };
+
+    deepFreeze(state);
+
+
     const serializedState = toSerializableFormat(state);
     const deserializedState = fromSerializableFormat(serializedState);
     assert.deepEqual(deserializedState.collection[STATUS], status);
@@ -53,6 +58,8 @@ describe('fromSerializableFormat', () => {
     };
     const collection = [1,2,3];
     collection[STATUS] = status;
+
+    deepFreeze(collection);
 
     const serializedCollection = toSerializableFormat(collection);
     console.log(serializedCollection);

@@ -1,6 +1,7 @@
 import _ from 'lodash';
 import { TYPE_KEY, ARRAY_TYPE } from './type';
 import { getStatus, STATUS } from '../status';
+import traverse from 'traverse';
 
 function arrayToObject(arr, initialAttributes = {}) {
   return {
@@ -26,42 +27,19 @@ function saveStatus(originalState, serializableState) {
 }
 
 /**
- * Creates deep copy of given substate and saves
- * transformation related data (type).
- * @param originalSubState
- * @returns {*}
- */
-function transformSubstate(originalSubState) {
-  if (_.isArray(originalSubState) && originalSubState[STATUS]) {
-    // Transform array into format that reverse transformation expects.
-    // JSON.stringify only serialize array items, it does not serialize
-    // additional array properties, this is used to save those properties.
-    // It is important because RIO adds STATUS property to collections.
-    return arrayToObject(originalSubState, { [TYPE_KEY]: ARRAY_TYPE });
-  }
-  return originalSubState;
-}
-
-/**
  * Transform state so it can be stringified.
  * Saves STATUS as enumerable property and transforms arrays into "array objects".
  * @param state
  * @returns {*}
  */
-export function toSerializableFormat(state) {
-  if (!_.isObjectLike(state)) {
-    return state;
-  }
-
-  const transformedState = transformSubstate(state);
-  const accumulator = _.isArray(transformedState) ? [] : {};
-  saveStatus(state, accumulator);
-
-  return _.reduce(transformedState, (serializableState, substate, subStateKey) => {
-    const serializableSubState = toSerializableFormat(substate);
-
-    // eslint-disable-next-line no-param-reassign
-    serializableState[subStateKey] = serializableSubState;
-    return serializableState;
-  }, accumulator);
+export function toSerializableFormat(state, fullTraverse = false) {
+  return traverse(state).map(function (element) {
+    if (_.isArray(element) && element[STATUS]) {
+      const transformed = arrayToObject(element, { [TYPE_KEY]: ARRAY_TYPE });
+      saveStatus(element, transformed);
+      this.update(transformed, !fullTraverse);
+      return transformed;
+    }
+    return element;
+  });
 }
