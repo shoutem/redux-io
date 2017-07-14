@@ -267,6 +267,7 @@ describe('One reducer', () => {
     const schema = 'schema_test';
     const tag = 'tag_test';
     const reducer = one(schema, tag, undefined, initialValue);
+    const state = reducer(undefined, {});
     deepFreeze(initialValue);
 
     const action = {
@@ -278,8 +279,7 @@ describe('One reducer', () => {
       payload: items,
     };
 
-    const customState = {};
-    const nextState = reducer(customState, action);
+    const nextState = reducer(state, action);
     expect(nextState.value).to.deep.equal(initialValue);
     expect(nextState[STATUS].validationStatus).to.eql(validationStatus.NONE);
     expect(nextState[STATUS].busyStatus).to.eql(busyStatus.IDLE);

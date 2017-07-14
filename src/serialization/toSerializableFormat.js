@@ -1,6 +1,6 @@
 import _ from 'lodash';
 import { TYPE_KEY, ARRAY_TYPE } from './type';
-import { getStatus, STATUS } from '../status';
+import { getStatus, hasStatus, STATUS } from '../status';
 import traverse from 'traverse';
 
 function arrayToObject(arr, initialAttributes = {}) {
@@ -34,12 +34,19 @@ function saveStatus(originalState, serializableState) {
  */
 export function toSerializableFormat(state, fullTraverse = false) {
   return traverse(state).map(function (element) {
-    if (_.isArray(element) && element[STATUS]) {
+    // We need to copy redux-io status from original element
+    // to copied element before element transformation due to
+    // hideen nature of redux-io status
+    const { node_: originalElement } = this;
+    saveStatus(originalElement, element);
+
+    if (_.isArray(element) && hasStatus(element)) {
       const transformed = arrayToObject(element, { [TYPE_KEY]: ARRAY_TYPE });
       saveStatus(element, transformed);
       this.update(transformed, !fullTraverse);
       return transformed;
     }
+
     return element;
   });
 }

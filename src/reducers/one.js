@@ -131,7 +131,7 @@ export default function one(schema, tag = '', settings = {}, initialValue = '') 
         if (state[STATUS]) {
           return state;
         }
-        const newState = { value: state.value ? state.value : initialValue };
+        const newState = { ...state };
         setStatus(newState, createDefaultStatus(schema, settings));
         return newState;
       }
