@@ -1,6 +1,7 @@
 import _ from 'lodash';
 import { TYPE_KEY, ARRAY_TYPE } from './type';
 import { setStatus, STATUS } from '../status';
+import traverse from 'traverse';
 
 function objectToArray(object) {
   return object.arr;
@@ -13,31 +14,24 @@ function objectToArray(object) {
  */
 function restoreStatus(serializableSubState, originalSubState) {
   const status = _.isPlainObject(serializableSubState) && serializableSubState[STATUS];
-  if (status) {
-    // eslint-disable-next-line no-param-reassign
-    delete originalSubState[STATUS]; // Delete enumerable status
-    setStatus(originalSubState, status); // Set non enumerable status
+  if (!status) {
+    return;
   }
+
+  // eslint-disable-next-line no-param-reassign
+  delete originalSubState[STATUS]; // Delete enumerable status
+  setStatus(originalSubState, status); // Set non enumerable status
 }
 
 /**
- * Creates deep copy of given substate and restores it to original form.
- * @param serializableSubState
- * @returns {*}
- */
-function revertTransformedSubstate(serializableSubState) {
-  if (_.isPlainObject(serializableSubState)) {
-    if (serializableSubState[TYPE_KEY] === ARRAY_TYPE) {
-      // Transform "array object" back to array as it was before serialization
-      return objectToArray(serializableSubState);
-    }
-    // eslint-disable-next-line no-use-before-define
-    return fromSerializableFormat(serializableSubState);
-  } else if (_.isArray(serializableSubState)) {
-    // eslint-disable-next-line no-use-before-define
-    return fromSerializableFormat(serializableSubState);
-  }
-  return serializableSubState;
+* We need to copy redux-io status from original element
+* to copied element before element transformation due to
+* hideen nature of redux-io status
+* @param element - copied element
+*/
+function applyOriginalElementStatus(element) {
+  const { node_: originalElement } = this;
+  restoreStatus(originalElement, element);
 }
 
 /**
@@ -46,16 +40,19 @@ function revertTransformedSubstate(serializableSubState) {
  * @param serializableState
  * @returns {object} Original state
  */
-export function fromSerializableFormat(serializableState) {
-  const accumulator = _.isArray(serializableState) ? [] : {};
+export function fromSerializableFormat(serializableState, fullTraverse = false) {
+  return traverse(serializableState).map(function (element) {
+    this.after(applyOriginalElementStatus);
 
-  return _.reduce(serializableState, (originalState, serializableSubState, subStateKey) => {
-    const originalSubState = revertTransformedSubstate(serializableSubState);
-
-    restoreStatus(serializableSubState, originalSubState);
-
-    // eslint-disable-next-line no-param-reassign
-    originalState[subStateKey] = originalSubState;
-    return originalState;
-  }, accumulator);
+    if (
+      _.isPlainObject(element) &&
+      element[TYPE_KEY] === ARRAY_TYPE
+    ) {
+      const transformed = objectToArray(element);
+      restoreStatus(element, transformed);
+      this.update(transformed, !fullTraverse);
+      return transformed;
+    }
+    return element;
+  });
 }

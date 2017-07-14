@@ -38,6 +38,7 @@ export const setStatus = (obj, status) => {
       value: status,
       enumerable: false,
       writable: true,
+      configurable: true,
     });
   }
 };
