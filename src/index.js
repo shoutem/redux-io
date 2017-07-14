@@ -19,6 +19,9 @@ export { find };
 import next from './actions/next';
 export { next };
 
+import prev from './actions/prev';
+export { prev };
+
 import create from './actions/create';
 export { create };
 
@@ -104,6 +107,7 @@ export {
   isExpired,
   hasStatus,
   hasNext,
+  hasPrev,
 } from './status';
 
 import { enableRio } from './enableRio';
