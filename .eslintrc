@@ -1,5 +1,5 @@
 {
-  "parser"  : "babel-eslint",
+  "parser": "babel-eslint",
   "extends": "airbnb",
   "parserOptions": {
     "ecmaVersion": 6,
@@ -8,12 +8,12 @@
       "jsx": false
     }
   },
-  "plugins" : [
+  "plugins": [
     "flow-vars"
   ],
-  "env"     : {
+  "env": {
     "browser" : true,
-    "mocha": true,
+    "mocha": true
   },
   "rules": {
     "no-empty-label": 0,

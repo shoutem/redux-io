@@ -110,6 +110,19 @@ export {
   hasPrev,
 } from './status';
 
+import {
+  createResourceStatus,
+  createNewState,
+  createEmptyState,
+  canResourceHandleAction,
+} from './reducers/resource';
+export const resourceUtils = {
+  createNewState,
+  createEmptyState,
+  createResourceStatus,
+  canResourceHandleAction,
+};
+
 import { enableRio } from './enableRio';
 export { enableRio };
 
