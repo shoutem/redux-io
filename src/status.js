@@ -97,6 +97,8 @@ export const getId = obj => statusProp(obj, 'id');
 
 export const hasNext = obj => !!statusProp(obj, ['links', 'next']);
 
+export const hasPrev = obj => !!statusProp(obj, ['links', 'prev']);
+
 /**
  * Checks whether a load is needed for selected propName on given set of new and current props.
  * @param nextProps New props
