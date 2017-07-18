@@ -15,9 +15,9 @@ import rio, {
 import { setStatus, updateStatus, getStatus } from '../../src/status';
 import { APPEND_MODE } from '../../src/actions/find';
 import { RESOLVED_ENDPOINT, NO_MORE_RESULTS } from '../../src/consts';
-import  { next } from '../../src/actions/next';
+import  { prev } from '../../src/actions/prev';
 
-describe('Next action creator', () => {
+describe('Prev action creator', () => {
   const middlewares = [thunk, apiMiddleware, apiStateMiddleware];
   let mockStore = configureMockStore(middlewares);
 
@@ -44,18 +44,18 @@ describe('Next action creator', () => {
 
     const links = {
       self: 'self url',
-      next: 'next url',
+      prev: 'prev url',
       last: 'last url',
     };
     const reducer = collection(schema, tag, [1, 2, 3]);
     const demoCollection = reducer();
     setStatus(demoCollection, updateStatus(getStatus(demoCollection), { links }));
 
-    const action = next(demoCollection);
+    const action = prev(demoCollection);
 
     expect(action[RSAA]).to.not.be.undefined;
     expect(action[RSAA].method).to.equal('GET');
-    expect(action[RSAA].endpoint).to.equal(links.next);
+    expect(action[RSAA].endpoint).to.equal(links.prev);
     expect(action[RSAA].headers).to.deep.equal({ 'Content-Type': 'application/vnd.api+json' });
     expect(action[RSAA].types).to.not.be.undefined;
 
@@ -64,7 +64,7 @@ describe('Next action creator', () => {
       source: JSON_API_SOURCE,
       schema,
       tag,
-      endpoint: links.next,
+      endpoint: links.prev,
       params: {},
       options: {
         [APPEND_MODE]: true,
@@ -93,7 +93,7 @@ describe('Next action creator', () => {
     const demoCollection = reducer();
     setStatus(demoCollection, updateStatus(getStatus(demoCollection)));
 
-    const action = next(demoCollection);
+    const action = prev(demoCollection);
     expect(action.type).to.equal(NO_MORE_RESULTS);
     expect(action.schema).to.equal(schema);
     expect(action.tag).to.equal(tag);
