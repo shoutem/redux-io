@@ -65,9 +65,15 @@ describe('Find action creator', () => {
     };
     const expectedResponseMeta = {
       ...expectedMeta,
-      response: { status: 200},
+      response: {
+        status: 200,
+        headers: {},
+      },
     };
-    const metaResponse = [{}, {}, { status: 200 }];
+    const metaResponse = [{}, {}, new Response(null, {
+      "status": 200,
+      "headers": {},
+    })];
 
     expect(types[0].type).to.equal(LOAD_REQUEST);
     expect(types[0].meta).to.deep.equal(expectedMeta);
@@ -101,7 +107,12 @@ describe('Find action creator', () => {
 
     expect(action[RSAA]).to.not.be.undefined;
     expect(action[RSAA].types).to.not.be.undefined;
-    const metaResponse = [{}, {}, { status: 200 }];
+    const metaResponse = [{}, {}, new Response(null, {
+      "status": 200,
+      "headers": {
+        "content-type": "vnd.api+json"
+      },
+    })];
 
     const types = action[RSAA].types;
     expect(types[0].type).to.equal(LOAD_REQUEST);
@@ -150,9 +161,15 @@ describe('Find action creator', () => {
     };
     const expectedResponseMeta = {
       ...expectedMeta,
-      response: { status: 200},
+      response: {
+        status: 200,
+        headers: {},
+      },
     };
-    const metaResponse = [{}, {}, { status: 200 }];
+    const metaResponse = [{}, {}, new Response(null, {
+      "status": 200,
+      "headers": {},
+    })];
 
     expect(types[0].type).to.equal(LOAD_REQUEST);
     expect(types[0].meta).to.deep.equal(expectedMeta);
@@ -199,9 +216,15 @@ describe('Find action creator', () => {
     };
     const expectedResponseMeta = {
       ...expectedMeta,
-      response: { status: 200},
+      response: {
+        status: 200,
+        headers: {},
+      },
     };
-    const metaResponse = [{}, {}, { status: 200 }];
+    const metaResponse = [{}, {}, new Response(null, {
+      "status": 200,
+      "headers": {},
+    })];
 
     expect(types[0].type).to.equal(LOAD_REQUEST);
     expect(types[0].meta).to.deep.equal(expectedMeta);
@@ -251,9 +274,15 @@ describe('Find action creator', () => {
     };
     const expectedResponseMeta = {
       ...expectedMeta,
-      response: { status: 200},
+      response: {
+        status: 200,
+        headers: {},
+      },
     };
-    const metaResponse = [{}, {}, { status: 200 }];
+    const metaResponse = [{}, {}, new Response(null, {
+      "status": 200,
+      "headers": {},
+    })];
 
     expect(types[0].type).to.equal(LOAD_REQUEST);
     expect(types[0].meta).to.deep.equal(expectedMeta);
@@ -307,9 +336,15 @@ describe('Find action creator', () => {
     };
     const expectedResponseMeta = {
       ...expectedMeta,
-      response: { status: 200},
+      response: {
+        status: 200,
+        headers: {},
+      },
     };
-    const metaResponse = [{}, {}, { status: 200 }];
+    const metaResponse = [{}, {}, new Response(null, {
+      "status": 200,
+      "headers": {},
+    })];
 
     expect(types[0].type).to.equal(LOAD_REQUEST);
     expect(types[0].meta).to.deep.equal(expectedMeta);
@@ -421,9 +456,15 @@ describe('Find action creator', () => {
     };
     const expectedResponseMeta = {
       ...expectedMeta,
-      response: { status: 200},
+      response: {
+        status: 200,
+        headers: {},
+      },
     };
-    const metaResponse = [{}, {}, { status: 200 }];
+    const metaResponse = [{}, {}, new Response(null, {
+      "status": 200,
+      "headers": {},
+    })];
 
     expect(types[0].type).to.equal(LOAD_REQUEST);
     expect(types[0].meta).to.deep.equal(expectedMeta);
@@ -478,9 +519,19 @@ describe('Find action creator', () => {
     };
     const expectedResponseMeta = {
       ...expectedMeta,
-      response: { status: 200},
+      response: {
+        status: 200,
+        headers: {
+          "content-type": "vnd.api+json"
+        },
+      },
     };
-    const metaResponse = [{}, {}, { status: 200 }];
+    const metaResponse = [{}, {}, {
+      status: 200,
+      headers: {
+        "content-type": "vnd.api+json"
+      },
+    }];
 
     const action = find(schemaConfig, tag);
 
