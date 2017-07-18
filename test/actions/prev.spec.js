@@ -17,7 +17,7 @@ import { APPEND_MODE } from '../../src/actions/find';
 import { RESOLVED_ENDPOINT, NO_MORE_RESULTS } from '../../src/consts';
 import  { prev } from '../../src/actions/prev';
 
-describe('Next action creator', () => {
+describe('Prev action creator', () => {
   const middlewares = [thunk, apiMiddleware, apiStateMiddleware];
   let mockStore = configureMockStore(middlewares);
 
