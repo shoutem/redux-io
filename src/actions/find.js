@@ -12,7 +12,7 @@ import {
   buildRSAAConfig,
 } from './../schemaConfig';
 import thunkAction from './_thunkAction';
-import { extendMetaWithResponse } from './_rsaa';
+import { extendMetaWithResponse } from './rsaa';
 
 /**
  * If this options key is set to true, the data will be

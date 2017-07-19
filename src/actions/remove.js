@@ -12,7 +12,7 @@ import {
   buildRSAAConfig,
 } from './../schemaConfig';
 import thunkAction from './_thunkAction';
-import { extendMetaWithResponse } from './_rsaa';
+import { extendMetaWithResponse } from './rsaa';
 
 /**
  * Action creator used to delete item on api (DELETE). Tag is not needed because all collection

@@ -12,7 +12,7 @@ import rio, {
 } from '../../src';
 import {
   extractResponseHeaders,
-} from '../../src/actions/_rsaa';
+} from '../../src/actions/rsaa';
 import { find } from '../../src/actions/find';
 
 describe('rsaa', () => {
