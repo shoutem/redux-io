@@ -9,11 +9,11 @@ import rio, {
   apiStateMiddleware,
   JSON_API_SOURCE,
   LOAD_SUCCESS,
-} from '../../src';
+} from '../src';
 import {
   extractResponseHeaders,
-} from '../../src/actions/rsaa';
-import { find } from '../../src/actions/find';
+} from '../src/rsaa';
+import { find } from '../src/actions/find';
 
 describe('rsaa', () => {
   const middlewares = [thunk, apiMiddleware, apiStateMiddleware];

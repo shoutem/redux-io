@@ -9,10 +9,9 @@ import { JSON_API_SOURCE } from './..';
 import {
   buildEndpoint,
   resolveConfig,
-  buildRSAAConfig,
 } from './../schemaConfig';
 import thunkAction from './_thunkAction';
-import { extendMetaWithResponse } from './rsaa';
+import { extendMetaWithResponse, buildRSAAConfig } from '../rsaa';
 
 /**
  * Action creator used to delete item on api (DELETE). Tag is not needed because all collection

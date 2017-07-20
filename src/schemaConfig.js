@@ -3,7 +3,6 @@ import ZSchema from 'z-schema';
 import UriTemplate from 'urijs/src/URITemplate';
 import { getStatus } from './status';
 import { RESOLVED_ENDPOINT } from './consts';
-import { buildRSAAConfig } from './actions/rsaa';
 import rio from './rio';
 
 const validator = new ZSchema();
@@ -132,5 +131,3 @@ export function resolveSchemaName(reference, schema) {
   }
   return schema;
 }
-
-export { buildRSAAConfig };
