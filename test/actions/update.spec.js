@@ -63,7 +63,10 @@ describe('Update action creator', () => {
     };
     const expectedResponseMeta = {
       ...expectedMeta,
-      response: { status: 200},
+      response: {
+        status: 200,
+        headers: {},
+      },
     };
     const metaResponse = [{}, {}, { status: 200 }];
 
@@ -119,7 +122,10 @@ describe('Update action creator', () => {
     };
     const expectedResponseMeta = {
       ...expectedMeta,
-      response: { status: 200},
+      response: {
+        status: 200,
+        headers: {},
+      },
     };
     const metaResponse = [{}, {}, { status: 200 }];
 
@@ -317,7 +323,12 @@ describe('Update action creator', () => {
           ...expectedMeta,
           transformation: {},
           timestamp: actionObjUpdated.meta.timestamp,
-          response: { status: 200 },
+          response: {
+            status: 200,
+            headers: {
+              'content-type': 'vnd.api+json'
+            },
+          },
         });
         expect(actionObjUpdated.payload).to.deep.equal(expectedPayload.data);
 
@@ -327,7 +338,12 @@ describe('Update action creator', () => {
           ...expectedMeta,
           tag: '*',
           timestamp: actionObjUpdated.meta.timestamp,
-          response: { status: 200 },
+          response: {
+            status: 200,
+            headers: {
+              'content-type': 'vnd.api+json'
+            },
+          },
         });
         const expectedCollStatusIdlePayload = {
           busyStatus: busyStatus.IDLE,
@@ -340,7 +356,12 @@ describe('Update action creator', () => {
         expect(successAction.meta).to.deep.equal({
           ...expectedMeta,
           timestamp: successAction.meta.timestamp,
-          response: { status: 200 },
+          response: {
+            status: 200,
+            headers: {
+              'content-type': 'vnd.api+json'
+            },
+          },
         });
         expect(successAction.payload).to.deep.equal(expectedPayload);
       }).then(done).catch(done);

@@ -73,7 +73,10 @@ describe('Create action creator', () => {
     };
     const expectedResponseMeta = {
       ...expectedMeta,
-      response: { status: 200},
+      response: {
+        status: 200,
+        headers: {},
+      },
     };
     const metaResponse = [{}, {}, { status: 200 }];
 
@@ -127,7 +130,10 @@ describe('Create action creator', () => {
     };
     const expectedResponseMeta = {
       ...expectedMeta,
-      response: { status: 200},
+      response: {
+        status: 200,
+        headers: {},
+      },
     };
     const metaResponse = [{}, {}, { status: 200 }];
 
@@ -179,7 +185,10 @@ describe('Create action creator', () => {
     };
     const expectedResponseMeta = {
       ...expectedMeta,
-      response: { status: 200},
+      response: {
+        status: 200,
+        headers: {},
+      },
     };
     const metaResponse = [{}, {}, { status: 200 }];
 
@@ -238,7 +247,10 @@ describe('Create action creator', () => {
     };
     const expectedResponseMeta = {
       ...expectedMeta,
-      response: { status: 200},
+      response: {
+        status: 200,
+        headers: {},
+      },
     };
     const metaResponse = [{}, {}, { status: 200 }];
 
@@ -375,7 +387,12 @@ describe('Create action creator', () => {
     };
     const expectedResponseMeta = {
       ...expectedMeta,
-      response: { status: 200},
+      response: {
+        status: 200,
+        headers: {
+          "content-type": "vnd.api+json"
+        },
+      },
     };
 
     const action = create(schemaConfig, item);
