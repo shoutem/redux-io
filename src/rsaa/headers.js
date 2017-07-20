@@ -31,11 +31,10 @@ export function extractHeaders(resource) {
 
   const headersInstance = getHeadersInstance(resource.headers);
   const headers = {};
-  let currentHeader = null;
 
   if (isHeadersEntriesSupported(headersInstance)) {
-    for (currentHeader of headersInstance.entries()) {
-      const [headerName, headerValue] = currentHeader.value;
+    for (const header of headersInstance.entries()) {
+      const [headerName, headerValue] = header.value;
       headers[headerName] = headerValue;
     }
   } else {
