@@ -34,8 +34,7 @@ export function extractHeaders(resource) {
   let currentHeader = null;
 
   if (isHeadersEntriesSupported(headersInstance)) {
-    const iterator = headersInstance.entries();
-    for (currentHeader = iterator.next(); !currentHeader.done; currentHeader = iterator.next()) {
+    for (currentHeader of headersInstance.entries()) {
       const [headerName, headerValue] = currentHeader.value;
       headers[headerName] = headerValue;
     }
