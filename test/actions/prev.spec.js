@@ -74,9 +74,14 @@ describe('Next action creator', () => {
     };
     const expectedResponseMeta = {
       ...expectedMeta,
-      response: { status: 200},
+      response: {
+        status: 200,
+        headers: {},
+      },
     };
-    const metaResponse = [{}, {}, { status: 200 }];
+    const metaResponse = [{}, {}, {
+      status: 200,
+    }];
 
     expect(types[0].type).to.equal(LOAD_REQUEST);
     expect(types[0].meta).to.deep.equal(expectedMeta);
