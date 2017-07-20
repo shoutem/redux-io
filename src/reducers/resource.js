@@ -18,6 +18,7 @@ import {
   STATUS,
   validationStatus,
   busyStatus,
+  createStatus,
   updateStatus,
   setStatus,
 } from './../status';
@@ -38,7 +39,7 @@ const actionsWithoutPayload = new Set([
  * @param {String} schema
  * @return {Object}
  */
-export function createStatus(schema) {
+export function createInitialStatus(schema) {
   return updateStatus(
     createStatus(),
     {
@@ -90,7 +91,7 @@ function canHandleAction(action, schema) {
  */
 export default function resource(schema, initialState = {}) {
   // eslint-disable-next-line no-param-reassign
-  setStatus(initialState, createStatus(schema));
+  setStatus(initialState, createInitialStatus(schema));
   const outdated = new Outdated();
 
   return (state = initialState, action) => {
@@ -199,7 +200,7 @@ export default function resource(schema, initialState = {}) {
           return state;
         }
         const newState = createNewState(state);
-        setStatus(newState, createStatus(schema));
+        setStatus(newState, createInitialStatus(schema));
         return newState;
       }
     }
