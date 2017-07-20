@@ -24,17 +24,6 @@ import {
 } from './../status';
 import Outdated from './../outdated';
 
-function createDefaultStatus(schema) {
-  return updateStatus(
-    createStatus(),
-    {
-      schema,
-      type: 'resource',
-      id: _.uniqueId(),
-    }
-  );
-}
-
 const actionsWithoutPayload = new Set([
   LOAD_REQUEST,
   CREATE_REQUEST,
@@ -46,14 +35,44 @@ const actionsWithoutPayload = new Set([
   REFERENCE_CLEAR,
 ]);
 
-function createNewState(state) {
+/**
+ * @param {String} schema
+ * @return {Object}
+ */
+export function createInitialStatus(schema) {
+  return updateStatus(
+    createStatus(),
+    {
+      schema,
+      type: 'resource',
+      id: _.uniqueId(),
+    }
+  );
+}
+
+/**
+ * Create new state instance
+ * @param {Array|Object} state
+ * @return {Array|Object}
+ */
+export function createNewState(state) {
   return _.isArray(state) ? [...state] : { ...state };
 }
 
-function createEmptyState(state) {
+/**
+ * Create new empty state instance
+ * @param {Array|Object} state
+ * @return {Array|Object}
+ */
+export function createEmptyState(state) {
   return _.isArray(state) ? [] : {};
 }
 
+/**
+ * @param {Object} action
+ * @param {String} schema
+ * @return {Boolean}
+ */
 function canHandleAction(action, schema) {
   if (_.get(action, 'meta.schema') !== schema) {
     return false;
@@ -72,7 +91,7 @@ function canHandleAction(action, schema) {
  */
 export default function resource(schema, initialState = {}) {
   // eslint-disable-next-line no-param-reassign
-  setStatus(initialState, createDefaultStatus(schema));
+  setStatus(initialState, createInitialStatus(schema));
   const outdated = new Outdated();
 
   return (state = initialState, action) => {
@@ -181,7 +200,7 @@ export default function resource(schema, initialState = {}) {
           return state;
         }
         const newState = createNewState(state);
-        setStatus(newState, createDefaultStatus(schema));
+        setStatus(newState, createInitialStatus(schema));
         return newState;
       }
     }
