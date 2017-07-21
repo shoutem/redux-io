@@ -11,7 +11,7 @@ import rio, {
   LOAD_SUCCESS,
 } from '../src';
 import {
-  extractResponseHeaders,
+  extractHeaders,
 } from '../src/rsaa';
 import { find } from '../src/actions/find';
 
@@ -78,5 +78,96 @@ describe('rsaa', () => {
     expect(types[1].type).to.equal(LOAD_SUCCESS);
     expect(types[1].meta).to.not.be.undefined;
     expect(types[1].meta(...metaResponse)).to.deep.equal(expectedResponseMeta);
-  })
-})
+  });
+
+  it ('can extract headers from raw headers map', () => {
+    const headers = {
+      accept: 'text/html',
+      'content-type': 'application/vnd.api+json',
+    };
+
+    const resource =  {
+      headers,
+    };
+
+    const expectedHeaders = {
+      ...headers,
+    };
+
+    const extractedHeaders = extractHeaders(resource);
+
+    expect(extractedHeaders).to.deep.equal(expectedHeaders);
+  });
+
+  it ('can extract headers when entries supported', () => {
+    const headers = {
+      accept: 'text/html',
+      'content-type': 'application/vnd.api+json',
+    };
+
+    const headersInstance =  new Headers({ ...headers });
+    headersInstance.entries = () => [
+      ['accept', 'text/html'],
+      ['content-type', 'application/vnd.api+json'],
+    ];
+
+    const resource =  {
+      headers: headersInstance,
+    };
+
+    const expectedHeaders = {
+      ...headers,
+    };
+
+    const extractedHeaders = extractHeaders(resource);
+
+    expect(extractedHeaders).to.deep.equal(expectedHeaders);
+  });
+
+  it ('can extract headers in resource without headers key', () => {
+    const resource =  {};
+
+    const expectedHeaders = {};
+
+    const extractedHeaders = extractHeaders(resource);
+
+    expect(extractedHeaders).to.deep.equal(expectedHeaders);
+  });
+
+  it ('can extract headers in resource with empty headers when entries supported', () => {
+    const headers = {};
+
+    const headersInstance =  new Headers({ ...headers });
+    headersInstance.entries = () => [];
+
+    const resource =  {
+      headers: headersInstance,
+    };
+
+    const expectedHeaders = {
+      ...headers,
+    };
+
+    const extractedHeaders = extractHeaders(resource);
+
+    expect(extractedHeaders).to.deep.equal(expectedHeaders);
+  });
+
+  it ('can extract headers in resource with empty headers', () => {
+    const headers = {};
+
+    const headersInstance =  new Headers({ ...headers });
+
+    const resource =  {
+      headers: headersInstance,
+    };
+
+    const expectedHeaders = {
+      ...headers,
+    };
+
+    const extractedHeaders = extractHeaders(resource);
+
+    expect(extractedHeaders).to.deep.equal(expectedHeaders);
+  });
+});

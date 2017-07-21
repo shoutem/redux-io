@@ -12,7 +12,9 @@ function isHeadersEntriesSupported(headers) {
  * Return existing or create new Headers object instance
  * @param {Headers|Object} headers
  */
-function getHeadersInstance(headers) {
+function getHeadersInstance(resource) {
+  const headers = _.get(resource, 'headers');
+
   if (headers instanceof Headers) {
     return headers;
   }
@@ -25,23 +27,19 @@ function getHeadersInstance(headers) {
  * @param {Object} response
  */
 export function extractHeaders(resource) {
-  if (!_.has(resource, 'headers')) {
-    return {};
-  }
+  const headers = getHeadersInstance(resource);
+  const extractedHeaders = {};
 
-  const headersInstance = getHeadersInstance(resource.headers);
-  const headers = {};
-
-  if (isHeadersEntriesSupported(headersInstance)) {
-    for (const header of headersInstance.entries()) {
-      const [headerName, headerValue] = header.value;
-      headers[headerName] = headerValue;
+  if (isHeadersEntriesSupported(headers)) {
+    for (const header of headers.entries()) {
+      const [headerName, headerValue] = header;
+      extractedHeaders[headerName] = headerValue;
     }
   } else {
-    headersInstance.forEach((headerValue, headerName) => {
-      headers[headerName] = headerValue;
+    headers.forEach((headerValue, headerName) => {
+      extractedHeaders[headerName] = headerValue;
     });
   }
 
-  return headers;
+  return extractedHeaders;
 }
