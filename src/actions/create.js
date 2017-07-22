@@ -9,10 +9,9 @@ import { JSON_API_SOURCE } from './..';
 import {
   buildEndpoint,
   resolveConfig,
-  buildRSAAConfig,
 } from './../schemaConfig';
 import thunkAction from './_thunkAction';
-import { extendMetaWithResponse } from './_rsaa';
+import { extendMetaWithResponse, buildRSAAConfig } from '../rsaa';
 
 /**
  * Action creator used to create item on api (POST). Tag is not needed because all collection

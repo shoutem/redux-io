@@ -9,10 +9,9 @@ import { JSON_API_SOURCE } from './..';
 import {
   buildEndpoint,
   resolveConfig,
-  buildRSAAConfig,
 } from './../schemaConfig';
 import thunkAction from './_thunkAction';
-import { extendMetaWithResponse } from './_rsaa';
+import { extendMetaWithResponse, buildRSAAConfig } from '../rsaa';
 
 /**
  * If this options key is set to true, the data will be
