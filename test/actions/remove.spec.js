@@ -63,9 +63,15 @@ describe('Delete action creator', () => {
     };
     const expectedResponseMeta = {
       ...expectedMeta,
-      response: { status: 200},
+      response: {
+        status: 200,
+        headers: {}
+      },
     };
-    const metaResponse = [{}, {}, { status: 200 }];
+    const metaResponse = [{}, {}, new Response(null, {
+      "status": 200,
+      "headers": {},
+    })];
 
     expect(types[0].type).to.equal(REMOVE_REQUEST);
     expect(types[0].meta).to.deep.equal(expectedMeta);
@@ -118,9 +124,15 @@ describe('Delete action creator', () => {
     };
     const expectedResponseMeta = {
       ...expectedMeta,
-      response: { status: 200},
+      response: {
+        status: 200,
+        headers: {},
+      },
     };
-    const metaResponse = [{}, {}, { status: 200 }];
+    const metaResponse = [{}, {}, new Response(null, {
+      "status": 200,
+      "headers": {},
+    })];
 
     expect(types[0].type).to.equal(REMOVE_REQUEST);
     expect(types[0].meta).to.deep.equal(expectedMeta);
@@ -239,7 +251,12 @@ describe('Delete action creator', () => {
           ...expectedMeta,
           transformation: {},
           timestamp: actionObjRemoved.meta.timestamp,
-          response: { status: 200 },
+          response: {
+            status: 200,
+            headers: {
+              "content-type": "vnd.api+json",
+            }
+          },
         });
 
         const actionCollStatus = batchedRemovedActions.payload[1];
@@ -248,7 +265,12 @@ describe('Delete action creator', () => {
           ...expectedMeta,
           tag: '*',
           timestamp: actionCollStatus.meta.timestamp,
-          response: { status: 200 },
+          response: {
+            status: 200,
+            headers: {
+              "content-type": "vnd.api+json",
+            }
+          },
         });
         const expectedCollStatusPayload = {
           validationStatus: validationStatus.INVALID,
@@ -261,7 +283,12 @@ describe('Delete action creator', () => {
         expect(successAction.meta).to.deep.equal({
           ...expectedMeta,
           timestamp: successAction.meta.timestamp,
-          response: { status: 200 },
+          response: {
+            status: 200,
+            headers: {
+              "content-type": "vnd.api+json",
+            }
+          },
         });
       }).then(done).catch(done);
   });
