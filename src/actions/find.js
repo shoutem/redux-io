@@ -21,6 +21,14 @@ import { extendMetaWithResponse, buildRSAAConfig } from '../rsaa';
 export const APPEND_MODE = 'appendMode';
 
 /**
+ * Check if current dispatched action is in "append" mode.
+ * @param {Object} action Current dispatched action
+ */
+export function isAppendMode(action) {
+  return !!(_.get(action, ['meta', 'options', APPEND_MODE]));
+}
+
+/**
  * Action creator used to fetch data from api (GET).
  * @param schema can be name of schema or schema configuration. In both cases
  * rio resolves schema with registered schema configurations, and in case of schema
