@@ -16,7 +16,7 @@ import {
   isInitialized,
   isExpired,
 } from './../status';
-import { APPEND_MODE } from '../actions/find';
+import { isAppendMode } from '../actions/find';
 
 function isValidAction(action, schema, tag) {
   if (_.get(action, 'type') === CHECK_EXPIRATION) {
@@ -70,7 +70,7 @@ export function getCollectionParams(collection) {
 }
 
 function handleReferencePayload(action, state = []) {
-  const appendMode = _.get(action, ['meta', 'options', APPEND_MODE]);
+  const appendMode = isAppendMode(action);
   const newIds = action.payload.map(item => item.id);
   if (appendMode) {
     return [...state, ...newIds];

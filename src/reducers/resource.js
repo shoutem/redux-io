@@ -73,11 +73,8 @@ export function createEmptyState(state) {
  * @param {String} schema
  * @return {Boolean}
  */
-function canHandleAction(action, schema) {
-  if (_.get(action, 'meta.schema') !== schema) {
-    return false;
-  }
-  return true;
+export function canHandleAction(action, schema) {
+  return (_.get(action, 'meta.schema') === schema);
 }
 
 /**
