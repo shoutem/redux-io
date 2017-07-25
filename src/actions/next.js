@@ -1,8 +1,17 @@
+import _ from 'lodash';
 import { getCollectionLink, getCollectionParams } from '../reducers/collection';
 import { getStatus } from '../status';
 import { find, APPEND_MODE } from './find';
 import { RESOLVED_ENDPOINT, NO_MORE_RESULTS } from '../consts';
 import thunkAction from './_thunkAction';
+
+/**
+ * Check if current dispatched action is in "append" mode.
+ * @param {Object} action Current dispatched action
+ */
+export function isAppendMode(action) {
+  return !!(_.get(action, ['meta', 'options', APPEND_MODE]));
+}
 
 /**
  * Create action for next collection items in sequence from collection links.
