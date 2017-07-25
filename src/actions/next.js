@@ -1,4 +1,3 @@
-import _ from 'lodash';
 import { getCollectionLink, getCollectionParams } from '../reducers/collection';
 import { getStatus } from '../status';
 import { find, APPEND_MODE } from './find';
