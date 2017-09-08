@@ -135,13 +135,11 @@ export default function collection(schema, tag = '', settings = {}, initialState
       }
       case REFERENCE_STATUS: {
         const newState = [...state];
-        const statusChange = action.payload;
 
+        const statusChange = action.payload;
         setStatus(newState, updateStatus(
           state[STATUS],
-          {
-            ...statusChange,
-          }
+          statusChange,
         ));
 
         // un-initialized collection should stay un-initialized on invalidation

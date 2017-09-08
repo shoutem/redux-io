@@ -95,6 +95,8 @@ export const shouldRefresh = (obj, ignoreError = false) => (
 
 export const getId = obj => statusProp(obj, 'id');
 
+export const getMeta = obj => statusProp(obj, 'meta');
+
 export const hasNext = obj => !!statusProp(obj, ['links', 'next']);
 
 export const hasPrev = obj => !!statusProp(obj, ['links', 'prev']);
