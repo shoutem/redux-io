@@ -148,6 +148,10 @@ const getIncluded = payload => (
   _.get(payload, 'included', [])
 );
 
+const getMeta = payload => (
+  _.get(payload, 'meta', {})
+);
+
 const getLinks = payload => {
   const links = _.get(payload, 'links', {});
   return {
@@ -157,6 +161,12 @@ const getLinks = payload => {
     last: links.last || null,
   };
 };
+
+function saveMeta(action, dispatch) {
+  const { schema, tag } = action.meta;
+  const meta = getMeta(action.payload);
+  dispatch(makeIndexAction(action, REFERENCE_STATUS, { meta }, schema, tag));
+}
 
 function saveLinks(action, dispatch) {
   const { schema, tag } = action.meta;
@@ -185,6 +195,7 @@ const actionHandlers = {
     // should trigger only for collections
     dispatch(makeIndexAction(action, REFERENCE_FETCHED, data, schema, tag));
 
+    saveMeta(action, dispatch);
     saveLinks(action, dispatch);
   },
   [LOAD_ERROR]: (action, data, dispatch) => {

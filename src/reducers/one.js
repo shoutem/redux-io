@@ -108,10 +108,13 @@ export default function one(schema, tag = '', settings = {}, initialValue = '') 
       }
       case REFERENCE_STATUS: {
         const newState = { value: state.value };
+
+        const statusChange = action.payload;
         setStatus(newState, updateStatus(
-            state[STATUS],
-            action.payload
+          state[STATUS],
+          statusChange
         ));
+
         return newState;
       }
       case CHECK_EXPIRATION: {

@@ -16,6 +16,7 @@ import {
   setStatus,
   isExpired,
   hasStatus,
+  getMeta,
   hasNext,
   hasPrev,
 } from '../src/status';
@@ -425,6 +426,48 @@ describe('Status metadata', () => {
         expect(isExpired(state)).to.be.not.ok;
         stateStatus.modifiedTimestamp = Date.now() - (expirationTime * 1000 + 1);
         expect(isExpired(state)).to.be.ok;
+      });
+    });
+  });
+
+  describe('Meta', () => {
+    describe('getMeta', () => {
+      it('Returns meta data if exists', () => {
+        const status = updateStatus(
+          createStatus(),
+          {
+            meta: {
+              count: 50,
+            },
+          },
+        );
+        const obj = {};
+        setStatus(obj, status);
+
+        expect(getMeta(obj)).to.be.eql({ count: 50 });
+      });
+
+      it('Returns empty object when meta is empty', () => {
+        const status = updateStatus(
+          createStatus(),
+          {
+            meta: {},
+          },
+        );
+        const obj = {};
+        setStatus(obj, status);
+
+        expect(getMeta(obj)).to.be.eql({});
+      });
+
+      it('Returns undefined when meta doesn\'t exist', () => {
+        const status = updateStatus(
+          createStatus(),
+        );
+        const obj = {};
+        setStatus(obj, status);
+
+        expect(getMeta(obj)).to.be.undefined;
       });
     });
   });
