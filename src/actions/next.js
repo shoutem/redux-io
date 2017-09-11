@@ -1,7 +1,8 @@
+import _ from 'lodash';
 import { getCollectionLink, getCollectionParams } from '../reducers/collection';
+import { RESOLVED_ENDPOINT, NO_MORE_RESULTS } from '../consts';
 import { getStatus } from '../status';
 import { find, APPEND_MODE } from './find';
-import { RESOLVED_ENDPOINT, NO_MORE_RESULTS } from '../consts';
 import thunkAction from './_thunkAction';
 
 /**
@@ -9,9 +10,10 @@ import thunkAction from './_thunkAction';
  *
  * @param collection
  * @param appendMode
+ * @param config
  * @returns {*}
  */
-export function next(collection, appendMode = true) {
+export function next(collection, appendMode = true, config = {}) {
   const nextLink = getCollectionLink(collection, 'next');
   const { schema, tag } = getStatus(collection);
   if (!nextLink) {
@@ -21,12 +23,12 @@ export function next(collection, appendMode = true) {
       tag,
     };
   }
-  const findConfig = {
+  const findConfig = _.merge({
     request: {
       endpoint: nextLink,
     },
     schema,
-  };
+  }, config);
 
   // We want to append the data to the data in the state, and we know that
   // the URL in the config already contains all the necessary query parameters
