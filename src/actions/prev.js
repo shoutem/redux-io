@@ -1,8 +1,7 @@
-import _ from 'lodash';
 import { getCollectionLink, getCollectionParams } from '../reducers/collection';
 import { getStatus } from '../status';
-import { RESOLVED_ENDPOINT, NO_MORE_RESULTS } from '../consts';
 import { find, APPEND_MODE } from './find';
+import { RESOLVED_ENDPOINT, NO_MORE_RESULTS } from '../consts';
 import thunkAction from './_thunkAction';
 
 /**
@@ -10,10 +9,9 @@ import thunkAction from './_thunkAction';
  *
  * @param collection
  * @param appendMode
- * @param config
  * @returns {*}
  */
-export function prev(collection, appendMode = true, config = {}) {
+export function prev(collection, appendMode = true) {
   const prevLink = getCollectionLink(collection, 'prev');
   const { schema, tag } = getStatus(collection);
   if (!prevLink) {
@@ -23,12 +21,12 @@ export function prev(collection, appendMode = true, config = {}) {
       tag,
     };
   }
-  const findConfig = _.merge({
+  const findConfig = {
     request: {
       endpoint: prevLink,
     },
     schema,
-  }, config);
+  };
 
   return find(findConfig, tag, getCollectionParams(collection), {
     [APPEND_MODE]: appendMode,
