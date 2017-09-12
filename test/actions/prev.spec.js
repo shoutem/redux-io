@@ -91,6 +91,82 @@ describe('Next action creator', () => {
     expect(types[2].meta(...metaResponse)).to.deep.equal(expectedResponseMeta);
   });
 
+  it('creates a valid action with extended config', () => {
+    const schema = 'schema_test';
+    const tag = 'tag_test';
+    const config = {
+      headers: {
+        'Content-Type': 'application/vnd.api+json',
+      },
+      endpoint: 'api.test',
+    };
+    const schemaConfig = {
+      schema,
+      request: config,
+    };
+    rio.registerSchema(schemaConfig);
+
+    const links = {
+      self: 'self url',
+      prev: 'prev url',
+      last: 'last url',
+    };
+    const reducer = collection(schema, tag, [1, 2, 3]);
+    const demoCollection = reducer();
+    setStatus(demoCollection, updateStatus(getStatus(demoCollection), { links }));
+
+    const additionalConfig = {
+      request: {
+        headers: {
+          Accept: 'application/vnd.api+json',
+        },
+        method: 'POST'
+      },
+    };
+
+    const action = prev(demoCollection, true, additionalConfig);
+
+    expect(action[RSAA]).to.not.be.undefined;
+    expect(action[RSAA].method).to.equal('POST');
+    expect(action[RSAA].endpoint).to.equal(links.prev);
+    expect(action[RSAA].headers).to.deep.equal({
+      'Content-Type': 'application/vnd.api+json',
+      Accept: 'application/vnd.api+json',
+    });
+    expect(action[RSAA].types).to.not.be.undefined;
+
+    const types = action[RSAA].types;
+    const expectedMeta = {
+      source: JSON_API_SOURCE,
+      schema,
+      tag,
+      endpoint: links.prev,
+      params: {},
+      options: {
+        [APPEND_MODE]: true,
+        [RESOLVED_ENDPOINT]: true,
+      },
+      timestamp: types[0].meta.timestamp,
+    };
+    const expectedResponseMeta = {
+      ...expectedMeta,
+      response: {
+        status: 200,
+        headers: {},
+      },
+    };
+    const metaResponse = [{}, {}, {
+      status: 200,
+    }];
+
+    expect(types[0].type).to.equal(LOAD_REQUEST);
+    expect(types[0].meta).to.deep.equal(expectedMeta);
+    expect(types[1].type).to.equal(LOAD_SUCCESS);
+    expect(types[1].meta(...metaResponse)).to.deep.equal(expectedResponseMeta);
+    expect(types[2].type).to.equal(LOAD_ERROR);
+    expect(types[2].meta(...metaResponse)).to.deep.equal(expectedResponseMeta);
+  });
+
   it('creates NO_MORE_ITEMS action', () => {
     const schema = 'test_schema';
     const tag = 'test_tag';
