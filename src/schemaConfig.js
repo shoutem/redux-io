@@ -115,7 +115,7 @@ export function buildEndpoint(endpoint, params = {}, options = {}) {
   const resolvedQueryParams = {
     ...paramEndpointUri.query(true),
     ...unusedQueryParams,
-  }
+  };
 
   return paramEndpointUri
     .query(resolvedQueryParams)

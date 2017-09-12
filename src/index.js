@@ -106,6 +106,7 @@ export {
   cloneStatus,
   isExpired,
   hasStatus,
+  getMeta,
   hasNext,
   hasPrev,
 } from './status';
