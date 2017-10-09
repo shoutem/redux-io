@@ -234,6 +234,89 @@ describe('Find action creator', () => {
     expect(types[2].meta(...metaResponse)).to.deep.equal(expectedResponseMeta);
   });
 
+  it('creates a valid action with predefined action config', () => {
+    const request = {
+      headers: {
+        'Content-Type': 'application/vnd.api+json',
+      },
+      endpoint: 'api.test',
+    };
+
+    const actions = {
+      find: {
+        request: {
+          endpoint: 'api.find.test',
+          headers: {
+            Accept: 'application/vnd.api+json',
+          },
+        },
+      },
+      update:  {
+        request: {
+          endpoint: 'api.find.test3',
+          headers: {
+            Accept3: 'application/vnd.api+json3',
+          },
+        },
+      },
+    };
+
+    const schema = 'app.builder';
+    const tag = 'collection_test';
+
+    const schemaConfig = {
+      schema,
+      request,
+      actions,
+    };
+    rio.registerSchema(schemaConfig);
+
+    const action = find(schema, tag);
+
+    const exceptedEndpoint = actions.find.request.endpoint;
+    const exceptedHeaders = {
+      ...request.headers,
+      ...actions.find.request.headers,
+    };
+
+    expect(action[RSAA]).to.not.be.undefined;
+    expect(action[RSAA].method).to.equal('GET');
+    expect(action[RSAA].endpoint).to.equal(exceptedEndpoint);
+    expect(action[RSAA].headers).to.deep.equal(exceptedHeaders);
+    expect(action[RSAA].types).to.not.be.undefined;
+
+    console.log(action[RSAA]);
+
+    const types = action[RSAA].types;
+    const expectedMeta = {
+      source: JSON_API_SOURCE,
+      schema,
+      tag,
+      endpoint: exceptedEndpoint,
+      params: {},
+      options: {},
+      timestamp: types[0].meta.timestamp,
+    };
+    const expectedResponseMeta = {
+      ...expectedMeta,
+      response: {
+        status: 200,
+        headers: {},
+      },
+    };
+    const metaResponse = [{}, {}, new Response(null, {
+      "status": 200,
+      "headers": {},
+    })];
+
+    expect(types[0].type).to.equal(LOAD_REQUEST);
+    expect(types[0].meta).to.deep.equal(expectedMeta);
+    expect(types[1].type).to.equal(LOAD_SUCCESS);
+    expect(types[1].meta(...metaResponse)).to.deep.equal(expectedResponseMeta);
+    expect(types[2].type).to.equal(LOAD_ERROR);
+    expect(types[2].meta(...metaResponse)).to.deep.equal(expectedResponseMeta);
+  });
+
   it('creates a valid action with predefined config overriding find defaults', () => {
     const config = {
       headers: {
@@ -354,6 +437,99 @@ describe('Find action creator', () => {
     expect(types[2].meta(...metaResponse)).to.deep.equal(expectedResponseMeta);
   });
 
+  it('creates a valid action with merged action config', () => {
+    const config = {
+      headers: {
+        'Content-Type': 'application/vnd.api+json',
+      },
+      endpoint: 'api.test',
+    };
+
+    const actions = {
+      find: {
+        request: {
+          endpoint: 'api.find.test',
+          headers: {
+            Accept: 'application/vnd.api+json',
+          },
+        },
+      }
+    };
+
+    const schema = 'app.builder';
+    const tag = 'collection_test';
+
+    const schemaConfig = {
+      schema,
+      request: config,
+      actions,
+    };
+    rio.registerSchema(schemaConfig);
+
+    const argsActions = {
+      find: {
+        request: {
+          endpoint: 'api.find.test2',
+          headers: {
+            Accept2: 'application/vnd.api+json',
+          },
+        },
+      }
+    };
+
+    const argSchemaConfig = {
+      schema,
+      request: {
+        endpoint: 'api.test2',
+      },
+      actions: argsActions,
+    };
+
+    const action = find(argSchemaConfig, tag);
+
+    const expectedEndpoint = argsActions.find.request.endpoint;
+    const expectedHeaders = {
+      ...config.headers,
+      ...actions.find.request.headers,
+      ...argsActions.find.request.headers,
+    };
+
+    expect(action[RSAA]).to.not.be.undefined;
+    expect(action[RSAA].method).to.equal('GET');
+    expect(action[RSAA].endpoint).to.equal(expectedEndpoint);
+    expect(action[RSAA].headers).to.deep.equal(expectedHeaders);
+    expect(action[RSAA].types).to.not.be.undefined;
+
+    const types = action[RSAA].types;
+    const expectedMeta = {
+      source: JSON_API_SOURCE,
+      schema,
+      tag,
+      endpoint: expectedEndpoint,
+      params: {},
+      options: {},
+      timestamp: types[0].meta.timestamp,
+    };
+    const expectedResponseMeta = {
+      ...expectedMeta,
+      response: {
+        status: 200,
+        headers: {},
+      },
+    };
+    const metaResponse = [{}, {}, new Response(null, {
+      "status": 200,
+      "headers": {},
+    })];
+
+    expect(types[0].type).to.equal(LOAD_REQUEST);
+    expect(types[0].meta).to.deep.equal(expectedMeta);
+    expect(types[1].type).to.equal(LOAD_SUCCESS);
+    expect(types[1].meta(...metaResponse)).to.deep.equal(expectedResponseMeta);
+    expect(types[2].type).to.equal(LOAD_ERROR);
+    expect(types[2].meta(...metaResponse)).to.deep.equal(expectedResponseMeta);
+  });
+
   it('creates a invalid action with missing registered schema', () => {
     const schema = 'app.builder';
     const tag = 'collection_test';
@@ -385,10 +561,10 @@ describe('Find action creator', () => {
     };
 
     expect(() => find(schemaConfig, tag)).to.throw(
-      'Schema configuration is invalid. Error:'
+      'Resource configuration is invalid. Error:'
       + ' [{"code":"OBJECT_MISSING_REQUIRED_PROPERTY","params":'
       + '["endpoint"],"message":"Missing required property: endpoint"'
-      + ',"path":"#/request"}]. Invalid schema config: {"schema":"'
+      + ',"path":"#/request"}]. Invalid resource config: {"schema":"'
       + 'app.builder","request":{"headers":{"Content-Type":"application'
       + '/vnd.api+json"}}}');
   });

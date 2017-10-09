@@ -162,7 +162,7 @@ describe('Update action creator', () => {
     expect(action[RSAA].body).to.equal(JSON.stringify({ data: item }));
   });
 
-  it('throws exception on action with schema configuration is invalid', () => {
+  it('throws exception on action with resource configuration is invalid', () => {
     const config = {
       headers: {
         'Content-Type': 'application/vnd.api+json',
@@ -177,10 +177,10 @@ describe('Update action creator', () => {
     };
 
     expect(() => update(schemaConfig, item)).to.throw(
-      'Schema configuration is invalid. Error:'
+      'Resource configuration is invalid. Error:'
       + ' [{"code":"OBJECT_MISSING_REQUIRED_PROPERTY","params":'
       + '["schema"],"message":"Missing required pr'
-      + 'operty: schema","path":"#/"}]. Invalid schema config:'
+      + 'operty: schema","path":"#/"}]. Invalid resource config:'
       + ' {"request":{"headers":{"Content-Type":'
       + '"application/vnd.api+json"},"endpoint":"api.test"}}'
     );

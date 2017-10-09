@@ -8,8 +8,9 @@ import {
 import { JSON_API_SOURCE } from './..';
 import {
   buildEndpoint,
-  resolveConfig,
-} from './../schemaConfig';
+  resolveResourceConfig,
+  resolveSchemaType,
+} from './../resources';
 import thunkAction from './_thunkAction';
 import { extendMetaWithResponse, buildRSAAConfig } from '../rsaa';
 
@@ -30,7 +31,7 @@ import { extendMetaWithResponse, buildRSAAConfig } from '../rsaa';
  * @returns {{}}
  */
 export function remove(schema, item, params = {}, options = {}) {
-  const config = resolveConfig(schema);
+  const config = resolveResourceConfig(schema);
   if (!config) {
     const schemaName = schema && _.isObject(schema) ? schema.schema : schema;
     throw new Error(`Couldn't resolve schema ${schemaName} in function find.`);
@@ -44,7 +45,7 @@ export function remove(schema, item, params = {}, options = {}) {
 
   const meta = {
     source: config.request.resourceType || JSON_API_SOURCE,
-    schema: config.schema,
+    schema: resolveSchemaType(config),
     params,
     endpoint,
     options,

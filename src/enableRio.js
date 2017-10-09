@@ -27,7 +27,7 @@ export function enableRio(reducer) {
   const initialState = reducer(undefined, { type: 'unknown' });
   const paths = discoverSchemaPaths(initialState);
 
-  rio.setSchemaPaths(paths);
+  rio.setResourcePaths(paths);
   rio.setDenormalizer(new ReduxApiStateDenormalizer());
 
   return enableBatching(reducer);

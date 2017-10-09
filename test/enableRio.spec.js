@@ -24,7 +24,7 @@ describe('EnableRio reducer', () => {
 
     expect(state).to.shallowDeepEqual({});
     expect(rio.denormalizer).to.be.an.instanceof(ReduxApiStateDenormalizer);
-    expect(rio.schemaPaths).to.be.deep.equal({ 'test': [] });
+    expect(rio.resourcePaths).to.be.deep.equal({ 'test': [] });
   });
 
   it('has a valid initial state on batched action', () => {
@@ -33,7 +33,7 @@ describe('EnableRio reducer', () => {
 
     expect(state).to.shallowDeepEqual({});
     expect(rio.denormalizer).to.be.an.instanceof(ReduxApiStateDenormalizer);
-    expect(rio.schemaPaths).to.be.deep.equal({ 'test': [] });
+    expect(rio.resourcePaths).to.be.deep.equal({ 'test': [] });
   });
 
   it('has a valid discovery of storage map', () => {
@@ -58,7 +58,7 @@ describe('EnableRio reducer', () => {
 
     expect(state).to.shallowDeepEqual({});
     expect(rio.denormalizer).to.be.an.instanceof(ReduxApiStateDenormalizer);
-    expect(rio.schemaPaths).to.deep.equal(expectedSchemaPaths);
+    expect(rio.resourcePaths).to.deep.equal(expectedSchemaPaths);
   });
 
   it('has a valid discovery of storage map with collections', () => {
@@ -85,6 +85,6 @@ describe('EnableRio reducer', () => {
 
     expect(state).to.shallowDeepEqual({});
     expect(rio.denormalizer).to.be.an.instanceof(ReduxApiStateDenormalizer);
-    expect(rio.schemaPaths).to.deep.equal(expectedSchemaPaths);
+    expect(rio.resourcePaths).to.deep.equal(expectedSchemaPaths);
   });
 });

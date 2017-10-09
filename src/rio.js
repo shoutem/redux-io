@@ -1,5 +1,5 @@
 import _ from 'lodash';
-import { validateSchemaConfig } from './schemaConfig';
+import { validateResourceConfig, resolveSchemaType } from './resources';
 import { JSON_API_SOURCE, transform } from './standardizers/json-api-standardizer';
 
 /**
@@ -12,34 +12,59 @@ export class Rio {
   }
 
   /**
-   * Register schema configuration. As schema configuration object or
-   * as passing a function that acts as schema resolver.
-  */
+   * @deprecated Since version 2.0. Will be deleted in version 3.0. Use registerResource instead.
+   */
   registerSchema(config) {
+    console.warn('Calling deprecated function rio.registerSchema, use rio.registerResource!');
+    this.registerResource(config);
+  }
+
+  /**
+   * @deprecated Since version 2.0. Will be deleted in version 3.0. Use getResource instead.
+   */
+  getSchema(schema) {
+    console.warn('Calling deprecated function rio.getSchema, use rio.getResource!');
+    return this.getResource(schema);
+  }
+
+  /**
+   * @deprecated Since version 2.0. Will be deleted in version 3.0. Use registerResource instead.
+   */
+  setSchemaPaths(schemaPaths) {
+    console.warn('Calling deprecated function rio.setSchemaPaths, use rio.setResourcePaths!');
+    this.setResourcePaths(schemaPaths);
+  }
+
+  /**
+   * Register resource configuration. As resource configuration object or
+   * as passing a function that acts as resource resolver.
+  */
+  registerResource(config) {
     if (_.isFunction(config)) {
-      this.schemaResolvers.push(config);
+      this.resourceResolvers.push(config);
     } else if (_.isObject(config)) {
-      validateSchemaConfig(config);
-      this.schemaConfigs[config.schema] = config;
+      validateResourceConfig(config);
+      const schema = resolveSchemaType(config);
+      this.resourceConfigs[schema] = config;
     } else {
-      throw new Error('Schema argument is invalid. Only object of function are allowed.');
+      throw new Error('Register argument is invalid. Only object of function are allowed.');
     }
   }
 
   /**
-   * Resolve schema by finding a schema configuration object
-   * or by resolving schema with registered schema resolvers.
+   * Resolve resource by finding a resource configuration object
+   * or by resolving resource with registered resource resolvers.
    */
-  getSchema(schema) {
-    let config = this.schemaConfigs[schema];
+  getResource(schema) {
+    let config = this.resourceConfigs[schema];
     if (config) {
       return _.cloneDeep(config);
     }
 
-    this.schemaResolvers.forEach(resolver => {
+    this.resourceResolvers.forEach(resolver => {
       config = resolver(schema);
       if (config) {
-        validateSchemaConfig(config);
+        validateResourceConfig(config);
         return false;
       }
       return true;
@@ -89,17 +114,17 @@ export class Rio {
   /**
    * Set instance of configured denormalizer used for denormalization with Rio.
    */
-  setSchemaPaths(schemaPaths) {
-    this.schemaPaths = schemaPaths;
+  setResourcePaths(resourcePaths) {
+    this.resourcePaths = resourcePaths;
   }
 
   /**
    * Clears registered collections and resolvers
    */
   clear() {
-    this.schemaConfigs = {};
-    this.schemaResolvers = [];
-    this.schemaPaths = {};
+    this.resourceConfigs = {};
+    this.resourceResolvers = [];
+    this.resourcePaths = {};
     this.denormalizer = null;
     this.standardizers = {};
 

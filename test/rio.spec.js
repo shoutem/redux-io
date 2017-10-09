@@ -7,7 +7,7 @@ describe('Rio', () => {
     rio.clear();
   });
 
-  it('register schema object', () => {
+  it('register resource object', () => {
     const config = {
       headers: {
         'Content-Type': 'application/vnd.api+json',
@@ -15,15 +15,45 @@ describe('Rio', () => {
       endpoint: 'api.test',
     };
     const schema = 'app.builder';
-    const schemaConfig = {
+    const resourceConfig = {
       schema,
       request: config,
     };
 
-    rio.registerSchema(schemaConfig);
+    rio.registerSchema(resourceConfig);
     const resolvedSchemaConfig = rio.getSchema(schema);
 
-    expect(resolvedSchemaConfig).to.deep.equal(schemaConfig);
+    expect(resolvedSchemaConfig).to.deep.equal(resourceConfig);
+  });
+
+  it('register resource object with schema object', () => {
+    const config = {
+      headers: {
+        'Content-Type': 'application/vnd.api+json',
+      },
+      endpoint: 'api.test',
+    };
+    const schemaType = 'app.builder';
+    const schema = {
+      type: schemaType,
+      relationships: {
+        cars: {
+          type: 'core.cars',
+        },
+        owners: {
+          type: 'core.users',
+        },
+      },
+    };
+    const resourceConfig = {
+      schema,
+      request: config,
+    };
+
+    rio.registerResource(resourceConfig);
+    const resolvedSchemaConfig = rio.getResource(schemaType);
+
+    expect(resolvedSchemaConfig).to.deep.equal(resourceConfig);
   });
 
   it('register schema object with actions', () => {
@@ -124,10 +154,10 @@ describe('Rio', () => {
 
     const schemaName = 'app.builder';
     expect(() => rio.getSchema(schemaName))
-      .to.throw('Schema configuration is invalid. Error:'
+      .to.throw('Resource configuration is invalid. Error:'
       + ' [{"code":"OBJECT_MISSING_REQUIRED_PROPERTY","params":["headers"],'
       + '"message":"Missing required property: headers","path":"#/request"}].'
-      + ' Invalid schema config: {"schema":"app.builder","request":{"endpoint"'
+      + ' Invalid resource config: {"schema":"app.builder","request":{"endpoint"'
       + ':"api.test.app.builder"}}');
   });
 
@@ -151,7 +181,7 @@ describe('Rio', () => {
 
   it('register with invalid schema config type', () => {
     expect(() => rio.registerSchema('Test'))
-      .to.throw('Schema argument is invalid. Only object of function are allowed.');
+      .to.throw('Register argument is invalid. Only object of function are allowed.');
   });
 
   it('register invalid schema object', () => {
@@ -168,10 +198,10 @@ describe('Rio', () => {
     };
 
     expect(() => rio.registerSchema(schemaConfig))
-      .to.throw('Schema configuration is invalid. Error:'
+      .to.throw('Resource configuration is invalid. Error:'
       + ' [{"code":"OBJECT_ADDITIONAL_PROPERTIES","params":[["schema"]],'
       + '"message":"Additional properties not allowed: schema","path":"#/request"}].'
-      + ' Invalid schema config: ' + JSON.stringify(schemaConfig));
+      + ' Invalid resource config: ' + JSON.stringify(schemaConfig));
   });
 
   it('register source type', () => {
