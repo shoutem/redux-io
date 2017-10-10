@@ -36,9 +36,9 @@ const expectedNormalizedItem = {
   },
 };
 const transformation = {
-  relationshipProperties: {
-    owners: 'owners',
-    parent: 'parent',
+  relationships: {
+    owners: { type: 'app.owner' },
+    parent: { type: 'app.owner' },
   },
 };
 
@@ -248,10 +248,10 @@ describe('json-normalizer', () => {
       createStatus(),
       {
         transformation: {
-          relationshipProperties: {
-            owners: 'owners',
-            parent: 'parent',
-            children: 'children',
+          relationships: {
+            owners: { type: 'app.owner' },
+            parent: { type: 'app.owner' },
+            children: { type: 'app.owner' },
           },
         },
       }
@@ -296,9 +296,9 @@ describe('json-normalizer', () => {
         createStatus(),
         {
           transformation: {
-            relationshipProperties: {
-              owners: 'owners',
-              parent: 'parent',
+            relationships: {
+              owners: { type: 'app.owner' },
+              parent: { type: 'app.owner' },
             },
           },
         }

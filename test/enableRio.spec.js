@@ -87,4 +87,104 @@ describe('EnableRio reducer', () => {
     expect(rio.denormalizer).to.be.an.instanceof(ReduxApiStateDenormalizer);
     expect(rio.resourcePaths).to.deep.equal(expectedSchemaPaths);
   });
+
+  it('keeps existing paths of storage map during repeated discovery', () => {
+    const userReducer = combineReducers({
+      locationsStorage: storage('locations'),
+      interestsStorage: storage('interests'),
+    });
+
+    const testReducer = combineReducers({
+      users: userReducer,
+      carsStorage: storage('cars'),
+    });
+
+    const expectedSchemaPaths = {
+      'locations': ['users', 'locationsStorage'],
+      'interests': ['users', 'interestsStorage'],
+      'cars': ['carsStorage']
+    };
+
+    const testBatchedReducer = enableRio(testReducer);
+    const state = testBatchedReducer(undefined, batchActions([{}]));
+
+    expect(state).to.shallowDeepEqual({});
+    expect(rio.denormalizer).to.be.an.instanceof(ReduxApiStateDenormalizer);
+    expect(rio.resourcePaths).to.deep.equal(expectedSchemaPaths);
+
+    const userReducerRepeated = combineReducers({
+      locationsStorageRepeated: storage('locations'),
+      interestsStorageRepeated: storage('interests'),
+      weather: storage('weather'),
+    });
+
+    const testReducerRepeated = combineReducers({
+      usersRepeated: userReducerRepeated,
+      carsStorageRepeated: storage('cars'),
+    });
+
+    const expectedSchemaPathsRepeated = {
+      'locations': ['users', 'locationsStorage'],
+      'interests': ['users', 'interestsStorage'],
+      'weather': ['usersRepeated', 'weather'],
+      'cars': ['carsStorage']
+    };
+
+    const testBatchedReducerRepeated = enableRio(testReducerRepeated, true);
+    const stateRepeated = testBatchedReducerRepeated(undefined, batchActions([{}]));
+
+    expect(stateRepeated).to.shallowDeepEqual({});
+    expect(rio.denormalizer).to.be.an.instanceof(ReduxApiStateDenormalizer);
+    expect(rio.resourcePaths).to.deep.equal(expectedSchemaPathsRepeated);
+  });
+
+  it('clears existing paths of storage map during repeated discovery', () => {
+    const userReducer = combineReducers({
+      locationsStorage: storage('locations'),
+      interestsStorage: storage('interests'),
+    });
+
+    const testReducer = combineReducers({
+      users: userReducer,
+      carsStorage: storage('cars'),
+    });
+
+    const expectedSchemaPaths = {
+      'locations': ['users', 'locationsStorage'],
+      'interests': ['users', 'interestsStorage'],
+      'cars': ['carsStorage']
+    };
+
+    const testBatchedReducer = enableRio(testReducer);
+    const state = testBatchedReducer(undefined, batchActions([{}]));
+
+    expect(state).to.shallowDeepEqual({});
+    expect(rio.denormalizer).to.be.an.instanceof(ReduxApiStateDenormalizer);
+    expect(rio.resourcePaths).to.deep.equal(expectedSchemaPaths);
+
+    const userReducerRepeated = combineReducers({
+      locationsStorageRepeated: storage('locations'),
+      interestsStorageRepeated: storage('interests'),
+      weather: storage('weather'),
+    });
+
+    const testReducerRepeated = combineReducers({
+      usersRepeated: userReducerRepeated,
+      carsStorageRepeated: storage('cars'),
+    });
+
+    const expectedSchemaPathsRepeated = {
+      'locations': ['usersRepeated', 'locationsStorageRepeated'],
+      'interests': ['usersRepeated', 'interestsStorageRepeated'],
+      'weather': ['usersRepeated', 'weather'],
+      'cars': ['carsStorageRepeated']
+    };
+
+    const testBatchedReducerRepeated = enableRio(testReducerRepeated, false);
+    const stateRepeated = testBatchedReducerRepeated(undefined, batchActions([{}]));
+
+    expect(stateRepeated).to.shallowDeepEqual({});
+    expect(rio.denormalizer).to.be.an.instanceof(ReduxApiStateDenormalizer);
+    expect(rio.resourcePaths).to.deep.equal(expectedSchemaPathsRepeated);
+  });
 });

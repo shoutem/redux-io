@@ -102,7 +102,7 @@ export {
   isInitialized,
   shouldLoad,
   shouldRefresh,
-  getTransformation,
+  getSchema,
   cloneStatus,
   isExpired,
   hasStatus,

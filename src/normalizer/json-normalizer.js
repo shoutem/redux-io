@@ -1,5 +1,5 @@
 import _ from 'lodash';
-import { STATUS, getTransformation } from '../status';
+import { STATUS, getSchema } from '../status';
 
 // Ignored properties are passed from store so they can not be Set
 const DEFAULT_IGNORED_PROPERTIES = { id: true, type: true, [STATUS]: true };
@@ -40,18 +40,18 @@ function isIgnoredProperty(property, ignoredProperties = DEFAULT_IGNORED_PROPERT
 }
 
 export function normalizeItem(item, picks = null) {
-  const itemTransformation = getTransformation(item);
+  const itemSchema = getSchema(item);
   if (!_.isNull(picks)) {
     // eslint-disable-next-line no-param-reassign
     item = _.pick(item, _.union(getDefaultJsonItemAttributeNames(), picks));
   }
 
   return _.reduce(item, (normalizedItem, val, property) => {
-    if (!itemTransformation || isIgnoredProperty(property)) {
+    if (!itemSchema || isIgnoredProperty(property)) {
       return normalizedItem;
     }
 
-    const relationshipItem = itemTransformation.relationshipProperties[property] && val;
+    const relationshipItem = itemSchema.relationships[property] && val;
     if (relationshipItem) {
       if (_.isArray(relationshipItem)) {
         // eslint-disable-next-line no-param-reassign
