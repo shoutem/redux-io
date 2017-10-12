@@ -1,1 +1,5 @@
-export { normalizeItem, normalizeCollection } from './json-normalizer';
+export {
+  normalizeItem,
+  normalizeCollection,
+  normalize,
+} from './json-normalizer';

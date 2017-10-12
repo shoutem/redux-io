@@ -66,7 +66,11 @@ export { getCollection };
 import { getOne } from './denormalizer/getOne';
 export { getOne };
 
-export { normalizeItem, normalizeCollection } from './normalizer';
+export {
+  normalizeItem,
+  normalizeCollection,
+  shouldNormalize,
+} from './normalizer';
 
 export { RioStateSerializer } from './serialization';
 

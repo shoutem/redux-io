@@ -1,7 +1,7 @@
 import ZSchema from 'z-schema';
 
 const validator = new ZSchema();
-const resourceDefinition = {
+const resourceSchema = {
   type: 'object',
   properties: {
     schema: {
@@ -50,9 +50,10 @@ const resourceDefinition = {
  * Returns useful errors to enable developer easier fixing invalid resource configuration.
  * @param config
  */
-export default function validateResourceConfig(config) {
-  const validResult = validator.validate(config, resourceDefinition);
-  if (!validResult) {
+export function validateResourceConfig(config, throwException = true) {
+  const validResult = validator.validate(config, resourceSchema);
+
+  if (throwException && !validResult) {
     const validationErrorsMsg = JSON.stringify(validator.getLastErrors());
     const configMsg = JSON.stringify(config);
     throw new Error(
@@ -60,4 +61,6 @@ export default function validateResourceConfig(config) {
       + ` Invalid resource config: ${configMsg}`
     );
   }
+
+  return validResult;
 }

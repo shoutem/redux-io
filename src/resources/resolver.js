@@ -3,7 +3,27 @@ import UriTemplate from 'urijs/src/URITemplate';
 import { getStatus } from '../status';
 import { RESOLVED_ENDPOINT } from '../consts';
 import rio from '../rio';
-import validateResourceConfig from './validation';
+import { validateResourceConfig } from './validation';
+
+export function resolveSchemaType(config) {
+  const schemaConfig = _.get(config, 'schema');
+
+  if (_.isString(schemaConfig)) {
+    return schemaConfig;
+  }
+
+  return _.get(schemaConfig, 'type');
+}
+
+export function resolveSchema(config) {
+  const schemaConfig = _.get(config, 'schema');
+
+  if (_.isString(schemaConfig)) {
+    return null;
+  }
+
+  return schemaConfig;
+}
 
 function resolveAction(config, action) {
   const actionConfig = _.get(config, ['actions', action], {});
@@ -21,7 +41,8 @@ function resolveResource(config) {
     return rio.getResource(schemaType);
   } else if (_.isObject(config)) {
     const argConfig = config;
-    const rioConfig = rio.getResource(argConfig.schema);
+    const argSchemaType = resolveSchemaType(argConfig);
+    const rioConfig = rio.getResource(argSchemaType);
     return _.merge({}, rioConfig, argConfig);
   }
 
@@ -37,12 +58,12 @@ function resolveResource(config) {
  */
 export function resolveResourceConfig(config, action = null) {
   const resolvedResource = resolveResource(config);
-
   if (!resolvedResource) {
     return null;
   }
 
   const actionResource = resolveAction(resolvedResource, action);
+
   validateResourceConfig(actionResource);
   return actionResource;
 }
@@ -89,14 +110,4 @@ export function resolveReferenceSchemaType(reference, schema) {
     return referenceSchema;
   }
   return schema;
-}
-
-export function resolveSchemaType(config) {
-  const schemaConfig = _.get(config, 'schema');
-
-  if (_.isString(schemaConfig)) {
-    return schemaConfig;
-  }
-
-  return _.get(schemaConfig, 'type');
 }

@@ -1,8 +1,10 @@
-import validateResourceConfig from './validation';
-export { validateResourceConfig };
+export {
+  validateResourceConfig,
+} from './validation';
 
 export {
   resolveSchemaType,
+  resolveSchema,
   resolveResourceConfig,
   resolveReferenceSchemaType,
   buildEndpoint,
