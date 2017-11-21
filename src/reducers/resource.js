@@ -194,17 +194,11 @@ export default function resource(schema, initialState = {}) {
         return newState;
       }
       case REFERENCE_STATUS: {
-        const {
-          validationStatus = validationStatus.VALID,
-          busyStatus = busyStatus.IDLE,
-        } = payload;
-
         const newState = createNewState(state);
         setStatus(newState, updateStatus(
           state[STATUS],
           {
-            validationStatus,
-            busyStatus,
+            ...payload
           }
         ));
         return newState;
