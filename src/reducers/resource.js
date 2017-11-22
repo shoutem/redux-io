@@ -197,9 +197,7 @@ export default function resource(schema, initialState = {}) {
         const newState = createNewState(state);
         setStatus(newState, updateStatus(
           state[STATUS],
-          {
-            ...payload
-          }
+          { ...payload }
         ));
         return newState;
       }
