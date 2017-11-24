@@ -1,4 +1,5 @@
 /* eslint-disable no-unused-expressions */
+import _ from 'lodash';
 import { combineReducers } from 'redux';
 import sinon from 'sinon';
 import chai, { expect } from 'chai';
@@ -144,7 +145,14 @@ describe('getOne', () => {
 
   it('freezes empty one', () => {
     const emptyCollection = getOne(undefined, {});
-    expect(() => emptyCollection.test = 1).to.throw('Can\'t add property');
+    expect(() => emptyCollection.test = 1)
+      .to.throw(TypeError)
+      .that.satisfies((error) => (
+        _.startsWith(error.message, 'Can\'t add property') ||
+        _.startsWith(error.message, 'Cannot add property')
+      ));
+
+
   });
 
   it('on invalid state throws appropriate error', () => {

@@ -144,7 +144,12 @@ describe('getCollection', () => {
 
   it('freezes empty collection', () => {
     const emptyCollection = getCollection(undefined, {});
-    expect(() => emptyCollection.push(1)).to.throw('Can\'t add property');
+    expect(() => emptyCollection.push(1))
+      .to.throw(TypeError)
+      .that.satisfies((error) => (
+        _.startsWith(error.message, 'Can\'t add property') ||
+        _.startsWith(error.message, 'Cannot add property')
+      ));
   });
 
   it('denormalize null', () => {
