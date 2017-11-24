@@ -34,8 +34,10 @@ import { extendMetaWithResponse, buildRSAAConfig } from '../rsaa';
  */
 export function create(schema, item = null, params = {}, options = {}) {
   const config = resolveResourceConfig(schema, 'create');
+  const schemaType = resolveSchemaType(config);
+
   if (!config) {
-    const schemaName = schema && _.isObject(schema) ? resolveSchemaType(config) : schema;
+    const schemaName = schema && _.isObject(schema) ? schemaType : schema;
     throw new Error(`Couldn't resolve schema ${schemaName} in function find.`);
   }
 
@@ -59,7 +61,7 @@ export function create(schema, item = null, params = {}, options = {}) {
     endpoint,
     options,
     source,
-    schema: resolveSchemaType(config),
+    schema: schemaType,
     timestamp: Date.now(),
   };
 

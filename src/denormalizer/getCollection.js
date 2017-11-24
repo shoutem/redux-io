@@ -6,9 +6,7 @@ import { resolveReferenceSchemaType } from '../resources';
 const emptyArray = [];
 Object.freeze(emptyArray);
 
-let lastState = null;
-let lastSchemaPaths = null;
-let storageMap = null;
+const resolveStorageMap = _.memoize((state, schemaPaths) => createSchemasMap(state, schemaPaths));
 
 /**
  * Connects rio configurations with denormalizer to simplify denormalization
@@ -39,16 +37,7 @@ export function getCollection(collection, state, schema = '') {
     throw new Error(`Storage for resolved schema ${resolvedSchema} doesn't exists in state.`);
   }
 
-  // TODO: use memoization https://www.npmjs.com/package/mem, https://www.npmjs.com/package/memoizee
-  if (
-    state !== lastState ||
-    schemaPaths !== lastSchemaPaths ||
-    !storageMap
-  ) {
-    storageMap = createSchemasMap(state, schemaPaths);
-    lastState = state;
-    lastSchemaPaths = schemaPaths;
-  }
+  const storageMap = resolveStorageMap(state, schemaPaths);
 
   return rio.denormalizer.denormalizeCollection(collection, storageMap, resolvedSchema);
 }

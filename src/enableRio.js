@@ -33,7 +33,12 @@ export function enableRio(reducer, keepExistingPaths = false) {
   const initialState = reducer(undefined, { type: 'unknown' });
   const paths = discoverSchemaPaths(initialState);
 
-  rio.setResourcePaths(paths, keepExistingPaths);
+  if (keepExistingPaths) {
+    rio.appendResourcePaths(paths);
+  } else {
+    rio.setResourcePaths(paths);
+  }
+
   rio.setDenormalizer(new ReduxApiStateDenormalizer());
 
   return enableBatching(reducer);

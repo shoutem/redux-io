@@ -34,8 +34,10 @@ import { extendMetaWithResponse, buildRSAAConfig } from '../rsaa';
  */
 export function remove(schema, item, params = {}, options = {}) {
   const config = resolveResourceConfig(schema, 'remove');
+  const schemaType = resolveSchemaType(config);
+
   if (!config) {
-    const schemaName = schema && _.isObject(schema) ? resolveSchemaType(config) : schema;
+    const schemaName = schema && _.isObject(schema) ? schemaType : schema;
     throw new Error(`Couldn't resolve schema ${schemaName} in function find.`);
   }
   if (!_.isObject(item)) {
@@ -53,7 +55,7 @@ export function remove(schema, item, params = {}, options = {}) {
     endpoint,
     options,
     source,
-    schema: resolveSchemaType(config),
+    schema: schemaType,
     timestamp: Date.now(),
   };
 

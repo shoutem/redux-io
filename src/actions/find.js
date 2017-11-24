@@ -46,9 +46,11 @@ export function isAppendMode(action) {
  */
 export function find(schema, tag = '', params = {}, options = {}) {
   const config = resolveResourceConfig(schema, 'find');
+  const schemaType = resolveSchemaType(config);
+
   if (!config) {
-    const schemaType = schema && _.isObject(schema) ? schema.schema : schema;
-    throw new Error(`Couldn't resolve schema ${schemaType} in function find.`);
+    const schemaName = schema && _.isObject(schema) ? schemaType : schema;
+    throw new Error(`Couldn't resolve schema ${schemaName} in function find.`);
   }
   if (!_.isString(tag)) {
     throw new Error(`Invalid tag, "find" expected a string but got: ${JSON.stringify(tag)}`);
@@ -58,12 +60,12 @@ export function find(schema, tag = '', params = {}, options = {}) {
   const endpoint = buildEndpoint(rsaaConfig.endpoint, params, options);
 
   const meta = {
-    source: config.request.resourceType || JSON_API_SOURCE,
-    schema: resolveSchemaType(config),
     tag,
     params,
     endpoint,
     options,
+    source: config.request.resourceType || JSON_API_SOURCE,
+    schema: schemaType,
     timestamp: Date.now(),
   };
 

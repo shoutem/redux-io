@@ -112,17 +112,20 @@ export class Rio {
   }
 
   /**
-   * Set instance of configured denormalizer used for denormalization with Rio.
+   * Set resource paths
    */
-  setResourcePaths(resourcePaths, keepExistingPaths = false) {
-    if (keepExistingPaths) {
-      this.resourcePaths = {
-        ...resourcePaths,
-        ...this.resourcePaths,
-      };
-    } else {
-      this.resourcePaths = resourcePaths;
-    }
+  setResourcePaths(resourcePaths) {
+    this.resourcePaths = resourcePaths;
+  }
+
+  /**
+   * Append resource paths to existing resource paths
+   */
+  appendResourcePaths(resourcePaths) {
+    this.resourcePaths = {
+      ...resourcePaths,
+      ...this.resourcePaths,
+    };
   }
 
   /**
