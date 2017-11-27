@@ -17,6 +17,7 @@ import {
   REMOVE_SUCCESS,
   REMOVE_ERROR,
   REFERENCE_CLEAR,
+  REFERENCE_STATUS,
 } from '../../src';
 import {
   STATUS,
@@ -580,5 +581,35 @@ describe('Resource reducer', () => {
     expect(nextState[STATUS].schema).to.eql(schema);
     expect(nextState[STATUS].type).to.eql('resource');
     expect(nextState).to.shallowDeepEqual(customState);
+  });
+
+  it('correctly references statuses from payload', () => {
+    const initialState = {
+      a: 1,
+      b: 3,
+      c: 17,
+    };
+    const payload = {
+      validationStatus: validationStatus.INVALID,
+      busyStatus: busyStatus.BUSY,
+    };
+    const schema = 'schema_test';
+    const reducer = resource(schema, initialState);
+    deepFreeze(initialState);
+
+    const action = {
+      type: REFERENCE_STATUS,
+      meta: {
+        schema,
+      },
+      payload,
+    };
+
+    const nextState = reducer(initialState, action);
+
+    expect(nextState[STATUS].validationStatus).to.eql(validationStatus.INVALID);
+    expect(nextState[STATUS].busyStatus).to.eql(busyStatus.BUSY);
+    expect(nextState[STATUS].schema).to.eql(schema);
+    expect(nextState).to.shallowDeepEqual(initialState);
   });
 });
