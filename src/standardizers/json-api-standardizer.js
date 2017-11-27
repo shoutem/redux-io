@@ -2,25 +2,40 @@ import _ from 'lodash';
 
 export const JSON_API_SOURCE = 'json-api';
 
+function resolveRelationshipType(relationship) {
+  const data = _.get(relationship, 'data');
+  const path = _.isArray(data) ?  'data.0.type' : 'data.type';
+
+  return {
+    type: _.get(relationship, path),
+  };
+}
+
+function resolveType(object) {
+  return _.get(object, 'type');
+}
+
 export function transform(object) {
   if (!_.has(object, 'relationships')) {
     return {
-      transformationDescription: {},
-      transformedObject: _.cloneDeep(object),
+      schema: {},
+      object: _.cloneDeep(object),
     };
   }
 
-  const keys = _.keys(object.relationships);
+  const relationships = _.mapValues(object.relationships, resolveRelationshipType);
+
   return {
-    transformationDescription: {
-      relationshipProperties: _.keyBy(keys),
+    schema: {
+      type: resolveType(object),
+      relationships: relationships,
     },
-    transformedObject: _.cloneDeep(object),
+    object: _.cloneDeep(object),
   };
 }
 
 // eslint-disable-next-line no-unused-vars
-export function inverse(transformedObject, transformationDescription) {
+export function inverse(object, schema) {
   // TODO: support inverse transformations based on transformation description
-  return transformedObject;
+  return object;
 }

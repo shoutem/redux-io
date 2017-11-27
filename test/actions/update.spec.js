@@ -135,10 +135,93 @@ describe('Update action creator', () => {
     expect(types[1].meta(...metaResponse)).to.deep.equal(expectedResponseMeta);
   });
 
-  it('creates a valid action where item in argument has priority over item in config.body', () => {
+  it('creates a valid action with denormalized item based on config.schema', () => {
+    const schemaType = 'schema_test';
+    const item = {
+      type: schemaType,
+      id: '1',
+      name: 'Test1',
+    };
+    const config = {
+      headers: {
+        'Content-Type': 'application/vnd.api+json',
+      },
+      endpoint: 'api.test',
+      body: 'Body',
+    };
+
+    const schema = {
+      type: schemaType,
+      relationships: { },
+    }
+
+    const schemaConfig = {
+      schema: schema,
+      request: config,
+    };
+
+    const action = update(schemaConfig, item);
+
+    const expectedItem = {
+      type: schemaType,
+      id: '1',
+      attributes: {
+        name: 'Test1',
+      },
+    };
+    expect(JSON.parse(action[RSAA].body)).to.deep.equal({ data: expectedItem });
+  });
+
+  it('creates a valid action with denormalized item without schema', () => {
+    const schemaType = 'schema_test';
+    const item = {
+      type: schemaType,
+      id: '1',
+      name: 'Test1',
+      owner: {
+        type: 'app.owner',
+        id: 'ABC',
+        name: 'User',
+        age: 22,
+      },
+    };
+    const config = {
+      headers: {
+        'Content-Type': 'application/vnd.api+json',
+      },
+      endpoint: 'api.test',
+      body: 'Body',
+    };
+
+    const resourceConfig = {
+      schema: schemaType,
+      request: config,
+    };
+
+    const action = update(resourceConfig, item);
+
+    const expectedItem = {
+      type: schemaType,
+      id: '1',
+      attributes: {
+        name: 'Test1',
+      },
+      relationships: {
+        owner: {
+          data: {
+            type: 'app.owner',
+            id: 'ABC',
+          },
+        },
+      },
+    };
+    expect(JSON.parse(action[RSAA].body)).to.deep.equal({ data: expectedItem });
+  });
+
+  it('creates a valid action where normalized item in argument has priority over item in config.body', () => {
     const schema = 'schema_test';
     const item = {
-      schema,
+      type: schema,
       id: '1',
       attributes: {
         name: 'Test1',
@@ -162,7 +245,7 @@ describe('Update action creator', () => {
     expect(action[RSAA].body).to.equal(JSON.stringify({ data: item }));
   });
 
-  it('throws exception on action with schema configuration is invalid', () => {
+  it('throws exception on action with resource configuration is invalid', () => {
     const config = {
       headers: {
         'Content-Type': 'application/vnd.api+json',
@@ -177,10 +260,10 @@ describe('Update action creator', () => {
     };
 
     expect(() => update(schemaConfig, item)).to.throw(
-      'Schema configuration is invalid. Error:'
+      'Resource configuration is invalid. Error:'
       + ' [{"code":"OBJECT_MISSING_REQUIRED_PROPERTY","params":'
       + '["schema"],"message":"Missing required pr'
-      + 'operty: schema","path":"#/"}]. Invalid schema config:'
+      + 'operty: schema","path":"#/"}]. Invalid resource config:'
       + ' {"request":{"headers":{"Content-Type":'
       + '"application/vnd.api+json"},"endpoint":"api.test"}}'
     );

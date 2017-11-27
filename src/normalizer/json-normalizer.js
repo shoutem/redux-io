@@ -1,22 +1,13 @@
 import _ from 'lodash';
-import { STATUS, getTransformation } from '../status';
+import { STATUS, getSchema } from '../status';
 
 // Ignored properties are passed from store so they can not be Set
 const DEFAULT_IGNORED_PROPERTIES = { id: true, type: true, [STATUS]: true };
 
-function getDefaultJsonItemAttributeNames() {
-  return [
-    'id',
-    'type',
-  ];
-}
-
-function createNormalizedJsonItemDescription(denormalizedItem) {
+function createNormalizedJsonItemDescription(denormalizedItem, schema) {
   return {
     id: denormalizedItem.id,
-    type: denormalizedItem.type,
-    attributes: {},
-    relationships: {},
+    type: denormalizedItem.type || _.get(schema, 'type'),
   };
 }
 
@@ -39,45 +30,72 @@ function isIgnoredProperty(property, ignoredProperties = DEFAULT_IGNORED_PROPERT
   return !!ignoredProperties[property];
 }
 
-export function normalizeItem(item, picks = null) {
-  const itemTransformation = getTransformation(item);
-  if (!_.isNull(picks)) {
-    // eslint-disable-next-line no-param-reassign
-    item = _.pick(item, _.union(getDefaultJsonItemAttributeNames(), picks));
+function isRelationship(schema, propertyKey, propertyValue) {
+  if (_.get(schema, ['relationships', propertyKey])) {
+    return true;
   }
 
-  return _.reduce(item, (normalizedItem, val, property) => {
-    if (!itemTransformation || isIgnoredProperty(property)) {
+  // TODO: use rio.options to turn off this feature
+  if (
+    _.get(propertyValue, 'id') &&
+    _.get(propertyValue, 'type')
+  ) {
+    return true;
+  }
+
+  return false;
+}
+
+function resolveSchema(item, schema) {
+  const itemSchema = schema || getSchema(item);
+  if (itemSchema) {
+    return itemSchema;
+  }
+  return null;
+}
+
+export function shouldNormalize(item) {
+  const dataItem = _.pick(item, 'attributes', 'relationships');
+  return _.isEmpty(dataItem);
+}
+
+export function normalizeItem(item, schema = null) {
+  if (!shouldNormalize(item)) {
+    return item;
+  }
+
+  const resolvedSchema = resolveSchema(item, schema);
+
+  return _.reduce(item, (normalizedItem, propertyValue, propertyKey) => {
+    if (isIgnoredProperty(propertyKey)) {
       return normalizedItem;
     }
 
-    const relationshipItem = itemTransformation.relationshipProperties[property] && val;
-    if (relationshipItem) {
-      if (_.isArray(relationshipItem)) {
-        // eslint-disable-next-line no-param-reassign
-        normalizedItem.relationships[property] = {
-          data: normalizeRelationshipArray(relationshipItem),
-        };
-      } else if (_.isPlainObject(relationshipItem)) {
-        // eslint-disable-next-line no-param-reassign
-        normalizedItem.relationships[property] = {
-          data: normalizeRelationshipObject(relationshipItem),
-        };
+    if (isRelationship(resolvedSchema, propertyKey, propertyValue)) {
+      if (_.isArray(propertyValue)) {
+        const data = normalizeRelationshipArray(propertyValue);
+        _.set(normalizedItem, ['relationships', propertyKey], { data });
+      } else if (_.isPlainObject(propertyValue)) {
+        const data = normalizeRelationshipObject(propertyValue);
+        _.set(normalizedItem, ['relationships', propertyKey], { data });
       } else {
-        // this should generally be case when relationship does not exists
-        // if relationship is not provided (included) it is little bit tricky NOW..
-        // eslint-disable-next-line no-param-reassign
-        normalizedItem.relationships[property] = { data: null };
+        _.set(normalizedItem, ['relationships', propertyKey], { data: null });
       }
     } else {
-      // eslint-disable-next-line no-param-reassign
-      normalizedItem.attributes[property] = val;
+      _.set(normalizedItem, ['attributes', propertyKey], propertyValue);
     }
     return normalizedItem;
-  }, createNormalizedJsonItemDescription(item));
+  }, createNormalizedJsonItemDescription(item, resolvedSchema));
 }
 
-export function normalizeCollection(collection, picks = null) {
-  return collection.map(item => normalizeItem(item, picks));
+export function normalizeCollection(collection, schema = null) {
+  return collection.map(item => normalizeItem(item, schema));
 }
 
+export function normalize(object, schema = null) {
+  if (_.isArray(object)) {
+    return normalizeCollection(object, schema);
+  }
+
+  return normalizeItem(object, schema);
+}

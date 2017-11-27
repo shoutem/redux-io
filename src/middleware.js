@@ -130,11 +130,11 @@ export function makeObjectAction(sourceAction, actionType, item) {
 
   return {
     type: actionType,
-    payload: transformation.transformedObject,
+    payload: transformation.object,
     meta: {
       ...sourceAction.meta,
       schema: _.get(item, 'type'),
-      transformation: transformation.transformationDescription,
+      transformation: transformation.schema,
     },
   };
 }

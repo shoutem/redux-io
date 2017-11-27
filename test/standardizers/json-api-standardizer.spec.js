@@ -58,22 +58,23 @@ const transformedItem = {
     },
   },
 };
-const transformationDescription = {
-  relationshipProperties: {
-    owners: 'owners',
-    parent: 'parent',
+const schema = {
+  relationships: {
+    owners: { type: 'app.owner' },
+    parent: { type: 'app.owner' },
   },
+  type: 'app.test',
 };
 
 describe('standardizer', () => {
   it('transform item', () => {
     const result = transform(originalItem);
-    expect(result.transformationDescription).to.be.deep.equal(transformationDescription);
-    expect(result.transformedObject).to.be.deep.equal(transformedItem);
+    expect(result.schema).to.be.deep.equal(schema);
+    expect(result.object).to.be.deep.equal(transformedItem);
   });
 
   it('inverse transformation item', () => {
-    const result = inverse(transformedItem, transformationDescription);
+    const result = inverse(transformedItem, schema);
     expect(result).to.be.deep.equal(originalItem);
   });
 });

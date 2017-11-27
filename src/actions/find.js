@@ -8,8 +8,9 @@ import {
 import { JSON_API_SOURCE } from './..';
 import {
   buildEndpoint,
-  resolveConfig,
-} from './../schemaConfig';
+  resolveResourceConfig,
+  resolveSchemaType,
+} from './../resources';
 import thunkAction from './_thunkAction';
 import { extendMetaWithResponse, buildRSAAConfig } from '../rsaa';
 
@@ -44,9 +45,11 @@ export function isAppendMode(action) {
  * @returns action
  */
 export function find(schema, tag = '', params = {}, options = {}) {
-  const config = resolveConfig(schema);
+  const config = resolveResourceConfig(schema, 'find');
+  const schemaType = resolveSchemaType(config);
+
   if (!config) {
-    const schemaName = schema && _.isObject(schema) ? schema.schema : schema;
+    const schemaName = schema && _.isObject(schema) ? schemaType : schema;
     throw new Error(`Couldn't resolve schema ${schemaName} in function find.`);
   }
   if (!_.isString(tag)) {
@@ -57,12 +60,12 @@ export function find(schema, tag = '', params = {}, options = {}) {
   const endpoint = buildEndpoint(rsaaConfig.endpoint, params, options);
 
   const meta = {
-    source: config.request.resourceType || JSON_API_SOURCE,
-    schema: config.schema,
     tag,
     params,
     endpoint,
     options,
+    source: config.request.resourceType || JSON_API_SOURCE,
+    schema: schemaType,
     timestamp: Date.now(),
   };
 

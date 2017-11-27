@@ -1,10 +1,12 @@
 import _ from 'lodash';
 import rio from '../rio';
 import { createSchemasMap } from './ReduxApiStateDenormalizer';
-import { resolveSchemaName } from '../schemaConfig';
+import { resolveReferenceSchemaType } from '../resources';
 
 const emptyObject = {};
 Object.freeze(emptyObject);
+
+const resolveStorageMap = _.memoize((state, schemaPaths) => createSchemasMap(state, schemaPaths));
 
 /**
  * Connects rio configurations with denormalizer to simplify denormalization
@@ -26,13 +28,14 @@ export function getOne(one, state, schema = '') {
     throw new Error('State argument is invalid, should be an object.');
   }
 
-  const resolvedSchema = resolveSchemaName(one, schema);
+  const resolvedSchema = resolveReferenceSchemaType(one, schema);
 
-  const schemaPaths = rio.schemaPaths;
+  const schemaPaths = rio.resourcePaths;
   if (!schemaPaths[resolvedSchema]) {
     throw new Error(`Storage for resolved schema ${resolvedSchema} doesn't exists in state.`);
   }
-  const storageMap = createSchemasMap(state, schemaPaths);
+
+  const storageMap = resolveStorageMap(state, schemaPaths);
 
   return rio.denormalizer.denormalizeOne(one, storageMap, resolvedSchema);
 }

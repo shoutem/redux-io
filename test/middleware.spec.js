@@ -975,10 +975,11 @@ describe('Json api middleware', () => {
         const actionFirstObjFetched = batchedAction.payload[0];
         expect(actionFirstObjFetched.type).to.equal(OBJECT_FETCHED);
         const transformationFirstObj = {
-          relationshipProperties: {
-            author: 'author',
-            places: 'places',
+          relationships: {
+            author: { type: 'people' },
+            places: { type: 'place' },
           },
+          type: 'schema_test',
         };
         const expectedMetaFirstObject = {
           ...expectedMeta,
@@ -990,9 +991,10 @@ describe('Json api middleware', () => {
         const actionSecondObjFetched = batchedAction.payload[1];
         expect(actionSecondObjFetched.type).to.equal(OBJECT_FETCHED);
         const transformationSecondObj = {
-          relationshipProperties: {
-            owner: 'owner',
+          relationships: {
+            owner: { type: 'Mike' },
           },
+          type: 'schema_test',
         };
         const expectedMetaSecondObject = {
           ...expectedMeta,

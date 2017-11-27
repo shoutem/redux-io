@@ -13,6 +13,7 @@ import {
   REMOVE_SUCCESS,
   REMOVE_ERROR,
   REFERENCE_CLEAR,
+  REFERENCE_STATUS,
 } from './../consts';
 import {
   STATUS,
@@ -189,6 +190,14 @@ export default function resource(schema, initialState = {}) {
             busyStatus: busyStatus.IDLE,
             error: false,
           }
+        ));
+        return newState;
+      }
+      case REFERENCE_STATUS: {
+        const newState = createNewState(state);
+        setStatus(newState, updateStatus(
+          state[STATUS],
+          { ...payload }
         ));
         return newState;
       }

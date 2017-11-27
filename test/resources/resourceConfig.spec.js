@@ -2,7 +2,7 @@
 import { expect } from 'chai';
 import {
   buildEndpoint,
-} from '../src/schemaConfig';
+} from '../../src/resources';
 
 describe('Build endpoint', () => {
   it('static', () => {
