@@ -4,7 +4,7 @@ export const JSON_API_SOURCE = 'json-api';
 
 function resolveRelationshipType(relationship) {
   const data = _.get(relationship, 'data');
-  const path = _.isArray(data) ?  'data.0.type' : 'data.type';
+  const path = _.isArray(data) ? 'data.0.type' : 'data.type';
 
   return {
     type: _.get(relationship, path),
@@ -27,8 +27,8 @@ export function transform(object) {
 
   return {
     schema: {
+      relationships,
       type: resolveType(object),
-      relationships: relationships,
     },
     object: _.cloneDeep(object),
   };
