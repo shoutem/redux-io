@@ -1,4 +1,5 @@
 /* eslint-disable no-unused-expressions */
+import 'cross-fetch/polyfill';
 import { expect } from 'chai';
 import nock from 'nock';
 import sinon from 'sinon';
