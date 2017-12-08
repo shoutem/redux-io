@@ -30,15 +30,27 @@ function isIgnoredProperty(property, ignoredProperties = DEFAULT_IGNORED_PROPERT
   return !!ignoredProperties[property];
 }
 
+function isRelationshipLikeObject(propertyValue) {
+  return (
+    _.get(propertyValue, 'id') &&
+    _.get(propertyValue, 'type')
+  );
+}
+
 function isRelationship(schema, propertyKey, propertyValue) {
   if (_.get(schema, ['relationships', propertyKey])) {
     return true;
   }
 
   // TODO: use rio.options to turn off this feature
+  if (isRelationshipLikeObject(propertyValue)) {
+    return true;
+  }
+
+  // TODO: use rio.options to turn off this feature
   if (
-    _.get(propertyValue, 'id') &&
-    _.get(propertyValue, 'type')
+    _.isArray(propertyValue) &&
+    _.every(propertyValue, isRelationshipLikeObject)
   ) {
     return true;
   }
