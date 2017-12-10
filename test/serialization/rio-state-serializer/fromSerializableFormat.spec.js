@@ -3,8 +3,8 @@ import _ from 'lodash';
 import {
   fromSerializableFormat,
   toSerializableFormat,
-} from '../../src/serialization';
-import { STATUS } from '../../src/status';
+} from '../../../src/serialization';
+import { STATUS } from '../../../src/status';
 
 describe('fromSerializableFormat', () => {
   it('restores status from serialized data', () => {

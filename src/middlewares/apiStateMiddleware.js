@@ -2,13 +2,13 @@
 /* eslint no-console: ["error", {allow: ["warn", "error"] }] */
 import _ from 'lodash';
 import { batchActions } from 'redux-batched-actions';
-import rio from './rio';
+import rio from '../rio';
 import {
   validationStatus,
   busyStatus,
-} from './status';
-import Outdated from './outdated';
-import { JSON_API_SOURCE } from './standardizers/json-api-standardizer';
+} from '../status';
+import Outdated from '../outdated';
+import { JSON_API_SOURCE } from '../standardizers/json-api-standardizer';
 import {
   LOAD_REQUEST,
   LOAD_SUCCESS,
@@ -32,7 +32,7 @@ import {
   REFERENCE_STATUS,
   OBJECT_ERROR,
   COLLECTION_ERROR,
-} from './consts';
+} from '../consts';
 
 const actionsWithoutPayload = new Set([
   REMOVE_SUCCESS,
@@ -411,7 +411,6 @@ function handleNetworkAction(action, dispatch) {
   // First dispatch included objects
   const included = getIncluded(action.payload);
   included.map(item => dispatch(makeObjectAction(action, OBJECT_FETCHED, item)));
-
 
   const data = getData(action.payload);
   // Find handler for supported action type to make appropriate logic

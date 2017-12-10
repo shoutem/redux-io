@@ -26,12 +26,12 @@ import {
   REFERENCE_STATUS,
   apiStateMiddleware,
   JSON_API_SOURCE,
-} from '../src';
+} from '../../src';
 import {
   validationStatus,
   busyStatus,
   STATUS,
-} from '../src/status';
+} from '../../src/status';
 
 describe('Json api middleware', () => {
   let mockStore = configureMockStore([thunk, apiStateMiddleware]);

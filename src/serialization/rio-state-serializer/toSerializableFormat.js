@@ -1,6 +1,6 @@
 import _ from 'lodash';
 import { TYPE_KEY, ARRAY_TYPE } from './type';
-import { getStatus, STATUS } from '../status';
+import { getStatus, STATUS } from '../../status';
 
 function arrayToObject(arr, initialAttributes = {}) {
   return {

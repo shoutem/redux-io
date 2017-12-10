@@ -50,6 +50,7 @@ function isRelationship(schema, propertyKey, propertyValue) {
   // TODO: use rio.options to turn off this feature
   if (
     _.isArray(propertyValue) &&
+    !_.isEmpty(propertyValue) &&
     _.every(propertyValue, isRelationshipLikeObject)
   ) {
     return true;

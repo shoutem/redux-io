@@ -1,0 +1,508 @@
+{
+  "result": [
+    {
+      "id": {
+        "id": 277883161,
+        "type": "issues"
+      },
+      "schema": "issues"
+    },
+    {
+      "id": {
+        "id": 277868630,
+        "type": "issues"
+      },
+      "schema": "issues"
+    },
+    {
+      "id": {
+        "id": 262484580,
+        "type": "issues"
+      },
+      "schema": "issues"
+    },
+    {
+      "id": {
+        "id": 260238767,
+        "type": "issues"
+      },
+      "schema": "issues"
+    },
+    {
+      "id": {
+        "id": 255680325,
+        "type": "issues"
+      },
+      "schema": "issues"
+    },
+    {
+      "id": {
+        "id": 234844404,
+        "type": "issues"
+      },
+      "schema": "issues"
+    },
+    {
+      "id": {
+        "id": 198344726,
+        "type": "issues"
+      },
+      "schema": "issues"
+    }
+  ],
+  "entities": {
+    "users": {
+      "33297": {
+        "id": 33297,
+        "type": "users",
+        "attributes": {
+          "login": "paularmstrong",
+          "avatar_url": "https://avatars1.githubusercontent.com/u/33297?v=4",
+          "gravatar_id": "",
+          "url": "https://api.github.com/users/paularmstrong",
+          "html_url": "https://github.com/paularmstrong",
+          "followers_url": "https://api.github.com/users/paularmstrong/followers",
+          "following_url": "https://api.github.com/users/paularmstrong/following{/other_user}",
+          "gists_url": "https://api.github.com/users/paularmstrong/gists{/gist_id}",
+          "starred_url": "https://api.github.com/users/paularmstrong/starred{/owner}{/repo}",
+          "subscriptions_url": "https://api.github.com/users/paularmstrong/subscriptions",
+          "organizations_url": "https://api.github.com/users/paularmstrong/orgs",
+          "repos_url": "https://api.github.com/users/paularmstrong/repos",
+          "events_url": "https://api.github.com/users/paularmstrong/events{/privacy}",
+          "received_events_url": "https://api.github.com/users/paularmstrong/received_events",
+          "site_admin": false
+        }
+      },
+      "55398": {
+        "id": 55398,
+        "type": "users",
+        "attributes": {
+          "login": "kumar303",
+          "avatar_url": "https://avatars1.githubusercontent.com/u/55398?v=4",
+          "gravatar_id": "",
+          "url": "https://api.github.com/users/kumar303",
+          "html_url": "https://github.com/kumar303",
+          "followers_url": "https://api.github.com/users/kumar303/followers",
+          "following_url": "https://api.github.com/users/kumar303/following{/other_user}",
+          "gists_url": "https://api.github.com/users/kumar303/gists{/gist_id}",
+          "starred_url": "https://api.github.com/users/kumar303/starred{/owner}{/repo}",
+          "subscriptions_url": "https://api.github.com/users/kumar303/subscriptions",
+          "organizations_url": "https://api.github.com/users/kumar303/orgs",
+          "repos_url": "https://api.github.com/users/kumar303/repos",
+          "events_url": "https://api.github.com/users/kumar303/events{/privacy}",
+          "received_events_url": "https://api.github.com/users/kumar303/received_events",
+          "site_admin": false
+        }
+      },
+      "211411": {
+        "id": 211411,
+        "type": "users",
+        "attributes": {
+          "login": "gre",
+          "avatar_url": "https://avatars1.githubusercontent.com/u/211411?v=4",
+          "gravatar_id": "",
+          "url": "https://api.github.com/users/gre",
+          "html_url": "https://github.com/gre",
+          "followers_url": "https://api.github.com/users/gre/followers",
+          "following_url": "https://api.github.com/users/gre/following{/other_user}",
+          "gists_url": "https://api.github.com/users/gre/gists{/gist_id}",
+          "starred_url": "https://api.github.com/users/gre/starred{/owner}{/repo}",
+          "subscriptions_url": "https://api.github.com/users/gre/subscriptions",
+          "organizations_url": "https://api.github.com/users/gre/orgs",
+          "repos_url": "https://api.github.com/users/gre/repos",
+          "events_url": "https://api.github.com/users/gre/events{/privacy}",
+          "received_events_url": "https://api.github.com/users/gre/received_events",
+          "site_admin": false
+        }
+      },
+      "896093": {
+        "id": 896093,
+        "type": "users",
+        "attributes": {
+          "login": "entropitor",
+          "avatar_url": "https://avatars3.githubusercontent.com/u/896093?v=4",
+          "gravatar_id": "",
+          "url": "https://api.github.com/users/entropitor",
+          "html_url": "https://github.com/entropitor",
+          "followers_url": "https://api.github.com/users/entropitor/followers",
+          "following_url": "https://api.github.com/users/entropitor/following{/other_user}",
+          "gists_url": "https://api.github.com/users/entropitor/gists{/gist_id}",
+          "starred_url": "https://api.github.com/users/entropitor/starred{/owner}{/repo}",
+          "subscriptions_url": "https://api.github.com/users/entropitor/subscriptions",
+          "organizations_url": "https://api.github.com/users/entropitor/orgs",
+          "repos_url": "https://api.github.com/users/entropitor/repos",
+          "events_url": "https://api.github.com/users/entropitor/events{/privacy}",
+          "received_events_url": "https://api.github.com/users/entropitor/received_events",
+          "site_admin": false
+        }
+      },
+      "2788272": {
+        "id": 2788272,
+        "type": "users",
+        "attributes": {
+          "login": "richardson-trevor",
+          "avatar_url": "https://avatars3.githubusercontent.com/u/2788272?v=4",
+          "gravatar_id": "",
+          "url": "https://api.github.com/users/richardson-trevor",
+          "html_url": "https://github.com/richardson-trevor",
+          "followers_url": "https://api.github.com/users/richardson-trevor/followers",
+          "following_url": "https://api.github.com/users/richardson-trevor/following{/other_user}",
+          "gists_url": "https://api.github.com/users/richardson-trevor/gists{/gist_id}",
+          "starred_url": "https://api.github.com/users/richardson-trevor/starred{/owner}{/repo}",
+          "subscriptions_url": "https://api.github.com/users/richardson-trevor/subscriptions",
+          "organizations_url": "https://api.github.com/users/richardson-trevor/orgs",
+          "repos_url": "https://api.github.com/users/richardson-trevor/repos",
+          "events_url": "https://api.github.com/users/richardson-trevor/events{/privacy}",
+          "received_events_url": "https://api.github.com/users/richardson-trevor/received_events",
+          "site_admin": false
+        }
+      },
+      "8394418": {
+        "id": 8394418,
+        "type": "users",
+        "attributes": {
+          "login": "PhilippSpo",
+          "avatar_url": "https://avatars3.githubusercontent.com/u/8394418?v=4",
+          "gravatar_id": "",
+          "url": "https://api.github.com/users/PhilippSpo",
+          "html_url": "https://github.com/PhilippSpo",
+          "followers_url": "https://api.github.com/users/PhilippSpo/followers",
+          "following_url": "https://api.github.com/users/PhilippSpo/following{/other_user}",
+          "gists_url": "https://api.github.com/users/PhilippSpo/gists{/gist_id}",
+          "starred_url": "https://api.github.com/users/PhilippSpo/starred{/owner}{/repo}",
+          "subscriptions_url": "https://api.github.com/users/PhilippSpo/subscriptions",
+          "organizations_url": "https://api.github.com/users/PhilippSpo/orgs",
+          "repos_url": "https://api.github.com/users/PhilippSpo/repos",
+          "events_url": "https://api.github.com/users/PhilippSpo/events{/privacy}",
+          "received_events_url": "https://api.github.com/users/PhilippSpo/received_events",
+          "site_admin": false
+        }
+      },
+      "15350893": {
+        "id": 15350893,
+        "type": "users",
+        "attributes": {
+          "login": "jsheetzati",
+          "avatar_url": "https://avatars2.githubusercontent.com/u/15350893?v=4",
+          "gravatar_id": "",
+          "url": "https://api.github.com/users/jsheetzati",
+          "html_url": "https://github.com/jsheetzati",
+          "followers_url": "https://api.github.com/users/jsheetzati/followers",
+          "following_url": "https://api.github.com/users/jsheetzati/following{/other_user}",
+          "gists_url": "https://api.github.com/users/jsheetzati/gists{/gist_id}",
+          "starred_url": "https://api.github.com/users/jsheetzati/starred{/owner}{/repo}",
+          "subscriptions_url": "https://api.github.com/users/jsheetzati/subscriptions",
+          "organizations_url": "https://api.github.com/users/jsheetzati/orgs",
+          "repos_url": "https://api.github.com/users/jsheetzati/repos",
+          "events_url": "https://api.github.com/users/jsheetzati/events{/privacy}",
+          "received_events_url": "https://api.github.com/users/jsheetzati/received_events",
+          "site_admin": false
+        }
+      }
+    },
+    "issues": {
+      "198344726": {
+        "id": 198344726,
+        "type": "issues",
+        "attributes": {
+          "url": "https://api.github.com/repos/paularmstrong/normalizr/issues/200",
+          "repository_url": "https://api.github.com/repos/paularmstrong/normalizr",
+          "labels_url": "https://api.github.com/repos/paularmstrong/normalizr/issues/200/labels{/name}",
+          "comments_url": "https://api.github.com/repos/paularmstrong/normalizr/issues/200/comments",
+          "events_url": "https://api.github.com/repos/paularmstrong/normalizr/issues/200/events",
+          "html_url": "https://github.com/paularmstrong/normalizr/issues/200",
+          "number": 200,
+          "title": "Wanted: Flux example",
+          "state": "open",
+          "locked": false,
+          "assignee": null,
+          "assignees": [],
+          "milestone": null,
+          "comments": 1,
+          "created_at": "2017-01-02T14:47:06Z",
+          "updated_at": "2017-02-27T13:43:59Z",
+          "closed_at": null,
+          "author_association": "OWNER",
+          "body": "# Problem\r\n\r\nA simple and easy to follow example of using Normalizr with Flux would be a great addition to the [`/examples`](https://github.com/paularmstrong/normalizr/tree/master/examples) available.\r\n\r\n# Solution\r\n\r\nI haven't used Flux for over a year, so am not a good person to go and try implementing any example using it. This is a good chance for anyone looking to give back to open source to get started!"
+        },
+        "relationships": {
+          "user": {
+            "data": {
+              "id": 33297,
+              "type": "users"
+            }
+          },
+          "labels": {
+            "data": [
+              {
+                "id": 373884278,
+                "type": "labels"
+              },
+              {
+                "id": 373884446,
+                "type": "labels"
+              }
+            ]
+          }
+        }
+      },
+      "234844404": {
+        "id": 234844404,
+        "type": "issues",
+        "attributes": {
+          "url": "https://api.github.com/repos/paularmstrong/normalizr/issues/271",
+          "repository_url": "https://api.github.com/repos/paularmstrong/normalizr",
+          "labels_url": "https://api.github.com/repos/paularmstrong/normalizr/issues/271/labels{/name}",
+          "comments_url": "https://api.github.com/repos/paularmstrong/normalizr/issues/271/comments",
+          "events_url": "https://api.github.com/repos/paularmstrong/normalizr/issues/271/events",
+          "html_url": "https://github.com/paularmstrong/normalizr/issues/271",
+          "number": 271,
+          "title": "Typescript: schema does not exist",
+          "state": "open",
+          "locked": false,
+          "assignee": null,
+          "assignees": [],
+          "milestone": null,
+          "comments": 3,
+          "created_at": "2017-06-09T14:29:05Z",
+          "updated_at": "2017-07-26T16:07:59Z",
+          "closed_at": null,
+          "author_association": "NONE",
+          "body": "Hi,\r\n\r\nStruggling to get typescript working with normalizr v3.  Getting property 'schema' does not exist.\r\nHere are the lines of code that I have:\r\n\r\n```\r\nimport * as normalizr from 'normalizr';\r\nexport const programSchema = new normalizr.schema.Entity('programs');\r\n```\r\ntsconfig.json\r\n```\r\n\r\n{\r\n  \"compilerOptions\": {\r\n    \"allowJs\": true,\r\n    \"module\": \"es6\",\r\n    \"target\": \"es6\",\r\n    \"allowSyntheticDefaultImports\": true,\r\n    \"baseUrl\": \".\",\r\n    \"sourceMap\": true,\r\n    \"outDir\": \"ts-build\",\r\n    \"jsx\": \"preserve\",\r\n    \"suppressImplicitAnyIndexErrors\": true,\r\n    \"strict\": true,\r\n    \"paths\": {\r\n      \"normalizr\": [\"node_modules/normalizr/index.d.tsx\"],\r\n      \"redux-saga/effects\": [\"node_modules/redux-saga/effects.d.tsx\"]\r\n    }\r\n  },\r\n  \"exclude\": [\"node_modules\"]\r\n}\r\n\r\n```"
+        },
+        "relationships": {
+          "user": {
+            "data": {
+              "id": 15350893,
+              "type": "users"
+            }
+          },
+          "labels": {
+            "data": [
+              {
+                "id": 373884166,
+                "type": "labels"
+              },
+              {
+                "id": 373884447,
+                "type": "labels"
+              }
+            ]
+          }
+        }
+      },
+      "255680325": {
+        "id": 255680325,
+        "type": "issues",
+        "attributes": {
+          "url": "https://api.github.com/repos/paularmstrong/normalizr/issues/290",
+          "repository_url": "https://api.github.com/repos/paularmstrong/normalizr",
+          "labels_url": "https://api.github.com/repos/paularmstrong/normalizr/issues/290/labels{/name}",
+          "comments_url": "https://api.github.com/repos/paularmstrong/normalizr/issues/290/comments",
+          "events_url": "https://api.github.com/repos/paularmstrong/normalizr/issues/290/events",
+          "html_url": "https://github.com/paularmstrong/normalizr/issues/290",
+          "number": 290,
+          "title": "An empty array of results should produce an empty entity",
+          "labels": [],
+          "state": "open",
+          "locked": false,
+          "assignee": null,
+          "assignees": [],
+          "milestone": null,
+          "comments": 6,
+          "created_at": "2017-09-06T17:18:46Z",
+          "updated_at": "2017-10-28T10:03:32Z",
+          "closed_at": null,
+          "author_association": "NONE",
+          "body": "<!--\r\nIf you're looking for help implementing something with normalizr or dealing with data after it's been normalized, you're more likely to get a quick response from somewhere like StackOverflow: http://stackoverflow.com/questions/tagged/normalizr\r\n-->\r\n\r\n# Problem\r\n\r\nIf the data for an entity is an empty array then the entities container is not created.\r\n\r\n**Input**\r\n\r\nHere's how I'm using normalizr:\r\n\r\n```js\r\nconst { schema, normalize } = require('normalizr');\r\n\r\n// Define a users schema\r\nconst user = new schema.Entity('users');\r\n\r\n// Define your comments schema\r\nconst comment = new schema.Entity('comments', {\r\n  commenter: user\r\n});\r\n\r\n// Define your article\r\nconst article = new schema.Entity('articles', {\r\n  author: user,\r\n  comments: [ comment ]\r\n});\r\n\r\nconst data = {\r\n  id: \"123\",\r\n  author: {\r\n    id: \"1\",\r\n    name: \"Paul\"\r\n  },\r\n  title: \"My awesome blog post\",\r\n  // Imagine the API returned zero comments for this article:\r\n  comments: []\r\n};\r\nconsole.log(normalize(data, article));\r\n```\r\n\r\nHere's what I *actually* see when I run the above:\r\n\r\n```js\r\n{ \r\n  entities: { \r\n    users: { '1': [Object] }, \r\n    articles: { '123': [Object] },\r\n  },\r\n  result: '123',\r\n}\r\n```\r\n\r\nHere's what I expected to see:\r\n\r\n```js\r\n{ \r\n  entities: { \r\n    users: { '1': [Object] }, \r\n    articles: { '123': [Object] },\r\n    comments: {},\r\n  },\r\n  result: '123',\r\n}\r\n```\r\n\r\nIn other words, the `comments` entity should be initialized to an empty object since the schema specified that it should exist. Without this, the top level `entities` object would sometimes be \"normalized\" to an inconsistent state. This makes it hard for code that receives `entities` to know if it's working with the right object or if the caller made a mistake."
+        },
+        "relationships": {
+          "user": {
+            "data": {
+              "id": 55398,
+              "type": "users"
+            }
+          }
+        }
+      },
+      "260238767": {
+        "id": 260238767,
+        "type": "issues",
+        "attributes": {
+          "url": "https://api.github.com/repos/paularmstrong/normalizr/issues/293",
+          "repository_url": "https://api.github.com/repos/paularmstrong/normalizr",
+          "labels_url": "https://api.github.com/repos/paularmstrong/normalizr/issues/293/labels{/name}",
+          "comments_url": "https://api.github.com/repos/paularmstrong/normalizr/issues/293/comments",
+          "events_url": "https://api.github.com/repos/paularmstrong/normalizr/issues/293/events",
+          "html_url": "https://github.com/paularmstrong/normalizr/issues/293",
+          "number": 293,
+          "title": "Denormalization: depth attribute",
+          "labels": [],
+          "state": "open",
+          "locked": false,
+          "assignee": null,
+          "assignees": [],
+          "milestone": null,
+          "comments": 0,
+          "created_at": "2017-09-25T11:14:21Z",
+          "updated_at": "2017-09-25T11:14:21Z",
+          "closed_at": null,
+          "author_association": "NONE",
+          "body": "# Problem\r\n\r\nI want to be able to denormalize data upto a certain depth (e.g. 3 levels deep)\r\n\r\n**Input**\r\n\r\nHere's how I'm using normalizr:\r\n\r\n```js\r\n// Add as much relevant code and input as possible.\r\nexport const chapter = new schema.Entity('chapters', {lessons: [lesson]})\r\nexport const course = new schema.Entity('courses', {chapters: [chapter]})\r\nexport const track = new schema.Entity('tracks', {courses: [course]})\r\n\r\nexport const trackWithCourses = new schema.Entity('tracks', {courses: [new schema.Entity('courses')]})\r\n\r\ndenormalize('3', track, myEntities, 2);\r\n//equivalent to\r\ndenormalize('3', trackWithCourses, myEntities);\r\n```\r\n\r\n**Output**\r\n\r\nHere's what I expect to see when I run the above:\r\n\r\n```js\r\n{\r\n    id: 3,\r\n    courses: [{\r\n     id: ...\r\n     chapters: [4, 5]\r\n   }]\r\n}\r\n```\r\n\r\nHere's what I *actually* see when I run the above:\r\n\r\n```js\r\n{\r\n    id: 3,\r\n    courses: [{\r\n     id: ...\r\n     chapters: [{id: 4, name: ...}, {id: 5, ...}]\r\n   }]\r\n}\r\n```\r\n"
+        },
+        "relationships": {
+          "user": {
+            "data": {
+              "id": 896093,
+              "type": "users"
+            }
+          }
+        }
+      },
+      "262484580": {
+        "id": 262484580,
+        "type": "issues",
+        "attributes": {
+          "url": "https://api.github.com/repos/paularmstrong/normalizr/issues/296",
+          "repository_url": "https://api.github.com/repos/paularmstrong/normalizr",
+          "labels_url": "https://api.github.com/repos/paularmstrong/normalizr/issues/296/labels{/name}",
+          "comments_url": "https://api.github.com/repos/paularmstrong/normalizr/issues/296/comments",
+          "events_url": "https://api.github.com/repos/paularmstrong/normalizr/issues/296/events",
+          "html_url": "https://github.com/paularmstrong/normalizr/issues/296",
+          "number": 296,
+          "title": "Denormalizing circular references 🔄",
+          "labels": [],
+          "state": "open",
+          "locked": false,
+          "assignee": null,
+          "assignees": [],
+          "milestone": null,
+          "comments": 0,
+          "created_at": "2017-10-03T15:57:57Z",
+          "updated_at": "2017-10-03T20:09:20Z",
+          "closed_at": null,
+          "author_association": "NONE",
+          "body": "I am a bit confused about how this should work. The docs say:\r\n> If your schema and data have recursive references, only the first instance of an entity will be given. Subsequent references will be returned as the id provided.\r\n\r\nGiven this Schema and Entities:\r\n```js\r\nconst user = new schema.Entity('users');\r\nconst report = new schema.Entity('reports');\r\n\r\nuser.define({\r\n  reports: [report]\r\n});\r\nreport.define({\r\n  draftedBy: user,\r\n});\r\n\r\nconst entities = {\r\n  reports: {\r\n    '1': {\r\n      id: '1',\r\n      draftedBy: '2',\r\n    }\r\n  },\r\n  users: {\r\n    '2': {\r\n      id: '2',\r\n      reports: ['1']\r\n    }\r\n  }\r\n};\r\n```\r\nI would expect the following output when denormalizing\r\n```js\r\nexpect(denormalize('1', report, entities)).toEqual({\r\n  id: '1',\r\n  draftedBy: {\r\n    id: '2',\r\n    reports: ['1']\r\n  }\r\n})\r\n```\r\n\r\nHowever what we get when calling denormalize is a circular structure:\r\n![image](https://user-images.githubusercontent.com/8394418/31134969-f9ae2f38-a863-11e7-96f8-fea36c1b3a25.png)\r\n\r\nI think [this test](https://github.com/paularmstrong/normalizr/blob/8dbcd8d440855b46defecd7b949f6298b924d378/src/schemas/__tests__/Entity.test.js#L210) is supposed to test the behavior I just described.\r\n\r\nLooking at the snapshot of the non-immutable JS version we can also see a Circular reference:\r\nhttps://github.com/paularmstrong/normalizr/blob/c9c8c8bfd616c76446c3d687c6c6d3cd1c48550c/src/schemas/__tests__/__snapshots__/Entity.test.js.snap#L98-L116\r\n\r\nSo it seems like the implementation is not following the documentation here.\r\n\r\nI also created a [CodeSandbox](https://codesandbox.io/s/rl4ll6vx8m) for this issue. 👀"
+        },
+        "relationships": {
+          "user": {
+            "data": {
+              "id": 8394418,
+              "type": "users"
+            }
+          }
+        }
+      },
+      "277868630": {
+        "id": 277868630,
+        "type": "issues",
+        "attributes": {
+          "url": "https://api.github.com/repos/paularmstrong/normalizr/issues/309",
+          "repository_url": "https://api.github.com/repos/paularmstrong/normalizr",
+          "labels_url": "https://api.github.com/repos/paularmstrong/normalizr/issues/309/labels{/name}",
+          "comments_url": "https://api.github.com/repos/paularmstrong/normalizr/issues/309/comments",
+          "events_url": "https://api.github.com/repos/paularmstrong/normalizr/issues/309/events",
+          "html_url": "https://github.com/paularmstrong/normalizr/issues/309",
+          "number": 309,
+          "title": "Feature request: flowtype the library",
+          "labels": [],
+          "state": "open",
+          "locked": false,
+          "assignee": null,
+          "assignees": [],
+          "milestone": null,
+          "comments": 0,
+          "created_at": "2017-11-29T18:59:41Z",
+          "updated_at": "2017-11-29T19:00:02Z",
+          "closed_at": null,
+          "author_association": "NONE",
+          "body": "I've been using normalizr for a month now and it helps us a lot building an API/data library. thanks for that.\r\nThe one thing that I find missing is it is difficult to have the objects typed properly regarding the schema provided by JS code.\r\n\r\nMore simply, I imagine we could at least have this possible:\r\n\r\n```js\r\n//@flow\r\n\r\nclass UserSchema extends schema.Entity<{ id: string, name: string, age: number }> {}\r\n\r\nconst userSchema = new UserSchema();\r\nconst mySchema = { users: [ user ] }\r\nconst entities = { users: { '1': { id: '1', name: \"gre\", age: 28 } };\r\nconst denormalizedData = denormalize({ users: [ 1 ] }, mySchema, entities);\r\n\r\n// denormalizedData type inferred to `{ users: Array<{ id: string, name: string, age: number }> }`\r\n```\r\n\r\nNB: i'm not sure an instance can hold a parametric type, therefore I have made class for UserSchema in this example.\r\nNB: more advanced usecase is obviously to make this work when you compose schemas, I imagine you could also express this in flowtype so things get even more inferred so user have less code to write. The only thing we can't really infer is the field that are not part of the normalization ;)\r\n\r\nCheers"
+        },
+        "relationships": {
+          "user": {
+            "data": {
+              "id": 211411,
+              "type": "users"
+            }
+          }
+        }
+      },
+      "277883161": {
+        "id": 277883161,
+        "type": "issues",
+        "attributes": {
+          "url": "https://api.github.com/repos/paularmstrong/normalizr/issues/310",
+          "repository_url": "https://api.github.com/repos/paularmstrong/normalizr",
+          "labels_url": "https://api.github.com/repos/paularmstrong/normalizr/issues/310/labels{/name}",
+          "comments_url": "https://api.github.com/repos/paularmstrong/normalizr/issues/310/comments",
+          "events_url": "https://api.github.com/repos/paularmstrong/normalizr/issues/310/events",
+          "html_url": "https://github.com/paularmstrong/normalizr/issues/310",
+          "number": 310,
+          "title": "Add ability to pass down additional information to `processStrategy`",
+          "labels": [],
+          "state": "open",
+          "locked": false,
+          "assignee": null,
+          "assignees": [],
+          "milestone": null,
+          "comments": 1,
+          "created_at": "2017-11-29T19:46:47Z",
+          "updated_at": "2017-12-01T20:04:32Z",
+          "closed_at": null,
+          "author_association": "NONE",
+          "body": "# Problem\r\nThere are times when I need information about ancestors higher than a parent when I'm processing a given schema using the `processStrategy`. \r\n\r\n# Current Solution\r\nOne technique that we can currently use to do this sort of thing is to map the additional information into the resulting value response from the `processStrategy`. This way the child can look at the `parent` arg in its `processStrategy`. The downside of this is that the additional 'pass-through' information gets mapped into the ancestor's entity result after normalization. \r\n\r\n# Desired Result\r\nIt would instead be nice to be able to pass down arbitrary information to descendants as they are being processed.\r\n\r\nAn example implementation of what I'm looking to do can be found in [this StackOverflow question](https://stackoverflow.com/questions/47535589/accessing-parent-properties-from-processstrategy)."
+        },
+        "relationships": {
+          "user": {
+            "data": {
+              "id": 2788272,
+              "type": "users"
+            }
+          }
+        }
+      }
+    },
+    "labels": {
+      "373884166": {
+        "id": 373884166,
+        "type": "labels",
+        "attributes": {
+          "url": "https://api.github.com/repos/paularmstrong/normalizr/labels/Priority:%20Low",
+          "name": "Priority: Low",
+          "color": "009800",
+          "default": false
+        }
+      },
+      "373884278": {
+        "id": 373884278,
+        "type": "labels",
+        "attributes": {
+          "url": "https://api.github.com/repos/paularmstrong/normalizr/labels/Status:%20Available",
+          "name": "Status: Available",
+          "color": "bfe5bf",
+          "default": false
+        }
+      },
+      "373884446": {
+        "id": 373884446,
+        "type": "labels",
+        "attributes": {
+          "url": "https://api.github.com/repos/paularmstrong/normalizr/labels/Type:%20Enhancement",
+          "name": "Type: Enhancement",
+          "color": "84b6eb",
+          "default": false
+        }
+      },
+      "373884447": {
+        "id": 373884447,
+        "type": "labels",
+        "attributes": {
+          "url": "https://api.github.com/repos/paularmstrong/normalizr/labels/Type:%20Bug",
+          "name": "Type: Bug",
+          "color": "e11d21",
+          "default": false
+        }
+      }
+    }
+  }
+}

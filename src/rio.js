@@ -1,4 +1,4 @@
- import _ from 'lodash';
+import _ from 'lodash';
 import { validateResourceConfig, resolveSchemaType } from './resources';
 import { JSON_API_SOURCE, transform } from './standardizers/json-api-standardizer';
 
