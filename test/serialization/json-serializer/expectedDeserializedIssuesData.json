@@ -1,53 +1,32 @@
 {
   "result": [
     {
-      "id": {
-        "id": 277883161,
-        "type": "issues"
-      },
-      "schema": "issues"
+      "id": 277883161,
+      "type": "issues"
     },
     {
-      "id": {
-        "id": 277868630,
-        "type": "issues"
-      },
-      "schema": "issues"
+      "id": 277868630,
+      "type": "issues"
     },
     {
-      "id": {
-        "id": 262484580,
-        "type": "issues"
-      },
-      "schema": "issues"
+      "id": 262484580,
+      "type": "issues"
     },
     {
-      "id": {
-        "id": 260238767,
-        "type": "issues"
-      },
-      "schema": "issues"
+      "id": 260238767,
+      "type": "issues"
     },
     {
-      "id": {
-        "id": 255680325,
-        "type": "issues"
-      },
-      "schema": "issues"
+      "id": 255680325,
+      "type": "issues"
     },
     {
-      "id": {
-        "id": 234844404,
-        "type": "issues"
-      },
-      "schema": "issues"
+      "id": 234844404,
+      "type": "issues"
     },
     {
-      "id": {
-        "id": 198344726,
-        "type": "issues"
-      },
-      "schema": "issues"
+      "id": 198344726,
+      "type": "issues"
     }
   ],
   "entities": {

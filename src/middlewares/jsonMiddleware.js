@@ -1,9 +1,11 @@
+import _ from 'lodash';
 import {
   LOAD_SUCCESS,
   UPDATE_SUCCESS,
   CREATE_SUCCESS,
 } from '../consts';
 import rio from '../rio';
+import { JSON_API_SOURCE } from '../standardizers/json-api-standardizer';
 
 function isValidAction(action) {
   if (
@@ -27,11 +29,6 @@ function isValidAction(action) {
     return false;
   }
 
-  // Source value exists but check if rio support standardization of such source type
-  if (!rio.getStandardizer(meta.source)) {
-    return false;
-  }
-
   // Check that schema is defined
   const { schema } = meta;
   if (!schema) {
@@ -47,6 +44,12 @@ function isValidAction(action) {
   }
 
   return true;
+}
+
+function getItem(reference, entities) {
+  const { id, type } = reference;
+  console.log('getItem', id, type, _.get(entities, [type, id]));
+  return _.get(entities, [type, id]);
 }
 
 export default store => next => action => {
@@ -65,11 +68,42 @@ export default store => next => action => {
   const resource = rio.getResource(schema);
 
   const { serializer } = resource;
-  const jsonApiPayload = serializer.deserialize(payload);
+  const deserializedPayload = serializer.deserialize(payload);
 
-  // TODO: transform deserilizae result into json-api payload with included and data
+  // transform deserializedData result into json-api payload with
+  // data and included properties
+  const { result, entities } = deserializedPayload;
+  const isArray = _.isArray(result);
+  const data = !isArray ?
+    getItem(result, entities) :
+    _.map(result, (resultItem) => getItem(resultItem, entities));
+
+  const dataEntityReferences = [].concat(result);
+  const included = _.reduce(
+    entities,
+    (acc, schemaEntities) => {
+      const nonDataEntities = _
+        .chain(schemaEntities)
+        .toArray()
+        .differenceWith(dataEntityReferences, (a, b) => a.id === b.id && a.type === b.type)
+        .value();
+      acc.push(...nonDataEntities);
+      return acc;
+    },
+    []
+  );
+
+  const jsonApiPayload = {
+    data,
+    included,
+  };
+
   const jsonApiAction = {
     ...action,
+    meta: {
+      ...action.meta,
+      source: JSON_API_SOURCE,
+    },
     payload: jsonApiPayload,
   };
 

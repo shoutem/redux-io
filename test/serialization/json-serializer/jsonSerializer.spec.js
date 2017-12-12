@@ -170,11 +170,11 @@ describe('jsonSerializer with Github issues API', () => {
     const serializer = new JsonSerializer(issueOrPullRequestSchema);
     const result = serializer.deserialize(issuesData);
     
-    //console.log(result);
     // use it to refresh expected seriazlied data
-    //const out = JSON.stringify(result, null, 2);
-    //fs.writeFileSync(path.resolve(__dirname, './expectedDeserializedIssuesData.json'), out);
+    // const out = JSON.stringify(result, null, 2);
+    // fs.writeFileSync(path.resolve(__dirname, './expectedDeserializedIssuesData.json'), out);
 
+    // TODO: verify expectedDeserializedIssuesData (deductive relationships)
     expect(result).to.be.deep.equal(expectedDeserializedIssuesData);
   });
 
