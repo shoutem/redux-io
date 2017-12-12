@@ -12,7 +12,6 @@ export default class JsonSerializer extends CustomSerializer {
 
   deserialize(data) {
     const normalizrResult = normalize(data, this.schema);
-    //console.log('normalizr', JSON.stringify(normalizrResult, null, 2));
 
     const jsonApiEntities = _.mapValues(
       normalizrResult.entities,
@@ -21,8 +20,6 @@ export default class JsonSerializer extends CustomSerializer {
         schemaEntity => jsonApiNormalize(schemaEntity)
       )
     );
-
-    //console.log('jsonApiEntities', JSON.stringify(jsonApiEntities, null, 2));
 
     const jsonApiResult = {
       result: normalizrResult.result,
