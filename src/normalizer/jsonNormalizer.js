@@ -37,8 +37,12 @@ function isRelationshipLikeObject(propertyValue) {
   );
 }
 
+function getSchemaRelationship(schema, relationship) {
+  return _.get(schema, ['relationships', relationship]);
+}
+
 function isRelationship(schema, propertyKey, propertyValue) {
-  if (_.get(schema, ['relationships', propertyKey])) {
+  if (getSchemaRelationship(schema, propertyKey)) {
     return true;
   }
 
@@ -91,8 +95,12 @@ export function normalizeItem(item, schema = null) {
       } else if (_.isPlainObject(propertyValue)) {
         const data = normalizeRelationshipObject(propertyValue);
         _.set(normalizedItem, ['relationships', propertyKey], { data });
-      } else {
+      } else if (_.isEmpty(propertyValue)) {
         _.set(normalizedItem, ['relationships', propertyKey], { data: null });
+      } else if (getSchemaRelationship(resolvedSchema, propertyKey)) {
+        const { type } = getSchemaRelationship(resolvedSchema, propertyKey);
+        const data = { id: propertyValue, type };
+        _.set(normalizedItem, ['relationships', propertyKey], { data });
       }
     } else {
       _.set(normalizedItem, ['attributes', propertyKey], propertyValue);

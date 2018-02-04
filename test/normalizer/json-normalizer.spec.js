@@ -33,6 +33,12 @@ const expectedNormalizedItem = {
         type: 'app.owner',
       },
     },
+    car: {
+      data: {
+        id: '2',
+        type: 'app.car',
+      },
+    },
   },
 };
 
@@ -40,6 +46,7 @@ const transformation = {
   relationships: {
     owners: { type: 'app.owner' },
     parent: { type: 'app.owner' },
+    car: { type: 'app.car' },
   },
 };
 
@@ -65,8 +72,9 @@ describe('json-normalizer with defined schema', () => {
       parent: {
         id: 'a',
         type: 'app.owner',
-        name: 'c',
+        name: 'b',
       },
+      car: '2',
     };
     denormalizedItem[STATUS] = updateStatus(
       createStatus(),
@@ -102,6 +110,7 @@ describe('json-normalizer with defined schema', () => {
         type: 'app.owner',
         name: 'c',
       },
+      car: '2',
     };
     denormalizedItem[STATUS] = updateStatus(
       createStatus()
@@ -134,6 +143,7 @@ describe('json-normalizer with defined schema', () => {
         type: 'app.owner',
         name: 'c',
       },
+      car: '2',
     };
     denormalizedItem[STATUS] = updateStatus(
       createStatus(),
@@ -173,6 +183,7 @@ describe('json-normalizer with defined schema', () => {
         type: 'app.owner',
         name: 'c',
       },
+      car: '2',
     };
     denormalizedItem[STATUS] = updateStatus(
       createStatus(),
@@ -182,6 +193,7 @@ describe('json-normalizer with defined schema', () => {
             owners: { type: 'app.owner' },
             parent: { type: 'app.owner' },
             children: { type: 'app.owner' },
+            car: { type: 'app.car' },
           },
         },
       }
@@ -210,6 +222,7 @@ describe('json-normalizer with defined schema', () => {
         },
       ],
       parent: null,
+      car: '2',
     };
     denormalizedItem[STATUS] = updateStatus(
       createStatus(),
@@ -218,6 +231,7 @@ describe('json-normalizer with defined schema', () => {
           relationships: {
             owners: { type: 'app.owner' },
             parent: { type: 'app.owner' },
+            car: { type: 'app.car' },
           },
         },
       }
@@ -249,6 +263,7 @@ describe('json-normalizer with defined schema', () => {
         },
       ],
       parent: [],
+      car: '2',
     };
     denormalizedItem[STATUS] = updateStatus(
       createStatus(),
@@ -257,6 +272,7 @@ describe('json-normalizer with defined schema', () => {
           relationships: {
             owners: { type: 'app.owner' },
             parent: { type: 'app.owner' },
+            car: { type: 'app.car' },
           },
         },
       }
@@ -292,6 +308,7 @@ describe('json-normalizer with defined schema', () => {
         type: 'app.owner',
         name: 'c',
       },
+      car: '2',
     };
     const denormalizedList = [
       Object.assign({}, denormalizedItem),
@@ -307,6 +324,7 @@ describe('json-normalizer with defined schema', () => {
             relationships: {
               owners: { type: 'app.owner' },
               parent: { type: 'app.owner' },
+              car: { type: 'app.car' },
             },
           },
         }
@@ -350,6 +368,7 @@ describe('json-normalizer with no explicit schema', () => {
         type: 'app.owner',
         name: 'c',
       },
+      car: '2',
     };
 
     const normalizedItem = normalizeItem(denormalizedItem);
@@ -379,6 +398,7 @@ describe('json-normalizer with no explicit schema', () => {
         type: 'app.owner',
         name: 'c',
       },
+      car: '2',
     };
 
     const normalizedItem = normalizeItem(denormalizedItem);
@@ -404,6 +424,7 @@ describe('json-normalizer with no explicit schema', () => {
         },
       ],
       parent: [],
+      car: '2',
     };
 
     const expectedNormalizedItemWithNoParent = _.cloneDeep(expectedNormalizedItem);
@@ -436,6 +457,7 @@ describe('json-normalizer with no explicit schema', () => {
         type: 'app.owner',
         name: 'c',
       },
+      car: '2',
     };
     const denormalizedList = [
       Object.assign({}, denormalizedItem),
@@ -449,7 +471,7 @@ describe('json-normalizer with no explicit schema', () => {
       Object.assign({}, expectedNormalizedItem),
       Object.assign({}, expectedNormalizedItem),
     ];
-   
+
     expect(normalizedList).to.be.deep.equal(expectedNormalizedList);
   });
 });
