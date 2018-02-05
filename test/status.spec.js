@@ -263,6 +263,50 @@ describe('Status metadata', () => {
     expect(destObj[STATUS]).to.be.deep.equal(status);
   });
 
+  it('cloneStatus clones status on destination object from source array', () => {
+    const status = updateStatus(
+      createStatus(),
+      {
+        busyStatus: busyStatus.BUSY,
+        validationStatus: validationStatus.INVALID,
+        transformation: {
+          a: 'a',
+          b: 'b',
+        },
+      }
+    );
+    deepFreeze(status);
+    const sourceObj = [];
+    setStatus(sourceObj, status);
+
+    const destObj = {};
+    cloneStatus(sourceObj, destObj);
+
+    expect(destObj[STATUS]).to.be.deep.equal(status);
+  });
+
+  it('cloneStatus clones status on destination array from source object', () => {
+    const status = updateStatus(
+      createStatus(),
+      {
+        busyStatus: busyStatus.BUSY,
+        validationStatus: validationStatus.INVALID,
+        transformation: {
+          a: 'a',
+          b: 'b',
+        },
+      }
+    );
+    deepFreeze(status);
+    const sourceObj = {};
+    setStatus(sourceObj, status);
+
+    const destObj = [];
+    cloneStatus(sourceObj, destObj);
+
+    expect(destObj[STATUS]).to.be.deep.equal(status);
+  });
+
   it('update status updates timestamp to newer', (done) => {
     const obj = {};
     setStatus(obj, createStatus());
