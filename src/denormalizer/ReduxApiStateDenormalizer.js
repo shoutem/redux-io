@@ -1,7 +1,8 @@
-import ReduxDenormalizer from './ReduxDenormalizer';
-import RioCache from '../cache/RioCache';
 import _ from 'lodash';
-import { cloneStatus, getStatus } from './../status';
+import { CircularDenormalizationError, TooDeepDenormalizationError } from '@shoutem/json-api-denormalizer';
+import RioCache from '../cache/RioCache';
+import { cloneStatus, getStatus } from '../status';
+import ReduxDenormalizer from './ReduxDenormalizer';
 
 /**
  * Created getStore for ReduxDenormalizer by using storageMap to find relationships.
@@ -86,8 +87,8 @@ export default class ReduxApiStateDenormalizer extends ReduxDenormalizer {
    * @param storeSchemasPaths - { schema: pathInStoreToSchema }
    */
   constructor(getStore, storeSchemasPaths) {
-    // TODO(Braco) - optimize relationships cache
-    // TODO(Braco) - use state entities to detect change
+    // TODO - optimize relationships cache
+    // TODO - use state entities to detect change
     if (getStore && storeSchemasPaths) {
       // FindStorage mode
       super(() => createSchemasMap(getStore(), storeSchemasPaths));
@@ -122,11 +123,24 @@ export default class ReduxApiStateDenormalizer extends ReduxDenormalizer {
    * @returns {{}}
    */
   denormalizeItem(itemDescriptor) {
-    let item = this.cache.getValidItem(itemDescriptor);
-    if (!item) {
-      item = this.cache.add(super.denormalizeItem(itemDescriptor));
+    const item = this.cache.getValidItem(itemDescriptor);
+    if (item) {
+      return item;
     }
-    return item;
+
+    try {
+      return this.cache.add(super.denormalizeItem(itemDescriptor));
+    } catch (error) {
+      if (error instanceof CircularDenormalizationError) {
+        return itemDescriptor;
+      }
+
+      if (error instanceof TooDeepDenormalizationError) {
+        return itemDescriptor;
+      }
+
+      throw error;
+    }
   }
 
   /**

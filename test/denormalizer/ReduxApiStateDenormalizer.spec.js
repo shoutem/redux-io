@@ -49,6 +49,7 @@ function createStorageMap() {
   return {
     type1: 'storage.type1',
     'type2.test': 'storage["type2.test"]',
+    typeA: 'storage.typeA',
   };
 }
 
@@ -139,6 +140,34 @@ const getStore = () => {
           },
         },
       },
+      typeA: {
+        typeAId1: {
+          id: 'typeAId1',
+          type: 'typeA',
+          attributes: {
+            name: 'typeAId1',
+          },
+          relationships: {
+            typeArel: {
+              data: [
+                {id: 'typeAId2', type: 'typeA'},
+              ],
+            },
+          },
+        },
+        typeAId2: {
+          id: 'typeAId2',
+          type: 'typeA',
+          attributes: {name: 'typeAId2'},
+          relationships: {
+            typeArel: {
+              data: [
+                {id: 'typeAId1', type: 'typeA'},
+              ],
+            },
+          },
+        },
+      },
     },
   };
   store.storage.type1.type1Id1[STATUS] = createStatus();
@@ -147,6 +176,8 @@ const getStore = () => {
   store.storage.type1.type1Id4[STATUS] = createStatus();
   store.storage.type1.type1Id5[STATUS] = createStatus();
   store.storage['type2.test'].type2Id1[STATUS] = createStatus();
+  store.storage.typeA.typeAId1[STATUS] = createStatus();
+  store.storage.typeA.typeAId2[STATUS] = createStatus();
   return store;
 };
 function getModifiedStore(store) {
@@ -291,6 +322,39 @@ describe('ReduxApiStateDenormalizer', () => {
         mergeStatus(denormalizer.denormalizeOne('type1Id1', storage, 'type1'));
       assert.isObject(denormalizedData[STATUS]);
       assert.isObject(denormalizedData['type2.test'][STATUS]);
+      assert.shallowDeepEqual(
+        denormalizedData,
+        expectedData,
+        'item not denormalized correctly'
+      );
+    });
+    it('denormalizes valid id with circular dependency', () => {
+      const denormalizer = new ReduxApiStateDenormalizer();
+      const storage = createSchemasMap(getStore(), createStorageMap());
+      const expectedData = {
+        id: 'typeAId1',
+        type: 'typeA',
+        [STATUS]: storage['typeA']['typeAId1'][STATUS],
+        name: 'typeAId1',
+        typeArel: [
+          {
+            id: 'typeAId2',
+            type: 'typeA',
+            name: 'typeAId2',
+            [STATUS]: storage['typeA']['typeAId2'][STATUS],
+            typeArel: [
+              {
+                id: 'typeAId1',
+                type: 'typeA',
+              },
+            ],
+          },
+        ],
+      };
+
+      const denormalizedData =
+        mergeStatus(denormalizer.denormalizeOne('typeAId1', storage, 'typeA'));
+      assert.isObject(denormalizedData[STATUS]);
       assert.shallowDeepEqual(
         denormalizedData,
         expectedData,
@@ -660,4 +724,3 @@ describe('ReduxApiStateDenormalizer', () => {
     });
   });
 });
-
