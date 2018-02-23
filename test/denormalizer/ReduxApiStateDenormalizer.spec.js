@@ -360,6 +360,8 @@ describe('ReduxApiStateDenormalizer', () => {
         expectedData,
         'item not denormalized correctly'
       );
+
+      denormalizer.denormalizeOne('typeAId1', storage, 'typeA');
     });
     it('throws error when denormalizing primitive one and no schema provided', () => {
       const denormalizer = new ReduxApiStateDenormalizer();

@@ -42,7 +42,6 @@ function isCacheValid(cachedModificationTime, currentModificationTime) {
 export function isReferenceChanged(reference, cachedReference) {
   const cachedReferenceModificationTime = getModificationTime(cachedReference);
   const currentReferenceModificationTime = getModificationTime(reference);
-
   return !isCacheValid(cachedReferenceModificationTime, currentReferenceModificationTime);
 }
 
@@ -70,12 +69,14 @@ export function getReferenceUniqueKey(reference) {
 export default class RioCache {
   constructor(getNormalizedItem) {
     this.cache = {};
+    this.traversedKeys = new Set();
     // It is expected to return descriptor for items that can't be found.
     this.getNormalizedItem = getNormalizedItem;
   }
 
   flush() {
     this.cache = {};
+    this.traversedKeys = new Set();
   }
 
   delete(reference) {
@@ -99,11 +100,30 @@ export default class RioCache {
   // eslint-disable-next-line consistent-return
   getValidItem(itemDescriptor) {
     const normalizedItem = this.getNormalizedItem(itemDescriptor);
-    if (normalizedItem && this.isItemCacheValid(normalizedItem)) {
-      return this.get(normalizedItem);
+
+    if (!normalizedItem) {
+      this.delete(normalizedItem);
+      return;
     }
-    // Delete invalid cache
-    this.delete(normalizedItem);
+
+    const uniqueKey = getReferenceUniqueKey(itemDescriptor);
+
+    if (this.traversedKeys.has(uniqueKey)) {
+      const cachedItem = this.get(normalizedItem);
+      this.traversedKeys.delete(uniqueKey);
+      return cachedItem;
+    }
+
+    this.traversedKeys.add(uniqueKey);
+
+    if (!this.isItemCacheValid(normalizedItem)) {
+      this.delete(normalizedItem);
+      this.traversedKeys.delete(uniqueKey);
+      return;
+    }
+
+    this.traversedKeys.delete(uniqueKey);
+    return this.get(normalizedItem);
   }
 
   /**
@@ -222,11 +242,12 @@ export default class RioCache {
     const cachedRelationship = cachedItem[relationshipName];
 
     if (isSingleRelation(relationship)) {
-      return this.isSingleRelationshipModified(relationship, cachedRelationship);
+      const singleResult = this.isSingleRelationshipModified(relationship, cachedRelationship);
+      return singleResult;
     } else if (isCollection(relationship)) {
-      return this.areCollectionItemsChanged(relationship, cachedRelationship);
+      const collectionResult = this.areCollectionItemsChanged(relationship, cachedRelationship);
+      return collectionResult;
     }
-
     throw Error('Unknown relationship format!');
   }
 }
