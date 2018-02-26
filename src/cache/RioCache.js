@@ -123,6 +123,7 @@ export default class RioCache {
     }
 
     this.traversedKeys.delete(uniqueKey);
+
     return this.get(normalizedItem);
   }
 
@@ -242,11 +243,9 @@ export default class RioCache {
     const cachedRelationship = cachedItem[relationshipName];
 
     if (isSingleRelation(relationship)) {
-      const singleResult = this.isSingleRelationshipModified(relationship, cachedRelationship);
-      return singleResult;
+      return this.isSingleRelationshipModified(relationship, cachedRelationship);
     } else if (isCollection(relationship)) {
-      const collectionResult = this.areCollectionItemsChanged(relationship, cachedRelationship);
-      return collectionResult;
+      return this.areCollectionItemsChanged(relationship, cachedRelationship);
     }
     throw Error('Unknown relationship format!');
   }
