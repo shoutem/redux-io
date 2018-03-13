@@ -56,9 +56,9 @@
     "sinon": "^1.17.4"
   },
   "dependencies": {
-    "@shoutem/json-api-denormalizer": "^0.3.5",
+    "@shoutem/json-api-denormalizer": "0.3.5",
     "lodash": "^4.13.1",
-    "normalizr": "^3.2.4",
+    "vedrani-json-api-normalizr": "^3.2.4",
     "redux": "^3.3.1",
     "redux-api-middleware": "2.0.1",
     "redux-batched-actions": "^0.1.2",

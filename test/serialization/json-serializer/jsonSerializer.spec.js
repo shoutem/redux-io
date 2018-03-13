@@ -2,7 +2,7 @@ import _ from 'lodash';
 import { expect } from 'chai';
 import fs from 'fs';
 import path from 'path';
-import { normalize, schema, denormalize } from 'normalizr';
+import { normalize, schema, denormalize } from 'vedrani-json-api-normalizr';
 import { normalize as jsonApiNormalize } from '../../../src/normalizer';
 import { JsonSerializer } from '../../../src/serialization';
 import issuesData from './issuesData';
@@ -31,8 +31,8 @@ const normalizedArticleData = {
     type: 'articles',
   },
   entities: {
-    articles: { 
-      '123': { 
+    articles: {
+      '123': {
         id: '123',
         type: 'articles',
         author: {
@@ -72,7 +72,7 @@ const articleCommentSchema = new schema.Entity(
 );
 const articleSchema = new schema.Entity(
   'articles',
-  { 
+  {
     author: articleUserSchema,
     comments: [ articleCommentSchema ]
   },
@@ -92,7 +92,7 @@ describe('jsonSerializer', () => {
 
     const articleJsonApi = jsonApiNormalize(article);
 
-    const expectedArticleJsonApi = { 
+    const expectedArticleJsonApi = {
       id: '123',
       type: 'articles',
       attributes: {
@@ -125,7 +125,7 @@ describe('jsonSerializer', () => {
       title: 'My awesome blog post',
       comments: ['324'],
     };
-    
+
     expect(result).to.be.deep.equal(denormalizedData);
   });
 });
@@ -169,7 +169,7 @@ describe('jsonSerializer with Github issues API', () => {
   it('deserilize data to json-api', () => {
     const serializer = new JsonSerializer(issueOrPullRequestSchema);
     const result = serializer.deserialize(issuesData);
-    
+
     // use it to refresh expected seriazlied data
     // const out = JSON.stringify(result, null, 2);
     // fs.writeFileSync(path.resolve(__dirname, './expectedDeserializedIssuesData.json'), out);
@@ -188,7 +188,7 @@ describe('jsonSerializer with Github issues API', () => {
       title: 'My awesome blog post',
       comments: ['324'],
     };
-    
+
     expect(result).to.be.deep.equal(denormalizedData);
   });
   */

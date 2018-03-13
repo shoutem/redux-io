@@ -1,6 +1,6 @@
 import _ from 'lodash';
 import CustomSerializer from './CustomSerializer';
-import { normalize } from 'normalizr';
+import { normalize } from 'vedrani-json-api-normalizr';
 import { normalize as jsonApiNormalize } from '../normalizer';
 
 export default class JsonSerializer extends CustomSerializer {
@@ -30,6 +30,6 @@ export default class JsonSerializer extends CustomSerializer {
   }
 
   serialize(data) {
-    // TODO: implement serializing data back to json 
+    // TODO: implement serializing data back to json
   }
 }

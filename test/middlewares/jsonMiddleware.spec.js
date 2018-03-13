@@ -1,6 +1,6 @@
 import _ from 'lodash';
 import { expect } from 'chai';
-import { normalize, schema, denormalize } from 'normalizr';
+import { normalize, schema, denormalize } from 'vedrani-json-api-normalizr';
 import configureMockStore from 'redux-mock-store';
 import thunk from 'redux-thunk';
 import sinon from 'sinon';
@@ -91,7 +91,7 @@ const commentSchema = new schema.Entity(
 );
 const articleSchema = new schema.Entity(
   'articles',
-  { 
+  {
     author: userSchema,
     comments: [ commentSchema ]
   },
@@ -126,7 +126,7 @@ describe('json middleware', () => {
       },
       serializer: new JsonSerializer(articleSchema),
     });
-    
+
     const meta = {
       source: 'json',
       schema,
