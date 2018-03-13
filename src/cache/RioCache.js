@@ -110,7 +110,6 @@ export default class RioCache {
 
     if (this.traversedKeys.has(uniqueKey)) {
       const cachedItem = this.get(normalizedItem);
-      this.traversedKeys.delete(uniqueKey);
       return cachedItem;
     }
 
