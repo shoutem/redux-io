@@ -48,11 +48,10 @@ function isValidAction(action) {
 
 function getItem(reference, entities) {
   const { id, type } = reference;
-  console.log('getItem', id, type, _.get(entities, [type, id]));
   return _.get(entities, [type, id]);
 }
 
-export default store => next => action => {
+export default () => next => action => {
   // Validate action, if not valid pass
   if (!isValidAction(action)) {
     return next(action);

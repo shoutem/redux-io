@@ -1,6 +1,9 @@
 import _ from 'lodash';
-import { CircularDenormalizationError, TooDeepDenormalizationError } from '@shoutem/json-api-denormalizer';
-import RioCache from '../cache/RioCache';
+import {
+  CircularDenormalizationError,
+  TooDeepDenormalizationError,
+} from '@shoutem/json-api-denormalizer';
+import RioCache, { getReferenceUniqueKey } from '../cache/RioCache';
 import { cloneStatus, getStatus } from '../status';
 import ReduxDenormalizer from './ReduxDenormalizer';
 
@@ -96,9 +99,11 @@ export default class ReduxApiStateDenormalizer extends ReduxDenormalizer {
       // ProvideStorage mode
       super();
     }
+
     this.denormalizeItem = this.denormalizeItem.bind(this);
     this.getNormalizedItem = this.getNormalizedItem.bind(this);
     this.cache = new RioCache(this.getNormalizedItem);
+    this.forbidCache = new Set();
   }
 
   /**
@@ -128,14 +133,28 @@ export default class ReduxApiStateDenormalizer extends ReduxDenormalizer {
       return item;
     }
 
+    const uniqueKey = getReferenceUniqueKey(itemDescriptor);
+
     try {
-      return this.cache.add(super.denormalizeItem(itemDescriptor));
+      const denormalizedItem = super.denormalizeItem(itemDescriptor);
+      this.forbidCache.delete(uniqueKey);
+
+      if (
+        _.isEmpty(this.forbidCache) &&
+        denormalizedItem !== itemDescriptor
+      ) {
+        this.cache.add(denormalizedItem);
+      }
+
+      return denormalizedItem;
     } catch (error) {
       if (error instanceof CircularDenormalizationError) {
+        this.forbidCache.add(uniqueKey);
         return itemDescriptor;
       }
 
       if (error instanceof TooDeepDenormalizationError) {
+        this.forbidCache.add(uniqueKey);
         return itemDescriptor;
       }
 

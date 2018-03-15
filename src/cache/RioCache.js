@@ -17,6 +17,24 @@ function isKeyValid(key) {
   return _.isNumber(key) || _.isString(key);
 }
 
+
+function getUniqueKey(item) {
+  return _.isPlainObject(item) && isKeyValid(item.id) && isKeyValid(item.type) ?
+    `${item.type}.${item.id}` :
+    undefined;
+}
+
+/**
+ * RIO one and collection have their own unique id in status, items do not.
+ * We create unique key for item based on item id and type.
+ *
+ * @param reference
+ * @returns {*}
+ */
+export function getReferenceUniqueKey(reference) {
+  return getId(reference) || getUniqueKey(reference);
+}
+
 /**
  * Compare cached entity modification time with current.
  * It is not expected to require older version of references then current in the state,
@@ -42,24 +60,14 @@ function isCacheValid(cachedModificationTime, currentModificationTime) {
 export function isReferenceChanged(reference, cachedReference) {
   const cachedReferenceModificationTime = getModificationTime(cachedReference);
   const currentReferenceModificationTime = getModificationTime(reference);
+
+  if (!cachedReferenceModificationTime && !currentReferenceModificationTime) {
+    const descriptor = getReferenceUniqueKey(reference);
+    const cacheDescriptor = getReferenceUniqueKey(cachedReference);
+    return descriptor !== cacheDescriptor;
+  }
+
   return !isCacheValid(cachedReferenceModificationTime, currentReferenceModificationTime);
-}
-
-function getUniqueKey(item) {
-  return _.isPlainObject(item) && isKeyValid(item.id) && isKeyValid(item.type) ?
-    `${item.type}.${item.id}` :
-    undefined;
-}
-
-/**
- * RIO one and collection have their own unique id in status, items do not.
- * We create unique key for item based on item id and type.
- *
- * @param reference
- * @returns {*}
- */
-export function getReferenceUniqueKey(reference) {
-  return getId(reference) || getUniqueKey(reference);
 }
 
 /**
@@ -98,32 +106,33 @@ export default class RioCache {
   }
 
   // eslint-disable-next-line consistent-return
-  getValidItem(itemDescriptor) {
+  getValidItem(itemDescriptor, useCache = true, cachedItem = null) {
     const normalizedItem = this.getNormalizedItem(itemDescriptor);
 
     if (!normalizedItem) {
       this.delete(normalizedItem);
-      return;
+      return null;
     }
 
     const uniqueKey = getReferenceUniqueKey(itemDescriptor);
 
     if (this.traversedKeys.has(uniqueKey)) {
-      const cachedItem = this.get(normalizedItem);
-      return cachedItem;
+      return itemDescriptor;
     }
 
     this.traversedKeys.add(uniqueKey);
 
-    if (!this.isItemCacheValid(normalizedItem)) {
+    const resolvedCachedItem = useCache ? this.get(normalizedItem) : cachedItem;
+
+    if (!this.isItemCacheValid(normalizedItem, resolvedCachedItem)) {
       this.delete(normalizedItem);
       this.traversedKeys.delete(uniqueKey);
-      return;
+      return null;
     }
 
     this.traversedKeys.delete(uniqueKey);
 
-    return this.get(normalizedItem);
+    return resolvedCachedItem;
   }
 
   /**
@@ -151,19 +160,19 @@ export default class RioCache {
     this.delete(descriptorCollection);
   }
 
-  isItemCacheValid(normalizedItem) {
-    if (!this.isItemModified(normalizedItem) &&
-      this.areCachedItemRelationshipsValid(normalizedItem)) {
-      return true;
-    }
-    return false;
+  isItemCacheValid(normalizedItem, cachedItem) {
+    return (
+      !this.isItemModified(normalizedItem, cachedItem) &&
+      this.areCachedItemRelationshipsValid(normalizedItem, cachedItem)
+    );
   }
 
   isOneCacheValid(one, cachedOne) {
-    if (!this.isOneModified(one, cachedOne)) {
-      return true;
+    if (!cachedOne) {
+      return false;
     }
-    return false;
+
+    return !this.isOneModified(one, cachedOne);
   }
 
   isCollectionCacheValid(collection, cachedCollection) {
@@ -174,15 +183,20 @@ export default class RioCache {
     return false;
   }
 
-  isItemModified(normalizedItem) {
-    const cachedItem = this.get(normalizedItem);
+  isItemModified(normalizedItem, cachedItem) {
     return !cachedItem || isReferenceChanged(normalizedItem, cachedItem);
   }
 
   isOneModified(one, cachedOne) {
     // Get real item to which One "points"
-    const oneItem = cachedOne && this.getNormalizedItem({ id: cachedOne.id, type: cachedOne.type });
-    return !oneItem || isReferenceChanged(one, cachedOne) || !this.isItemCacheValid(oneItem);
+    const cachedReference = { id: cachedOne.id, type: cachedOne.type };
+    const cachedItem = this.get(cachedReference);
+    const oneItem = this.getNormalizedItem(cachedReference);
+
+    return (
+      isReferenceChanged(one, cachedOne) ||
+      !this.isItemCacheValid(oneItem, cachedItem)
+    );
   }
 
   isCollectionModified(collection, cachedCollection) {
@@ -199,12 +213,13 @@ export default class RioCache {
       return relationship !== cachedRelationship;
     }
 
-    const relationshipItem = this.getValidItem(relationship);
+    const relationshipItem = this.getValidItem(relationship, false, cachedRelationship);
     return !relationshipItem || relationshipItem !== cachedRelationship;
   }
 
   /**
    * Takes collection of item descriptors and check if cached collection items match current items
+   *
    *
    * @param descriptorCollection
    * @param cachedCollection
@@ -213,8 +228,13 @@ export default class RioCache {
   areCollectionItemsChanged(descriptorCollection, cachedCollection = []) {
     let matchedRelationshipsItems = 0;
 
-    const relationshipChanged = _.some(descriptorCollection, item => {
-      if (!isItemInCollection(cachedCollection, item) || !this.getValidItem(item)) {
+    const relationshipChanged = _.some(descriptorCollection, (item, index) => {
+      const cachedItem = _.get(cachedCollection, [index]);
+
+      if (
+        !isItemInCollection(cachedCollection, item, cachedItem) ||
+        !this.getValidItem(item, false, cachedItem)
+      ) {
         return true;
       }
 
@@ -225,20 +245,21 @@ export default class RioCache {
     return relationshipChanged || cachedCollection.length !== matchedRelationshipsItems;
   }
 
-  areCachedItemRelationshipsValid(normalizedItem) {
+  areCachedItemRelationshipsValid(normalizedItem, cachedItem) {
     const relationshipsNames = Object.keys(normalizedItem.relationships || {});
 
     // TODO - can relationship be removed so there is no property at all?
     // if so, new and old relationship keys must match to be valid!
     return !_.some(
       relationshipsNames,
-      relationshipName => this.isRelationshipChanged(normalizedItem, relationshipName)
+      relationshipName => (
+        this.isRelationshipChanged(normalizedItem, relationshipName, cachedItem)
+      )
     );
   }
 
-  isRelationshipChanged(normalizedItem, relationshipName) {
+  isRelationshipChanged(normalizedItem, relationshipName, cachedItem) {
     const relationship = normalizedItem.relationships[relationshipName].data;
-    const cachedItem = this.get(normalizedItem);
     const cachedRelationship = cachedItem[relationshipName];
 
     if (isSingleRelation(relationship)) {
