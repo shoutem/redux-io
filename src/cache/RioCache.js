@@ -105,8 +105,7 @@ export default class RioCache {
     return this.get(reference);
   }
 
-  // eslint-disable-next-line consistent-return
-  getValidItem(itemDescriptor, useCache = true, cachedItem = null) {
+  getValidItem(itemDescriptor, cachedItem = null) {
     const normalizedItem = this.getNormalizedItem(itemDescriptor);
 
     if (!normalizedItem) {
@@ -122,9 +121,7 @@ export default class RioCache {
 
     this.traversedKeys.add(uniqueKey);
 
-    const resolvedCachedItem = useCache ? this.get(normalizedItem) : cachedItem;
-
-    if (!this.isItemCacheValid(normalizedItem, resolvedCachedItem)) {
+    if (!this.isItemCacheValid(normalizedItem, cachedItem)) {
       this.delete(normalizedItem);
       this.traversedKeys.delete(uniqueKey);
       return null;
@@ -132,7 +129,7 @@ export default class RioCache {
 
     this.traversedKeys.delete(uniqueKey);
 
-    return resolvedCachedItem;
+    return cachedItem;
   }
 
   /**
@@ -213,7 +210,7 @@ export default class RioCache {
       return relationship !== cachedRelationship;
     }
 
-    const relationshipItem = this.getValidItem(relationship, false, cachedRelationship);
+    const relationshipItem = this.getValidItem(relationship, cachedRelationship);
     return !relationshipItem || relationshipItem !== cachedRelationship;
   }
 
@@ -233,7 +230,7 @@ export default class RioCache {
 
       if (
         !isItemInCollection(cachedCollection, item, cachedItem) ||
-        !this.getValidItem(item, false, cachedItem)
+        !this.getValidItem(item, cachedItem)
       ) {
         return true;
       }

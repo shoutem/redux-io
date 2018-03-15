@@ -218,10 +218,9 @@ describe('RioCache', () => {
 
       cache.add(denormalizedReference);
 
-      assert.isOk(denormalizedReference === cache.getValidItem({
-          id,
-          type
-        }), 'didn\'t return valid reference');
+      const cachedReference = cache.getValidItem({ id, type }, denormalizedReference);
+
+      assert.isOk(denormalizedReference === cachedReference, 'didn\'t return valid reference');
     });
 
     it('returns cached item for item descriptor', () => {
@@ -234,10 +233,9 @@ describe('RioCache', () => {
 
       cache.add(reference);
 
-      assert.isOk(reference === cache.getValidItem({
-          id,
-          type
-        }), 'didn\'t return valid reference');
+      const cachedReference = cache.getValidItem({ id, type }, reference);
+
+      assert.isOk(reference === cachedReference, 'didn\'t return valid reference');
     });
 
     it('doesn\'t return cached item when item changed', () => {
@@ -257,7 +255,7 @@ describe('RioCache', () => {
       const cache = new RioCache(() => changedReference);
       cache.add(denormalizedReference);
 
-      assert.isNull(cache.getValidItem({ id, type }), 'returned some entity');
+      assert.isNull(cache.getValidItem({ id, type }, denormalizedReference), 'returned some entity');
     });
 
     it('returns cached item when non rio object required even if changed', () => {
@@ -270,10 +268,9 @@ describe('RioCache', () => {
 
       cache.add(reference);
 
-      assert.isOk(reference === cache.getValidItem({
-          id,
-          type
-        }), 'didn\'t return valid reference');
+      const cachedReference = cache.getValidItem({ id, type }, reference);
+
+      assert.isOk(reference === cachedReference, 'didn\'t return valid reference');
     });
   });
 

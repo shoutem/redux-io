@@ -444,14 +444,14 @@ describe('ReduxApiStateDenormalizer', () => {
         'item not retrived from cache'
       );
 
-      const denormalizedDataFromCacheA1 =
+      const denormalizedOtherData =
       denormalizer.denormalizeOne('typeAId1', storage, 'typeA');
 
-      const denormalizedDataFromCache2 =
+      const denormalizedDataFromCacheAfterOtherDenormalization =
       denormalizer.denormalizeOne('typeAId3', storage, 'typeA');
       assert.equal(
         denormalizedDataFromCache,
-        denormalizedDataFromCache2,
+        denormalizedDataFromCacheAfterOtherDenormalization,
         'item not retrived from cache'
       );
     });
