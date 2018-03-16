@@ -441,6 +441,9 @@ export default store => next => action => {
   }
 
   if (!_.isEmpty(actions)) {
+    if (rio.denormalizer) {
+      rio.denormalizer.setCacheLastChecked();
+    }
     store.dispatch(batchActions(actions));
   }
 

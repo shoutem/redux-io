@@ -325,6 +325,8 @@ describe('RioCache', () => {
       cache.add(denormalizedOne);
       cache.add(denormalizedItem);
 
+      cache.flushLastChecked();
+
       assert.isOk(
         denormalizedOne !== cache.getValidOne(changedOne)
         , 'returned cached one'

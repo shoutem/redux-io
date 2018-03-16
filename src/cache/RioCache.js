@@ -78,17 +78,32 @@ export default class RioCache {
   constructor(getNormalizedItem) {
     this.cache = {};
     this.traversedKeys = new Set();
+    this.lastChecked = new Set();
+    this.lastChange = new Date().getTime();
     // It is expected to return descriptor for items that can't be found.
     this.getNormalizedItem = getNormalizedItem;
+  }
+
+  setLastChanged(timestamp = new Date().getTime()) {
+    this.lastChange = timestamp;
+  }
+
+  flushLastChecked() {
+    this.lastChecked = new Set();
+    this.setLastChanged();
   }
 
   flush() {
     this.cache = {};
     this.traversedKeys = new Set();
+    this.flushLastChecked();
   }
 
   delete(reference) {
-    delete this.cache[getReferenceUniqueKey(reference)];
+    const referenceKey = getReferenceUniqueKey(reference);
+
+    delete this.cache[referenceKey];
+    delete this.lastChecked[referenceKey];
   }
 
   get(reference) {
@@ -97,12 +112,30 @@ export default class RioCache {
 
   add(reference) {
     const referenceKey = getReferenceUniqueKey(reference);
+
     if (!isKeyValid(referenceKey)) {
       // If provided entity is not RIO reference, it can not be cached
       return reference;
     }
+
     this.cache[referenceKey] = reference;
+    this.addLastChecked(reference);
+
     return this.get(reference);
+  }
+
+  isAlreadyChecked(reference) {
+    const referenceLastChecked = this.lastChecked[getReferenceUniqueKey(reference)];
+
+    if (!referenceLastChecked) {
+      return false;
+    }
+
+    return referenceLastChecked > this.lastChange;
+  }
+
+  addLastChecked(reference) {
+    this.lastChecked[getReferenceUniqueKey(reference)] = new Date().getTime();
   }
 
   getValidItem(itemDescriptor, cachedItem = null) {
@@ -140,6 +173,11 @@ export default class RioCache {
   // eslint-disable-next-line consistent-return
   getValidOne(one) {
     const cachedOne = this.get(one);
+
+    if (this.isAlreadyChecked(one)) {
+      return cachedOne;
+    }
+
     if (this.isOneCacheValid(one, cachedOne)) {
       return cachedOne;
     }
@@ -150,6 +188,10 @@ export default class RioCache {
   // eslint-disable-next-line consistent-return
   getValidCollection(descriptorCollection) {
     const cachedCollection = this.get(descriptorCollection);
+    if (this.isAlreadyChecked(descriptorCollection)) {
+      return cachedCollection;
+    }
+
     if (this.isCollectionCacheValid(descriptorCollection, cachedCollection)) {
       return cachedCollection;
     }
@@ -169,15 +211,25 @@ export default class RioCache {
       return false;
     }
 
-    return !this.isOneModified(one, cachedOne);
+    const isValid = !this.isOneModified(one, cachedOne);
+    if (isValid) {
+      this.addLastChecked(one);
+    }
+
+    return isValid;
   }
 
   isCollectionCacheValid(collection, cachedCollection) {
-    if (!this.isCollectionModified(collection, cachedCollection) &&
-      !this.areCollectionItemsChanged(collection, cachedCollection)) {
-      return true;
+    const isValid = (
+      !this.isCollectionModified(collection, cachedCollection) &&
+      !this.areCollectionItemsChanged(collection, cachedCollection)
+    );
+
+    if (isValid) {
+      this.addLastChecked(collection);
     }
-    return false;
+
+    return isValid;
   }
 
   isItemModified(normalizedItem, cachedItem) {
