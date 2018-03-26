@@ -6,8 +6,6 @@ import { resolveReferenceSchemaType } from '../resources';
 const emptyObject = {};
 Object.freeze(emptyObject);
 
-const resolveStorageMap = _.memoize((state, schemaPaths) => createSchemasMap(state, schemaPaths));
-
 /**
  * Connects rio configurations with denormalizer to simplify denormalization
  * of normalized data in state.
@@ -35,7 +33,7 @@ export function getOne(one, state, schema = '') {
     throw new Error(`Storage for resolved schema ${resolvedSchema} doesn't exists in state.`);
   }
 
-  const storageMap = resolveStorageMap(state, schemaPaths);
+  const storageMap = createSchemasMap(state, schemaPaths);
 
   return rio.denormalizer.denormalizeOne(one, storageMap, resolvedSchema);
 }

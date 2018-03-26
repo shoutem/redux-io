@@ -13,14 +13,35 @@ import ReduxDenormalizer from './ReduxDenormalizer';
  * @param storeSchemasPaths {schema: 'path.to.storage' || schema: ['path', 'to', 'storage]}
  * @returns {{}}
  */
-export function createSchemasMap(state, storeSchemasPaths) {
-  const storage = {};
+function memoizedCreateSchemasMap() {
+  const memoization = {
+    prevStorageMap: null,
+    prevState: null,
+    prevStoreSchemasPaths: null,
+  };
 
-  // eslint-disable-next-line no-return-assign
-  _.forEach(storeSchemasPaths, (path, schema) => storage[schema] = _.get(state, path));
+  return (state, storeSchemasPaths) => {
+    if (
+      memoization.prevState === state &&
+      memoization.prevStoreSchemasPaths === storeSchemasPaths
+    ) {
+      return memoization.prevStorageMap;
+    }
 
-  return storage;
+    const storage = {};
+
+    // eslint-disable-next-line no-return-assign
+    _.forEach(storeSchemasPaths, (path, schema) => storage[schema] = _.get(state, path));
+
+    memoization.prevState = state;
+    memoization.prevStoreSchemasPaths = storeSchemasPaths;
+    memoization.prevStorageMap = storage;
+
+    return storage;
+  };
 }
+
+export const createSchemasMap = memoizedCreateSchemasMap();
 
 function getType(collection, schema) {
   const collectionStatus = getStatus(collection);
