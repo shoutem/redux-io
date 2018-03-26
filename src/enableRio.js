@@ -29,7 +29,7 @@ function discoverSchemaPaths(state, currentPath = [], discoveredPaths = {}) {
   return discoveredPaths;
 }
 
-export function enableRio(reducer, keepExistingPaths = false) {
+export function enableRio(reducer, keepExistingPaths = false, useModificationCache = true) {
   const initialState = reducer(undefined, { type: 'unknown' });
   const paths = discoverSchemaPaths(initialState);
 
@@ -39,8 +39,7 @@ export function enableRio(reducer, keepExistingPaths = false) {
     rio.setResourcePaths(paths);
   }
 
-  rio.setDenormalizer(new ReduxApiStateDenormalizer());
+  rio.setDenormalizer(new ReduxApiStateDenormalizer(null, null, { useModificationCache }));
 
   return enableBatching(reducer);
 }
-
