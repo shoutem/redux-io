@@ -4,7 +4,7 @@ import nock from 'nock';
 import { RSAA, apiMiddleware } from 'redux-api-middleware';
 import configureMockStore from 'redux-mock-store';
 import thunk from 'redux-thunk';
-import {
+import rio, {
   REMOVE_REQUEST,
   REMOVE_SUCCESS,
   REMOVE_ERROR,
@@ -13,6 +13,7 @@ import {
   REFERENCE_STATUS,
   apiStateMiddleware,
   JSON_API_SOURCE,
+  ReduxApiStateDenormalizer,
 } from '../../src';
 import {
   validationStatus,
@@ -23,6 +24,11 @@ import  { remove } from '../../src/actions/remove';
 describe('Delete action creator', () => {
   const middlewares = [thunk, apiMiddleware, apiStateMiddleware];
   let mockStore = configureMockStore(middlewares);
+
+  beforeEach(() => {
+    const denormalizer = new ReduxApiStateDenormalizer();
+    rio.setDenormalizer(denormalizer);
+  });
 
   afterEach(() => {
     nock.cleanAll();

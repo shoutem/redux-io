@@ -5,9 +5,10 @@ import { RSAA, apiMiddleware } from 'redux-api-middleware';
 import sinon from 'sinon';
 import thunk from 'redux-thunk';
 import configureMockStore from 'redux-mock-store';
-import {
+import rio, {
   apiStateMiddleware,
   JSON_API_SOURCE,
+  ReduxApiStateDenormalizer
 } from '../../src';
 import create from '../../src/actions/create';
 
@@ -18,6 +19,8 @@ describe('thunkActions', () => {
   beforeEach(() => {
     nock.cleanAll();
     mockStore = configureMockStore(middlewares);
+    const denormalizer = new ReduxApiStateDenormalizer();
+    rio.setDenormalizer(denormalizer);
   });
 
   it('resolves valid action',  done => {

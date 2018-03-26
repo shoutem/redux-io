@@ -344,7 +344,7 @@ describe('ReduxApiStateDenormalizer', () => {
     });
 
     it('denormalizes valid id with modification check cache', (done) => {
-      const denormalizer = new ReduxApiStateDenormalizer(null, null, { useLastCheckedCache: true });
+      const denormalizer = new ReduxApiStateDenormalizer(null, null, { useModificationCache: true });
       const storage = createSchemasMap(getStore(), createStorageMap());
       const expectedData = {
         id: 'type1Id1',
@@ -396,23 +396,23 @@ describe('ReduxApiStateDenormalizer', () => {
           'item not denormalized correctly'
         );
 
-        const isAlreadyChecked = sinon.spy(denormalizer.cache, "isAlreadyChecked");
+        const isChecked = sinon.spy(denormalizer.cache, "isChecked");
         const getValidItem = sinon.spy(denormalizer.cache, "getValidItem");
 
         const denormalizedDataWithCheck =
           denormalizer.denormalizeOne('type1Id1', storage, 'type1');
 
         assert.isOk(denormalizedData === denormalizedDataWithCheck);
-        assert.isOk(isAlreadyChecked.called, 'check not called');
+        assert.isOk(isChecked.called, 'check not called');
         assert.isOk(getValidItem.notCalled, 'getValidItem called');
-        assert.isOk(isAlreadyChecked.returned(true), 'check returned false');
+        assert.isOk(isChecked.returned(true), 'check returned false');
 
         done();
       }, 10);
     });
 
     it('denormalizes modified storage with valid id with modification check cache', (done) => {
-      const denormalizer = new ReduxApiStateDenormalizer(null, null, { useLastCheckedCache: true });
+      const denormalizer = new ReduxApiStateDenormalizer(null, null, { useModificationCache: true });
       const storage = createSchemasMap(getStore(), createStorageMap());
 
       const denormalizedData =
@@ -428,18 +428,18 @@ describe('ReduxApiStateDenormalizer', () => {
       // cache is time based
       setTimeout(() => {
         const modifiedStorage = createSchemasMap(modifiedStore, createStorageMap());
-        denormalizer.setCacheLastChecked();
+        denormalizer.invalidateModificationCache();
 
-        const isAlreadyChecked = sinon.spy(denormalizer.cache, "isAlreadyChecked");
+        const isChecked = sinon.spy(denormalizer.cache, "isChecked");
         const getValidItem = sinon.spy(denormalizer.cache, "getValidItem");
 
         const denormalizedDataWithCheck =
           denormalizer.denormalizeOne('type1Id1', storage, 'type1');
 
         assert.isOk(denormalizedData === denormalizedDataWithCheck);
-        assert.isOk(isAlreadyChecked.called, 'check not called');
+        assert.isOk(isChecked.called, 'check not called');
         assert.isOk(getValidItem.called, 'getValidItem not called');
-        assert.isOk(isAlreadyChecked.returned(false), 'check returned true');
+        assert.isOk(isChecked.returned(false), 'check returned true');
       done();
       }, 10);
     });

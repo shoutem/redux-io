@@ -437,9 +437,7 @@ function isInternalAction(action) {
 
 export default store => next => action => {
   if (isInternalAction(action)) {
-    if (rio.denormalizer) {
-      rio.denormalizer.setCacheLastChecked();
-    }
+    rio.denormalizer.invalidateModificationCache();
   }
 
   // Validate action, if not valid pass
@@ -465,9 +463,7 @@ export default store => next => action => {
   }
 
   if (!_.isEmpty(actions)) {
-    if (rio.denormalizer) {
-      rio.denormalizer.setCacheLastChecked();
-    }
+    rio.denormalizer.invalidateModificationCache();
     store.dispatch(batchActions(actions));
   }
 

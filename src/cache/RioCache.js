@@ -78,37 +78,37 @@ export default class RioCache {
   constructor(getNormalizedItem, options = {}) {
     this.cache = {};
     this.traversedKeys = new Set();
-    this.lastChecked = new Set();
-    this.lastChange = new Date().getTime();
+    this.modificationCache = new Set();
+    this.lastModificationTimestamp = new Date().getTime();
     // It is expected to return descriptor for items that can't be found.
     this.getNormalizedItem = getNormalizedItem;
 
     this.options = {
-      useLastCheckedCache: false,
+      useModificationCache: false,
       ...options,
     };
   }
 
-  setLastChanged(timestamp = new Date().getTime()) {
-    this.lastChange = timestamp;
+  invalidateModificationCache(timestamp = new Date().getTime()) {
+    this.lastModificationTimestamp = timestamp;
   }
 
-  flushLastChecked() {
-    this.lastChecked = new Set();
-    this.setLastChanged();
+  flushModificationCache() {
+    this.modificationCache = new Set();
+    this.invalidateModificationCache();
   }
 
   flush() {
     this.cache = {};
     this.traversedKeys = new Set();
-    this.flushLastChecked();
+    this.flushModificationCache();
   }
 
   delete(reference) {
     const referenceKey = getReferenceUniqueKey(reference);
 
     delete this.cache[referenceKey];
-    delete this.lastChecked[referenceKey];
+    delete this.modificationCache[referenceKey];
   }
 
   get(reference) {
@@ -124,27 +124,27 @@ export default class RioCache {
     }
 
     this.cache[referenceKey] = reference;
-    this.addLastChecked(reference);
+    this.addChecked(reference);
 
     return this.get(reference);
   }
 
-  isAlreadyChecked(reference) {
-    if (!this.options.useLastCheckedCache) {
+  isChecked(reference) {
+    if (!this.options.useModificationCache) {
       return false;
     }
 
-    const referenceLastChecked = this.lastChecked[getReferenceUniqueKey(reference)];
+    const referenceCheckedTimestamp = this.modificationCache[getReferenceUniqueKey(reference)];
 
-    if (!referenceLastChecked) {
+    if (!referenceCheckedTimestamp) {
       return false;
     }
 
-    return referenceLastChecked > this.lastChange;
+    return referenceCheckedTimestamp > this.lastModificationTimestamp;
   }
 
-  addLastChecked(reference) {
-    this.lastChecked[getReferenceUniqueKey(reference)] = new Date().getTime();
+  addChecked(reference) {
+    this.modificationCache[getReferenceUniqueKey(reference)] = new Date().getTime();
   }
 
   getValidItem(itemDescriptor, cachedItem = null) {
@@ -183,7 +183,7 @@ export default class RioCache {
   getValidOne(one) {
     const cachedOne = this.get(one);
 
-    if (this.isAlreadyChecked(one)) {
+    if (this.isChecked(one)) {
       return cachedOne;
     }
 
@@ -197,7 +197,7 @@ export default class RioCache {
   // eslint-disable-next-line consistent-return
   getValidCollection(descriptorCollection) {
     const cachedCollection = this.get(descriptorCollection);
-    if (this.isAlreadyChecked(descriptorCollection)) {
+    if (this.isChecked(descriptorCollection)) {
       return cachedCollection;
     }
 
@@ -222,7 +222,7 @@ export default class RioCache {
 
     const isValid = !this.isOneModified(one, cachedOne);
     if (isValid) {
-      this.addLastChecked(one);
+      this.addChecked(one);
     }
 
     return isValid;
@@ -235,7 +235,7 @@ export default class RioCache {
     );
 
     if (isValid) {
-      this.addLastChecked(collection);
+      this.addChecked(collection);
     }
 
     return isValid;

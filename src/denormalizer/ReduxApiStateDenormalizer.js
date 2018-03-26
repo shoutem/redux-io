@@ -102,15 +102,15 @@ export default class ReduxApiStateDenormalizer extends ReduxDenormalizer {
 
     this.denormalizeItem = this.denormalizeItem.bind(this);
     this.getNormalizedItem = this.getNormalizedItem.bind(this);
-    this.setCacheLastChecked = this.setCacheLastChecked.bind(this);
+    this.invalidateModificationCache = this.invalidateModificationCache.bind(this);
     this.flushCache = this.flushCache.bind(this);
-    this.flushLastChecked = this.flushCacheLastChecked.bind(this);
+    this.flushModificationCache = this.flushModificationCache.bind(this);
 
     this.forbidCache = new Set();
     this.cache = new RioCache(
       this.getNormalizedItem,
       {
-        useLastCheckedCache: options.useLastCheckedCache,
+        useModificationCache: options.useModificationCache,
       }
     );
   }
@@ -139,7 +139,7 @@ export default class ReduxApiStateDenormalizer extends ReduxDenormalizer {
   denormalizeItem(itemDescriptor) {
     const cachedItem = this.cache.get(itemDescriptor);
 
-    if (this.cache.isAlreadyChecked(itemDescriptor)) {
+    if (this.cache.isChecked(itemDescriptor)) {
       return cachedItem;
     }
 
@@ -278,11 +278,11 @@ export default class ReduxApiStateDenormalizer extends ReduxDenormalizer {
     this.cache.flush();
   }
 
-  flushCacheLastChecked() {
-    this.cache.flushLastChecked();
+  flushModificationCache() {
+    this.cache.flushModificationCache();
   }
 
-  setCacheLastChecked() {
-    this.cache.setLastChanged();
+  invalidateModificationCache() {
+    this.cache.invalidateModificationCache();
   }
 }

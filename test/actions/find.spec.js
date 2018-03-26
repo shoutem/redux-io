@@ -13,6 +13,7 @@ import rio, {
   REFERENCE_STATUS,
   apiStateMiddleware,
   JSON_API_SOURCE,
+  ReduxApiStateDenormalizer,
 } from '../../src';
 import {
   busyStatus,
@@ -22,6 +23,11 @@ import  { find } from '../../src/actions/find';
 describe('Find action creator', () => {
   const middlewares = [thunk, apiMiddleware, apiStateMiddleware];
   let mockStore = configureMockStore(middlewares);
+
+  beforeEach(() => {
+    const denormalizer = new ReduxApiStateDenormalizer();
+    rio.setDenormalizer(denormalizer);
+  });
 
   afterEach(() => {
     nock.cleanAll();

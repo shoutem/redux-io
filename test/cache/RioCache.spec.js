@@ -331,7 +331,7 @@ describe('RioCache', () => {
       cache.add(denormalizedOne);
       cache.add(denormalizedItem);
 
-      cache.flushLastChecked();
+      cache.flushModificationCache();
 
       assert.isOk(
         denormalizedOne !== cache.getValidOne(changedOne)
@@ -379,7 +379,7 @@ describe('RioCache', () => {
       one[STATUS] = { id: _.uniqueId(), modifiedTimestamp: 1 };
 
       const cache = new RioCache((descriptor) => descriptor.id ? item : one, {
-        useLastCheckedCache: true,
+        useModificationCache: true,
       });
 
       const denormalizedOne = { ...item };
@@ -400,7 +400,7 @@ describe('RioCache', () => {
           , 'didn\'t return valid reference'
         );
 
-        const isAlreadyChecked = sinon.spy(cache, "isAlreadyChecked");
+        const isChecked = sinon.spy(cache, "isChecked");
         const isOneModified = sinon.spy(cache, "isOneModified");
 
         const cachedDenormalizedOneWithActiveOne = cache.getValidOne(one);
@@ -410,9 +410,9 @@ describe('RioCache', () => {
           , 'didn\'t return valid reference'
         );
 
-        assert.isOk(isAlreadyChecked.called, 'check not called');
+        assert.isOk(isChecked.called, 'check not called');
         assert.isOk(isOneModified.notCalled, 'valid item called');
-        assert.isOk(isAlreadyChecked.returned(true), 'check returned false');
+        assert.isOk(isChecked.returned(true), 'check returned false');
         done();
       }, 10);
     });
@@ -430,7 +430,7 @@ describe('RioCache', () => {
       one[STATUS] = { id: _.uniqueId(), modifiedTimestamp: 1 };
 
       const cache = new RioCache((descriptor) => descriptor.id ? changedItem : one, {
-        useLastCheckedCache: true,
+        useModificationCache: true,
       });
 
       const denormalizedOne = { ...item };
@@ -442,11 +442,11 @@ describe('RioCache', () => {
       cache.add(denormalizedOne);
       cache.add(denormalizedItem);
 
-      cache.setLastChanged();
+      cache.invalidateModificationCache();
 
       // cache is time based
       setTimeout(() => {
-        const isAlreadyChecked = sinon.spy(cache, "isAlreadyChecked");
+        const isChecked = sinon.spy(cache, "isChecked");
         const isOneModified = sinon.spy(cache, "isOneModified");
 
         const cachedDenormalizedOne = cache.getValidOne(one);
@@ -456,16 +456,16 @@ describe('RioCache', () => {
           , 'returned cached one'
         );
 
-        assert.isOk(isAlreadyChecked.called, 'check not called');
+        assert.isOk(isChecked.called, 'check not called');
         assert.isOk(isOneModified.called, 'valid item not called');
-        assert.isOk(isAlreadyChecked.returned(false), 'check returned true');
+        assert.isOk(isChecked.returned(false), 'check returned true');
         assert.isOk(isOneModified.returned(true), 'check returned true');
 
         done();
       }, 10);
     });
 
-    it('modification check doesnt have timestamp so isAlreadyChecked fails', () => {
+    it('modification check doesnt have timestamp so isChecked fails', () => {
       const id = 1;
       const type = 'type';
 
@@ -476,17 +476,17 @@ describe('RioCache', () => {
       one[STATUS] = { id: _.uniqueId(), modifiedTimestamp: 1 };
 
       const cache = new RioCache((descriptor) => descriptor.id ? item : one, {
-        useLastCheckedCache: true,
+        useModificationCache: true,
       });
 
-      const isAlreadyChecked = sinon.spy(cache, "isAlreadyChecked");
+      const isChecked = sinon.spy(cache, "isChecked");
       const isOneCacheValid = sinon.spy(cache, "isOneCacheValid");
 
       const cachedDenormalizedOne = cache.getValidOne(one);
 
-      assert.isOk(isAlreadyChecked.called, 'check not called');
+      assert.isOk(isChecked.called, 'check not called');
       assert.isOk(isOneCacheValid.called, 'valid item not called');
-      assert.isOk(isAlreadyChecked.returned(false), 'check returned true');
+      assert.isOk(isChecked.returned(false), 'check returned true');
     });
   });
 
@@ -597,7 +597,7 @@ describe('RioCache', () => {
 
       const cache = new RioCache(
         () => item,
-        { useLastCheckedCache: true }
+        { useModificationCache: true }
       );
 
       cache.add(item);
@@ -623,14 +623,14 @@ describe('RioCache', () => {
           'didn\'t return valid reference'
         );
 
-        const isAlreadyChecked = sinon.spy(cache, "isAlreadyChecked");
+        const isChecked = sinon.spy(cache, "isChecked");
         const isCollectionCacheValid = sinon.spy(cache, "isCollectionCacheValid");
 
         const denormalizedCollectionWithCheck = cache.getValidCollection(descriptorCollection);
 
-        assert.isOk(isAlreadyChecked.called, 'check not called');
+        assert.isOk(isChecked.called, 'check not called');
         assert.isOk(isCollectionCacheValid.notCalled, 'valid collection cache called');
-        assert.isOk(isAlreadyChecked.returned(true), 'check returned false');
+        assert.isOk(isChecked.returned(true), 'check returned false');
       done();
       }, 10);
     });

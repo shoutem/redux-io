@@ -45,6 +45,8 @@ describe('Json api middleware', () => {
 
   beforeEach(() => {
     sinon.spy(console, 'error');
+    const denormalizer = new ReduxApiStateDenormalizer();
+    rio.setDenormalizer(denormalizer);
   });
 
   afterEach(() => {
@@ -1946,7 +1948,7 @@ describe('Json api middleware', () => {
   describe('Modification check cache', () => {
     it('set modified flag on rio actions', done => {
       const denormalizer = new ReduxApiStateDenormalizer();
-      const setCacheLastChecked = sinon.spy(denormalizer, 'setCacheLastChecked');
+      const invalidateModificationCache = sinon.spy(denormalizer, 'invalidateModificationCache');
 
       rio.setDenormalizer(denormalizer);
 
@@ -1976,13 +1978,13 @@ describe('Json api middleware', () => {
       const store = mockStore({});
       store.dispatch(actionPromise(mockSuccessAction))
         .then(() => {
-          expect(setCacheLastChecked.called).to.be.true;
+          expect(invalidateModificationCache.called).to.be.true;
         }).then(done).catch(done);
     });
 
     it('set modified flag on internal rio action', done => {
       const denormalizer = new ReduxApiStateDenormalizer();
-      const setCacheLastChecked = sinon.spy(denormalizer, 'setCacheLastChecked');
+      const invalidateModificationCache = sinon.spy(denormalizer, 'invalidateModificationCache');
 
       rio.setDenormalizer(denormalizer);
 
@@ -1992,13 +1994,13 @@ describe('Json api middleware', () => {
       const store = mockStore({});
       store.dispatch(actionPromise(mockInvaliateAction))
         .then(() => {
-          expect(setCacheLastChecked.called).to.be.true;
+          expect(invalidateModificationCache.called).to.be.true;
         }).then(done).catch(done);
     });
 
     it('ignore modified flag on 3rd party action', done => {
       const denormalizer = new ReduxApiStateDenormalizer();
-      const setCacheLastChecked = sinon.spy(denormalizer, 'setCacheLastChecked');
+      const invalidateModificationCache = sinon.spy(denormalizer, 'invalidateModificationCache');
 
       rio.setDenormalizer(denormalizer);
 
@@ -2009,7 +2011,7 @@ describe('Json api middleware', () => {
       const store = mockStore({});
       store.dispatch(actionPromise(mockAction))
         .then(() => {
-          expect(setCacheLastChecked.called).to.be.false;
+          expect(invalidateModificationCache.called).to.be.false;
         }).then(done).catch(done);
     });
   });
