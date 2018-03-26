@@ -1,10 +1,12 @@
 import { assert } from 'chai';
+import sinon from 'sinon';
 import RioCache from '../../src/cache/RioCache';
 import {
   STATUS,
   createStatus,
 } from '../../src/status';
 import _ from 'lodash';
+import { denormalize } from 'vedrani-json-api-normalizr';
 
 class NormalizedData {
   constructor(normalizedData) {
@@ -157,6 +159,7 @@ describe('RioCache', () => {
       assert.isUndefined(cache.get(reference), 'returned something from cache');
     });
   });
+
   describe('isSingleRelationshipModified', () => {
     it('is modified', () => {
       const id = 1;
@@ -203,6 +206,7 @@ describe('RioCache', () => {
         );
       });
   });
+
   describe('getValidItem', () => {
     it('returns cached item', () => {
       const id = 1;
@@ -296,8 +300,10 @@ describe('RioCache', () => {
       cache.add(denormalizedOne);
       cache.add(denormalizedItem);
 
+      const cachedDenormalizedOne = cache.getValidOne(one);
+
       assert.isOk(
-        denormalizedOne === cache.getValidOne(one)
+        denormalizedOne === cachedDenormalizedOne
         , 'didn\'t return valid reference'
       );
     });
@@ -360,6 +366,127 @@ describe('RioCache', () => {
         denormalizedOne !== cache.getValidOne(one)
         , 'returned cached one'
       );
+    });
+
+    it('returns cached one with modification check', (done) => {
+      const id = 1;
+      const type = 'type';
+
+      const item = { id, type };
+      item[STATUS] = { modifiedTimestamp: 1 };
+
+      const one = {};
+      one[STATUS] = { id: _.uniqueId(), modifiedTimestamp: 1 };
+
+      const cache = new RioCache((descriptor) => descriptor.id ? item : one, {
+        useLastCheckedCache: true,
+      });
+
+      const denormalizedOne = { ...item };
+      denormalizedOne[STATUS] = { ...one[STATUS] };
+
+      const denormalizedItem = { ...item };
+      denormalizedItem[STATUS] = { ...item[STATUS] };
+
+      cache.add(denormalizedOne);
+      cache.add(denormalizedItem);
+
+      // cache is time based
+      setTimeout(() => {
+        const cachedDenormalizedOne = cache.getValidOne(one);
+
+        assert.isOk(
+          denormalizedOne === cachedDenormalizedOne
+          , 'didn\'t return valid reference'
+        );
+
+        const isAlreadyChecked = sinon.spy(cache, "isAlreadyChecked");
+        const isOneModified = sinon.spy(cache, "isOneModified");
+
+        const cachedDenormalizedOneWithActiveOne = cache.getValidOne(one);
+
+        assert.isOk(
+          cachedDenormalizedOneWithActiveOne === cachedDenormalizedOne
+          , 'didn\'t return valid reference'
+        );
+
+        assert.isOk(isAlreadyChecked.called, 'check not called');
+        assert.isOk(isOneModified.notCalled, 'valid item called');
+        assert.isOk(isAlreadyChecked.returned(true), 'check returned false');
+        done();
+      }, 10);
+    });
+
+    it('doesn\'t return cached one when item modified with modification check' , (done) => {
+      const id = 1;
+      const type = 'type';
+
+      const item = { id, type };
+      item[STATUS] = { modifiedTimestamp: 1 };
+      const changedItem = {...item};
+      changedItem[STATUS] = {...item[STATUS], modifiedTimestamp: 2};
+
+      const one = {};
+      one[STATUS] = { id: _.uniqueId(), modifiedTimestamp: 1 };
+
+      const cache = new RioCache((descriptor) => descriptor.id ? changedItem : one, {
+        useLastCheckedCache: true,
+      });
+
+      const denormalizedOne = { ...item };
+      denormalizedOne[STATUS] = { ...one[STATUS] };
+
+      const denormalizedItem = { ...item };
+      denormalizedItem[STATUS] = { ...item[STATUS] };
+
+      cache.add(denormalizedOne);
+      cache.add(denormalizedItem);
+
+      cache.setLastChanged();
+
+      // cache is time based
+      setTimeout(() => {
+        const isAlreadyChecked = sinon.spy(cache, "isAlreadyChecked");
+        const isOneModified = sinon.spy(cache, "isOneModified");
+
+        const cachedDenormalizedOne = cache.getValidOne(one);
+
+        assert.isOk(
+          denormalizedOne !== cachedDenormalizedOne
+          , 'returned cached one'
+        );
+
+        assert.isOk(isAlreadyChecked.called, 'check not called');
+        assert.isOk(isOneModified.called, 'valid item not called');
+        assert.isOk(isAlreadyChecked.returned(false), 'check returned true');
+        assert.isOk(isOneModified.returned(true), 'check returned true');
+
+        done();
+      }, 10);
+    });
+
+    it('modification check doesnt have timestamp so isAlreadyChecked fails', () => {
+      const id = 1;
+      const type = 'type';
+
+      const item = { id, type };
+      item[STATUS] = { modifiedTimestamp: 1 };
+
+      const one = {};
+      one[STATUS] = { id: _.uniqueId(), modifiedTimestamp: 1 };
+
+      const cache = new RioCache((descriptor) => descriptor.id ? item : one, {
+        useLastCheckedCache: true,
+      });
+
+      const isAlreadyChecked = sinon.spy(cache, "isAlreadyChecked");
+      const isOneCacheValid = sinon.spy(cache, "isOneCacheValid");
+
+      const cachedDenormalizedOne = cache.getValidOne(one);
+
+      assert.isOk(isAlreadyChecked.called, 'check not called');
+      assert.isOk(isOneCacheValid.called, 'valid item not called');
+      assert.isOk(isAlreadyChecked.returned(false), 'check returned true');
     });
   });
 
@@ -455,6 +582,57 @@ describe('RioCache', () => {
         cache.getValidCollection(descriptorCollection),
         'didn\'t return valid reference'
       );
+    });
+
+    it('returns cached collection with modifiation check', (done) => {
+      const id = 1;
+      const schema = 'type';
+      const type = schema;
+
+      const item = { id, type };
+      item[STATUS] = { id: _.uniqueId(), modifiedTimestamp: 1 };
+
+      const collection = [1];
+      collection[STATUS] = { schema, id: _.uniqueId(), modifiedTimestamp: 1 };
+
+      const cache = new RioCache(
+        () => item,
+        { useLastCheckedCache: true }
+      );
+
+      cache.add(item);
+
+      const denormalizedReference = [{
+        id,
+        type,
+        [STATUS]: item[STATUS],
+      }];
+      denormalizedReference[STATUS] = { ...collection[STATUS] };
+
+      cache.add(denormalizedReference);
+
+      const descriptorCollection = [{ id, type }];
+      descriptorCollection[STATUS] = { ...collection[STATUS] };
+
+      // cache is time based
+      setTimeout(() => {
+        const denormalizedCollection = cache.getValidCollection(descriptorCollection);
+
+        assert.isOk(
+          denormalizedReference === denormalizedCollection,
+          'didn\'t return valid reference'
+        );
+
+        const isAlreadyChecked = sinon.spy(cache, "isAlreadyChecked");
+        const isCollectionCacheValid = sinon.spy(cache, "isCollectionCacheValid");
+
+        const denormalizedCollectionWithCheck = cache.getValidCollection(descriptorCollection);
+
+        assert.isOk(isAlreadyChecked.called, 'check not called');
+        assert.isOk(isCollectionCacheValid.notCalled, 'valid collection cache called');
+        assert.isOk(isAlreadyChecked.returned(true), 'check returned false');
+      done();
+      }, 10);
     });
   });
 

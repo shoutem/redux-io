@@ -75,13 +75,18 @@ export function isReferenceChanged(reference, cachedReference) {
  * Provides methods to validate, get and resolve new data with cached data.
  */
 export default class RioCache {
-  constructor(getNormalizedItem) {
+  constructor(getNormalizedItem, options = {}) {
     this.cache = {};
     this.traversedKeys = new Set();
     this.lastChecked = new Set();
     this.lastChange = new Date().getTime();
     // It is expected to return descriptor for items that can't be found.
     this.getNormalizedItem = getNormalizedItem;
+
+    this.options = {
+      useLastCheckedCache: false,
+      ...options,
+    };
   }
 
   setLastChanged(timestamp = new Date().getTime()) {
@@ -125,6 +130,10 @@ export default class RioCache {
   }
 
   isAlreadyChecked(reference) {
+    if (!this.options.useLastCheckedCache) {
+      return false;
+    }
+
     const referenceLastChecked = this.lastChecked[getReferenceUniqueKey(reference)];
 
     if (!referenceLastChecked) {

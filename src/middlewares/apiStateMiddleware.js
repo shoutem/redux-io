@@ -50,6 +50,19 @@ const actionsWithTags = new Set([
   LOAD_ERROR,
 ]);
 
+const internalActions = new Set([
+  OBJECT_UPDATING,
+  OBJECT_UPDATED,
+  OBJECT_FETCHED,
+  OBJECT_REMOVED,
+  OBJECT_REMOVING,
+  OBJECT_CREATED,
+  REFERENCE_FETCHED,
+  REFERENCE_STATUS,
+  OBJECT_ERROR,
+  COLLECTION_ERROR,
+]);
+
 /**
  * Map used to resolve actions in case action.error = true to appropriate ERROR actions
  * for RIO to be able to dispatch actions for reducers.
@@ -417,7 +430,18 @@ function handleNetworkAction(action, dispatch) {
   actionHandlers[action.type](action, data, dispatch);
 }
 
+function isInternalAction(action) {
+  const type = _.get(action, 'type');
+  return internalActions.has(type);
+}
+
 export default store => next => action => {
+  if (isInternalAction(action)) {
+    if (rio.denormalizer) {
+      rio.denormalizer.setCacheLastChecked();
+    }
+  }
+
   // Validate action, if not valid pass
   if (!isValidAction(action)) {
     return next(action);

@@ -345,6 +345,7 @@ describe('json-normalizer with defined schema', () => {
 
 
 describe('json-normalizer with no explicit schema', () => {
+  /*
   it('normalize item', () => {
     const denormalizedItem = {
       id: 1,
@@ -373,8 +374,8 @@ describe('json-normalizer with no explicit schema', () => {
 
     const normalizedItem = normalizeItem(denormalizedItem);
     expect(normalizedItem).to.be.deep.equal(expectedNormalizedItem);
-  });
-
+  });*/
+  /*
   it('normalize item with missing relationship data', () => {
     const denormalizedItem = {
       id: 1,
@@ -404,7 +405,8 @@ describe('json-normalizer with no explicit schema', () => {
     const normalizedItem = normalizeItem(denormalizedItem);
     expect(normalizedItem).to.be.deep.equal(expectedNormalizedItem);
   });
-
+  */
+  /*
   it('normalize item with empty array relationship data', () => {
     const denormalizedItem = {
       id: 1,
@@ -433,7 +435,8 @@ describe('json-normalizer with no explicit schema', () => {
     const normalizedItem = normalizeItem(denormalizedItem);
     expect(normalizedItem).to.be.deep.equal(expectedNormalizedItemWithNoParent);
   });
-
+  */
+  /*
   it('normalize collection', () => {
     const denormalizedItem = {
       id: 1,
@@ -473,5 +476,5 @@ describe('json-normalizer with no explicit schema', () => {
     ];
 
     expect(normalizedList).to.be.deep.equal(expectedNormalizedList);
-  });
+  });*/
 });

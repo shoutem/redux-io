@@ -1,5 +1,6 @@
 import chai, { assert } from 'chai';
 import shallowDeepEqual from 'chai-shallow-deep-equal';
+import sinon from 'sinon';
 import { ReduxApiStateDenormalizer } from '../../src/index';
 import { createSchemasMap } from '../../src/denormalizer/ReduxApiStateDenormalizer';
 import {
@@ -342,6 +343,107 @@ describe('ReduxApiStateDenormalizer', () => {
       );
     });
 
+    it('denormalizes valid id with modification check cache', (done) => {
+      const denormalizer = new ReduxApiStateDenormalizer(null, null, { useLastCheckedCache: true });
+      const storage = createSchemasMap(getStore(), createStorageMap());
+      const expectedData = {
+        id: 'type1Id1',
+        type: 'type1',
+        [STATUS]: storage['type1']['type1Id1'][STATUS],
+        name: 'type1Id1',
+        'type2.test': {
+          [STATUS]: storage['type2.test']['type2Id1'][STATUS],
+          id: 'type2Id1',
+          type: 'type2.test',
+          name: 'type2Id1',
+        },
+        type1: [
+          {
+            id: 'type1Id2',
+            type: 'type1',
+            name: 'type1Id2',
+            [STATUS]: storage['type1']['type1Id2'][STATUS],
+          },
+          {
+            id: 'type1Id3',
+            type: 'type1',
+            name: 'type1Id3',
+            [STATUS]: storage['type1']['type1Id3'][STATUS],
+            type1: [
+              {
+                id: 'type1Id2',
+                type: 'type1',
+                name: 'type1Id2',
+                [STATUS]: storage['type1']['type1Id2'][STATUS],
+              },
+            ],
+          },
+        ],
+      };
+
+      // cache is time based
+      setTimeout(() => {
+        const denormalizedData =
+          denormalizer.denormalizeOne('type1Id1', storage, 'type1');
+        const denormalizedDataWithStatus =
+          mergeStatus(denormalizedData);
+
+        assert.isObject(denormalizedDataWithStatus[STATUS]);
+        assert.isObject(denormalizedDataWithStatus['type2.test'][STATUS]);
+        assert.shallowDeepEqual(
+          denormalizedDataWithStatus,
+          expectedData,
+          'item not denormalized correctly'
+        );
+
+        const isAlreadyChecked = sinon.spy(denormalizer.cache, "isAlreadyChecked");
+        const getValidItem = sinon.spy(denormalizer.cache, "getValidItem");
+
+        const denormalizedDataWithCheck =
+          denormalizer.denormalizeOne('type1Id1', storage, 'type1');
+
+        assert.isOk(denormalizedData === denormalizedDataWithCheck);
+        assert.isOk(isAlreadyChecked.called, 'check not called');
+        assert.isOk(getValidItem.notCalled, 'getValidItem called');
+        assert.isOk(isAlreadyChecked.returned(true), 'check returned false');
+
+        done();
+      }, 10);
+    });
+
+    it('denormalizes modified storage with valid id with modification check cache', (done) => {
+      const denormalizer = new ReduxApiStateDenormalizer(null, null, { useLastCheckedCache: true });
+      const storage = createSchemasMap(getStore(), createStorageMap());
+
+      const denormalizedData =
+        denormalizer.denormalizeOne('type1Id1', storage, 'type1');
+
+      const modifiedStore = getStore();
+      modifiedStore.storage.type1.type1Id4.relationships.type1 = {
+        data: {
+          id: 'type1Id8', type: 'type1',
+        },
+      };
+
+      // cache is time based
+      setTimeout(() => {
+        const modifiedStorage = createSchemasMap(modifiedStore, createStorageMap());
+        denormalizer.setCacheLastChecked();
+
+        const isAlreadyChecked = sinon.spy(denormalizer.cache, "isAlreadyChecked");
+        const getValidItem = sinon.spy(denormalizer.cache, "getValidItem");
+
+        const denormalizedDataWithCheck =
+          denormalizer.denormalizeOne('type1Id1', storage, 'type1');
+
+        assert.isOk(denormalizedData === denormalizedDataWithCheck);
+        assert.isOk(isAlreadyChecked.called, 'check not called');
+        assert.isOk(getValidItem.called, 'getValidItem not called');
+        assert.isOk(isAlreadyChecked.returned(false), 'check returned true');
+      done();
+      }, 10);
+    });
+
     it('denormalizes valid id with circular dependency', () => {
       const denormalizer = new ReduxApiStateDenormalizer();
       const storage = createSchemasMap(getStore(), createStorageMap());
@@ -574,6 +676,7 @@ describe('ReduxApiStateDenormalizer', () => {
 
       const denormalizedData =
         denormalizer.denormalizeOne(one, storage);
+
       const cachedDenormalizedData =
         denormalizer.denormalizeOne(one, modifiedStorage);
 
@@ -600,12 +703,15 @@ describe('ReduxApiStateDenormalizer', () => {
       const one = { value: 'type1Id1' };
       one[STATUS] = { schema: 'type1', id: _.uniqueId() };
 
-      const denormalizedData = mergeStatus(denormalizer.denormalizeOne(one, storage));
+      const denormalizedData = denormalizer.denormalizeOne(one, storage);
+      const denormalizedDataWithStatus = mergeStatus(denormalizedData);
 
       storage = createSchemasMap(getModifiedStore(store), createStorageMap());
 
       const notCachedDenormalizedData =
-        mergeStatus(denormalizer.denormalizeOne(one, storage));
+        denormalizer.denormalizeOne(one, storage);
+      const notCachedDenormalizedDataWithStatus =
+        mergeStatus(notCachedDenormalizedData);
 
       const expectedData = {
         id: 'type1Id1',
@@ -644,7 +750,7 @@ describe('ReduxApiStateDenormalizer', () => {
 
       assert.isOk(notCachedDenormalizedData !== denormalizedData, 'didn\'t create new object');
       assert.deepEqual(
-        notCachedDenormalizedData,
+        notCachedDenormalizedDataWithStatus,
         expectedData,
         'item not denormalized correctly'
       );

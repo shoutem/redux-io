@@ -89,7 +89,7 @@ export default class ReduxApiStateDenormalizer extends ReduxDenormalizer {
    * @param getStore - returns latest store
    * @param storeSchemasPaths - { schema: pathInStoreToSchema }
    */
-  constructor(getStore, storeSchemasPaths) {
+  constructor(getStore, storeSchemasPaths, options = {}) {
     // TODO - optimize relationships cache
     // TODO - use state entities to detect change
     if (getStore && storeSchemasPaths) {
@@ -106,8 +106,13 @@ export default class ReduxApiStateDenormalizer extends ReduxDenormalizer {
     this.flushCache = this.flushCache.bind(this);
     this.flushLastChecked = this.flushCacheLastChecked.bind(this);
 
-    this.cache = new RioCache(this.getNormalizedItem);
     this.forbidCache = new Set();
+    this.cache = new RioCache(
+      this.getNormalizedItem,
+      {
+        useLastCheckedCache: options.useLastCheckedCache,
+      }
+    );
   }
 
   /**
