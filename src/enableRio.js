@@ -51,6 +51,7 @@ export function enableRio(reducer, options = {}) {
 
   const denormalizerOptions = {
     useModificationCache: resolvedOptions.useModificationCache,
+    defaultMaxDepth: resolvedOptions.defaultMaxDepth,
   };
   rio.setDenormalizer(new ReduxApiStateDenormalizer(null, null, denormalizerOptions));
 

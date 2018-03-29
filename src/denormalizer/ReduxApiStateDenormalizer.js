@@ -115,6 +115,10 @@ export default class ReduxApiStateDenormalizer extends ReduxDenormalizer {
         defaultMaxDepth: this.nestingDepthLimit,
       }
     );
+
+    if (options.defaultMaxDepth) {
+      this.setNestingDepthLimit(options.defaultMaxDepth);
+    }
   }
 
   /**
