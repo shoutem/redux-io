@@ -56,7 +56,7 @@
     "sinon": "^1.17.4"
   },
   "dependencies": {
-    "@shoutem/json-api-denormalizer": "^0.3.7",
+    "@shoutem/json-api-denormalizer": "0.4.0-beta.2",
     "lodash": "^4.13.1",
     "vedrani-json-api-normalizr": "^3.2.4",
     "redux": "^3.3.1",

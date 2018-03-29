@@ -111,6 +111,7 @@ export default class ReduxApiStateDenormalizer extends ReduxDenormalizer {
       this.getNormalizedItem,
       {
         useModificationCache: options.useModificationCache,
+        defaultMaxDepth: this.nestingDepthLimit,
       }
     );
   }
@@ -136,14 +137,14 @@ export default class ReduxApiStateDenormalizer extends ReduxDenormalizer {
    * @param itemDescriptor - { id, type }
    * @returns {{}}
    */
-  denormalizeItem(itemDescriptor) {
-    const cachedItem = this.cache.get(itemDescriptor);
+  denormalizeItem(itemDescriptor, maxDepth) {
+    const cachedItem = this.cache.get(itemDescriptor, maxDepth);
 
     if (this.cache.isChecked(itemDescriptor)) {
       return cachedItem;
     }
 
-    const item = this.cache.getValidItem(itemDescriptor, cachedItem);
+    const item = this.cache.getValidItem(itemDescriptor, cachedItem, maxDepth);
     if (item) {
       return item;
     }
@@ -151,14 +152,14 @@ export default class ReduxApiStateDenormalizer extends ReduxDenormalizer {
     const uniqueKey = getReferenceUniqueKey(itemDescriptor);
 
     try {
-      const denormalizedItem = super.denormalizeItem(itemDescriptor);
+      const denormalizedItem = super.denormalizeItem(itemDescriptor, maxDepth);
       this.forbidCache.delete(uniqueKey);
 
       if (
         _.isEmpty(this.forbidCache) &&
         denormalizedItem !== itemDescriptor
       ) {
-        this.cache.add(denormalizedItem);
+        this.cache.add(denormalizedItem, maxDepth);
       }
 
       return denormalizedItem;
@@ -169,7 +170,7 @@ export default class ReduxApiStateDenormalizer extends ReduxDenormalizer {
       }
 
       if (error instanceof TooDeepDenormalizationError) {
-        this.forbidCache.add(uniqueKey);
+        //this.forbidCache.add(uniqueKey);
         return itemDescriptor;
       }
 
@@ -189,7 +190,7 @@ export default class ReduxApiStateDenormalizer extends ReduxDenormalizer {
    * @param schema (optional)
    * @returns {{}}
    */
-  denormalizeOne(one, storage, schema) {
+  denormalizeOne(one, storage, schema, maxDepth) {
     if (!one) {
       // If one undefined we have nothing to do with it
       return undefined;
@@ -201,21 +202,21 @@ export default class ReduxApiStateDenormalizer extends ReduxDenormalizer {
 
     if (_.isPlainObject(one)) {
       // is RIO One reference
-      let denormalizedOne = this.cache.getValidOne(one);
+      let denormalizedOne = this.cache.getValidOne(one, maxDepth);
       if (denormalizedOne) {
         return denormalizedOne;
       }
 
       // One is different object then denormalizedItem
-      denormalizedOne = { ...this.denormalizeItem(itemDescriptor) };
+      denormalizedOne = { ...this.denormalizeItem(itemDescriptor, maxDepth) };
       // Append One status to denormalizedOne
       // When One is RIO reference we want status of reference and not status of contained item.
       cloneStatus(one, denormalizedOne);
-      return this.cache.add(denormalizedOne);
+      return this.cache.add(denormalizedOne, maxDepth);
     }
 
     // is Primitive value
-    return this.denormalizeItem(itemDescriptor);
+    return this.denormalizeItem(itemDescriptor, maxDepth);
   }
 
   /**
@@ -245,7 +246,7 @@ export default class ReduxApiStateDenormalizer extends ReduxDenormalizer {
    * @param schema (optional)
    * @returns {{}}
    */
-  denormalizeCollection(collection, storage, schema) {
+  denormalizeCollection(collection, storage, schema, maxDepth) {
     if (!collection) {
       // If collection undefined we have nothing to do with it
       return undefined;
@@ -253,22 +254,27 @@ export default class ReduxApiStateDenormalizer extends ReduxDenormalizer {
 
     const descriptorCollection = createDescriptorCollection(collection, schema);
 
-    let denormalizedCollection = this.cache.getValidCollection(descriptorCollection);
+    let denormalizedCollection = this.cache.getValidCollection(descriptorCollection, maxDepth);
     if (!denormalizedCollection) {
       this.updateStorageMap(storage);
 
       denormalizedCollection =
-        descriptorCollection.map(itemDescriptor => this.denormalizeItem(itemDescriptor));
+        descriptorCollection.map(itemDescriptor => this.denormalizeItem(itemDescriptor, maxDepth));
 
       if (!getStatus(collection)) {
         return denormalizedCollection;
       }
 
       cloneStatus(collection, denormalizedCollection);
-      this.cache.add(denormalizedCollection);
+      this.cache.add(denormalizedCollection, maxDepth);
     }
 
     return denormalizedCollection;
+  }
+
+  setNestingDepthLimit(nestingDepthLimit) {
+    super.setNestingDepthLimit(nestingDepthLimit);
+    this.cache.setDefaultMaxDepth(nestingDepthLimit);
   }
 
   /**

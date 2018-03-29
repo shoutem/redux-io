@@ -94,6 +94,6 @@ export default class ReduxDenormalizer extends ObjectDenormalizer {
    */
   denormalizeCollection(collection, storage) {
     this.updateStorageMap(storage);
-    return collection.map(this.denormalizeItem);
+    return collection.map(item => this.denormalizeItem(item));
   }
 }

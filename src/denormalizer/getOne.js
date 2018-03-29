@@ -8,6 +8,10 @@ Object.freeze(emptyObject);
 
 const resolveStorageMap = _.memoize((state, schemaPaths) => createSchemasMap(state, schemaPaths));
 
+const defaultOptions = {
+  schema: '',
+};
+
 /**
  * Connects rio configurations with denormalizer to simplify denormalization
  * of normalized data in state.
@@ -16,7 +20,7 @@ const resolveStorageMap = _.memoize((state, schemaPaths) => createSchemasMap(sta
  * @param schema
  * @returns {{}}
  */
-export function getOne(one, state, schema = '') {
+export function getOne(one, state, options = {}) {
   if ((_.isUndefined(one) || _.isNull(one))) {
     // Always return same reference.
     return emptyObject;
@@ -28,7 +32,12 @@ export function getOne(one, state, schema = '') {
     throw new Error('State argument is invalid, should be an object.');
   }
 
-  const resolvedSchema = resolveReferenceSchemaType(one, schema);
+  const resolvedOptions = {
+    ...defaultOptions,
+    ...(_.isString(options) ? { schema: options } : options),
+  };
+
+  const resolvedSchema = resolveReferenceSchemaType(one, resolvedOptions.schema);
 
   const schemaPaths = rio.resourcePaths;
   if (!schemaPaths[resolvedSchema]) {

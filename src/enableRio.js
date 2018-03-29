@@ -29,17 +29,30 @@ function discoverSchemaPaths(state, currentPath = [], discoveredPaths = {}) {
   return discoveredPaths;
 }
 
-export function enableRio(reducer, keepExistingPaths = false, useModificationCache = true) {
+const DEFAULT_OPTIONS = {
+  keepExistingPaths: false,
+  useModificationCache: true,
+};
+
+export function enableRio(reducer, options = {}) {
+  const resolvedOptions = {
+    ...DEFAULT_OPTIONS,
+    ...options,
+  };
+
   const initialState = reducer(undefined, { type: 'unknown' });
   const paths = discoverSchemaPaths(initialState);
 
-  if (keepExistingPaths) {
+  if (resolvedOptions.keepExistingPaths) {
     rio.appendResourcePaths(paths);
   } else {
     rio.setResourcePaths(paths);
   }
 
-  rio.setDenormalizer(new ReduxApiStateDenormalizer(null, null, { useModificationCache }));
+  const denormalizerOptions = {
+    useModificationCache: resolvedOptions.useModificationCache,
+  };
+  rio.setDenormalizer(new ReduxApiStateDenormalizer(null, null, denormalizerOptions));
 
   return enableBatching(reducer);
 }
