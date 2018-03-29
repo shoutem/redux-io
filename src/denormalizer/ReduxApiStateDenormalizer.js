@@ -1,4 +1,5 @@
 import _ from 'lodash';
+import memoizeOne from 'memoize-one';
 import {
   CircularDenormalizationError,
   TooDeepDenormalizationError,
@@ -13,14 +14,14 @@ import ReduxDenormalizer from './ReduxDenormalizer';
  * @param storeSchemasPaths {schema: 'path.to.storage' || schema: ['path', 'to', 'storage]}
  * @returns {{}}
  */
-export function createSchemasMap(state, storeSchemasPaths) {
+export const createSchemasMap = memoizeOne((state, storeSchemasPaths) => {
   const storage = {};
 
   // eslint-disable-next-line no-return-assign
   _.forEach(storeSchemasPaths, (path, schema) => storage[schema] = _.get(state, path));
 
   return storage;
-}
+});
 
 function getType(collection, schema) {
   const collectionStatus = getStatus(collection);
