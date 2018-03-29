@@ -37,7 +37,9 @@ export function getOne(one, state, options = {}) {
     ...(_.isString(options) ? { schema: options } : options),
   };
 
-  const resolvedSchema = resolveReferenceSchemaType(one, resolvedOptions.schema);
+  const { schema, maxDepth } = resolvedOptions;
+
+  const resolvedSchema = resolveReferenceSchemaType(one, schema);
 
   const schemaPaths = rio.resourcePaths;
   if (!schemaPaths[resolvedSchema]) {
@@ -46,5 +48,5 @@ export function getOne(one, state, options = {}) {
 
   const storageMap = resolveStorageMap(state, schemaPaths);
 
-  return rio.denormalizer.denormalizeOne(one, storageMap, resolvedSchema);
+  return rio.denormalizer.denormalizeOne(one, storageMap, resolvedSchema, maxDepth);
 }

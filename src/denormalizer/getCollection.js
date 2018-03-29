@@ -8,6 +8,10 @@ Object.freeze(emptyArray);
 
 const resolveStorageMap = _.memoize((state, schemaPaths) => createSchemasMap(state, schemaPaths));
 
+const defaultOptions = {
+  schema: '',
+};
+
 /**
  * Connects rio configurations with denormalizer to simplify denormalization
  * of normalized data in state.
@@ -16,7 +20,7 @@ const resolveStorageMap = _.memoize((state, schemaPaths) => createSchemasMap(sta
  * @param schema
  * @returns {[]}
  */
-export function getCollection(collection, state, schema = '') {
+export function getCollection(collection, state, options = {}) {
   if (!collection) {
     // Handle undefined values reasonably
     // Always return same reference.
@@ -30,6 +34,13 @@ export function getCollection(collection, state, schema = '') {
     throw new Error('State argument is invalid, should be an object.');
   }
 
+  const resolvedOptions = {
+    ...defaultOptions,
+    ...(_.isString(options) ? { schema: options } : options),
+  };
+
+  const { schema, maxDepth } = resolvedOptions;
+
   const resolvedSchema = resolveReferenceSchemaType(collection, schema);
 
   const schemaPaths = rio.resourcePaths;
@@ -39,5 +50,5 @@ export function getCollection(collection, state, schema = '') {
 
   const storageMap = resolveStorageMap(state, schemaPaths);
 
-  return rio.denormalizer.denormalizeCollection(collection, storageMap, resolvedSchema);
+  return rio.denormalizer.denormalizeCollection(collection, storageMap, resolvedSchema, maxDepth);
 }
