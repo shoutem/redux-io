@@ -107,7 +107,7 @@ export default class ReduxApiStateDenormalizer extends ReduxDenormalizer {
     this.flushCache = this.flushCache.bind(this);
     this.flushModificationCache = this.flushModificationCache.bind(this);
 
-    this.forbidCache = new Set();
+    this.forbidLoopCaching = new Set();
     this.cache = new RioCache(
       this.getNormalizedItem,
       {
@@ -158,10 +158,14 @@ export default class ReduxApiStateDenormalizer extends ReduxDenormalizer {
 
     try {
       const denormalizedItem = super.denormalizeItem(itemDescriptor, maxDepth);
-      this.forbidCache.delete(uniqueKey);
+      this.forbidLoopCaching.delete(uniqueKey);
+      if (_.isEmpty(this.denormalizingDescriptorKeys)) {
+        this.forbidIncompleteCaching = false;
+      }
 
       if (
-        _.isEmpty(this.forbidCache) &&
+        !this.forbidIncompleteCaching &&
+        _.isEmpty(this.forbidLoopCaching) &&
         denormalizedItem !== itemDescriptor
       ) {
         this.cache.add(denormalizedItem, maxDepth);
@@ -170,12 +174,12 @@ export default class ReduxApiStateDenormalizer extends ReduxDenormalizer {
       return denormalizedItem;
     } catch (error) {
       if (error instanceof CircularDenormalizationError) {
-        this.forbidCache.add(uniqueKey);
+        this.forbidLoopCaching.add(uniqueKey);
         return itemDescriptor;
       }
 
       if (error instanceof TooDeepDenormalizationError) {
-        //this.forbidCache.add(uniqueKey);
+        this.forbidIncompleteCaching = true;
         return itemDescriptor;
       }
 
