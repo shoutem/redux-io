@@ -54,7 +54,8 @@ of data in redux state. This section documents the complete redux-io API.
 
 ### Importing
 
-Every function described above is a top-level export, except `rio` that has default export. You can import any of them like this:
+Every function described above is a top-level export, except `rio` that has default export. You can import any of them
+like this:
 
 #### ES6
 
