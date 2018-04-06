@@ -70,6 +70,12 @@ function createSingleDescriptor(single, schema) {
   };
 }
 
+const DEFAULT_OPTIONS = {
+  defaultMaxDepth: null,
+  useModificationCache: false,
+  cacheChildObjects: false,
+};
+
 /**
  * Returns provided data in denormalized form
  */
@@ -101,24 +107,34 @@ export default class ReduxApiStateDenormalizer extends ReduxDenormalizer {
       super();
     }
 
+    this.isRootLevel = this.isRootLevel.bind(this);
     this.denormalizeItem = this.denormalizeItem.bind(this);
     this.getNormalizedItem = this.getNormalizedItem.bind(this);
     this.invalidateModificationCache = this.invalidateModificationCache.bind(this);
     this.flushCache = this.flushCache.bind(this);
     this.flushModificationCache = this.flushModificationCache.bind(this);
 
+    this.options = {
+      ...DEFAULT_OPTIONS,
+      ...options,
+    };
+
     this.forbidLoopCaching = new Set();
     this.cache = new RioCache(
       this.getNormalizedItem,
       {
-        useModificationCache: options.useModificationCache,
+        useModificationCache: this.options.useModificationCache,
         defaultMaxDepth: this.nestingDepthLimit,
       }
     );
 
-    if (options.defaultMaxDepth) {
-      this.setNestingDepthLimit(options.defaultMaxDepth);
+    if (this.options.defaultMaxDepth) {
+      this.setNestingDepthLimit(this.options.defaultMaxDepth);
     }
+  }
+
+  isRootLevel() {
+    return _.isEmpty(this.denormalizingDescriptorKeys);
   }
 
   /**
@@ -143,15 +159,17 @@ export default class ReduxApiStateDenormalizer extends ReduxDenormalizer {
    * @returns {{}}
    */
   denormalizeItem(itemDescriptor, maxDepth) {
-    const cachedItem = this.cache.get(itemDescriptor, maxDepth);
+    if (this.isRootLevel() || this.options.cacheChildObjects) {
+      const cachedItem = this.cache.get(itemDescriptor, maxDepth);
 
-    if (this.cache.isChecked(itemDescriptor)) {
-      return cachedItem;
-    }
+      if (this.cache.isChecked(itemDescriptor, maxDepth)) {
+        return cachedItem;
+      }
 
-    const item = this.cache.getValidItem(itemDescriptor, cachedItem, maxDepth);
-    if (item) {
-      return item;
+      const item = this.cache.getValidItem(itemDescriptor, cachedItem, maxDepth);
+      if (item) {
+        return item;
+      }
     }
 
     const uniqueKey = getReferenceUniqueKey(itemDescriptor);
@@ -159,11 +177,12 @@ export default class ReduxApiStateDenormalizer extends ReduxDenormalizer {
     try {
       const denormalizedItem = super.denormalizeItem(itemDescriptor, maxDepth);
       this.forbidLoopCaching.delete(uniqueKey);
-      if (_.isEmpty(this.denormalizingDescriptorKeys)) {
+      if (this.isRootLevel()) {
         this.forbidIncompleteCaching = false;
       }
 
       if (
+        (this.isRootLevel() || this.options.cacheChildObjects) &&
         !this.forbidIncompleteCaching &&
         _.isEmpty(this.forbidLoopCaching) &&
         denormalizedItem !== itemDescriptor

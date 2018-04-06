@@ -32,6 +32,7 @@ function discoverSchemaPaths(state, currentPath = [], discoveredPaths = {}) {
 const DEFAULT_OPTIONS = {
   keepExistingPaths: false,
   useModificationCache: true,
+  cacheChildObjects: false,
 };
 
 export function enableRio(reducer, options = {}) {
@@ -49,9 +50,12 @@ export function enableRio(reducer, options = {}) {
     rio.setResourcePaths(paths);
   }
 
+  const { useModificationCache, defaultMaxDepth, cacheChildObjects } = resolvedOptions;
+
   const denormalizerOptions = {
-    useModificationCache: resolvedOptions.useModificationCache,
-    defaultMaxDepth: resolvedOptions.defaultMaxDepth,
+    useModificationCache,
+    defaultMaxDepth,
+    cacheChildObjects,
   };
   rio.setDenormalizer(new ReduxApiStateDenormalizer(null, null, denormalizerOptions));
 

@@ -79,7 +79,7 @@ export default class RioCache {
   constructor(getNormalizedItem, options = {}) {
     this.cache = {};
     this.traversedKeys = new Set();
-    this.modificationCache = new Set();
+    this.modificationCache = {};
     this.lastModificationTimestamp = new Date().getTime();
     // It is expected to return descriptor for items that can't be found.
     this.getNormalizedItem = getNormalizedItem;
@@ -111,7 +111,7 @@ export default class RioCache {
   }
 
   flushModificationCache() {
-    this.modificationCache = new Set();
+    this.modificationCache = {};
     this.invalidateModificationCache();
   }
 
