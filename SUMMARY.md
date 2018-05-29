@@ -1,7 +1,7 @@
 # Table of contents
 
-* [READ ME](README.md)
+* [redux-io](README.md)
 * docs
-  * [API Reference](docs/api/README.md)
-    * [storage\(schema, initialState={}\)](docs/api/storage.md)
+  * [API Reference](docs/api-reference/README.md)
+    * [storage\(schema, initialState={}\)](docs/api-reference/storage-schema-initialstate.md)
 

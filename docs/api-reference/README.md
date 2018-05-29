@@ -5,7 +5,7 @@ The redux-io defines a set of actions, reducers, selectors, middleware and helpe
 ## Reducers
 
 * [resource\(schema, initialState = {}\)](https://github.com/shoutem/redux-io/tree/d07e4568e1af7c2fd89072d223bed8fd407657dd/docs/api/resouce.md)
-* [storage\(schema, initialState = {}\)](storage.md)
+* [storage\(schema, initialState = {}\)](storage-schema-initialstate.md)
 * [collection\(schema, tag = '', settings = {}, initialState = \[\]\)](https://github.com/shoutem/redux-io/tree/d07e4568e1af7c2fd89072d223bed8fd407657dd/docs/api/collection.md)
 * [one\(schema, tag = '', settings = {}, initialValue = ''\)](https://github.com/shoutem/redux-io/tree/d07e4568e1af7c2fd89072d223bed8fd407657dd/docs/api/one.md)
 
