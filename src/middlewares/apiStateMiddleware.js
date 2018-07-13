@@ -1,7 +1,7 @@
 /* eslint-disable no-unused-expressions */
 /* eslint no-console: ["error", {allow: ["warn", "error"] }] */
 import _ from 'lodash';
-import { batchActions } from 'redux-batched-actions';
+import { batchActions, BATCH } from 'redux-batched-actions';
 import rio from '../rio';
 import {
   validationStatus,
@@ -432,6 +432,11 @@ function handleNetworkAction(action, dispatch) {
 
 function isInternalAction(action) {
   const type = _.get(action, 'type');
+
+  if (type === BATCH) {
+    return _.some(action.payload, isInternalAction);
+  }
+
   return internalActions.has(type);
 }
 
@@ -463,7 +468,6 @@ export default store => next => action => {
   }
 
   if (!_.isEmpty(actions)) {
-    rio.denormalizer.invalidateModificationCache();
     store.dispatch(batchActions(actions));
   }
 

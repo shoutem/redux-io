@@ -1,6 +1,6 @@
 {
   "name": "@shoutem/redux-io",
-  "version": "3.1.0-beta.3",
+  "version": "3.1.0-beta.10",
   "description": "Action creators, reducers and middleware for simple handling of normalized json api data in state",
   "main": "index.js",
   "scripts": {
@@ -56,14 +56,15 @@
     "sinon": "^1.17.4"
   },
   "dependencies": {
-    "@shoutem/json-api-denormalizer": "^0.3.7",
+    "@shoutem/json-api-denormalizer": "0.4.0-beta.2",
     "lodash": "^4.13.1",
-    "vedrani-json-api-normalizr": "^3.2.4",
+    "memoize-one": "^3.1.1",
     "redux": "^3.3.1",
     "redux-api-middleware": "2.0.1",
     "redux-batched-actions": "^0.1.2",
     "redux-thunk": "^2.0.0",
     "urijs": "^1.18.10",
+    "vedrani-json-api-normalizr": "^3.2.4",
     "z-schema": "^3.17.0"
   }
 }

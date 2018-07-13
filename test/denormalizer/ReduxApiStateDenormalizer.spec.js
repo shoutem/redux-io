@@ -558,6 +558,151 @@ describe('ReduxApiStateDenormalizer', () => {
       );
     });
 
+    it('denormalizes valid id with depth limit reached', () => {
+      const denormalizer = new ReduxApiStateDenormalizer();
+      denormalizer.setNestingDepthLimit(1);
+
+      const storage = createSchemasMap(getStore(), createStorageMap());
+      const expectedData = {
+        id: 'typeAId1',
+        type: 'typeA',
+        [STATUS]: storage['typeA']['typeAId1'][STATUS],
+        name: 'typeAId1',
+        typeArel: [
+          {
+            id: 'typeAId2',
+            type: 'typeA',
+          },
+          {
+            id: 'typeAId3',
+            type: 'typeA',
+          },
+        ],
+      };
+
+      const denormalizedData =
+        denormalizer.denormalizeOne('typeAId1', storage, 'typeA');
+      const denormalizedDataWithStatus =
+        mergeStatus(denormalizedData);
+
+        assert.isObject(denormalizedDataWithStatus[STATUS]);
+      assert.shallowDeepEqual(
+        denormalizedDataWithStatus,
+        expectedData,
+        'item not denormalized correctly'
+      );
+
+      const denormalizedDataFromCache =
+        denormalizer.denormalizeOne('typeAId1', storage, 'typeA');
+      const denormalizedDataFromCacheWithStatus =
+        mergeStatus(denormalizedDataFromCache);
+
+        assert.isObject(denormalizedDataFromCacheWithStatus[STATUS]);
+      assert.shallowDeepEqual(
+        denormalizedDataFromCacheWithStatus,
+        expectedData,
+        'item not denormalized correctly'
+      );
+
+      assert.isOk(denormalizedDataFromCache === denormalizedData);
+      assert.equal(denormalizedDataFromCache, denormalizedData, 'item is not returned from cache');
+    });
+
+    it('denormalizes valid id with various depth limit reached', () => {
+      const denormalizer = new ReduxApiStateDenormalizer();
+      denormalizer.setNestingDepthLimit(1);
+
+      const storage = createSchemasMap(getStore(), createStorageMap());
+      const expectedData = {
+        id: 'typeAId1',
+        type: 'typeA',
+        [STATUS]: storage['typeA']['typeAId1'][STATUS],
+        name: 'typeAId1',
+        typeArel: [
+          {
+            id: 'typeAId2',
+            type: 'typeA',
+          },
+          {
+            id: 'typeAId3',
+            type: 'typeA',
+          },
+        ],
+      };
+
+      const denormalizedData =
+        denormalizer.denormalizeOne('typeAId1', storage, 'typeA');
+      const denormalizedDataWithStatus =
+        mergeStatus(denormalizedData);
+
+      assert.isObject(denormalizedDataWithStatus[STATUS]);
+      assert.deepEqual(
+        denormalizedDataWithStatus,
+        expectedData,
+        'item not denormalized correctly'
+      );
+
+      const expectedDeepData = {
+        id: 'typeAId1',
+        type: 'typeA',
+        [STATUS]: storage['typeA']['typeAId1'][STATUS],
+        name: 'typeAId1',
+        typeArel: [
+          {
+            id: 'typeAId2',
+            type: 'typeA',
+            name: 'typeAId2',
+            [STATUS]: storage['typeA']['typeAId2'][STATUS],
+            typeArel:
+              {
+                id: 'typeAId1',
+                type: 'typeA',
+              },
+          },
+          {
+            id: 'typeAId3',
+            type: 'typeA',
+            name: 'typeAId3',
+            [STATUS]: storage['typeA']['typeAId3'][STATUS],
+            typeArel:
+              {
+                id: 'typeAId1',
+                type: 'typeA',
+              },
+          },
+        ],
+      };
+
+      const denormalizedDeepDataFromCache =
+        denormalizer.denormalizeOne('typeAId1', storage, 'typeA', 2);
+      const denormalizedDeepDataFromCacheWithStatus =
+        mergeStatus(denormalizedDeepDataFromCache);
+
+      assert.isObject(denormalizedDeepDataFromCacheWithStatus[STATUS]);
+      assert.deepEqual(
+        denormalizedDeepDataFromCacheWithStatus,
+        expectedDeepData,
+        'item not denormalized correctly'
+      );
+
+      assert.isOk(denormalizedDeepDataFromCache !== denormalizedData);
+
+      const denormalizedDataFromCache =
+        denormalizer.denormalizeOne('typeAId1', storage, 'typeA');
+      const denormalizedDataFromCacheWithStatus =
+        mergeStatus(denormalizedDataFromCache);
+
+      assert.isObject(denormalizedDataFromCacheWithStatus[STATUS]);
+      assert.deepEqual(
+        denormalizedDataFromCacheWithStatus,
+        expectedData,
+        'item not denormalized correctly'
+      );
+
+      assert.isOk(denormalizedDataFromCache !== denormalizedDeepDataFromCache);
+      assert.isOk(denormalizedDataFromCache === denormalizedData);
+    });
+
     it('throws error when denormalizing primitive one and no schema provided', () => {
       const denormalizer = new ReduxApiStateDenormalizer();
       const storage = createSchemasMap(getStore(), createStorageMap());

@@ -6,7 +6,9 @@ import { resolveReferenceSchemaType } from '../resources';
 const emptyObject = {};
 Object.freeze(emptyObject);
 
-const resolveStorageMap = _.memoize((state, schemaPaths) => createSchemasMap(state, schemaPaths));
+const defaultOptions = {
+  schema: '',
+};
 
 /**
  * Connects rio configurations with denormalizer to simplify denormalization
@@ -16,7 +18,7 @@ const resolveStorageMap = _.memoize((state, schemaPaths) => createSchemasMap(sta
  * @param schema
  * @returns {{}}
  */
-export function getOne(one, state, schema = '') {
+export function getOne(one, state, options = {}) {
   if ((_.isUndefined(one) || _.isNull(one))) {
     // Always return same reference.
     return emptyObject;
@@ -28,6 +30,13 @@ export function getOne(one, state, schema = '') {
     throw new Error('State argument is invalid, should be an object.');
   }
 
+  const resolvedOptions = {
+    ...defaultOptions,
+    ...(_.isString(options) ? { schema: options } : options),
+  };
+
+  const { schema, maxDepth } = resolvedOptions;
+
   const resolvedSchema = resolveReferenceSchemaType(one, schema);
 
   const schemaPaths = rio.resourcePaths;
@@ -35,7 +44,7 @@ export function getOne(one, state, schema = '') {
     throw new Error(`Storage for resolved schema ${resolvedSchema} doesn't exists in state.`);
   }
 
-  const storageMap = resolveStorageMap(state, schemaPaths);
+  const storageMap = createSchemasMap(state, schemaPaths);
 
-  return rio.denormalizer.denormalizeOne(one, storageMap, resolvedSchema);
+  return rio.denormalizer.denormalizeOne(one, storageMap, resolvedSchema, maxDepth);
 }

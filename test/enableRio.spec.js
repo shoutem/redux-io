@@ -130,7 +130,9 @@ describe('EnableRio reducer', () => {
       'cars': ['carsStorage']
     };
 
-    const testBatchedReducerRepeated = enableRio(testReducerRepeated, true);
+    const testBatchedReducerRepeated = enableRio(testReducerRepeated, {
+      keepExistingPaths: true,
+    });
     const stateRepeated = testBatchedReducerRepeated(undefined, batchActions([{}]));
 
     expect(stateRepeated).to.shallowDeepEqual({});
@@ -180,7 +182,9 @@ describe('EnableRio reducer', () => {
       'cars': ['carsStorageRepeated']
     };
 
-    const testBatchedReducerRepeated = enableRio(testReducerRepeated, false);
+    const testBatchedReducerRepeated = enableRio(testReducerRepeated, {
+      keepExistingPaths: false,
+    });
     const stateRepeated = testBatchedReducerRepeated(undefined, batchActions([{}]));
 
     expect(stateRepeated).to.shallowDeepEqual({});
