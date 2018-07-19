@@ -8,7 +8,7 @@ import {
   busyStatus,
 } from '../status';
 import Outdated from '../outdated';
-import { JSON_API_SOURCE } from '../standardizers/json-api-standardizer';
+import { JSON_API_RESOURCE } from '../resources';
 import {
   LOAD_REQUEST,
   LOAD_SUCCESS,
@@ -137,9 +137,9 @@ export function makeObjectAction(sourceAction, actionType, item) {
   }
 
   // finds appropriate standardizer for transformation
-  const transform = rio.getStandardizer(sourceAction.meta.source);
+  const standardizer = rio.getStandardizer(sourceAction.meta.source);
   // transforms item into standard model
-  const transformation = transform(item);
+  const transformation = standardizer.transform(item);
 
   return {
     type: actionType,
@@ -380,8 +380,8 @@ function isValidAction(action) {
       console.error('Response should contain payload.');
       return false;
     }
-    if (meta.source === JSON_API_SOURCE && !_.has(action, 'payload.data')) {
-      console.error(`${JSON_API_SOURCE} response should contain payload.data.`);
+    if (meta.source === JSON_API_RESOURCE && !_.has(action, 'payload.data')) {
+      console.error(`${JSON_API_RESOURCE} response should contain payload.data.`);
       return false;
     }
   }

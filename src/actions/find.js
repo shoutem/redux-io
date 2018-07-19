@@ -4,13 +4,13 @@ import {
   LOAD_REQUEST,
   LOAD_SUCCESS,
   LOAD_ERROR,
-} from './../consts';
-import { JSON_API_SOURCE } from './..';
+} from '../consts';
 import {
   buildEndpoint,
   resolveResourceConfig,
   resolveSchemaType,
-} from './../resources';
+  JSON_API_RESOURCE,
+} from '../resources';
 import thunkAction from './_thunkAction';
 import { extendMetaWithResponse, buildRSAAConfig } from '../rsaa';
 
@@ -64,7 +64,7 @@ export function find(schema, tag = '', params = {}, options = {}) {
     params,
     endpoint,
     options,
-    source: config.request.resourceType || JSON_API_SOURCE,
+    source: config.request.resourceType || JSON_API_RESOURCE,
     schema: schemaType,
     timestamp: Date.now(),
   };
@@ -93,4 +93,3 @@ export function find(schema, tag = '', params = {}, options = {}) {
 }
 
 export default thunkAction(find);
-

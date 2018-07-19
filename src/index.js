@@ -51,8 +51,11 @@ export { invalidate };
 import checkExpiration from './actions/checkExpiration';
 export { checkExpiration };
 
-import { JSON_API_SOURCE } from './standardizers/json-api-standardizer';
-export { JSON_API_SOURCE };
+export {
+  JSON_API_RESOURCE,
+  baseResourceTypeConfig,
+  jsonApiResourceTypeConfig,
+} from './resources';
 
 import ReduxApiStateDenormalizer, {
   createSchemasMap,

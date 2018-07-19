@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import {
   CREATE_SUCCESS,
-  JSON_API_SOURCE,
+  JSON_API_RESOURCE,
 } from '../../src';
 import created from '../../src/actions/created';
 
@@ -23,7 +23,7 @@ describe('Created action creator', () => {
       payload: item,
       meta: {
         schema,
-        source: JSON_API_SOURCE,
+        source: JSON_API_RESOURCE,
       },
     };
     const createSuccessAction = created(item, schema);

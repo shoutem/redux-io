@@ -1,9 +1,11 @@
 export {
   validateResourceConfig,
+  validateResourceTypeConfig,
 } from './validation';
 
 export {
   resolveSchemaType,
+  resolveResourceType,
   resolveSchema,
   resolveResourceConfig,
   resolveReferenceSchemaType,
@@ -11,6 +13,7 @@ export {
 } from './resolver';
 
 export {
-  defaultResourceConfig,
-  jsonApiResourceConfig,
-} from './configs';
+  baseResourceTypeConfig,
+  jsonApiResourceTypeConfig,
+  JSON_API_RESOURCE,
+} from './config';

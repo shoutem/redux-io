@@ -4,14 +4,14 @@ import {
   REMOVE_REQUEST,
   REMOVE_SUCCESS,
   REMOVE_ERROR,
-} from './../consts';
-import { JSON_API_SOURCE } from './..';
+} from '../consts';
 import {
   buildEndpoint,
   resolveResourceConfig,
   resolveSchemaType,
   resolveSchema,
-} from './../resources';
+  JSON_API_RESOURCE,
+} from '../resources';
 import { normalize } from '../normalizer';
 import thunkAction from './_thunkAction';
 import { extendMetaWithResponse, buildRSAAConfig } from '../rsaa';
@@ -38,7 +38,7 @@ export function remove(schema, item, params = {}, options = {}) {
 
   if (!config) {
     const schemaName = schema && _.isObject(schema) ? schemaType : schema;
-    throw new Error(`Couldn't resolve schema ${schemaName} in function find.`);
+    throw new Error(`Couldn't resolve schema ${schemaName} in function remove.`);
   }
   if (!_.isObject(item)) {
     throw new Error('Item isn\'t object.');
@@ -48,7 +48,7 @@ export function remove(schema, item, params = {}, options = {}) {
 
   const rsaaConfig = buildRSAAConfig(config);
   const endpoint = buildEndpoint(rsaaConfig.endpoint, params, options);
-  const source = _.get(config, 'request.resourceType', JSON_API_SOURCE);
+  const source = _.get(config, 'request.resourceType', JSON_API_RESOURCE);
 
   const meta = {
     params,

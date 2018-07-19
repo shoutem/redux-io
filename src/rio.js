@@ -1,6 +1,12 @@
 import _ from 'lodash';
-import { validateResourceConfig, resolveSchemaType } from './resources';
-import { JSON_API_SOURCE, transform } from './standardizers/json-api-standardizer';
+import {
+  validateResourceConfig,
+  validateResourceTypeConfig,
+  resolveSchemaType,
+  JSON_API_RESOURCE,
+  jsonApiResourceTypeConfig,
+} from './resources';
+import JsonApiStandardizer from './standardizers/JsonApiStandardizer';
 
 /**
  * Adds additional layer over library by providing central place for defining rio behavior
@@ -74,34 +80,50 @@ export class Rio {
   }
 
   /**
-   * Register source type for data standardization.
+   * Register register type for data.
    */
-  registerSourceType(sourceType, standardizer) {
-    if (!_.isString(sourceType)) {
-      throw new Error('rio.registerSourceType sourceType argument must be string.');
-    }
-    if (_.isEmpty(sourceType)) {
-      throw new Error('rio.registerSourceType sourceType is empty.');
-    }
-    if (!_.isFunction(standardizer)) {
-      throw new Error('rio.registerSourceType standardizer argument must be a function.');
+  registerResourceType(config) {
+    if (!config) {
+      throw new Error('rio.registerResourceType config argument must be object.');
     }
 
-    this.standardizers[sourceType] = standardizer;
+    const { type, standardizer } = config;
+
+    if (!_.isString(type)) {
+      throw new Error('rio.registerResourceType type argument must be string.');
+    }
+    if (_.isEmpty(type)) {
+      throw new Error('rio.registerResourceType type is empty.');
+    }
+    if (!_.isObject(standardizer)) {
+      throw new Error('rio.registerResourceType standardizer argument must be an object.');
+    }
+
+    validateResourceTypeConfig(config);
+    this.resourceTypeConfigs[type] = config;
+
+    this.standardizers[type] = standardizer;
+  }
+
+  /**
+   * Resolve resource by finding a resource based on resourceType
+   */
+  getResourceType(resourceType) {
+    return this.resourceTypeConfigs[resourceType];
   }
 
   /**
    * Get standardizer function based on source type.
    */
-  getStandardizer(sourceType) {
-    if (!_.isString(sourceType)) {
-      throw new Error('rio.getStandardizer sourceType argument must be string.');
+  getStandardizer(resourceType) {
+    if (!_.isString(resourceType)) {
+      throw new Error('rio.getStandardizer resourceType argument must be string.');
     }
-    if (_.isEmpty(sourceType)) {
-      throw new Error('rio.getStandardizer sourceType is empty.');
+    if (_.isEmpty(resourceType)) {
+      throw new Error('rio.getStandardizer resourceType is empty.');
     }
 
-    return this.standardizers[sourceType];
+    return this.standardizers[resourceType];
   }
 
   /**
@@ -132,6 +154,7 @@ export class Rio {
    * Clears registered collections and resolvers
    */
   clear() {
+    this.resourceTypeConfigs = {};
     this.resourceConfigs = {};
     this.resourceResolvers = [];
     this.resourcePaths = {};
@@ -139,7 +162,10 @@ export class Rio {
     this.standardizers = {};
 
     // Default standardizer for json-api
-    this.registerSourceType(JSON_API_SOURCE, transform);
+    this.registerResourceType({
+      ...jsonApiResourceTypeConfig,
+      standardizer: new JsonApiStandardizer(),
+    });
   }
 }
 

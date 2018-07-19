@@ -4,7 +4,7 @@ import {
   REFERENCE_STATUS,
   REFERENCE_CLEAR,
   CHECK_EXPIRATION,
-} from './../consts';
+} from '../consts';
 import {
   STATUS,
   validationStatus,
@@ -15,7 +15,7 @@ import {
   setStatus,
   isInitialized,
   isExpired,
-} from './../status';
+} from '../status';
 import { isAppendMode } from '../actions/find';
 
 function isValidAction(action, schema, tag) {

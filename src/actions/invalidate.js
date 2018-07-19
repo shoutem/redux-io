@@ -1,10 +1,10 @@
 import _ from 'lodash';
 import {
   REFERENCE_STATUS,
-} from './../consts';
+} from '../consts';
 import {
   validationStatus,
-} from './../status';
+} from '../status';
 
 export default function invalidate(schema) {
   if (!_.isString(schema)) {

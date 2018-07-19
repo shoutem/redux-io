@@ -8,7 +8,7 @@ import { normalize as jsonApiNormalize } from '../../src/normalizer';
 import { jsonMiddleware } from '../../src/middlewares';
 import { JsonSerializer } from '../../src/serialization';
 import rio, {
-  JSON_API_SOURCE,
+  JSON_API_RESOURCE,
   LOAD_SUCCESS,
 } from '../../src';
 
@@ -140,7 +140,7 @@ describe('json middleware', () => {
     };
 
     const expectedMeta = {
-      source: JSON_API_SOURCE,
+      source: JSON_API_RESOURCE,
       schema,
       tag,
     };

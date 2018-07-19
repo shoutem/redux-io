@@ -14,7 +14,7 @@ import {
   REMOVE_ERROR,
   REFERENCE_CLEAR,
   REFERENCE_STATUS,
-} from './../consts';
+} from '../consts';
 import {
   STATUS,
   validationStatus,
@@ -22,8 +22,8 @@ import {
   createStatus,
   updateStatus,
   setStatus,
-} from './../status';
-import Outdated from './../outdated';
+} from '../status';
+import Outdated from '../outdated';
 
 const actionsWithoutPayload = new Set([
   LOAD_REQUEST,

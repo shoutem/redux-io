@@ -4,7 +4,7 @@ import {
   REFERENCE_STATUS,
   REFERENCE_CLEAR,
   CHECK_EXPIRATION,
-} from './../consts';
+} from '../consts';
 import {
   STATUS,
   validationStatus,
@@ -13,7 +13,7 @@ import {
   updateStatus,
   setStatus,
   isExpired,
-} from './../status';
+} from '../status';
 
 function isValidAction(action, schema, tag) {
   if (_.get(action, 'type') === CHECK_EXPIRATION) {

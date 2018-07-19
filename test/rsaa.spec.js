@@ -8,7 +8,7 @@ import { RSAA, apiMiddleware } from 'redux-api-middleware';
 import configureMockStore from 'redux-mock-store';
 import rio, {
   apiStateMiddleware,
-  JSON_API_SOURCE,
+  JSON_API_RESOURCE,
   LOAD_SUCCESS,
 } from '../src';
 import {
@@ -46,7 +46,7 @@ describe('rsaa', () => {
       const action = find(schemaConfig, tag);
       const types = action[RSAA].types;
       const expectedMeta = {
-        source: JSON_API_SOURCE,
+        source: JSON_API_RESOURCE,
         schema,
         tag,
         endpoint: config.endpoint,

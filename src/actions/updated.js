@@ -1,8 +1,8 @@
 import _ from 'lodash';
 import {
   UPDATE_SUCCESS,
-} from './../consts';
-import { JSON_API_SOURCE } from './..';
+} from '../consts';
+import { JSON_API_RESOURCE } from '../resources';
 
 export default function updated(payload, schema) {
   if (!_.isPlainObject(payload)) {
@@ -24,7 +24,7 @@ export default function updated(payload, schema) {
     type: UPDATE_SUCCESS,
     payload,
     meta: {
-      source: JSON_API_SOURCE,
+      source: JSON_API_RESOURCE,
       schema,
       timestamp: Date.now(),
     },

@@ -25,7 +25,7 @@ import rio, {
   REFERENCE_FETCHED,
   REFERENCE_STATUS,
   apiStateMiddleware,
-  JSON_API_SOURCE,
+  JSON_API_RESOURCE,
   ReduxApiStateDenormalizer,
   invalidate,
 } from '../../src';
@@ -58,7 +58,7 @@ describe('Json api middleware', () => {
     const schema = 'schema_test';
     const tag = 'tag_test';
     const expectedMeta = {
-      source: JSON_API_SOURCE,
+      source: JSON_API_RESOURCE,
       schema,
       tag,
     };
@@ -107,7 +107,7 @@ describe('Json api middleware', () => {
       }],
     };
     const expectedMeta = {
-      source: JSON_API_SOURCE,
+      source: JSON_API_RESOURCE,
       schema,
       tag,
     };
@@ -147,7 +147,7 @@ describe('Json api middleware', () => {
     const schema = 'schema_test';
     const tag = 'tag_test';
     const expectedMeta = {
-      source: JSON_API_SOURCE,
+      source: JSON_API_RESOURCE,
       schema,
       tag,
     };
@@ -185,7 +185,7 @@ describe('Json api middleware', () => {
     const schema = 'schema_test';
     const tag = 'tag_test';
     const expectedMeta = {
-      source: JSON_API_SOURCE,
+      source: JSON_API_RESOURCE,
       schema,
       tag,
     };
@@ -230,7 +230,7 @@ describe('Json api middleware', () => {
       }],
     };
     const expectedMeta = {
-      source: JSON_API_SOURCE,
+      source: JSON_API_RESOURCE,
       schema,
       tag: '',
     };
@@ -273,7 +273,7 @@ describe('Json api middleware', () => {
   it('produces valid actions for create error', done => {
     const schema = 'schema_test';
     const expectedMeta = {
-      source: JSON_API_SOURCE,
+      source: JSON_API_RESOURCE,
       schema,
     };
 
@@ -317,7 +317,7 @@ describe('Json api middleware', () => {
       }],
     };
     const expectedMeta = {
-      source: JSON_API_SOURCE,
+      source: JSON_API_RESOURCE,
       schema,
       tag: '',
     };
@@ -370,7 +370,7 @@ describe('Json api middleware', () => {
       }],
     };
     const expectedMeta = {
-      source: JSON_API_SOURCE,
+      source: JSON_API_RESOURCE,
       schema,
       tag: '',
     };
@@ -414,7 +414,7 @@ describe('Json api middleware', () => {
   it('produces valid actions for update error', done => {
     const schema = 'schema_test';
     const expectedMeta = {
-      source: JSON_API_SOURCE,
+      source: JSON_API_RESOURCE,
       schema,
     };
 
@@ -456,7 +456,7 @@ describe('Json api middleware', () => {
     const expectedPayload = { data: deletedItem };
 
     const expectedMeta = {
-      source: JSON_API_SOURCE,
+      source: JSON_API_RESOURCE,
       schema,
       tag: '',
     };
@@ -503,7 +503,7 @@ describe('Json api middleware', () => {
     const expectedPayload = { data: deletedItem };
 
     const expectedMeta = {
-      source: JSON_API_SOURCE,
+      source: JSON_API_RESOURCE,
       schema,
       tag: '',
     };
@@ -543,7 +543,7 @@ describe('Json api middleware', () => {
   it('produces valid actions for delete error', done => {
     const schema = 'schema_test';
     const expectedMeta = {
-      source: JSON_API_SOURCE,
+      source: JSON_API_RESOURCE,
       schema,
     };
 
@@ -612,7 +612,7 @@ describe('Json api middleware', () => {
       ],
     };
     const expectedMeta = {
-      source: JSON_API_SOURCE,
+      source: JSON_API_RESOURCE,
       schema,
       tag,
     };
@@ -679,7 +679,7 @@ describe('Json api middleware', () => {
       ],
     };
     const expectedMeta = {
-      source: JSON_API_SOURCE,
+      source: JSON_API_RESOURCE,
       schema,
       tag,
     };
@@ -741,7 +741,7 @@ describe('Json api middleware', () => {
       ],
     };
     const expectedMeta = {
-      source: JSON_API_SOURCE,
+      source: JSON_API_RESOURCE,
       schema,
       tag,
     };
@@ -806,7 +806,7 @@ describe('Json api middleware', () => {
         },
     };
     const expectedMeta = {
-      source: JSON_API_SOURCE,
+      source: JSON_API_RESOURCE,
       schema,
       tag,
     };
@@ -872,7 +872,7 @@ describe('Json api middleware', () => {
       ],
     };
     const expectedMeta = {
-      source: JSON_API_SOURCE,
+      source: JSON_API_RESOURCE,
       schema,
       tag,
     };
@@ -958,7 +958,7 @@ describe('Json api middleware', () => {
       }],
     };
     const expectedMeta = {
-      source: JSON_API_SOURCE,
+      source: JSON_API_RESOURCE,
       schema,
       tag,
     };
@@ -1028,7 +1028,7 @@ describe('Json api middleware', () => {
       }],
     };
     const expectedMeta = {
-      source: JSON_API_SOURCE,
+      source: JSON_API_RESOURCE,
       schema,
       tag,
     };
@@ -1095,7 +1095,7 @@ describe('Json api middleware', () => {
     const schema = 'schema_test';
     const tag = undefined;
     const expectedMeta = {
-      source: JSON_API_SOURCE,
+      source: JSON_API_RESOURCE,
       schema,
       tag,
     };
@@ -1135,7 +1135,7 @@ describe('Json api middleware', () => {
       }],
     };
     const expectedMeta = {
-      source: JSON_API_SOURCE,
+      source: JSON_API_RESOURCE,
       schema,
       tag,
     };
@@ -1256,7 +1256,7 @@ describe('Json api middleware', () => {
     };
 
     const expectedMeta = {
-      source: JSON_API_SOURCE,
+      source: JSON_API_RESOURCE,
       tag,
     };
 
@@ -1284,7 +1284,7 @@ describe('Json api middleware', () => {
     const schema = 'schema_test';
 
     const expectedMeta = {
-      source: JSON_API_SOURCE,
+      source: JSON_API_RESOURCE,
       schema,
       tag,
     };
@@ -1314,7 +1314,7 @@ describe('Json api middleware', () => {
     const expectedPayload = {};
 
     const expectedMeta = {
-      source: JSON_API_SOURCE,
+      source: JSON_API_RESOURCE,
       schema,
       tag,
     };
@@ -1334,7 +1334,7 @@ describe('Json api middleware', () => {
       expect(requestAction.type).to.equal(LOAD_SUCCESS);
 
       expect(console.error.calledOnce).to.be.true;
-      expect(console.error.calledWith(`${JSON_API_SOURCE} response should contain payload.data.`)).to.be.true;
+      expect(console.error.calledWith(`${JSON_API_RESOURCE} response should contain payload.data.`)).to.be.true;
     }).then(done).catch(done);
   });
 
@@ -1382,7 +1382,7 @@ describe('Json api middleware', () => {
       }],
     };
     const expectedMeta = {
-      source: JSON_API_SOURCE,
+      source: JSON_API_RESOURCE,
       schema,
       tag: '',
     };
@@ -1456,7 +1456,7 @@ describe('Json api middleware', () => {
       }],
     };
     const expectedMeta = {
-      source: JSON_API_SOURCE,
+      source: JSON_API_RESOURCE,
       schema,
       tag: '',
     };
@@ -1575,7 +1575,7 @@ describe('Json api middleware', () => {
     const schema = 'schema_test';
 
     const expectedMeta = {
-      source: JSON_API_SOURCE,
+      source: JSON_API_RESOURCE,
       schema,
       tag: '',
       response: { status: 204 },
@@ -1615,7 +1615,7 @@ describe('Json api middleware', () => {
       const schema = 'schema_test';
       const tag = 'tag_test';
       const expectedMeta = {
-        source: JSON_API_SOURCE,
+        source: JSON_API_RESOURCE,
         schema,
         tag,
       };
@@ -1653,7 +1653,7 @@ describe('Json api middleware', () => {
       const schema = 'schema_test';
       const tag = 'tag_test';
       const expectedMeta = {
-        source: JSON_API_SOURCE,
+        source: JSON_API_RESOURCE,
         schema,
         tag,
       };
@@ -1697,7 +1697,7 @@ describe('Json api middleware', () => {
       const expectedPayload = { data: deletedItem };
 
       const expectedMeta = {
-        source: JSON_API_SOURCE,
+        source: JSON_API_RESOURCE,
         schema,
         tag: '',
       };
@@ -1740,7 +1740,7 @@ describe('Json api middleware', () => {
       const expectedPayload = { data: deletedItem };
 
       const expectedMeta = {
-        source: JSON_API_SOURCE,
+        source: JSON_API_RESOURCE,
         schema,
         tag: '',
       };
@@ -1777,7 +1777,7 @@ describe('Json api middleware', () => {
       const schema = 'schema_test';
       const tag = 'tag_test';
       const expectedMeta = {
-        source: JSON_API_SOURCE,
+        source: JSON_API_RESOURCE,
         schema,
         tag,
       };
@@ -1814,7 +1814,7 @@ describe('Json api middleware', () => {
       const schema = 'schema_test';
       const tag = 'tag_test';
       const expectedMeta = {
-        source: JSON_API_SOURCE,
+        source: JSON_API_RESOURCE,
         schema,
         tag,
       };
@@ -1859,7 +1859,7 @@ describe('Json api middleware', () => {
         }],
       };
       const expectedMeta = {
-        source: JSON_API_SOURCE,
+        source: JSON_API_RESOURCE,
         schema,
         tag: '',
       };
@@ -1907,7 +1907,7 @@ describe('Json api middleware', () => {
         }],
       };
       const expectedMeta = {
-        source: JSON_API_SOURCE,
+        source: JSON_API_RESOURCE,
         schema,
         tag: '',
       };
@@ -1964,7 +1964,7 @@ describe('Json api middleware', () => {
         }],
       };
       const expectedMeta = {
-        source: JSON_API_SOURCE,
+        source: JSON_API_RESOURCE,
         schema,
         tag,
       };

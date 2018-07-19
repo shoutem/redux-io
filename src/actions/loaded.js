@@ -1,8 +1,8 @@
 import _ from 'lodash';
 import {
   LOAD_SUCCESS,
-} from './../consts';
-import { JSON_API_SOURCE } from './..';
+} from '../consts';
+import { JSON_API_RESOURCE } from '../resources';
 
 export default function loaded(payload, schema, tag = '') {
   if (!_.isPlainObject(payload)) {
@@ -26,7 +26,7 @@ export default function loaded(payload, schema, tag = '') {
     meta: {
       schema,
       tag,
-      source: JSON_API_SOURCE,
+      source: JSON_API_RESOURCE,
       timestamp: Date.now(),
     },
   };
