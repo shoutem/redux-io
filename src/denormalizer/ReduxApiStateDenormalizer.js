@@ -1,7 +1,12 @@
-import ReduxDenormalizer from './ReduxDenormalizer';
-import RioCache from '../cache/RioCache';
 import _ from 'lodash';
-import { cloneStatus, getStatus } from './../status';
+import memoizeOne from 'memoize-one';
+import {
+  CircularDenormalizationError,
+  TooDeepDenormalizationError,
+} from '@shoutem/json-api-denormalizer';
+import RioCache, { getReferenceUniqueKey } from '../cache/RioCache';
+import { cloneStatus, getStatus } from '../status';
+import ReduxDenormalizer from './ReduxDenormalizer';
 
 /**
  * Created getStore for ReduxDenormalizer by using storageMap to find relationships.
@@ -9,14 +14,14 @@ import { cloneStatus, getStatus } from './../status';
  * @param storeSchemasPaths {schema: 'path.to.storage' || schema: ['path', 'to', 'storage]}
  * @returns {{}}
  */
-export function createSchemasMap(state, storeSchemasPaths) {
+export const createSchemasMap = memoizeOne((state, storeSchemasPaths) => {
   const storage = {};
 
   // eslint-disable-next-line no-return-assign
   _.forEach(storeSchemasPaths, (path, schema) => storage[schema] = _.get(state, path));
 
   return storage;
-}
+});
 
 function getType(collection, schema) {
   const collectionStatus = getStatus(collection);
@@ -65,6 +70,12 @@ function createSingleDescriptor(single, schema) {
   };
 }
 
+const DEFAULT_OPTIONS = {
+  defaultMaxDepth: null,
+  useModificationCache: false,
+  cacheChildObjects: false,
+};
+
 /**
  * Returns provided data in denormalized form
  */
@@ -85,9 +96,9 @@ export default class ReduxApiStateDenormalizer extends ReduxDenormalizer {
    * @param getStore - returns latest store
    * @param storeSchemasPaths - { schema: pathInStoreToSchema }
    */
-  constructor(getStore, storeSchemasPaths) {
-    // TODO(Braco) - optimize relationships cache
-    // TODO(Braco) - use state entities to detect change
+  constructor(getStore, storeSchemasPaths, options = {}) {
+    // TODO - optimize relationships cache
+    // TODO - use state entities to detect change
     if (getStore && storeSchemasPaths) {
       // FindStorage mode
       super(() => createSchemasMap(getStore(), storeSchemasPaths));
@@ -95,9 +106,35 @@ export default class ReduxApiStateDenormalizer extends ReduxDenormalizer {
       // ProvideStorage mode
       super();
     }
+
+    this.isRootLevel = this.isRootLevel.bind(this);
     this.denormalizeItem = this.denormalizeItem.bind(this);
     this.getNormalizedItem = this.getNormalizedItem.bind(this);
-    this.cache = new RioCache(this.getNormalizedItem);
+    this.invalidateModificationCache = this.invalidateModificationCache.bind(this);
+    this.flushCache = this.flushCache.bind(this);
+    this.flushModificationCache = this.flushModificationCache.bind(this);
+
+    this.options = {
+      ...DEFAULT_OPTIONS,
+      ...options,
+    };
+
+    this.forbidLoopCaching = new Set();
+    this.cache = new RioCache(
+      this.getNormalizedItem,
+      {
+        useModificationCache: this.options.useModificationCache,
+        defaultMaxDepth: this.nestingDepthLimit,
+      }
+    );
+
+    if (this.options.defaultMaxDepth) {
+      this.setNestingDepthLimit(this.options.defaultMaxDepth);
+    }
+  }
+
+  isRootLevel() {
+    return _.isEmpty(this.denormalizingDescriptorKeys);
   }
 
   /**
@@ -121,12 +158,52 @@ export default class ReduxApiStateDenormalizer extends ReduxDenormalizer {
    * @param itemDescriptor - { id, type }
    * @returns {{}}
    */
-  denormalizeItem(itemDescriptor) {
-    let item = this.cache.getValidItem(itemDescriptor);
-    if (!item) {
-      item = this.cache.add(super.denormalizeItem(itemDescriptor));
+  denormalizeItem(itemDescriptor, maxDepth) {
+    if (this.isRootLevel() || this.options.cacheChildObjects) {
+      const cachedItem = this.cache.get(itemDescriptor, maxDepth);
+
+      if (this.cache.isChecked(itemDescriptor, maxDepth)) {
+        return cachedItem;
+      }
+
+      const item = this.cache.getValidItem(itemDescriptor, cachedItem, maxDepth);
+      if (item) {
+        return item;
+      }
     }
-    return item;
+
+    const uniqueKey = getReferenceUniqueKey(itemDescriptor);
+
+    try {
+      const denormalizedItem = super.denormalizeItem(itemDescriptor, maxDepth);
+      this.forbidLoopCaching.delete(uniqueKey);
+      if (this.isRootLevel()) {
+        this.forbidIncompleteCaching = false;
+      }
+
+      if (
+        (this.isRootLevel() || this.options.cacheChildObjects) &&
+        !this.forbidIncompleteCaching &&
+        _.isEmpty(this.forbidLoopCaching) &&
+        denormalizedItem !== itemDescriptor
+      ) {
+        this.cache.add(denormalizedItem, maxDepth);
+      }
+
+      return denormalizedItem;
+    } catch (error) {
+      if (error instanceof CircularDenormalizationError) {
+        this.forbidLoopCaching.add(uniqueKey);
+        return itemDescriptor;
+      }
+
+      if (error instanceof TooDeepDenormalizationError) {
+        this.forbidIncompleteCaching = true;
+        return itemDescriptor;
+      }
+
+      throw error;
+    }
   }
 
   /**
@@ -141,7 +218,7 @@ export default class ReduxApiStateDenormalizer extends ReduxDenormalizer {
    * @param schema (optional)
    * @returns {{}}
    */
-  denormalizeOne(one, storage, schema) {
+  denormalizeOne(one, storage, schema, maxDepth) {
     if (!one) {
       // If one undefined we have nothing to do with it
       return undefined;
@@ -153,21 +230,21 @@ export default class ReduxApiStateDenormalizer extends ReduxDenormalizer {
 
     if (_.isPlainObject(one)) {
       // is RIO One reference
-      let denormalizedOne = this.cache.getValidOne(one);
+      let denormalizedOne = this.cache.getValidOne(one, maxDepth);
       if (denormalizedOne) {
         return denormalizedOne;
       }
 
       // One is different object then denormalizedItem
-      denormalizedOne = { ...this.denormalizeItem(itemDescriptor) };
+      denormalizedOne = { ...this.denormalizeItem(itemDescriptor, maxDepth) };
       // Append One status to denormalizedOne
       // When One is RIO reference we want status of reference and not status of contained item.
       cloneStatus(one, denormalizedOne);
-      return this.cache.add(denormalizedOne);
+      return this.cache.add(denormalizedOne, maxDepth);
     }
 
     // is Primitive value
-    return this.denormalizeItem(itemDescriptor);
+    return this.denormalizeItem(itemDescriptor, maxDepth);
   }
 
   /**
@@ -197,7 +274,7 @@ export default class ReduxApiStateDenormalizer extends ReduxDenormalizer {
    * @param schema (optional)
    * @returns {{}}
    */
-  denormalizeCollection(collection, storage, schema) {
+  denormalizeCollection(collection, storage, schema, maxDepth) {
     if (!collection) {
       // If collection undefined we have nothing to do with it
       return undefined;
@@ -205,22 +282,27 @@ export default class ReduxApiStateDenormalizer extends ReduxDenormalizer {
 
     const descriptorCollection = createDescriptorCollection(collection, schema);
 
-    let denormalizedCollection = this.cache.getValidCollection(descriptorCollection);
+    let denormalizedCollection = this.cache.getValidCollection(descriptorCollection, maxDepth);
     if (!denormalizedCollection) {
       this.updateStorageMap(storage);
 
       denormalizedCollection =
-        descriptorCollection.map(itemDescriptor => this.denormalizeItem(itemDescriptor));
+        descriptorCollection.map(itemDescriptor => this.denormalizeItem(itemDescriptor, maxDepth));
 
       if (!getStatus(collection)) {
         return denormalizedCollection;
       }
 
       cloneStatus(collection, denormalizedCollection);
-      this.cache.add(denormalizedCollection);
+      this.cache.add(denormalizedCollection, maxDepth);
     }
 
     return denormalizedCollection;
+  }
+
+  setNestingDepthLimit(nestingDepthLimit) {
+    super.setNestingDepthLimit(nestingDepthLimit);
+    this.cache.setDefaultMaxDepth(nestingDepthLimit);
   }
 
   /**
@@ -228,5 +310,13 @@ export default class ReduxApiStateDenormalizer extends ReduxDenormalizer {
    */
   flushCache() {
     this.cache.flush();
+  }
+
+  flushModificationCache() {
+    this.cache.flushModificationCache();
+  }
+
+  invalidateModificationCache() {
+    this.cache.invalidateModificationCache();
   }
 }

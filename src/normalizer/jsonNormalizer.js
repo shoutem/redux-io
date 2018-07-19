@@ -30,15 +30,32 @@ function isIgnoredProperty(property, ignoredProperties = DEFAULT_IGNORED_PROPERT
   return !!ignoredProperties[property];
 }
 
+function isRelationshipLikeObject(propertyValue) {
+  return (
+    _.get(propertyValue, 'id') &&
+    _.get(propertyValue, 'type')
+  );
+}
+
+function getSchemaRelationship(schema, relationship) {
+  return _.get(schema, ['relationships', relationship]);
+}
+
 function isRelationship(schema, propertyKey, propertyValue) {
-  if (_.get(schema, ['relationships', propertyKey])) {
+  if (getSchemaRelationship(schema, propertyKey)) {
+    return true;
+  }
+
+  // TODO: use rio.options to turn off this feature
+  if (isRelationshipLikeObject(propertyValue)) {
     return true;
   }
 
   // TODO: use rio.options to turn off this feature
   if (
-    _.get(propertyValue, 'id') &&
-    _.get(propertyValue, 'type')
+    _.isArray(propertyValue) &&
+    !_.isEmpty(propertyValue) &&
+    _.every(propertyValue, isRelationshipLikeObject)
   ) {
     return true;
   }
@@ -78,8 +95,12 @@ export function normalizeItem(item, schema = null) {
       } else if (_.isPlainObject(propertyValue)) {
         const data = normalizeRelationshipObject(propertyValue);
         _.set(normalizedItem, ['relationships', propertyKey], { data });
-      } else {
+      } else if (_.isEmpty(propertyValue)) {
         _.set(normalizedItem, ['relationships', propertyKey], { data: null });
+      } else if (getSchemaRelationship(resolvedSchema, propertyKey)) {
+        const { type } = getSchemaRelationship(resolvedSchema, propertyKey);
+        const data = { id: propertyValue, type };
+        _.set(normalizedItem, ['relationships', propertyKey], { data });
       }
     } else {
       _.set(normalizedItem, ['attributes', propertyKey], propertyValue);

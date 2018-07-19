@@ -1,5 +1,7 @@
-import apiStateMiddleware from './middleware';
-export { apiStateMiddleware };
+export {
+  apiStateMiddleware,
+  jsonMiddleware,
+} from './middlewares';
 
 import resource from './reducers/resource';
 export { resource };

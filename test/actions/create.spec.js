@@ -4,7 +4,7 @@ import nock from 'nock';
 import { RSAA, apiMiddleware } from 'redux-api-middleware';
 import configureMockStore from 'redux-mock-store';
 import thunk from 'redux-thunk';
-import {
+import rio, {
   CREATE_REQUEST,
   CREATE_SUCCESS,
   CREATE_ERROR,
@@ -12,6 +12,7 @@ import {
   REFERENCE_STATUS,
   apiStateMiddleware,
   JSON_API_SOURCE,
+  ReduxApiStateDenormalizer,
 } from '../../src';
 import {
   validationStatus,
@@ -26,6 +27,8 @@ describe('Create action creator', () => {
   beforeEach(() => {
     nock.cleanAll();
     mockStore = configureMockStore(middlewares);
+    const denormalizer = new ReduxApiStateDenormalizer();
+    rio.setDenormalizer(denormalizer);
   });
 
   it('creates a valid action', () => {
@@ -453,4 +456,3 @@ describe('Create action creator', () => {
       }).then(done).catch(done);
   });
 });
-

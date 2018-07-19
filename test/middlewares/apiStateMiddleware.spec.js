@@ -3,7 +3,7 @@ import { expect } from 'chai';
 import configureMockStore from 'redux-mock-store';
 import thunk from 'redux-thunk';
 import sinon from 'sinon';
-import {
+import rio, {
   LOAD_REQUEST,
   LOAD_SUCCESS,
   LOAD_ERROR,
@@ -26,12 +26,14 @@ import {
   REFERENCE_STATUS,
   apiStateMiddleware,
   JSON_API_SOURCE,
-} from '../src';
+  ReduxApiStateDenormalizer,
+  invalidate,
+} from '../../src';
 import {
   validationStatus,
   busyStatus,
   STATUS,
-} from '../src/status';
+} from '../../src/status';
 
 describe('Json api middleware', () => {
   let mockStore = configureMockStore([thunk, apiStateMiddleware]);
@@ -43,6 +45,8 @@ describe('Json api middleware', () => {
 
   beforeEach(() => {
     sinon.spy(console, 'error');
+    const denormalizer = new ReduxApiStateDenormalizer();
+    rio.setDenormalizer(denormalizer);
   });
 
   afterEach(() => {
@@ -1937,6 +1941,77 @@ describe('Json api middleware', () => {
           expect(actionUpdateRequest.type).to.equal(UPDATE_ERROR);
           expect(actionUpdateRequest.meta).to.deep.equal(expectedMeta);
           expect(actionUpdateRequest.payload).to.deep.equal(expectedPayload);
+        }).then(done).catch(done);
+    });
+  });
+
+  describe('Modification check cache', () => {
+    it('set modified flag on rio actions', done => {
+      const denormalizer = new ReduxApiStateDenormalizer();
+      const invalidateModificationCache = sinon.spy(denormalizer, 'invalidateModificationCache');
+
+      rio.setDenormalizer(denormalizer);
+
+      const schema = 'schema_test';
+      const tag = 'tag_test';
+      const expectedPayload = {
+        data: [{
+          type: schema,
+          id: '1',
+          attributes: {
+            name: 'Test1',
+          },
+        }],
+      };
+      const expectedMeta = {
+        source: JSON_API_SOURCE,
+        schema,
+        tag,
+      };
+
+      const mockSuccessAction = {
+        type: LOAD_SUCCESS,
+        meta: expectedMeta,
+        payload: expectedPayload,
+      };
+
+      const store = mockStore({});
+      store.dispatch(actionPromise(mockSuccessAction))
+        .then(() => {
+          expect(invalidateModificationCache.called).to.be.true;
+        }).then(done).catch(done);
+    });
+
+    it('set modified flag on internal rio action', done => {
+      const denormalizer = new ReduxApiStateDenormalizer();
+      const invalidateModificationCache = sinon.spy(denormalizer, 'invalidateModificationCache');
+
+      rio.setDenormalizer(denormalizer);
+
+      const schema = 'schema_test';
+      const mockInvaliateAction = invalidate(schema);
+
+      const store = mockStore({});
+      store.dispatch(actionPromise(mockInvaliateAction))
+        .then(() => {
+          expect(invalidateModificationCache.called).to.be.true;
+        }).then(done).catch(done);
+    });
+
+    it('ignore modified flag on 3rd party action', done => {
+      const denormalizer = new ReduxApiStateDenormalizer();
+      const invalidateModificationCache = sinon.spy(denormalizer, 'invalidateModificationCache');
+
+      rio.setDenormalizer(denormalizer);
+
+      const mockAction = {
+        type: 'A',
+      }
+
+      const store = mockStore({});
+      store.dispatch(actionPromise(mockAction))
+        .then(() => {
+          expect(invalidateModificationCache.called).to.be.false;
         }).then(done).catch(done);
     });
   });

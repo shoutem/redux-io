@@ -1,5 +1,13 @@
-export { toSerializableFormat } from './toSerializableFormat';
-export { fromSerializableFormat } from './fromSerializableFormat';
+export {
+  toSerializableFormat,
+  fromSerializableFormat,
+  RioStateSerializer,
+}
+from './rio-state-serializer';
 
-import RioStateSerializer from './RioStateSerializer';
-export { RioStateSerializer };
+import JsonSerializer from './JsonSerializer';
+import CustomSerializer from './CustomSerializer';
+export {
+  CustomSerializer,
+  JsonSerializer,
+};

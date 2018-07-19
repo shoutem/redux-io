@@ -1,14 +1,14 @@
 /* eslint-disable no-unused-expressions */
 /* eslint no-console: ["error", {allow: ["warn", "error"] }] */
 import _ from 'lodash';
-import { batchActions } from 'redux-batched-actions';
-import rio from './rio';
+import { batchActions, BATCH } from 'redux-batched-actions';
+import rio from '../rio';
 import {
   validationStatus,
   busyStatus,
-} from './status';
-import Outdated from './outdated';
-import { JSON_API_SOURCE } from './standardizers/json-api-standardizer';
+} from '../status';
+import Outdated from '../outdated';
+import { JSON_API_SOURCE } from '../standardizers/json-api-standardizer';
 import {
   LOAD_REQUEST,
   LOAD_SUCCESS,
@@ -32,7 +32,7 @@ import {
   REFERENCE_STATUS,
   OBJECT_ERROR,
   COLLECTION_ERROR,
-} from './consts';
+} from '../consts';
 
 const actionsWithoutPayload = new Set([
   REMOVE_SUCCESS,
@@ -48,6 +48,19 @@ const actionsWithTags = new Set([
   LOAD_REQUEST,
   LOAD_SUCCESS,
   LOAD_ERROR,
+]);
+
+const internalActions = new Set([
+  OBJECT_UPDATING,
+  OBJECT_UPDATED,
+  OBJECT_FETCHED,
+  OBJECT_REMOVED,
+  OBJECT_REMOVING,
+  OBJECT_CREATED,
+  REFERENCE_FETCHED,
+  REFERENCE_STATUS,
+  OBJECT_ERROR,
+  COLLECTION_ERROR,
 ]);
 
 /**
@@ -412,13 +425,26 @@ function handleNetworkAction(action, dispatch) {
   const included = getIncluded(action.payload);
   included.map(item => dispatch(makeObjectAction(action, OBJECT_FETCHED, item)));
 
-
   const data = getData(action.payload);
   // Find handler for supported action type to make appropriate logic
   actionHandlers[action.type](action, data, dispatch);
 }
 
+function isInternalAction(action) {
+  const type = _.get(action, 'type');
+
+  if (type === BATCH) {
+    return _.some(action.payload, isInternalAction);
+  }
+
+  return internalActions.has(type);
+}
+
 export default store => next => action => {
+  if (isInternalAction(action)) {
+    rio.denormalizer.invalidateModificationCache();
+  }
+
   // Validate action, if not valid pass
   if (!isValidAction(action)) {
     return next(action);

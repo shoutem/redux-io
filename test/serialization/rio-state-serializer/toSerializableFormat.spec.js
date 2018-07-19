@@ -1,8 +1,13 @@
 import { assert } from 'chai';
 import _ from 'lodash';
-import { toSerializableFormat } from '../../src/serialization';
-import { TYPE_KEY, ARRAY_TYPE } from '../../src/serialization/type';
-import { STATUS } from '../../src/status';
+import {
+  toSerializableFormat
+} from '../../../src/serialization';
+import {
+  TYPE_KEY,
+  ARRAY_TYPE
+} from '../../../src/serialization/rio-state-serializer/type';
+import { STATUS } from '../../../src/status';
 
 describe('toSerializableFormat', () => {
   it('saves status to enumerable property', () => {

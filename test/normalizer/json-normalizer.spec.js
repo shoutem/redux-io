@@ -33,6 +33,12 @@ const expectedNormalizedItem = {
         type: 'app.owner',
       },
     },
+    car: {
+      data: {
+        id: '2',
+        type: 'app.car',
+      },
+    },
   },
 };
 
@@ -40,10 +46,11 @@ const transformation = {
   relationships: {
     owners: { type: 'app.owner' },
     parent: { type: 'app.owner' },
+    car: { type: 'app.car' },
   },
 };
 
-describe('json-normalizer', () => {
+describe('json-normalizer with defined schema', () => {
   it('normalize item', () => {
     const denormalizedItem = {
       id: 1,
@@ -65,8 +72,9 @@ describe('json-normalizer', () => {
       parent: {
         id: 'a',
         type: 'app.owner',
-        name: 'c',
+        name: 'b',
       },
+      car: '2',
     };
     denormalizedItem[STATUS] = updateStatus(
       createStatus(),
@@ -102,6 +110,7 @@ describe('json-normalizer', () => {
         type: 'app.owner',
         name: 'c',
       },
+      car: '2',
     };
     denormalizedItem[STATUS] = updateStatus(
       createStatus()
@@ -134,6 +143,7 @@ describe('json-normalizer', () => {
         type: 'app.owner',
         name: 'c',
       },
+      car: '2',
     };
     denormalizedItem[STATUS] = updateStatus(
       createStatus(),
@@ -173,6 +183,7 @@ describe('json-normalizer', () => {
         type: 'app.owner',
         name: 'c',
       },
+      car: '2',
     };
     denormalizedItem[STATUS] = updateStatus(
       createStatus(),
@@ -182,6 +193,7 @@ describe('json-normalizer', () => {
             owners: { type: 'app.owner' },
             parent: { type: 'app.owner' },
             children: { type: 'app.owner' },
+            car: { type: 'app.car' },
           },
         },
       }
@@ -210,6 +222,7 @@ describe('json-normalizer', () => {
         },
       ],
       parent: null,
+      car: '2',
     };
     denormalizedItem[STATUS] = updateStatus(
       createStatus(),
@@ -218,6 +231,7 @@ describe('json-normalizer', () => {
           relationships: {
             owners: { type: 'app.owner' },
             parent: { type: 'app.owner' },
+            car: { type: 'app.car' },
           },
         },
       }
@@ -249,6 +263,7 @@ describe('json-normalizer', () => {
         },
       ],
       parent: [],
+      car: '2',
     };
     denormalizedItem[STATUS] = updateStatus(
       createStatus(),
@@ -257,6 +272,7 @@ describe('json-normalizer', () => {
           relationships: {
             owners: { type: 'app.owner' },
             parent: { type: 'app.owner' },
+            car: { type: 'app.car' },
           },
         },
       }
@@ -292,6 +308,7 @@ describe('json-normalizer', () => {
         type: 'app.owner',
         name: 'c',
       },
+      car: '2',
     };
     const denormalizedList = [
       Object.assign({}, denormalizedItem),
@@ -307,6 +324,7 @@ describe('json-normalizer', () => {
             relationships: {
               owners: { type: 'app.owner' },
               parent: { type: 'app.owner' },
+              car: { type: 'app.car' },
             },
           },
         }
@@ -321,6 +339,139 @@ describe('json-normalizer', () => {
     ];
     delete normalizedList[STATUS];
     normalizedList.map(x => delete x[STATUS]);
+    expect(normalizedList).to.be.deep.equal(expectedNormalizedList);
+  });
+});
+
+
+describe('json-normalizer with no explicit schema', () => {
+  it('normalize item', () => {
+    const denormalizedItem = {
+      id: 1,
+      type: 'app.test',
+      address: 'address1',
+      numOfPeople: 22,
+      owners: [
+        {
+          id: 1,
+          type: 'app.owner',
+          name: 'a',
+        },
+        {
+          id: 2,
+          type: 'app.owner',
+          name: 'b',
+        },
+      ],
+      parent: {
+        id: 'a',
+        type: 'app.owner',
+        name: 'c',
+      },
+      car: '2',
+    };
+
+    const normalizedItem = normalizeItem(denormalizedItem);
+    expect(normalizedItem).to.be.deep.equal(expectedNormalizedItem);
+  });
+
+  it('normalize item with missing relationship data', () => {
+    const denormalizedItem = {
+      id: 1,
+      type: 'app.test',
+      address: 'address1',
+      numOfPeople: 22,
+      owners: [
+        {
+          id: 1,
+          type: 'app.owner',
+          name: 'a',
+        },
+        {
+          id: 2,
+          type: 'app.owner',
+          name: 'b',
+        },
+      ],
+      parent: {
+        id: 'a',
+        type: 'app.owner',
+        name: 'c',
+      },
+      car: '2',
+    };
+
+    const normalizedItem = normalizeItem(denormalizedItem);
+    expect(normalizedItem).to.be.deep.equal(expectedNormalizedItem);
+  });
+
+  it('normalize item with empty array relationship data', () => {
+    const denormalizedItem = {
+      id: 1,
+      type: 'app.test',
+      address: 'address1',
+      numOfPeople: 22,
+      owners: [
+        {
+          id: 1,
+          type: 'app.owner',
+          name: 'a',
+        },
+        {
+          id: 2,
+          type: 'app.owner',
+          name: 'b',
+        },
+      ],
+      parent: [],
+      car: '2',
+    };
+
+    const expectedNormalizedItemWithNoParent = _.cloneDeep(expectedNormalizedItem);
+    expectedNormalizedItemWithNoParent.relationships.parent.data = [];
+
+    const normalizedItem = normalizeItem(denormalizedItem);
+    expect(normalizedItem).to.be.deep.equal(expectedNormalizedItemWithNoParent);
+  });
+
+  it('normalize collection', () => {
+    const denormalizedItem = {
+      id: 1,
+      type: 'app.test',
+      address: 'address1',
+      numOfPeople: 22,
+      owners: [
+        {
+          id: 1,
+          type: 'app.owner',
+          name: 'a',
+        },
+        {
+          id: 2,
+          type: 'app.owner',
+          name: 'b',
+        },
+      ],
+      parent: {
+        id: 'a',
+        type: 'app.owner',
+        name: 'c',
+      },
+      car: '2',
+    };
+    const denormalizedList = [
+      Object.assign({}, denormalizedItem),
+      Object.assign({}, denormalizedItem),
+      Object.assign({}, denormalizedItem),
+    ];
+
+    const normalizedList = normalizeCollection(denormalizedList);
+    const expectedNormalizedList = [
+      Object.assign({}, expectedNormalizedItem),
+      Object.assign({}, expectedNormalizedItem),
+      Object.assign({}, expectedNormalizedItem),
+    ];
+
     expect(normalizedList).to.be.deep.equal(expectedNormalizedList);
   });
 });

@@ -38,6 +38,9 @@ const resourceSchema = {
     actions: {
       type: 'object',
     },
+    serializer: {
+      type: 'object',
+    },
   },
   additionalProperties: false,
   required: [

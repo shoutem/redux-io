@@ -1,0 +1,41 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Run All Tests",
+      "type": "node",
+      "request": "launch",
+      "cwd": "${workspaceRoot}",
+      "program": "${workspaceRoot}/node_modules/mocha/bin/_mocha",
+      "args": [
+          "**/*.spec.js",
+          "--require", "babel-register",
+          "-u", "tdd",
+          "--timeout", "999999",
+          "--colors"
+      ],
+      "runtimeArgs": [
+          "--nolazy"
+      ],
+      "sourceMaps": true
+    },
+    {
+      "name": "Run current test file",
+      "type": "node",
+      "request": "launch",
+      "cwd": "${workspaceRoot}",
+      "program": "${workspaceRoot}/node_modules/mocha/bin/_mocha",
+      "args": [
+          "--require", "babel-register",
+          "-u", "tdd",
+          "--timeout", "999999",
+          "--colors",
+          "${file}"
+      ],
+      "runtimeArgs": [
+          "--nolazy"
+      ],
+      "sourceMaps": true
+    },
+  ]
+}
