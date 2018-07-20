@@ -55,7 +55,7 @@ export function getResourceType(config) {
   return null;
 }
 
-function resolveResourceType(...configs) {
+export function resolveResourceType(...configs) {
   const resolvedResourceType = _.chain(configs)
     .map(config => getResourceType(config), JSON_API_RESOURCE)
     .compact()

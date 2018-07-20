@@ -3,8 +3,8 @@ import {
   validateResourceConfig,
   validateResourceTypeConfig,
   resolveSchemaType,
-  JSON_API_RESOURCE,
   jsonApiResourceTypeConfig,
+  resolveResourceType,
 } from './resources';
 import JsonApiStandardizer from './standardizers/JsonApiStandardizer';
 
@@ -49,9 +49,14 @@ export class Rio {
     if (_.isFunction(config)) {
       this.resourceResolvers.push(config);
     } else if (_.isObject(config)) {
-      validateResourceConfig(config);
+      const resourceType = resolveResourceType(config);
+      const resourceTypeConfig = this.getResourceType(resourceType);
+
+      const resolvedConfig = _.merge({}, resourceTypeConfig, config);
+      validateResourceConfig(resolvedConfig);
+
       const schema = resolveSchemaType(config);
-      this.resourceConfigs[schema] = config;
+      this.resourceConfigs[schema] = Object.freeze(config);
     } else {
       throw new Error('Register argument is invalid. Only object of function are allowed.');
     }
@@ -64,7 +69,7 @@ export class Rio {
   getResource(schema) {
     let config = this.resourceConfigs[schema];
     if (config) {
-      return _.cloneDeep(config);
+      return config;
     }
 
     this.resourceResolvers.forEach(resolver => {
@@ -76,7 +81,7 @@ export class Rio {
       return true;
     });
 
-    return _.cloneDeep(config);
+    return config;
   }
 
   /**
@@ -100,7 +105,7 @@ export class Rio {
     }
 
     validateResourceTypeConfig(config);
-    this.resourceTypeConfigs[type] = config;
+    this.resourceTypeConfigs[type] = Object.freeze(config);
 
     this.standardizers[type] = standardizer;
   }

@@ -1,80 +1,102 @@
 /* eslint-disable no-unused-expressions */
 import { expect } from 'chai';
+import _ from 'lodash';
 import {
-  buildEndpoint,
+  resolveResourceConfig,
+  jsonApiResourceTypeConfig,
 } from '../../src/resources';
+import rio from '../../src';
 
-describe('Build endpoint', () => {
-  it('static', () => {
-    const endpoint = 'http://new.shoutem.com';
-    const params = { test: 1 };
-
-    const expectedEndpoint = 'http://new.shoutem.com';
-    const builtEndpoint = buildEndpoint(endpoint, params);
-
-    expect(builtEndpoint).to.be.equal(expectedEndpoint);
+describe('Resolve resource config', () => {
+  afterEach(() => {
+    rio.clear();
   });
 
-  it('with segment param', () => {
-    const endpoint = 'http://new.shoutem.com/{x}';
-    const params = { x: 1 };
+  it('create custom config', () => {
+    const expectedConfig = { schema: 'test', type: 'custom' };
+    const config = resolveResourceConfig(expectedConfig);
 
-    const expectedEndpoint = 'http://new.shoutem.com/1';
-    const builtEndpoint = buildEndpoint(endpoint, params);
-
-    expect(builtEndpoint).to.be.equal(expectedEndpoint);
+    expect(config).to.deep.equal(expectedConfig);
   });
 
-  it('with segment param not provided', () => {
-    const endpoint = 'http://new.shoutem.com{/x}';
+  it('override json-api config with arg config', () => {
+    const argConfig = { schema: 'test', request: { endpoint: '', method: 'GET' }};
+    const config = resolveResourceConfig(argConfig);
 
-    const expectedEndpoint = 'http://new.shoutem.com';
-    const builtEndpoint = buildEndpoint(endpoint);
+    const expectedConfig = _.chain({ standardizer: {}})
+      .merge(jsonApiResourceTypeConfig, argConfig)
+      .omit('actions')
+      .value();
 
-    expect(builtEndpoint).to.be.equal(expectedEndpoint);
+    expect(config).to.deep.equal(expectedConfig);
   });
 
-  it('static with segment param', () => {
-    const endpoint = 'http://new.shoutem.com';
-    const params = { x: 1 };
+  it('override action json-api config with arg config', () => {
+    const argConfig = { schema: 'test', request: { endpoint: '', method: 'GET' }};
+    const config = resolveResourceConfig(argConfig, 'create');
 
-    const expectedEndpoint = 'http://new.shoutem.com';
-    const builtEndpoint = buildEndpoint(endpoint, params);
+    const expectedJsonApiResourceConfig = _.merge(
+      {},
+      jsonApiResourceTypeConfig,
+      jsonApiResourceTypeConfig.actions['create']
+    );
 
-    expect(builtEndpoint).to.be.equal(expectedEndpoint);
+    const expectedConfig = _.chain({ standardizer: {}})
+      .merge(expectedJsonApiResourceConfig, argConfig)
+      .omit('actions')
+      .value();
+
+    expect(config).to.deep.equal(expectedConfig);
   });
 
-  it('with query params', () => {
-    const endpoint = 'http://new.shoutem.com{?q1,q2}';
-    const params = { q1: 1, q2: 2 };
-
-    const expectedEndpoint = 'http://new.shoutem.com?q1=1&q2=2';
-    const builtEndpoint = buildEndpoint(endpoint, params);
-
-    expect(builtEndpoint).to.be.equal(expectedEndpoint);
-  });
-
-  it('with query params not provided', () => {
-    const endpoint = 'http://new.shoutem.com{?q1,q2}';
-
-    const expectedEndpoint = 'http://new.shoutem.com';
-    const builtEndpoint = buildEndpoint(endpoint);
-
-    expect(builtEndpoint).to.be.equal(expectedEndpoint);
-  });
-
-  it('with spread query params', () => {
-    const endpoint = 'http://new.shoutem.com{?q*}';
-    const params = {
-      q: {
-        q1: 1,
-        q2: 2,
+  it('override from type to schema to arg config', () => {
+    const resourceTypeConfig = {
+      type: 'test',
+      request: {
+        method: 'A',
+        resourceType: 'A',
+        headers: {
+          A: 'A',
+        },
       },
+      standardizer: {},
+    };
+    rio.registerResourceType(resourceTypeConfig);
+
+    const schemaTypeConfig = {
+      schema: 'B',
+      type: 'test',
+      request: {
+        method: 'B',
+        endpoint: 'B',
+      }
+    };
+    rio.registerResource(schemaTypeConfig);
+
+    const argConfig = {
+      schema: 'B',
+      type: 'test',
+      request: {
+        endpoint: 'C',
+        resourceType: 'C',
+      }
+    };
+    const config = resolveResourceConfig(argConfig);
+
+    const expectedConfig = {
+      schema: 'B',
+      type: 'test',
+      request: {
+        method: 'B',
+        endpoint: 'C',
+        resourceType: 'C',
+        headers: {
+          A: 'A',
+        },
+      },
+      standardizer: {},
     };
 
-    const expectedEndpoint = 'http://new.shoutem.com?q1=1&q2=2';
-    const builtEndpoint = buildEndpoint(endpoint, params);
-
-    expect(builtEndpoint).to.be.equal(expectedEndpoint);
+    expect(config).to.deep.equal(expectedConfig);
   });
 });

@@ -341,6 +341,7 @@ describe('Find action creator', () => {
     const tag = 'collection_test';
 
     const schemaConfig = {
+      type: 'custom',
       schema,
       actions: {
         find: {

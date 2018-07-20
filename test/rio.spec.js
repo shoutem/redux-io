@@ -194,6 +194,7 @@ describe('Rio', () => {
     const schema = 'app.builder';
     const schemaConfig = {
       schema,
+      type: 'custom',
       request: config,
     };
 
