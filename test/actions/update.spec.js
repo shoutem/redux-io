@@ -12,7 +12,7 @@ import rio, {
   OBJECT_UPDATED,
   REFERENCE_STATUS,
   apiStateMiddleware,
-  JSON_API_SOURCE,
+  JSON_API_RESOURCE,
   ReduxApiStateDenormalizer,
 } from '../../src';
 import {
@@ -52,15 +52,20 @@ describe('Update action creator', () => {
 
     const action = update(schemaConfig, item);
 
+    const expectedHeaders = {
+      Accept: 'application/vnd.api+json',
+      'Content-Type': 'application/vnd.api+json',
+    };
+
     expect(action[RSAA]).to.not.be.undefined;
     expect(action[RSAA].method).to.equal('PATCH');
     expect(action[RSAA].endpoint).to.equal(config.endpoint);
-    expect(action[RSAA].headers).to.deep.equal(config.headers);
+    expect(action[RSAA].headers).to.deep.equal(expectedHeaders);
     expect(action[RSAA].types).to.not.be.undefined;
 
     const types = action[RSAA].types;
     const expectedMeta = {
-      source: JSON_API_SOURCE,
+      source: JSON_API_RESOURCE,
       schema,
       endpoint: config.endpoint,
       params: {},
@@ -110,16 +115,21 @@ describe('Update action creator', () => {
 
     const action = update(schemaConfig, item, params);
 
+    const expectedHeaders = {
+      Accept: 'application/vnd.api+json',
+      'Content-Type': 'application/vnd.api+json',
+    };
+
     const expectedEndpoint = 'api.test/a/b/abc?q1=c&q2=d';
     expect(action[RSAA]).to.not.be.undefined;
     expect(action[RSAA].method).to.equal('PATCH');
     expect(action[RSAA].endpoint).to.equal(expectedEndpoint);
-    expect(action[RSAA].headers).to.deep.equal(config.headers);
+    expect(action[RSAA].headers).to.deep.equal(expectedHeaders);
     expect(action[RSAA].types).to.not.be.undefined;
 
     const types = action[RSAA].types;
     const expectedMeta = {
-      source: JSON_API_SOURCE,
+      source: JSON_API_RESOURCE,
       schema,
       endpoint: expectedEndpoint,
       params,
@@ -270,15 +280,16 @@ describe('Update action creator', () => {
       + ' [{"code":"OBJECT_MISSING_REQUIRED_PROPERTY","params":'
       + '["schema"],"message":"Missing required pr'
       + 'operty: schema","path":"#/"}]. Invalid resource config:'
-      + ' {"request":{"headers":{"Content-Type":'
-      + '"application/vnd.api+json"},"endpoint":"api.test"}}'
+      + ' {"type":"json-api","request":{"headers":{"Accept":"appli'
+      + 'cation/vnd.api+json","Content-Type":"application/vnd.api+json"},"method"'
+      + ':"PATCH","endpoint":"api.test"},"standardizer":{}}'
     );
   });
 
   it('throws exception on action with schema undefined', () => {
     const schemaConfig = 'schema_test';
     expect(() => update(schemaConfig)).to.throw(
-      'Couldn\'t resolve schema schema_test in function find.'
+      'Couldn\'t resolve schema schema_test in function update.'
     );
   });
 
@@ -361,7 +372,7 @@ describe('Update action creator', () => {
     };
 
     const expectedMeta = {
-      source: JSON_API_SOURCE,
+      source: JSON_API_RESOURCE,
       schema,
       endpoint: config.endpoint,
       params: {},

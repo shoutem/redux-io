@@ -4,14 +4,14 @@ import {
   CREATE_REQUEST,
   CREATE_SUCCESS,
   CREATE_ERROR,
-} from './../consts';
-import { JSON_API_SOURCE } from './..';
+} from '../consts';
 import {
   buildEndpoint,
   resolveResourceConfig,
   resolveSchemaType,
   resolveSchema,
-} from './../resources';
+  JSON_API_RESOURCE,
+} from '../resources';
 import { normalize } from '../normalizer';
 import thunkAction from './_thunkAction';
 import { extendMetaWithResponse, buildRSAAConfig } from '../rsaa';
@@ -38,12 +38,12 @@ export function create(schema, item = null, params = {}, options = {}) {
 
   if (!config) {
     const schemaName = schema && _.isObject(schema) ? schemaType : schema;
-    throw new Error(`Couldn't resolve schema ${schemaName} in function find.`);
+    throw new Error(`Couldn't resolve schema ${schemaName} in function create.`);
   }
 
   const rsaaConfig = buildRSAAConfig(config);
   const endpoint = buildEndpoint(rsaaConfig.endpoint, params, options);
-  const source = _.get(config, 'request.resourceType', JSON_API_SOURCE);
+  const source = _.get(config, 'request.resourceType', JSON_API_RESOURCE);
 
   let body = null;
   if (item !== null) {

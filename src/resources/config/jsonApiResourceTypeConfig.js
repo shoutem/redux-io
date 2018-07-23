@@ -1,7 +1,10 @@
 import _ from 'lodash';
-import defaultResourceConfig from './defaultResourceConfig';
+import baseResourceTypeConfig from './baseResourceTypeConfig';
 
-const jsonApiResourceConfig = _.merge({}, defaultResourceConfig, {
+export const JSON_API_RESOURCE = 'json-api';
+
+const jsonApiResourceTypeConfig = _.merge({}, baseResourceTypeConfig, {
+  type: JSON_API_RESOURCE,
   request: {
     headers: {
       Accept: 'application/vnd.api+json',
@@ -25,4 +28,4 @@ const jsonApiResourceConfig = _.merge({}, defaultResourceConfig, {
   },
 });
 
-export default Object.freeze(jsonApiResourceConfig);
+export default Object.freeze(jsonApiResourceTypeConfig);

@@ -7,6 +7,9 @@ const resourceSchema = {
     schema: {
       type: ['object', 'string'],
     },
+    type: {
+      type: 'string',
+    },
     request: {
       type: 'object',
       properties: {
@@ -41,20 +44,62 @@ const resourceSchema = {
     serializer: {
       type: 'object',
     },
+    standardizer: {
+      type: 'object',
+    },
   },
   additionalProperties: false,
   required: [
     'schema',
   ],
 };
+const resourceTypeSchema = {
+  type: 'object',
+  properties: {
+    type: {
+      type: 'string',
+    },
+    request: {
+      type: 'object',
+      properties: {
+        headers: {
+          type: 'object',
+        },
+        method: {
+          type: 'string',
+        },
+        types: {
+          type: 'array',
+        },
+        resourceType: {
+          type: 'string',
+        },
+      },
+      additionalProperties: false,
+    },
+    actions: {
+      type: 'object',
+    },
+    serializer: {
+      type: 'object',
+    },
+    standardizer: {
+      type: 'object',
+    },
+  },
+  additionalProperties: false,
+  required: [
+    'type',
+  ],
+};
 
 /**
- * Validates resource configuration using ZSchema library and json-schema convention.
+ * Validates configuration based on schema using ZSchema library and json-schema convention.
  * Returns useful errors to enable developer easier fixing invalid resource configuration.
  * @param config
  */
-export function validateResourceConfig(config, throwException = true) {
-  const validResult = validator.validate(config, resourceSchema);
+export function validateConfig(config, schema, throwException = true) {
+  const validResult = validator.validate(config, schema);
 
   if (throwException && !validResult) {
     const validationErrorsMsg = JSON.stringify(validator.getLastErrors());
@@ -66,4 +111,20 @@ export function validateResourceConfig(config, throwException = true) {
   }
 
   return validResult;
+}
+
+/**
+ * Validates resource configuration
+ * @param config
+ */
+export function validateResourceConfig(config, throwException = true) {
+  return validateConfig(config, resourceSchema, throwException);
+}
+
+/**
+ * Validates resourceType configuration
+ * @param config
+ */
+export function validateResourceTypeConfig(config, throwException = true) {
+  return validateConfig(config, resourceTypeSchema, throwException);
 }

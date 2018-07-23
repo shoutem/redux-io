@@ -11,7 +11,7 @@ import rio, {
   OBJECT_CREATED,
   REFERENCE_STATUS,
   apiStateMiddleware,
-  JSON_API_SOURCE,
+  JSON_API_RESOURCE,
   ReduxApiStateDenormalizer,
 } from '../../src';
 import {
@@ -34,6 +34,7 @@ describe('Create action creator', () => {
   it('creates a valid action', () => {
     const config = {
       headers: {
+        'Accept': 'application/vnd.api+json',
         'Content-Type': 'application/vnd.api+json',
       },
       endpoint: 'api.test',
@@ -67,7 +68,7 @@ describe('Create action creator', () => {
 
     const types = action[RSAA].types;
     const expectedMeta = {
-      source: JSON_API_SOURCE,
+      source: JSON_API_RESOURCE,
       schema,
       endpoint: config.endpoint,
       params: {},
@@ -102,6 +103,7 @@ describe('Create action creator', () => {
     };
     const config = {
       headers: {
+        'Accept': 'application/vnd.api+json',
         'Content-Type': 'application/vnd.api+json',
       },
       endpoint: 'api.test',
@@ -124,7 +126,7 @@ describe('Create action creator', () => {
 
     const types = action[RSAA].types;
     const expectedMeta = {
-      source: JSON_API_SOURCE,
+      source: JSON_API_RESOURCE,
       schema,
       endpoint: config.endpoint,
       params: {},
@@ -157,6 +159,7 @@ describe('Create action creator', () => {
     };
     const config = {
       headers: {
+        'Accept': 'application/vnd.api+json',
         'Content-Type': 'application/vnd.api+json',
       },
       endpoint: 'api.test',
@@ -179,7 +182,7 @@ describe('Create action creator', () => {
 
     const types = action[RSAA].types;
     const expectedMeta = {
-      source: JSON_API_SOURCE,
+      source: JSON_API_RESOURCE,
       schema,
       endpoint: config.endpoint,
       params: {},
@@ -212,6 +215,7 @@ describe('Create action creator', () => {
     };
     const config = {
       headers: {
+        'Accept': 'application/vnd.api+json',
         'Content-Type': 'application/vnd.api+json',
       },
       endpoint: 'api.test/{param1}/{param2}/abc{?q1,q2}',
@@ -241,7 +245,7 @@ describe('Create action creator', () => {
 
     const types = action[RSAA].types;
     const expectedMeta = {
-      source: JSON_API_SOURCE,
+      source: JSON_API_RESOURCE,
       schema,
       endpoint: expectedEndpoint,
       params,
@@ -276,19 +280,17 @@ describe('Create action creator', () => {
     };
 
     expect(() => create(schemaConfig)).to.throw(
-      'Resource configuration is invalid. Error:'
-      + ' [{"code":"OBJECT_MISSING_REQUIRED_PROPERTY","params":'
-      + '["schema"],"message":"Missing required pr'
-      + 'operty: schema","path":"#/"}]. Invalid resource config:'
-      + ' {"request":{"headers":{"Content-Type":'
-      + '"application/vnd.api+json"},"endpoint":"api.test"}}'
+      'Resource configuration is invalid. Error: [{"code":"OBJECT_MISSING_REQUIRED_PROPERTY",'
+      + '"params":["schema"],"message":"Missing required property: schema","path":"#/"}]. Invalid res'
+      + 'ource config: {"type":"json-api","request":{"headers":{"Accept":"application/vnd.api+json","'
+      + 'Content-Type":"application/vnd.api+json"},"method":"POST","endpoint":"api.test"},"standardizer":{}}'
     );
   });
 
   it('throws exception on action with schema undefined', () => {
     const schemaConfig = 'schema_test';
     expect(() => create(schemaConfig)).to.throw(
-      'Couldn\'t resolve schema schema_test in function find.'
+      'Couldn\'t resolve schema schema_test in function create.'
     );
   });
 
@@ -382,7 +384,7 @@ describe('Create action creator', () => {
     };
 
     const expectedMeta = {
-      source: JSON_API_SOURCE,
+      source: JSON_API_RESOURCE,
       endpoint: config.endpoint,
       params: {},
       options: {},

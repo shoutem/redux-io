@@ -23,12 +23,16 @@ export function next(collection, appendMode = true, config = {}) {
       tag,
     };
   }
-  const findConfig = _.merge({
-    request: {
-      endpoint: nextLink,
+  const findConfig = _.merge(
+    {},
+    {
+      request: {
+        endpoint: nextLink,
+      },
+      schema,
     },
-    schema,
-  }, config);
+    config
+  );
 
   // We want to append the data to the data in the state, and we know that
   // the URL in the config already contains all the necessary query parameters

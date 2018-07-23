@@ -6,7 +6,7 @@ import {
   OBJECT_UPDATED,
   OBJECT_REMOVING,
   OBJECT_REMOVED,
-} from './../consts';
+} from '../consts';
 import {
   STATUS,
   validationStatus,
@@ -15,7 +15,7 @@ import {
   updateStatus,
   setStatus,
   cloneStatus,
-} from './../status';
+} from '../status';
 
 export const STORAGE_TYPE = '@@redux-io/storage';
 

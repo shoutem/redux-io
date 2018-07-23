@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import {
   LOAD_SUCCESS,
-  JSON_API_SOURCE,
+  JSON_API_RESOURCE,
 } from '../../src';
 import loaded from '../../src/actions/loaded';
 
@@ -24,7 +24,7 @@ describe('Loaded action creator', () => {
       payload: item,
       meta: {
         schema,
-        source: JSON_API_SOURCE,
+        source: JSON_API_RESOURCE,
         tag,
       },
     };

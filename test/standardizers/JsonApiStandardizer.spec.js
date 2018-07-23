@@ -1,6 +1,6 @@
 import _ from 'lodash';
 import { expect } from 'chai';
-import { transform, inverse } from '../../src/standardizers/json-api-standardizer';
+import JsonApiStandardizer from '../../src/standardizers/JsonApiStandardizer';
 
 const originalItem = {
   id: 1,
@@ -68,13 +68,15 @@ const schema = {
 
 describe('standardizer', () => {
   it('transform item', () => {
-    const result = transform(originalItem);
+    const standardizer = new JsonApiStandardizer();
+    const result = standardizer.transform(originalItem);
     expect(result.schema).to.be.deep.equal(schema);
     expect(result.object).to.be.deep.equal(transformedItem);
   });
 
   it('inverse transformation item', () => {
-    const result = inverse(transformedItem, schema);
+    const standardizer = new JsonApiStandardizer();
+    const result = standardizer.inverse(transformedItem, schema);
     expect(result).to.be.deep.equal(originalItem);
   });
 });

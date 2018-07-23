@@ -12,7 +12,7 @@ import rio, {
   REFERENCE_FETCHED,
   REFERENCE_STATUS,
   apiStateMiddleware,
-  JSON_API_SOURCE,
+  JSON_API_RESOURCE,
   ReduxApiStateDenormalizer,
 } from '../../src';
 import {
@@ -38,6 +38,7 @@ describe('Find action creator', () => {
   it('creates a valid action', () => {
     const config = {
       headers: {
+        'Accept': 'application/vnd.api+json',
         'Content-Type': 'application/vnd.api+json',
       },
       endpoint: 'api.test',
@@ -61,7 +62,7 @@ describe('Find action creator', () => {
 
     const types = action[RSAA].types;
     const expectedMeta = {
-      source: JSON_API_SOURCE,
+      source: JSON_API_RESOURCE,
       schema,
       tag,
       endpoint: config.endpoint,
@@ -132,6 +133,7 @@ describe('Find action creator', () => {
   it('creates a valid action with appendMode option', () => {
     const config = {
       headers: {
+        'Accept': 'application/vnd.api+json',
         'Content-Type': 'application/vnd.api+json',
       },
       endpoint: 'api.test',
@@ -155,7 +157,7 @@ describe('Find action creator', () => {
 
     const types = action[RSAA].types;
     const expectedMeta = {
-      source: JSON_API_SOURCE,
+      source: JSON_API_RESOURCE,
       schema,
       tag,
       endpoint: config.endpoint,
@@ -188,6 +190,7 @@ describe('Find action creator', () => {
   it('creates a valid action with predefined config', () => {
     const config = {
       headers: {
+        'Accept': 'application/vnd.api+json',
         'Content-Type': 'application/vnd.api+json',
       },
       endpoint: 'api.test',
@@ -212,7 +215,7 @@ describe('Find action creator', () => {
 
     const types = action[RSAA].types;
     const expectedMeta = {
-      source: JSON_API_SOURCE,
+      source: JSON_API_RESOURCE,
       schema,
       tag,
       endpoint: config.endpoint,
@@ -295,7 +298,7 @@ describe('Find action creator', () => {
 
     const types = action[RSAA].types;
     const expectedMeta = {
-      source: JSON_API_SOURCE,
+      source: JSON_API_RESOURCE,
       schema,
       tag,
       endpoint: exceptedEndpoint,
@@ -326,6 +329,7 @@ describe('Find action creator', () => {
   it('creates a valid action with predefined config overriding find defaults', () => {
     const config = {
       headers: {
+        Accept: 'application/vnd.api+json',
         'Content-Type': 'application/vnd.api+json',
       },
       endpoint: 'api.test',
@@ -337,12 +341,18 @@ describe('Find action creator', () => {
     const tag = 'collection_test';
 
     const schemaConfig = {
+      type: 'custom',
       schema,
-      request: config,
+      actions: {
+        find: {
+          request: config,
+        }
+      }
     };
     rio.registerSchema(schemaConfig);
 
     const action = find(schema, tag);
+    console.log(action);
 
     expect(action[RSAA]).to.not.be.undefined;
     expect(action[RSAA].method).to.equal(config.method);
@@ -353,7 +363,7 @@ describe('Find action creator', () => {
 
     const types = action[RSAA].types;
     const expectedMeta = {
-      source: JSON_API_SOURCE,
+      source: JSON_API_RESOURCE,
       schema,
       tag,
       endpoint: config.endpoint,
@@ -384,6 +394,7 @@ describe('Find action creator', () => {
   it('creates a valid action with merged config', () => {
     const config = {
       headers: {
+        'Accept': 'application/vnd.api+json',
         'Content-Type': 'application/vnd.api+json',
       },
       endpoint: 'api.test',
@@ -415,7 +426,7 @@ describe('Find action creator', () => {
 
     const types = action[RSAA].types;
     const expectedMeta = {
-      source: JSON_API_SOURCE,
+      source: JSON_API_RESOURCE,
       schema,
       tag,
       endpoint: argSchemaConfig.request.endpoint,
@@ -472,32 +483,23 @@ describe('Find action creator', () => {
     };
     rio.registerSchema(schemaConfig);
 
-    const argsActions = {
-      find: {
-        request: {
-          endpoint: 'api.find.test2',
-          headers: {
-            Accept2: 'application/vnd.api+json',
-          },
-        },
-      }
-    };
-
     const argSchemaConfig = {
       schema,
       request: {
-        endpoint: 'api.test2',
+        endpoint: 'api.find.test2',
+        headers: {
+          Accept2: 'application/vnd.api+json',
+        },
       },
-      actions: argsActions,
     };
 
     const action = find(argSchemaConfig, tag);
 
-    const expectedEndpoint = argsActions.find.request.endpoint;
+    const expectedEndpoint = argSchemaConfig.request.endpoint;
     const expectedHeaders = {
       ...config.headers,
       ...actions.find.request.headers,
-      ...argsActions.find.request.headers,
+      ...argSchemaConfig.request.headers,
     };
 
     expect(action[RSAA]).to.not.be.undefined;
@@ -508,7 +510,7 @@ describe('Find action creator', () => {
 
     const types = action[RSAA].types;
     const expectedMeta = {
-      source: JSON_API_SOURCE,
+      source: JSON_API_RESOURCE,
       schema,
       tag,
       endpoint: expectedEndpoint,
@@ -570,9 +572,10 @@ describe('Find action creator', () => {
       'Resource configuration is invalid. Error:'
       + ' [{"code":"OBJECT_MISSING_REQUIRED_PROPERTY","params":'
       + '["endpoint"],"message":"Missing required property: endpoint"'
-      + ',"path":"#/request"}]. Invalid resource config: {"schema":"'
-      + 'app.builder","request":{"headers":{"Content-Type":"application'
-      + '/vnd.api+json"}}}');
+      + ',"path":"#/request"}]. Invalid resource config: {"type":"json-api"'
+      + ',"request":{"headers":{"Accept":"application/vnd.api+json",'
+      + '"Content-Type":"application/vnd.api+json"},"method":"GET"},'
+      + '"standardizer":{},"schema":"app.builder"}');
   });
 
   it('creates a invalid action with invalid tag', () => {
@@ -597,6 +600,7 @@ describe('Find action creator', () => {
   it('creates a valid action with valid endpoint with filled params', () => {
     const config = {
       headers: {
+        Accept: 'application/vnd.api+json',
         'Content-Type': 'application/vnd.api+json',
       },
       endpoint: 'api.test/{param1}/{param2}/abc{?q1,q2}',
@@ -628,7 +632,7 @@ describe('Find action creator', () => {
 
     const types = action[RSAA].types;
     const expectedMeta = {
-      source: JSON_API_SOURCE,
+      source: JSON_API_RESOURCE,
       schema,
       tag,
       endpoint: expectedEndpoint,
@@ -692,7 +696,7 @@ describe('Find action creator', () => {
     };
 
     const expectedMeta = {
-      source: JSON_API_SOURCE,
+      source: JSON_API_RESOURCE,
       schema,
       tag,
       endpoint: config.endpoint,

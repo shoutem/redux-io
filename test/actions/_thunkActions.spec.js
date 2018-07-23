@@ -7,7 +7,7 @@ import thunk from 'redux-thunk';
 import configureMockStore from 'redux-mock-store';
 import rio, {
   apiStateMiddleware,
-  JSON_API_SOURCE,
+  JSON_API_RESOURCE,
   ReduxApiStateDenormalizer
 } from '../../src';
 import create from '../../src/actions/create';
@@ -36,7 +36,7 @@ describe('thunkActions', () => {
       },
     };
     const expectedMeta = {
-      source: JSON_API_SOURCE,
+      source: JSON_API_RESOURCE,
       schema,
     };
 
@@ -91,7 +91,7 @@ describe('thunkActions', () => {
       },
     };
     const expectedMeta = {
-      source: JSON_API_SOURCE,
+      source: JSON_API_RESOURCE,
       schema,
     };
 

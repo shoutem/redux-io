@@ -1,6 +1,6 @@
 /* eslint-disable no-unused-expressions */
 import { expect } from 'chai';
-import rio, { JSON_API_SOURCE } from '../src';
+import rio, { JSON_API_RESOURCE } from '../src';
 
 describe('Rio', () => {
   afterEach(() => {
@@ -194,6 +194,7 @@ describe('Rio', () => {
     const schema = 'app.builder';
     const schemaConfig = {
       schema,
+      type: 'custom',
       request: config,
     };
 
@@ -205,46 +206,44 @@ describe('Rio', () => {
   });
 
   it('register source type', () => {
-    rio.registerSourceType('test_source', () => true);
+    rio.registerResourceType({ type: 'test_source', standardizer: {}});
     const standardizer = rio.getStandardizer('test_source');
 
     expect(standardizer).to.not.be.undefined;
-    const result = standardizer();
-    expect(result).to.be.true;
   });
 
   it('throws error if source type argument isn\'t string on registration of source type', () => {
-    expect(() => rio.registerSourceType({}, () => true)).to.throw(
-      'rio.registerSourceType sourceType argument must be string.'
+    expect(() => rio.registerResourceType({ type: {}, standardizer: {} })).to.throw(
+      'rio.registerResourceType type argument must be string.'
     );
   });
 
-  it('throws error if source type argument is empty on registration of source type', () => {
-    expect(() => rio.registerSourceType('', () => true)).to.throw(
-      'rio.registerSourceType sourceType is empty.'
+  it('throws error if source type argument is empty on registration of resource type', () => {
+    expect(() => rio.registerResourceType({ type: '', standardizer: {}})).to.throw(
+      'rio.registerResourceType type is empty.'
     );
   });
 
-  it('throws error if standardizer argument isn\'t function on registration of source type', () => {
-    expect(() => rio.registerSourceType('test', {})).to.throw(
-      'rio.registerSourceType standardizer argument must be a function.'
+  it('throws error if standardizer argument isn\'t object on registration of resource type', () => {
+    expect(() => rio.registerResourceType({ type: 'test', standardizer: null })).to.throw(
+      'rio.registerResourceType standardizer argument must be an object.'
     );
   });
 
   it('resolve default JSON-API standardizer', () => {
-    const standardizer = rio.getStandardizer(JSON_API_SOURCE);
+    const standardizer = rio.getStandardizer(JSON_API_RESOURCE);
     expect(standardizer).to.not.be.undefined;
   });
 
   it('throws error if source type argument isn\'t string on getStandardizer', () => {
     expect(() => rio.getStandardizer({})).to.throw(
-      'rio.getStandardizer sourceType argument must be string.'
+      'rio.getStandardizer resourceType argument must be string.'
     );
   });
 
-  it('throws error if source type argument is empty on getStandardizer', () => {
+  it('throws error if resource type argument is empty on getStandardizer', () => {
     expect(() => rio.getStandardizer('')).to.throw(
-      'rio.getStandardizer sourceType is empty.'
+      'rio.getStandardizer resourceType is empty.'
     );
   });
 });

@@ -5,7 +5,7 @@ import {
   CREATE_SUCCESS,
 } from '../consts';
 import rio from '../rio';
-import { JSON_API_SOURCE } from '../standardizers/json-api-standardizer';
+import { JSON_API_RESOURCE } from '../resources';
 
 function isValidAction(action) {
   if (
@@ -101,7 +101,7 @@ export default () => next => action => {
     ...action,
     meta: {
       ...action.meta,
-      source: JSON_API_SOURCE,
+      source: JSON_API_RESOURCE,
     },
     payload: jsonApiPayload,
   };

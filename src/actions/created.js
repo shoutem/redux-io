@@ -1,8 +1,8 @@
 import _ from 'lodash';
 import {
   CREATE_SUCCESS,
-} from './../consts';
-import { JSON_API_SOURCE } from './..';
+} from '../consts';
+import { JSON_API_RESOURCE } from '../resources';
 
 export default function created(payload, schema) {
   if (!_.isPlainObject(payload)) {
@@ -21,7 +21,7 @@ export default function created(payload, schema) {
     type: CREATE_SUCCESS,
     payload,
     meta: {
-      source: JSON_API_SOURCE,
+      source: JSON_API_RESOURCE,
       schema,
       timestamp: Date.now(),
     },

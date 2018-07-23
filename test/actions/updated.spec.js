@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import {
   UPDATE_SUCCESS,
-  JSON_API_SOURCE,
+  JSON_API_RESOURCE,
 } from '../../src';
 import updated from '../../src/actions/updated';
 
@@ -23,7 +23,7 @@ describe('Updated action creator', () => {
       payload: item,
       meta: {
         schema,
-        source: JSON_API_SOURCE,
+        source: JSON_API_RESOURCE,
       },
     };
     const updateSuccessAction = updated(item, schema);

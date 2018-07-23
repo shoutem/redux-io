@@ -9,7 +9,7 @@ import rio, {
   LOAD_SUCCESS,
   LOAD_ERROR,
   apiStateMiddleware,
-  JSON_API_SOURCE,
+  JSON_API_RESOURCE,
   collection,
 } from '../../src';
 import { setStatus, updateStatus, getStatus } from '../../src/status';
@@ -53,15 +53,20 @@ describe('Next action creator', () => {
 
     const action = prev(demoCollection);
 
+    const expectedHeaders = {
+      Accept: 'application/vnd.api+json',
+      'Content-Type': 'application/vnd.api+json',
+    };
+
     expect(action[RSAA]).to.not.be.undefined;
     expect(action[RSAA].method).to.equal('GET');
     expect(action[RSAA].endpoint).to.equal(links.prev);
-    expect(action[RSAA].headers).to.deep.equal({ 'Content-Type': 'application/vnd.api+json' });
+    expect(action[RSAA].headers).to.deep.equal(expectedHeaders);
     expect(action[RSAA].types).to.not.be.undefined;
 
     const types = action[RSAA].types;
     const expectedMeta = {
-      source: JSON_API_SOURCE,
+      source: JSON_API_RESOURCE,
       schema,
       tag,
       endpoint: links.prev,
@@ -137,7 +142,7 @@ describe('Next action creator', () => {
 
     const types = action[RSAA].types;
     const expectedMeta = {
-      source: JSON_API_SOURCE,
+      source: JSON_API_RESOURCE,
       schema,
       tag,
       endpoint: links.prev,

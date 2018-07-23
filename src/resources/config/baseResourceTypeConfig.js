@@ -1,4 +1,4 @@
-const defaultResourceConfig = {
+const baseResourceTypeConfig = {
   actions: {
     find: {
       request: {
@@ -23,4 +23,4 @@ const defaultResourceConfig = {
   },
 };
 
-export default Object.freeze(defaultResourceConfig);
+export default Object.freeze(baseResourceTypeConfig);
