@@ -25,9 +25,6 @@ const resourceSchema = {
         types: {
           type: 'array',
         },
-        resourceType: {
-          type: 'string',
-        },
         body: {
           type: ['object', 'string'],
         },
@@ -53,6 +50,7 @@ const resourceSchema = {
     'schema',
   ],
 };
+
 const resourceTypeSchema = {
   type: 'object',
   properties: {
@@ -70,9 +68,6 @@ const resourceTypeSchema = {
         },
         types: {
           type: 'array',
-        },
-        resourceType: {
-          type: 'string',
         },
       },
       additionalProperties: false,

@@ -136,8 +136,19 @@ export function makeObjectAction(sourceAction, actionType, item) {
     return makeErrorAction(OBJECT_ERROR, 'Id is not valid.');
   }
 
+  const source = _.get(sourceAction, 'meta.source');
+  if (!source) {
+    console.error('Source is missing.');
+    return makeErrorAction(OBJECT_ERROR, 'Source is missing.');
+  }
+
   // finds appropriate standardizer for transformation
-  const standardizer = rio.getStandardizer(sourceAction.meta.source);
+  const standardizer = rio.getStandardizer(source);
+  if (!standardizer) {
+    console.error('Standardizer is missing.');
+    return makeErrorAction(OBJECT_ERROR, 'Standardizer is missing.');
+  }
+
   // transforms item into standard model
   const transformation = standardizer.transform(item);
 

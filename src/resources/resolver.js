@@ -40,8 +40,8 @@ function resolveSchemaResourceConfig(config) {
   if (_.isString(config)) {
     return rio.getResource(config);
   } else if (_.isObject(config)) {
-    const schema = resolveSchemaType(config);
-    return rio.getResource(schema);
+    const schemaType = resolveSchemaType(config);
+    return rio.getResource(schemaType);
   }
 
   return null;
@@ -55,9 +55,14 @@ export function getResourceType(config) {
   return null;
 }
 
+/**
+ * Resolves resource type based on order of configurations
+ * @param {*} configs - resource configurations, order is from more
+ * important to less important
+ */
 export function resolveResourceType(...configs) {
   const resolvedResourceType = _.chain(configs)
-    .map(config => getResourceType(config), JSON_API_RESOURCE)
+    .map(config => getResourceType(config))
     .compact()
     .head()
     .value();

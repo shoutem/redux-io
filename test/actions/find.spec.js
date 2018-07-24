@@ -363,7 +363,7 @@ describe('Find action creator', () => {
 
     const types = action[RSAA].types;
     const expectedMeta = {
-      source: JSON_API_RESOURCE,
+      source: 'custom',
       schema,
       tag,
       endpoint: config.endpoint,

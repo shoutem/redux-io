@@ -10,6 +10,7 @@ export {
   resolveResourceConfig,
   resolveReferenceSchemaType,
   buildEndpoint,
+  getResourceType,
 } from './resolver';
 
 export {

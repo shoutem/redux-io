@@ -9,6 +9,7 @@ import {
   buildEndpoint,
   resolveResourceConfig,
   resolveSchemaType,
+  getResourceType,
   JSON_API_RESOURCE,
 } from '../resources';
 import thunkAction from './_thunkAction';
@@ -47,6 +48,7 @@ export function isAppendMode(action) {
 export function find(schema, tag = '', params = {}, options = {}) {
   const config = resolveResourceConfig(schema, 'find');
   const schemaType = resolveSchemaType(config);
+  const resourceType = getResourceType(config);
 
   if (!config) {
     const schemaName = schema && _.isObject(schema) ? schemaType : schema;
@@ -64,7 +66,7 @@ export function find(schema, tag = '', params = {}, options = {}) {
     params,
     endpoint,
     options,
-    source: config.request.resourceType || JSON_API_RESOURCE,
+    source: resourceType || JSON_API_RESOURCE,
     schema: schemaType,
     timestamp: Date.now(),
   };

@@ -18,7 +18,7 @@ export default class JsonApiStandardizer {
     if (!_.has(object, 'relationships')) {
       return {
         schema: {},
-        object: _.cloneDeep(object),
+        object,
       };
     }
 
@@ -29,7 +29,7 @@ export default class JsonApiStandardizer {
         relationships,
         type: resolveType(object),
       },
-      object: _.cloneDeep(object),
+      object,
     };
   }
 

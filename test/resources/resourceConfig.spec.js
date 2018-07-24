@@ -54,7 +54,6 @@ describe('Resolve resource config', () => {
       type: 'test',
       request: {
         method: 'A',
-        resourceType: 'A',
         headers: {
           A: 'A',
         },
@@ -78,7 +77,6 @@ describe('Resolve resource config', () => {
       type: 'test',
       request: {
         endpoint: 'C',
-        resourceType: 'C',
       }
     };
     const config = resolveResourceConfig(argConfig);
@@ -89,7 +87,6 @@ describe('Resolve resource config', () => {
       request: {
         method: 'B',
         endpoint: 'C',
-        resourceType: 'C',
         headers: {
           A: 'A',
         },

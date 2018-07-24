@@ -11,6 +11,7 @@ import {
   resolveSchemaType,
   resolveSchema,
   JSON_API_RESOURCE,
+  getResourceType,
 } from '../resources';
 import { normalize } from '../normalizer';
 import thunkAction from './_thunkAction';
@@ -35,6 +36,7 @@ import { extendMetaWithResponse, buildRSAAConfig } from '../rsaa';
 export function remove(schema, item, params = {}, options = {}) {
   const config = resolveResourceConfig(schema, 'remove');
   const schemaType = resolveSchemaType(config);
+  const resourceType = getResourceType(config);
 
   if (!config) {
     const schemaName = schema && _.isObject(schema) ? schemaType : schema;
@@ -48,13 +50,12 @@ export function remove(schema, item, params = {}, options = {}) {
 
   const rsaaConfig = buildRSAAConfig(config);
   const endpoint = buildEndpoint(rsaaConfig.endpoint, params, options);
-  const source = _.get(config, 'request.resourceType', JSON_API_RESOURCE);
 
   const meta = {
     params,
     endpoint,
     options,
-    source,
+    source: resourceType || JSON_API_RESOURCE,
     schema: schemaType,
     timestamp: Date.now(),
   };

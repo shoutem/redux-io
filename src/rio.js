@@ -53,6 +53,10 @@ export class Rio {
       const resourceTypeConfig = this.getResourceType(resourceType);
 
       const resolvedConfig = _.merge({}, resourceTypeConfig, config);
+
+      // validation of resource configurtion is domne on merged configurations
+      // because schema resource config alone can be invalid, but resolved configuration
+      // can be valid because resource type configuration can add missing parts
       validateResourceConfig(resolvedConfig);
 
       const schema = resolveSchemaType(config);
@@ -85,7 +89,7 @@ export class Rio {
   }
 
   /**
-   * Register register type for data.
+   * Register resource type for data.
    */
   registerResourceType(config) {
     if (!config) {
@@ -106,7 +110,6 @@ export class Rio {
 
     validateResourceTypeConfig(config);
     this.resourceTypeConfigs[type] = Object.freeze(config);
-
     this.standardizers[type] = standardizer;
   }
 
