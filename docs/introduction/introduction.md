@@ -126,7 +126,6 @@ rio.registerResource({
   request: {
     endpoint: 'https://api.jazer.io/resources/authors{/authorId}',
     headers: {
-      Accept: 'application/vnd.api+json',
       'api-key': API_KEY,
       'application-id': APPLICATION_ID,
     },
@@ -405,7 +404,7 @@ function mapDispatchToProps(dispatch) {
 
 We add button that will render title `Refresh` or icon `refresh` based on returned boolean value of  `isBusy` function called with `authors` argument. List of `authors` is result of denoralization with `getCollection` and holds status data about `authors` collection in app, one of status data is `busy` flag that is active when `redux-io` has an active request for schema `author`.
 
-Other functionality that we added is manual invalidation of data. Invalidation happens automatically for every mutable operation on resource, but we will talk about it later. Here I want to show you interesting feature that status data embeded with `authors` list enables. Button has an click handler `this.handleRefreshClick` that will trigger dispatch of `invalidate('authors')` action. Invalidation action changes status data of all collections defined with `authors` schema, so when we use `redux-io` helper `shouldLoad` it will return `true` value meaning data needs to be loaded and we will dispatch `loadAuthors`. Once `authors` are fetched, data again will be valid and `getAuthors` will automatically return new instance of denormalized data from redux store.
+Other functionality that we added is manual invalidation of data. Invalidation happens automatically for every mutable operation on resource, but we will talk about it later. Here I want to show you interesting feature that status data embeded with `authors` list enables. Button has a click handler `this.handleRefreshClick` that will trigger dispatch of `invalidate('authors')` action. Invalidation action changes status data of all collections defined with `authors` schema, so when we use `redux-io` helper `shouldLoad` it will return `true` value meaning data needs to be loaded and we will dispatch `loadAuthors`. Once `authors` are fetched, data again will be valid and `getAuthors` will automatically return new instance of denormalized data from redux store.
 
 Great, we finished section explaining how to fetch resource from server and render it. Along way we passed all parts that needs to exist to create unidirectional circle from dispatching action, fetching data, storing data in redux store, denormalizing it with selectors and rendering it in table.
 
@@ -415,24 +414,10 @@ But that is only fetching of data, surely `redux-io` provides more. Absolutely, 
 
 We saw how to fetch existing authors and how to refresh data, now let's create new author. Most work will be with UI becuase we need to implement modal screen that will be opened once user click on Create button. Modal needs to contain form that will on submit collect data and pass it to callback. Only when callback is called will we use `redux-io` to send request for creating new user on server. We will start with mocking UI and adding functionality on redux side to focus on `redux-io` and after that implement UI.
 
-First step is to extend our resource definition and encapsulate `create` action for easier usage in `react`, so let's add code in `actions.js`:
+First step is to encapsulate `create` action for easier usage in `react`, so let's add code in `actions.js`:
 
 ```jsx
 import rio, { find, create } from '@shoutem/redux-io';
-
-rio.registerResource({
-  // ...
-  // In next version this will be redundant due to JsonApiResource
-  actions: {
-    create: {
-      request: {
-        headers: {
-          'Content-Type': 'application/vnd.api+json',
-        },
-      },
-    },
-  },
-});
 
 // ...
 export function createAuthor(values) {
@@ -445,9 +430,7 @@ export function createAuthor(values) {
 }
 ```
 
-Function `createAuthor` accepts `values` and creates `item` that will be normalized based on `authors` schema as part of `create` action. We also extended our resource with `actions.create.request.headers` where  `json:api` requires specific header. In future versions of `redux-io` this will be redundant due to idea of `jsonApiResource` that will already have such config.
-
-Now we have `createAuthor` action creator, so we can dispatch it with mocked values in `AuthorFragment.js`:
+Function `createAuthor` accepts `values` and creates `item` that will be normalized based on `authors` schema as part of `create` action.  Now we have `createAuthor` action creator, so we can dispatch it with mocked values in `AuthorFragment.js`:
 
 ```jsx
 import { loadAuthors, createAuthor } from '../actions';
@@ -705,20 +688,6 @@ What if we want to update author and change name or link to profile, no problem.
 
 ```jsx
 import rio, { find, create, update } from '@shoutem/redux-io';
-
-rio.registerResource({
-  // ...
-  actions: {
-    // ...
-    update: {
-      request: {
-        headers: {
-          'Content-Type': 'application/vnd.api+json',
-        },
-      },
-    },
-  },
-});
 
 // ...
 export function updateAuthor(authorId, patchValues) {
