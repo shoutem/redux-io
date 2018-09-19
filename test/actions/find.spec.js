@@ -18,7 +18,7 @@ import rio, {
 import {
   busyStatus,
 } from '../../src/status';
-import  { find } from '../../src/actions/find';
+import { find } from '../../src/actions/find';
 
 describe('Find action creator', () => {
   const middlewares = [thunk, apiMiddleware, apiStateMiddleware];

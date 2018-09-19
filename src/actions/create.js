@@ -1,21 +1,5 @@
-import _ from 'lodash';
-import { RSAA } from 'redux-api-middleware';
-import {
-  CREATE_REQUEST,
-  CREATE_SUCCESS,
-  CREATE_ERROR,
-} from '../consts';
-import {
-  buildEndpoint,
-  resolveResourceConfig,
-  resolveSchemaType,
-  resolveSchema,
-  JSON_API_RESOURCE,
-  getResourceType,
-} from '../resources';
-import { normalize } from '../normalizer';
 import thunkAction from './_thunkAction';
-import { extendMetaWithResponse, buildRSAAConfig } from '../rsaa';
+import { execute } from './execute';
 
 /**
  * Action creator used to create item on api (POST). Tag is not needed because all collection
@@ -34,60 +18,16 @@ import { extendMetaWithResponse, buildRSAAConfig } from '../rsaa';
  * @returns {function}
  */
 export function create(schema, item = null, params = {}, options = {}) {
-  const config = resolveResourceConfig(schema, 'create');
-  const schemaType = resolveSchemaType(config);
-  const resourceType = getResourceType(config);
-
-  if (!config) {
-    const schemaName = schema && _.isObject(schema) ? schemaType : schema;
-    throw new Error(`Couldn't resolve schema ${schemaName} in function create.`);
-  }
-
-  const rsaaConfig = buildRSAAConfig(config);
-  const endpoint = buildEndpoint(rsaaConfig.endpoint, params, options);
-
-  let body = null;
-  if (item !== null) {
-    if (!_.isObject(item)) {
-      throw new Error('Item is not valid in method argument');
-    }
-    const normalizedItem = normalize(item, resolveSchema(config));
-    body = JSON.stringify({ data: normalizedItem });
-  } else {
-    body = rsaaConfig.body;
-  }
-
-  const meta = {
-    params,
-    endpoint,
-    options,
-    source: resourceType || JSON_API_RESOURCE,
-    schema: schemaType,
-    timestamp: Date.now(),
-  };
-
-  return {
-    [RSAA]: {
-      method: 'POST',
-      ...rsaaConfig,
-      endpoint,
-      body,
-      types: [
-        {
-          type: CREATE_REQUEST,
-          meta,
-        },
-        {
-          type: CREATE_SUCCESS,
-          meta: extendMetaWithResponse(meta),
-        },
-        {
-          type: CREATE_ERROR,
-          meta: extendMetaWithResponse(meta),
-        },
-      ],
+  return execute(
+    {
+      name: 'create',
+      actionTypes: 'CREATE',
+      schema,
+      item,
     },
-  };
+    params,
+    options,
+  );
 }
 
 export default thunkAction(create);

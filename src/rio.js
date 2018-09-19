@@ -5,6 +5,7 @@ import {
   resolveSchemaType,
   jsonApiResourceTypeConfig,
   resolveResourceType,
+  Resource,
 } from './resources';
 import JsonApiStandardizer from './standardizers/JsonApiStandardizer';
 
@@ -48,6 +49,7 @@ export class Rio {
   registerResource(config) {
     if (_.isFunction(config)) {
       this.resourceResolvers.push(config);
+      return null;
     } else if (_.isObject(config)) {
       const resourceType = resolveResourceType(config);
       const resourceTypeConfig = this.getResourceType(resourceType);
@@ -61,9 +63,11 @@ export class Rio {
 
       const schema = resolveSchemaType(config);
       this.resourceConfigs[schema] = Object.freeze(config);
-    } else {
-      throw new Error('Register argument is invalid. Only object of function are allowed.');
+
+      return new Resource(resolvedConfig);
     }
+
+    throw new Error('Register argument is invalid. Only object of function are allowed.');
   }
 
   /**

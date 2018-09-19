@@ -1,19 +1,6 @@
 import _ from 'lodash';
-import { RSAA } from 'redux-api-middleware';
-import {
-  LOAD_REQUEST,
-  LOAD_SUCCESS,
-  LOAD_ERROR,
-} from '../consts';
-import {
-  buildEndpoint,
-  resolveResourceConfig,
-  resolveSchemaType,
-  getResourceType,
-  JSON_API_RESOURCE,
-} from '../resources';
+import { execute } from './execute';
 import thunkAction from './_thunkAction';
-import { extendMetaWithResponse, buildRSAAConfig } from '../rsaa';
 
 /**
  * If this options key is set to true, the data will be
@@ -45,53 +32,16 @@ export function isAppendMode(action) {
  * as query params key=value
  * @returns action
  */
-export function find(schema, tag = '', params = {}, options = {}) {
-  const config = resolveResourceConfig(schema, 'find');
-  const schemaType = resolveSchemaType(config);
-  const resourceType = getResourceType(config);
-
-  if (!config) {
-    const schemaName = schema && _.isObject(schema) ? schemaType : schema;
-    throw new Error(`Couldn't resolve schema ${schemaName} in function find.`);
-  }
-  if (!_.isString(tag)) {
-    throw new Error(`Invalid tag, "find" expected a string but got: ${JSON.stringify(tag)}`);
-  }
-
-  const rsaaConfig = buildRSAAConfig(config);
-  const endpoint = buildEndpoint(rsaaConfig.endpoint, params, options);
-
-  const meta = {
-    tag,
-    params,
-    endpoint,
-    options,
-    source: resourceType || JSON_API_RESOURCE,
-    schema: schemaType,
-    timestamp: Date.now(),
-  };
-
-  return {
-    [RSAA]: {
-      method: 'GET',
-      ...rsaaConfig,
-      endpoint,
-      types: [
-        {
-          type: LOAD_REQUEST,
-          meta,
-        },
-        {
-          type: LOAD_SUCCESS,
-          meta: extendMetaWithResponse(meta),
-        },
-        {
-          type: LOAD_ERROR,
-          meta: extendMetaWithResponse(meta),
-        },
-      ],
+export function find(schema, tag = '', ...otherArgs) {
+  return execute(
+    {
+      name: 'find',
+      actionTypes: 'LOAD',
+      schema,
+      tag,
     },
-  };
+    ...otherArgs,
+  );
 }
 
 export default thunkAction(find);

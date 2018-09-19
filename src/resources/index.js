@@ -18,3 +18,7 @@ export {
   jsonApiResourceTypeConfig,
   JSON_API_RESOURCE,
 } from './config';
+
+export {
+  default as Resource,
+} from './Resource';
