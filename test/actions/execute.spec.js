@@ -56,9 +56,9 @@ describe('Find action creator', () => {
     };
 
     const action = execute({
+      ...schemaConfig,
       name: 'find',
       actionTypes: 'LOAD',
-      schema: schemaConfig,
       tag,
     });
 
@@ -99,22 +99,19 @@ describe('Find action creator', () => {
   });
 
   it('creates a valid find action with resource', () => {
-    const config = {
-      headers: {
-        'Content-Type': 'application/vnd.api+json',
-      },
-      endpoint: 'api.test',
-    };
-
-    const schema = 'app.builder';
     const tag = 'collection_test';
 
-    const schemaConfig = {
-      schema,
-      request: config,
+    const resourceConfig = {
+      schema: 'app.builder',
+      request: {
+        headers: {
+          'Content-Type': 'application/vnd.api+json',
+        },
+        endpoint: 'api.test',
+      },
     };
 
-    const resource = rio.registerResource(schemaConfig);
+    const resource = rio.registerResource(resourceConfig);
 
     const actionThunk = resource.find({ tag });
 
@@ -127,7 +124,7 @@ describe('Find action creator', () => {
 
     expect(spiedAction[RSAA]).to.not.be.undefined;
     expect(spiedAction[RSAA].method).to.equal('GET');
-    expect(spiedAction[RSAA].endpoint).to.equal(config.endpoint);
+    expect(spiedAction[RSAA].endpoint).to.equal(resourceConfig.request.endpoint);
     expect(spiedAction[RSAA].headers).to.deep.equal(expectedHeaders);
     expect(spiedAction[RSAA].types).to.not.be.undefined;
 
@@ -135,9 +132,9 @@ describe('Find action creator', () => {
     console.log('########', spiedAction[RSAA]);
     const expectedMeta = {
       source: JSON_API_RESOURCE,
-      schema,
+      schema: resourceConfig.schema,
       tag,
-      endpoint: config.endpoint,
+      endpoint: resourceConfig.request.endpoint,
       params: {},
       options: {},
       timestamp: types[0].meta.timestamp,
@@ -187,10 +184,10 @@ describe('Find action creator', () => {
     };
 
     const action = execute({
+      ...schemaConfig,
       name: 'create',
       item,
       actionTypes: 'CREATE',
-      schema: schemaConfig,
     });
 
     expect(action[RSAA]).to.not.be.undefined;

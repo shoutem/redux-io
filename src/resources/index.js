@@ -8,6 +8,7 @@ export {
   resolveResourceType,
   resolveSchema,
   resolveResourceConfig,
+  resolveSchemaResourceConfig,
   resolveReferenceSchemaType,
   buildEndpoint,
   getResourceType,

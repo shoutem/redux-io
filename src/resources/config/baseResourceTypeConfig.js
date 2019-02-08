@@ -4,11 +4,13 @@ const baseResourceTypeConfig = {
       request: {
         method: 'GET',
       },
+      actionTypes: 'LOAD',
     },
     create: {
       request: {
         method: 'POST',
       },
+      actionTypes: 'CREATE',
     },
     update: {
       request: {

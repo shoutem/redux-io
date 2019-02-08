@@ -1,3 +1,4 @@
+import _ from 'lodash';
 import thunkAction from './_thunkAction';
 import { execute } from './execute';
 
@@ -18,12 +19,15 @@ import { execute } from './execute';
  * @returns {function}
  */
 export function create(schema, item = null, params = {}, options = {}) {
+
+  const resolvedSchema = _.isString(schema) ? { schema } : schema;
+
   return execute(
     {
       name: 'create',
       actionTypes: 'CREATE',
-      schema,
       item,
+      ...(!_.isEmpty(schema) ? resolvedSchema : {}),
     },
     params,
     options,

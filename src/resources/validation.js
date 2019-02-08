@@ -29,7 +29,7 @@ const resourceSchema = {
           type: ['object', 'string'],
         },
       },
-      additionalProperties: false,
+      additionalProperties: true,
       required: [
         'endpoint',
         'headers',
@@ -38,6 +38,15 @@ const resourceSchema = {
     actions: {
       type: 'object',
     },
+    actionTypes: {
+      type: 'string',
+    },
+    item: {
+      type: ['object', 'null'],
+    },
+    tag: {
+      type: 'string',
+    },
     serializer: {
       type: 'object',
     },
@@ -45,7 +54,7 @@ const resourceSchema = {
       type: 'object',
     },
   },
-  additionalProperties: false,
+  additionalProperties: true,
   required: [
     'schema',
   ],
@@ -74,6 +83,15 @@ const resourceTypeSchema = {
     },
     actions: {
       type: 'object',
+    },
+    actionTypes: {
+      type: 'string',
+    },
+    item: {
+      type: ['object', 'null'],
+    },
+    tag: {
+      type: 'string',
     },
     serializer: {
       type: 'object',

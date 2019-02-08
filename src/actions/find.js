@@ -33,12 +33,14 @@ export function isAppendMode(action) {
  * @returns action
  */
 export function find(schema, tag = '', ...otherArgs) {
+  const resolvedSchema = _.isString(schema) ? { schema } : schema;
+
   return execute(
     {
       name: 'find',
       actionTypes: 'LOAD',
-      schema,
       tag,
+      ...(!_.isEmpty(schema) ? resolvedSchema : {}),
     },
     ...otherArgs,
   );

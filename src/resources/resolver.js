@@ -36,7 +36,7 @@ function resolveAction(config, action) {
     .value();
 }
 
-function resolveSchemaResourceConfig(config) {
+export function resolveSchemaResourceConfig(config) {
   if (_.isString(config)) {
     return rio.getResource(config);
   } else if (_.isObject(config)) {

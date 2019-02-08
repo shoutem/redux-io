@@ -56,7 +56,7 @@ export class Rio {
 
       const resolvedConfig = _.merge({}, resourceTypeConfig, config);
 
-      // validation of resource configurtion is domne on merged configurations
+      // validation of resource configurtion is done on merged configurations
       // because schema resource config alone can be invalid, but resolved configuration
       // can be valid because resource type configuration can add missing parts
       validateResourceConfig(resolvedConfig);

@@ -3,8 +3,8 @@ import { RSAA } from 'redux-api-middleware';
 import {
   buildEndpoint,
   resolveResourceConfig,
+  resolveSchemaResourceConfig,
   resolveSchemaType,
-  resolveSchema,
   getResourceType,
   JSON_API_RESOURCE,
 } from '../resources';
@@ -54,32 +54,30 @@ function resolveTypes(types, meta) {
   return null;
 }
 
-export function execute(actionConfig, params = {}, options = {}) {
+export function execute(config, params = {}, options = {}) {
   const {
     name,
     item,
     actionTypes,
-    schema,
     tag,
-  } = actionConfig;
+  } = config;
 
-  const hasTag = _.has(actionConfig, 'tag');
-  const hasItem = _.get(actionConfig, 'item');
+  const hasTag = _.has(config, 'tag');
+  const hasItem = _.get(config, 'item');
 
-  const config = resolveResourceConfig(schema, name);
-  const schemaType = resolveSchemaType(config);
-  const schemaConfig = resolveSchema(config);
-  const resourceType = getResourceType(config);
+  const resourceConfig = resolveResourceConfig(config, name);
+  const schemaType = resolveSchemaType(resourceConfig);
+  const resourceType = getResourceType(resourceConfig);
 
-  if (!config) {
-    const schemaName = schema && _.isObject(schema) ? schemaType : schema;
+  if (!resourceConfig) {
+    const schemaName = _.isObject(config) ? schemaType : config;
     throw new Error(`Couldn't resolve schema ${schemaName} in function ${name}.`);
   }
   if (hasTag && !_.isString(tag)) {
     throw new Error(`Invalid tag, "${name}" expected a string but got: ${JSON.stringify(tag)}`);
   }
 
-  const rsaaConfig = buildRSAAConfig(config);
+  const rsaaConfig = buildRSAAConfig(resourceConfig);
   const endpoint = buildEndpoint(rsaaConfig.endpoint, params, options);
 
   const meta = {
@@ -98,7 +96,7 @@ export function execute(actionConfig, params = {}, options = {}) {
     [RSAA]: {
       ...rsaaConfig,
       endpoint,
-      ...(hasItem && { body: prepareItem(item, schemaConfig) }),
+      ...(hasItem && { body: prepareItem(item, resourceConfig) }),
       types: resolveTypes(actionTypes, meta),
     },
   };

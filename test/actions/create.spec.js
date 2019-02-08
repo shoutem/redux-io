@@ -281,9 +281,10 @@ describe('Create action creator', () => {
 
     expect(() => create(schemaConfig)).to.throw(
       'Resource configuration is invalid. Error: [{"code":"OBJECT_MISSING_REQUIRED_PROPERTY",'
-      + '"params":["schema"],"message":"Missing required property: schema","path":"#/"}]. Invalid res'
-      + 'ource config: {"type":"json-api","request":{"headers":{"Accept":"application/vnd.api+json","'
-      + 'Content-Type":"application/vnd.api+json"},"method":"POST","endpoint":"api.test"},"standardizer":{}}'
+      + '"params":["schema"],"message":"Missing required property: schema","path":"#/"}]. Invalid'
+      + ' resource config: {"type":"json-api","request":{"headers":{"Accept":"application/vnd.api+json",'
+      + '"Content-Type":"application/vnd.api+json"},"method":"POST","endpoint":"api.test"},"standardizer":'
+      + '{},"actionTypes":"CREATE","name":"create","item":null}'
     );
   });
 
