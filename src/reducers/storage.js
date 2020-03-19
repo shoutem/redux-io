@@ -1,4 +1,5 @@
 import _ from 'lodash';
+import { v4 as uuidv4 } from 'uuid';
 import {
   OBJECT_FETCHED,
   OBJECT_CREATED,
@@ -50,7 +51,7 @@ function createDefaultStatus(schema) {
   return {
     schema,
     type: STORAGE_TYPE,
-    id: _.uniqueId(),
+    id: uuidv4(),
   };
 }
 

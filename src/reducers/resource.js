@@ -1,4 +1,5 @@
 import _ from 'lodash';
+import { v4 as uuidv4 } from 'uuid';
 import {
   CREATE_REQUEST,
   CREATE_SUCCESS,
@@ -46,7 +47,7 @@ export function createInitialStatus(schema) {
     {
       schema,
       type: 'resource',
-      id: _.uniqueId(),
+      id: uuidv4(),
     }
   );
 }

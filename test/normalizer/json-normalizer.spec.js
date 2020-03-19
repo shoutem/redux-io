@@ -1,6 +1,6 @@
 import _ from 'lodash';
 import { expect } from 'chai';
-import { normalizeItem, normalizeCollection, shouldNormalize } from '../../src';
+import { normalizeItem, normalizeCollection } from '../../src';
 import {
   STATUS,
   createStatus,

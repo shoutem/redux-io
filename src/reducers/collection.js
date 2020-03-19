@@ -1,4 +1,5 @@
 import _ from 'lodash';
+import { v4 as uuidv4 } from 'uuid';
 import {
   REFERENCE_FETCHED,
   REFERENCE_STATUS,
@@ -48,7 +49,7 @@ function createDefaultStatus(schema, tag, settings = {}) {
       schema,
       tag,
       type: 'collection',
-      id: _.uniqueId(),
+      id: uuidv4(),
     }
   );
 }

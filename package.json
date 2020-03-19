@@ -57,13 +57,14 @@
   },
   "dependencies": {
     "@shoutem/json-api-denormalizer": "0.4.0-beta.2",
-    "lodash": "^4.13.1",
+    "lodash": "^4.17.15",
     "memoize-one": "^3.1.1",
     "redux": "^3.3.1",
     "redux-api-middleware": "2.0.1",
     "redux-batched-actions": "^0.1.2",
     "redux-thunk": "^2.0.0",
     "urijs": "^1.18.10",
+    "uuid": "^7.0.2",
     "vedrani-json-api-normalizr": "^3.2.4",
     "z-schema": "^3.17.0"
   }
