@@ -8,7 +8,7 @@
       "cwd": "${workspaceRoot}",
       "program": "${workspaceRoot}/node_modules/mocha/bin/_mocha",
       "args": [
-          "--require", "@babel/register",
+          "--require", "babelTestSetup",
           "--reporter", "spec",
           "--recursive", "test",
           "-u", "bdd",
@@ -27,7 +27,7 @@
       "cwd": "${workspaceRoot}",
       "program": "${workspaceRoot}/node_modules/mocha/bin/_mocha",
       "args": [
-          "--require", "@babel/register",
+          "--require", "babelTestSetup",
           "-u", "bdd",
           "--timeout", "999999",
           "--colors",

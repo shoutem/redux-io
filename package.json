@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "lint": "eslint src test",
-    "test": "mocha --require @babel/register --reporter spec --recursive test",
+    "test": "mocha --require babelTestSetup --reporter spec --recursive test",
     "coverage": "babel-node node_modules/isparta/bin/isparta cover --report text --report html node_modules/mocha/bin/_mocha -- -R spec --recursive test",
     "build": "babel src --out-dir lib && npm run move",
     "move": "copyfiles package.json .npmignore lib",
