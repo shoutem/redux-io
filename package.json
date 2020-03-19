@@ -1,6 +1,6 @@
 {
   "name": "@shoutem/redux-io",
-  "version": "3.1.0",
+  "version": "3.2.0-beta.1",
   "description": "Action creators, reducers and middleware for simple handling of normalized json api data in state",
   "main": "index.js",
   "scripts": {
@@ -28,14 +28,14 @@
   "bugs": {
     "url": "https://github.com/shoutem/redux-io/issues"
   },
-  "homepage": "https://github.com/shoutem/redux-io",
+  "homepage": "https://github.com/shoutem/redux-io#readme",
   "devDependencies": {
-    "babel-cli": "^6.9.0",
-    "babel-core": "^6.9.1",
+    "@babel/cli": "^7.8.4",
+    "@babel/core": "^7.8.7",
+    "@babel/node": "^7.8.7",
+    "@babel/preset-env": "^7.8.7",
+    "@babel/register": "^7.8.6",
     "babel-eslint": "^6.0.0",
-    "babel-preset-es2015": "^6.9.0",
-    "babel-preset-stage-0": "^6.3.13",
-    "babel-register": "^6.9.0",
     "chai": "^3.5.0",
     "chai-shallow-deep-equal": "^1.4.0",
     "copyfiles": "^1.2.0",
