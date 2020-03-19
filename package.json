@@ -13,7 +13,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://git@bitbucket.org:fiveminutes/redux-api-state.git"
+    "url": "git@github.com:shoutem/redux-io.git"
   },
   "keywords": [
     "redux",
@@ -26,9 +26,9 @@
   "author": "Shoutem",
   "license": "MIT",
   "bugs": {
-    "url": "https://bitbucket.org/fiveminutes/redux-api-state/issues"
+    "url": "https://github.com/shoutem/redux-io/issues"
   },
-  "homepage": "https://bitbucket.org/fiveminutes/redux-api-state#readme",
+  "homepage": "https://github.com/shoutem/redux-io",
   "devDependencies": {
     "babel-cli": "^6.9.0",
     "babel-core": "^6.9.1",
@@ -58,12 +58,12 @@
   "dependencies": {
     "@shoutem/json-api-denormalizer": "0.4.0-beta.2",
     "lodash": "^4.17.15",
-    "memoize-one": "^3.1.1",
-    "redux": "^3.3.1",
-    "redux-api-middleware": "2.0.1",
-    "redux-batched-actions": "^0.1.2",
-    "redux-thunk": "^2.0.0",
-    "urijs": "^1.18.10",
+    "memoize-one": "^5.1.1",
+    "redux": "^4.0.5",
+    "redux-api-middleware": "^3.2.1",
+    "redux-batched-actions": "^0.4.1",
+    "redux-thunk": "^2.3.0",
+    "urijs": "^1.19.2",
     "uuid": "^7.0.2",
     "vedrani-json-api-normalizr": "^3.2.4",
     "z-schema": "^3.17.0"
