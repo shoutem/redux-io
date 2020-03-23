@@ -9,7 +9,7 @@ describe('Build endpoint', () => {
     const endpoint = 'http://new.shoutem.com';
     const params = { test: 1 };
 
-    const expectedEndpoint = 'http://new.shoutem.com';
+    const expectedEndpoint = 'http://new.shoutem.com/?test=1';
     const builtEndpoint = buildEndpoint(endpoint, params);
 
     expect(builtEndpoint).to.be.equal(expectedEndpoint);
@@ -38,7 +38,7 @@ describe('Build endpoint', () => {
     const endpoint = 'http://new.shoutem.com';
     const params = { x: 1 };
 
-    const expectedEndpoint = 'http://new.shoutem.com';
+    const expectedEndpoint = 'http://new.shoutem.com/?x=1';
     const builtEndpoint = buildEndpoint(endpoint, params);
 
     expect(builtEndpoint).to.be.equal(expectedEndpoint);

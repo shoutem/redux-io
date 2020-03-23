@@ -1,5 +1,6 @@
 import _ from 'lodash';
 import UriTemplate from 'urijs/src/URITemplate';
+import Uri from 'urijs';
 import { getStatus } from '../status';
 import { RESOLVED_ENDPOINT } from '../consts';
 import rio from '../rio';
@@ -82,7 +83,27 @@ export function buildEndpoint(endpoint, params = {}, options = {}) {
     return endpoint;
   }
 
-  return new UriTemplate(endpoint).expand(params);
+  const usedParams = [];
+  const template = new UriTemplate(endpoint);
+  const templateUri = template.expand(key => {
+    usedParams.push(key);
+    return params[key];
+  });
+
+  const unusedQueryParams = _.omit(params, usedParams);
+  if (_.isEmpty(unusedQueryParams)) {
+    return templateUri;
+  }
+
+  const paramEndpointUri = new Uri(templateUri);
+  const resolvedQueryParams = {
+    ...paramEndpointUri.query(true),
+    ...unusedQueryParams,
+  };
+
+  return paramEndpointUri
+    .query(resolvedQueryParams)
+    .toString();
 }
 
 export function resolveReferenceSchemaType(reference, schema) {
