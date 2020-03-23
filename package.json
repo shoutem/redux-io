@@ -1,16 +1,14 @@
 {
   "name": "@shoutem/redux-io",
-  "version": "3.2.0-beta.2",
+  "version": "3.2.0-beta.3",
   "description": "Action creators, reducers and middleware for simple handling of normalized json api data in state",
-  "main": "lib/index.js",
-  "files": [
-    "lib"
-  ],
+  "main": "index.js",
   "scripts": {
     "lint": "eslint src test",
     "test": "mocha --require babelTestSetup --reporter spec --recursive test",
     "coverage": "babel-node node_modules/isparta/bin/isparta cover --report text --report html node_modules/mocha/bin/_mocha -- -R spec --recursive test",
-    "build": "babel src --out-dir lib"
+    "move": "copyfiles package.json LICENSE README.md .npmignore lib",
+    "build": "babel src --out-dir lib && npm run move"
   },
   "repository": {
     "type": "git",
@@ -39,6 +37,7 @@
     "babel-eslint": "^6.0.0",
     "chai": "^4.2.0",
     "chai-shallow-deep-equal": "^1.4.6",
+    "copyfiles": "^1.2.0",
     "cross-fetch": "^3.0.4",
     "deep-freeze": "0.0.1",
     "eslint": "^2.11.1",
