@@ -55,7 +55,7 @@
     "sinon": "^9.0.1"
   },
   "dependencies": {
-    "@shoutem/json-api-denormalizer": "0.4.1-beta.1",
+    "@shoutem/json-api-denormalizer": "0.4.1",
     "lodash": "^4.17.15",
     "memoize-one": "^5.1.1",
     "redux": "^4.0.5",
