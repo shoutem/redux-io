@@ -1,7 +1,7 @@
 import { assert } from 'chai';
 import sinon from 'sinon';
 import _ from 'lodash';
-import { v4 as uuidv4 } from 'uuid';
+import uuid from 'uuid-random';
 import RioCache from '../../src/cache/RioCache';
 import {
   STATUS,
@@ -144,7 +144,7 @@ describe('RioCache', () => {
       const cache = new RioCache();
 
       const reference = {};
-      reference[STATUS] = { id: uuidv4() };
+      reference[STATUS] = { id: uuid() };
 
       cache.add(reference);
 
@@ -287,7 +287,7 @@ describe('RioCache', () => {
       item[STATUS] = { modifiedTimestamp: 1 };
 
       const one = {};
-      one[STATUS] = { id: uuidv4(), modifiedTimestamp: 1 };
+      one[STATUS] = { id: uuid(), modifiedTimestamp: 1 };
 
       const cache = new RioCache((descriptor) => descriptor.id ? item : one);
 
@@ -316,7 +316,7 @@ describe('RioCache', () => {
       item[STATUS] = { modifiedTimestamp: 1 };
 
       const one = {};
-      one[STATUS] = { id: uuidv4(), modifiedTimestamp: 1 };
+      one[STATUS] = { id: uuid(), modifiedTimestamp: 1 };
       const changedOne = {};
       changedOne[STATUS] = {...one[STATUS], modifiedTimestamp: 2};
 
@@ -349,7 +349,7 @@ describe('RioCache', () => {
       changedItem[STATUS] = {...item[STATUS], modifiedTimestamp: 2};
 
       const one = {};
-      one[STATUS] = { id: uuidv4(), modifiedTimestamp: 1 };
+      one[STATUS] = { id: uuid(), modifiedTimestamp: 1 };
 
       const cache = new RioCache((descriptor) => descriptor.id ? changedItem : one);
 
@@ -376,7 +376,7 @@ describe('RioCache', () => {
       item[STATUS] = { modifiedTimestamp: 1 };
 
       const one = {};
-      one[STATUS] = { id: uuidv4(), modifiedTimestamp: 1 };
+      one[STATUS] = { id: uuid(), modifiedTimestamp: 1 };
 
       const cache = new RioCache((descriptor) => descriptor.id ? item : one, {
         useModificationCache: true,
@@ -427,7 +427,7 @@ describe('RioCache', () => {
       changedItem[STATUS] = {...item[STATUS], modifiedTimestamp: 2};
 
       const one = {};
-      one[STATUS] = { id: uuidv4(), modifiedTimestamp: 1 };
+      one[STATUS] = { id: uuid(), modifiedTimestamp: 1 };
 
       const cache = new RioCache((descriptor) => descriptor.id ? changedItem : one, {
         useModificationCache: true,
@@ -473,7 +473,7 @@ describe('RioCache', () => {
       item[STATUS] = { modifiedTimestamp: 1 };
 
       const one = {};
-      one[STATUS] = { id: uuidv4(), modifiedTimestamp: 1 };
+      one[STATUS] = { id: uuid(), modifiedTimestamp: 1 };
 
       const cache = new RioCache((descriptor) => descriptor.id ? item : one, {
         useModificationCache: true,
@@ -497,10 +497,10 @@ describe('RioCache', () => {
       const type = schema;
 
       const item = { id, type };
-      item[STATUS] = { id: uuidv4(), modifiedTimestamp: 1 };
+      item[STATUS] = { id: uuid(), modifiedTimestamp: 1 };
 
       const collection = [1];
-      collection[STATUS] = { schema, id: uuidv4(), modifiedTimestamp: 1 };
+      collection[STATUS] = { schema, id: uuid(), modifiedTimestamp: 1 };
 
       const cache = new RioCache(() => item);
       cache.add(item);
@@ -529,10 +529,10 @@ describe('RioCache', () => {
       const type = schema;
 
       const item = { id, type };
-      item[STATUS] = { id: uuidv4(), modifiedTimestamp: 1 };
+      item[STATUS] = { id: uuid(), modifiedTimestamp: 1 };
 
       const collection = [1];
-      collection[STATUS] = { schema, id: uuidv4(), modifiedTimestamp: 1 };
+      collection[STATUS] = { schema, id: uuid(), modifiedTimestamp: 1 };
 
       const cache = new RioCache(() => item);
       cache.add(item);
@@ -558,10 +558,10 @@ describe('RioCache', () => {
       const type = schema;
 
       const item = { id, type };
-      item[STATUS] = { id: uuidv4(), modifiedTimestamp: 1 };
+      item[STATUS] = { id: uuid(), modifiedTimestamp: 1 };
 
       const reference = [1];
-      reference[STATUS] = { schema, id: uuidv4(), modifiedTimestamp: 1 };
+      reference[STATUS] = { schema, id: uuid(), modifiedTimestamp: 1 };
 
       const changedItem = { id, type };
       // simulate item update - change modifiedTimestamp
@@ -590,10 +590,10 @@ describe('RioCache', () => {
       const type = schema;
 
       const item = { id, type };
-      item[STATUS] = { id: uuidv4(), modifiedTimestamp: 1 };
+      item[STATUS] = { id: uuid(), modifiedTimestamp: 1 };
 
       const collection = [1];
-      collection[STATUS] = { schema, id: uuidv4(), modifiedTimestamp: 1 };
+      collection[STATUS] = { schema, id: uuid(), modifiedTimestamp: 1 };
 
       const cache = new RioCache(
         () => item,

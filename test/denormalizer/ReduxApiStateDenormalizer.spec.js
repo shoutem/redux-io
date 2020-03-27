@@ -2,7 +2,7 @@ import chai, { assert } from 'chai';
 import shallowDeepEqual from 'chai-shallow-deep-equal';
 import sinon from 'sinon';
 import _ from 'lodash';
-import { v4 as uuidv4 } from 'uuid';
+import uuid from 'uuid-random';
 import { ReduxApiStateDenormalizer } from '../../src/index';
 import { createSchemasMap } from '../../src/denormalizer/ReduxApiStateDenormalizer';
 import {
@@ -718,7 +718,7 @@ describe('ReduxApiStateDenormalizer', () => {
       const storage = createSchemasMap(getStore(), createStorageMap());
 
       const one = { value: 'type1Id1' };
-      one[STATUS] = { schema: 'type1', id: uuidv4(), modifiedTimestamp: 1 };
+      one[STATUS] = { schema: 'type1', id: uuid(), modifiedTimestamp: 1 };
 
       const denormalizedData =
         denormalizer.denormalizeOne(one, storage);
@@ -735,7 +735,7 @@ describe('ReduxApiStateDenormalizer', () => {
       const storage = createSchemasMap(getStore(), createStorageMap());
 
       const one = { value: 'unexisting' };
-      one[STATUS] = { schema: 'type1', id: uuidv4(), modifiedTimestamp: 1 };
+      one[STATUS] = { schema: 'type1', id: uuid(), modifiedTimestamp: 1 };
 
       const denormalizedData =
         denormalizer.denormalizeOne(one, storage);
@@ -750,7 +750,7 @@ describe('ReduxApiStateDenormalizer', () => {
       const storage = createSchemasMap(getStore(), createStorageMap());
 
       const one = { value: '' };
-      one[STATUS] = { schema: 'type1', id: uuidv4(), modifiedTimestamp: 1 };
+      one[STATUS] = { schema: 'type1', id: uuid(), modifiedTimestamp: 1 };
 
       const denormalizedData =
         denormalizer.denormalizeOne(one, storage);
@@ -765,7 +765,7 @@ describe('ReduxApiStateDenormalizer', () => {
       const storage = createSchemasMap(getStore(), createStorageMap());
 
       const one = { value: 0 };
-      one[STATUS] = { schema: 'type1', id: uuidv4(), modifiedTimestamp: 1 };
+      one[STATUS] = { schema: 'type1', id: uuid(), modifiedTimestamp: 1 };
 
       const denormalizedData =
         denormalizer.denormalizeOne(one, storage);
@@ -780,7 +780,7 @@ describe('ReduxApiStateDenormalizer', () => {
       const storage = createSchemasMap(getStore(), createStorageMap());
 
       const one = { value: 'type1Id5' };
-      one[STATUS] = { schema: 'type1', id: uuidv4(), modifiedTimestamp: 1 };
+      one[STATUS] = { schema: 'type1', id: uuid(), modifiedTimestamp: 1 };
 
       const denormalizedData =
         denormalizer.denormalizeOne(one, storage);
@@ -795,7 +795,7 @@ describe('ReduxApiStateDenormalizer', () => {
       const storage = createSchemasMap(getStore(), createStorageMap());
 
       const one = { value: 'type1Id4' };
-      one[STATUS] = { schema: 'type1', id: uuidv4(), modifiedTimestamp: 1 };
+      one[STATUS] = { schema: 'type1', id: uuid(), modifiedTimestamp: 1 };
 
       const denormalizedData =
         denormalizer.denormalizeOne(one, storage);
@@ -818,7 +818,7 @@ describe('ReduxApiStateDenormalizer', () => {
       const modifiedStorage = createSchemasMap(modifiedStore, createStorageMap());
 
       const one = { value: 'type1Id4' };
-      one[STATUS] = { schema: 'type1', id: uuidv4(), modifiedTimestamp: 1 };
+      one[STATUS] = { schema: 'type1', id: uuid(), modifiedTimestamp: 1 };
 
       const denormalizedData =
         denormalizer.denormalizeOne(one, storage);
@@ -847,7 +847,7 @@ describe('ReduxApiStateDenormalizer', () => {
       let storage = createSchemasMap(store, createStorageMap());
 
       const one = { value: 'type1Id1' };
-      one[STATUS] = { schema: 'type1', id: uuidv4() };
+      one[STATUS] = { schema: 'type1', id: uuid() };
 
       const denormalizedData = denormalizer.denormalizeOne(one, storage);
       const denormalizedDataWithStatus = mergeStatus(denormalizedData);
@@ -1045,7 +1045,7 @@ describe('ReduxApiStateDenormalizer', () => {
       const store = getStore();
       const denormalizer = new ReduxApiStateDenormalizer(() => store, createStorageMap());
       const collection = ['type1Id1'];
-      collection[STATUS] = createStatus({ schema: 'type1', tag: '', id: uuidv4()});
+      collection[STATUS] = createStatus({ schema: 'type1', tag: '', id: uuid()});
 
       const denormalizedData =
         denormalizer.denormalizeCollection(collection);
@@ -1053,7 +1053,7 @@ describe('ReduxApiStateDenormalizer', () => {
       // Used to be sure that collection are not clashed between each other.
       // That not other cached collection data is used.
       const otherCollection = ['type1Id1'];
-        otherCollection[STATUS] = createStatus({ schema: 'type1', tag: 'other', id: uuidv4()});
+        otherCollection[STATUS] = createStatus({ schema: 'type1', tag: 'other', id: uuid()});
         denormalizer.denormalizeCollection(otherCollection);
 
       const cachedDenormalizedData =
