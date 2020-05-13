@@ -119,6 +119,13 @@ export class Rio {
   }
 
   /**
+   * Set option to append unused query params for endpoint
+   */
+  enableAppendOfUnusedQueryParams() {
+    this.appendUnusedQueryParams = true;
+  }
+
+  /**
    * Append resource paths to existing resource paths
    */
   appendResourcePaths(resourcePaths) {
@@ -136,6 +143,7 @@ export class Rio {
     this.resourceResolvers = [];
     this.resourcePaths = {};
     this.denormalizer = null;
+    this.appendUnusedQueryParams = false;
     this.standardizers = {};
 
     // Default standardizer for json-api

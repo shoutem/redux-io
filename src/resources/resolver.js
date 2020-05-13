@@ -90,6 +90,10 @@ export function buildEndpoint(endpoint, params = {}, options = {}) {
     return params[key];
   });
 
+  if (!rio.appendUnusedQueryParams) {
+    return templateUri.toString();
+  }
+
   const unusedQueryParams = _.omit(params, usedParams);
   if (_.isEmpty(unusedQueryParams)) {
     return templateUri;
