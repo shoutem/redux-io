@@ -72,7 +72,7 @@ export function resolveResourceConfig(config, action = null) {
 /**
  * Replace endpoint placeholders '{key}' with corresponding value of key in params dict.
  * Unused params are resolved into query params as 'key=value' pairs and concatenated to endpoint
- * if appendUnusedQueryParams option is enabled.
+ * if ignoreUnusedActionParams option is disabled.
  * @param endpoint
  * @param params
  * @param options
@@ -91,7 +91,7 @@ export function buildEndpoint(endpoint, params = {}, options = {}) {
     return params[key];
   });
 
-  if (!rio.appendUnusedQueryParams) {
+  if (rio.ignoreUnusedActionParams) {
     return templateUri.toString();
   }
 
