@@ -29,7 +29,7 @@ export default class JsonSerializer extends CustomSerializer {
     return jsonApiResult;
   }
 
-  serialize(data) {
+  serialize() {
     // TODO: implement serializing data back to json
   }
 }
