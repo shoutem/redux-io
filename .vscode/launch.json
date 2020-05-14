@@ -8,9 +8,10 @@
       "cwd": "${workspaceRoot}",
       "program": "${workspaceRoot}/node_modules/mocha/bin/_mocha",
       "args": [
-          "**/*.spec.js",
-          "--require", "babel-register",
-          "-u", "tdd",
+          "--require", "babelTestSetup",
+          "--reporter", "spec",
+          "--recursive", "test",
+          "-u", "bdd",
           "--timeout", "999999",
           "--colors"
       ],
@@ -26,8 +27,8 @@
       "cwd": "${workspaceRoot}",
       "program": "${workspaceRoot}/node_modules/mocha/bin/_mocha",
       "args": [
-          "--require", "babel-register",
-          "-u", "tdd",
+          "--require", "babelTestSetup",
+          "-u", "bdd",
           "--timeout", "999999",
           "--colors",
           "${file}"

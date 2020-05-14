@@ -119,6 +119,16 @@ export class Rio {
   }
 
   /**
+   * Set option to ingore unused query params for endpoint.
+   * Disabling this option, all params that were not used by
+   * an endpoint template will be resolved into query params
+   * as 'key=value' pairs and concatenated to the endpoint.
+   */
+  setIgnoreUnusedActionParams(ignoreUnusedActionParams = true) {
+    this.ignoreUnusedActionParams = ignoreUnusedActionParams;
+  }
+
+  /**
    * Append resource paths to existing resource paths
    */
   appendResourcePaths(resourcePaths) {
@@ -136,6 +146,7 @@ export class Rio {
     this.resourceResolvers = [];
     this.resourcePaths = {};
     this.denormalizer = null;
+    this.ignoreUnusedActionParams = true;
     this.standardizers = {};
 
     // Default standardizer for json-api
