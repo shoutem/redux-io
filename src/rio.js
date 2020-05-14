@@ -124,7 +124,7 @@ export class Rio {
    * an endpoint template will be resolved into query params
    * as 'key=value' pairs and concatenated to the endpoint.
    */
-  setIgnoreUnusedActionParams(ignoreUnusedActionParams) {
+  setIgnoreUnusedActionParams(ignoreUnusedActionParams = true) {
     this.ignoreUnusedActionParams = ignoreUnusedActionParams;
   }
 
