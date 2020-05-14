@@ -72,6 +72,7 @@ export function resolveResourceConfig(config, action = null) {
 /**
  * Replace endpoint placeholders '{key}' with corresponding value of key in params dict.
  * Unused params are resolved into query params as 'key=value' pairs and concatenated to endpoint
+ * if appendUnusedQueryParams option is enabled.
  * @param endpoint
  * @param params
  * @param options

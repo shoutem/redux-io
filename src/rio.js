@@ -119,7 +119,10 @@ export class Rio {
   }
 
   /**
-   * Set option to append unused query params for endpoint
+   * Set option to append unused query params for endpoint.
+   * Enabling this option, all params that were not used by
+   * an endpoint template will be resolved into query params
+   * as 'key=value' pairs and concatenated to the endpoint.
    */
   enableAppendOfUnusedQueryParams() {
     this.appendUnusedQueryParams = true;
