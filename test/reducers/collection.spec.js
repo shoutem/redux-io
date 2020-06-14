@@ -7,7 +7,6 @@ import {
   REFERENCE_FETCHED,
   REFERENCE_CLEAR,
   REFERENCE_STATUS,
-  CHECK_EXPIRATION,
 } from '../../src';
 import {
   STATUS,
@@ -15,7 +14,7 @@ import {
   busyStatus,
   createStatus,
   setStatus,
- } from '../../src/status';
+} from '../../src/status';
 
 chai.use(shallowDeepEqual);
 
@@ -395,7 +394,7 @@ describe('Collection reducer', () => {
   });
 
   it('invalidates collection', () => {
-    const initialState =  [
+    const initialState = [
       { id: 1 },
       { id: 2 },
     ];
@@ -419,8 +418,57 @@ describe('Collection reducer', () => {
     expect(nextState).to.deep.eql(initialState);
   });
 
+  it('invalidates collection by tag', () => {
+    const initialState = [
+      { id: 1 },
+      { id: 2 },
+    ];
+    const schema = 'schema_test';
+    const tag = 'tag_test'
+    const reducer = collection(schema, tag, undefined, initialState);
+    initialState[STATUS].validationStatus = validationStatus.VALID;
+    deepFreeze(initialState);
+
+    const action = {
+      type: REFERENCE_STATUS,
+      meta: {
+        schema,
+        tag,
+      },
+      payload: { validationStatus: validationStatus.INVALID },
+    };
+    const nextState = reducer(undefined, action);
+    expect(nextState[STATUS].validationStatus).to.eql(validationStatus.INVALID);
+
+    nextState[STATUS] = initialState[STATUS];
+    expect(nextState).to.deep.eql(initialState);
+  });
+
+  it('cannot invalidate collection with different tag', () => {
+    const initialState = [
+      { id: 1 },
+      { id: 2 },
+    ];
+    const schema = 'schema_test';
+    const tag = 'tag_test'
+    const reducer = collection(schema, tag, undefined, initialState);
+    initialState[STATUS].validationStatus = validationStatus.VALID;
+    deepFreeze(initialState);
+
+    const action = {
+      type: REFERENCE_STATUS,
+      meta: {
+        schema,
+        tag: 'custom_test',
+      },
+      payload: { validationStatus: validationStatus.INVALID },
+    };
+    const nextState = reducer(undefined, action);
+    expect(nextState[STATUS].validationStatus).to.eql(validationStatus.VALID);
+  });
+
   it('cannot invalidate un-initialized collection', () => {
-    const initialState =  [
+    const initialState = [
       { id: 1 },
       { id: 2 },
     ];

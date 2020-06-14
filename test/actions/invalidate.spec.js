@@ -21,6 +21,21 @@ describe('Invalidate action creator', () => {
     expect(invalidateAction).to.deep.equal(action);
   });
 
+  it('creates valid action with tag', () => {
+    const action = {
+      type: REFERENCE_STATUS,
+      meta: {
+        schema: 'schema_test',
+        tag: 'custom',
+      },
+      payload: {
+        validationStatus: validationStatus.INVALID,
+      }
+    };
+    const invalidateAction = invalidate('schema_test', 'custom');
+    expect(invalidateAction).to.deep.equal(action);
+  });
+
   it('throws exception on action with invalid schema', () => {
     expect(() => invalidate(undefined, 'collection_test'))
       .to.throw('Invalid schema, "invalidate" expected a string but got: undefined');

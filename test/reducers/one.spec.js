@@ -200,6 +200,50 @@ describe('One reducer', () => {
     expect(nextState[STATUS].busyStatus).to.eql(busyStatus.IDLE);
   });
 
+  it('invalidates value by tag', () => {
+    const initialValue = 1;
+    const schema = 'schema_test';
+    const tag = 'tag_value';
+    const reducer = one(schema, tag, undefined, initialValue);
+    deepFreeze(initialValue);
+
+    const action = {
+      type: REFERENCE_STATUS,
+      payload: { validationStatus: validationStatus.INVALID, busyStatus: busyStatus.IDLE },
+      meta: {
+        schema,
+        tag,
+      },
+    };
+
+    const nextState = reducer(undefined, action);
+    expect(nextState.value).to.eql(initialValue);
+    expect(nextState[STATUS].validationStatus).to.eql(validationStatus.INVALID);
+    expect(nextState[STATUS].busyStatus).to.eql(busyStatus.IDLE);
+  });
+
+  it('cannot invalidate value with different tag', () => {
+    const initialValue = 1;
+    const schema = 'schema_test';
+    const tag = 'tag_value';
+    const reducer = one(schema, tag, undefined, initialValue);
+    deepFreeze(initialValue);
+
+    const action = {
+      type: REFERENCE_STATUS,
+      payload: { validationStatus: validationStatus.INVALID, busyStatus: busyStatus.IDLE },
+      meta: {
+        schema,
+        tag: 'tag_custom',
+      },
+    };
+
+    const nextState = reducer(undefined, action);
+    expect(nextState.value).to.eql(initialValue);
+    expect(nextState[STATUS].validationStatus).to.eql(validationStatus.NONE);
+    expect(nextState[STATUS].busyStatus).to.eql(busyStatus.IDLE);
+  });
+
   it('change one status to busy with non-broadcast status', () => {
     const initialValue = 1;
     const schema = 'schema_test';
