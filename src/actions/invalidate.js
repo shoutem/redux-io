@@ -6,7 +6,7 @@ import {
   validationStatus,
 } from './../status';
 
-export default function invalidate(schema) {
+export default function invalidate(schema, tag = '*') {
   if (!_.isString(schema)) {
     throw new Error(
       `Invalid schema, "invalidate" expected a string but got: ${JSON.stringify(schema)}`
@@ -17,7 +17,7 @@ export default function invalidate(schema) {
     type: REFERENCE_STATUS,
     meta: {
       schema,
-      tag: '*',
+      tag,
     },
     payload: {
       validationStatus: validationStatus.INVALID,

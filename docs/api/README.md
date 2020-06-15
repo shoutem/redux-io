@@ -16,12 +16,12 @@ The redux-io defines a set of actions, reducers, selectors, middleware and helpe
 * [update\(config, schema, item\)](https://github.com/shoutem/redux-io/tree/d07e4568e1af7c2fd89072d223bed8fd407657dd/docs/api/update.md)
 * [remove\(config, schema, item\)](https://github.com/shoutem/redux-io/tree/d07e4568e1af7c2fd89072d223bed8fd407657dd/docs/api/remove.md)
 * [next\(collection, appendMode = true\)](https://github.com/shoutem/redux-io/tree/d07e4568e1af7c2fd89072d223bed8fd407657dd/docs/api/next.md)
-* [crated\(payload, schema\)](https://github.com/shoutem/redux-io/tree/d07e4568e1af7c2fd89072d223bed8fd407657dd/docs/api/created.md)
+* [created\(payload, schema\)](https://github.com/shoutem/redux-io/tree/d07e4568e1af7c2fd89072d223bed8fd407657dd/docs/api/created.md)
 * [loaded\(payload, schema\)](https://github.com/shoutem/redux-io/tree/d07e4568e1af7c2fd89072d223bed8fd407657dd/docs/api/loaded.md)
 * [updated\(payload, schema\)](https://github.com/shoutem/redux-io/tree/d07e4568e1af7c2fd89072d223bed8fd407657dd/docs/api/updated.md)
 * [removed\(payload, schema\)](https://github.com/shoutem/redux-io/tree/d07e4568e1af7c2fd89072d223bed8fd407657dd/docs/api/removed.md)
 * [clear\(schema, tag = ''\)](https://github.com/shoutem/redux-io/tree/d07e4568e1af7c2fd89072d223bed8fd407657dd/docs/api/clear.md)
-* [invalidate\(schema\)](https://github.com/shoutem/redux-io/tree/d07e4568e1af7c2fd89072d223bed8fd407657dd/docs/api/invalidate.md)
+* [invalidate\(schema, tag = ''\)](https://github.com/shoutem/redux-io/tree/d07e4568e1af7c2fd89072d223bed8fd407657dd/docs/api/invalidate.md)
 * [checkExipration\(\)](https://github.com/shoutem/redux-io/tree/d07e4568e1af7c2fd89072d223bed8fd407657dd/docs/api/checkExpiration.md)
 
 ## Selectors
