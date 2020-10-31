@@ -239,36 +239,49 @@ const actionHandlers = {
   [CREATE_REQUEST]: (action, data, dispatch) => {
     // Change collection status to busy and invalid to prevent fetching.
     const schema = action.meta.schema;
-    dispatch(makeIndexAction(
-      action,
-      REFERENCE_STATUS,
-      { validationStatus: validationStatus.INVALID, busyStatus: busyStatus.BUSY },
-      schema
-    ));
+    const invalidate = _.get(action.meta, 'options.invalidate');
+
+    if (invalidate !== false) {
+      dispatch(makeIndexAction(
+        action,
+        REFERENCE_STATUS,
+        { validationStatus: validationStatus.INVALID, busyStatus: busyStatus.BUSY },
+        schema
+      ));
+    }
   },
   [CREATE_SUCCESS]: (action, data, dispatch) => {
     // Dispatch created objects to storage and change collection status to invalid, idle
     data.map(item => dispatch(makeObjectAction(action, OBJECT_CREATED, item)));
+
     const schema = action.meta.schema;
-    dispatch(makeIndexAction(
-      action,
-      REFERENCE_STATUS,
-      { validationStatus: validationStatus.INVALID, busyStatus: busyStatus.IDLE },
-      schema
-    ));
+    const invalidate = _.get(action.meta, 'options.invalidate');
+
+    if (invalidate !== false) {
+      dispatch(makeIndexAction(
+        action,
+        REFERENCE_STATUS,
+        { validationStatus: validationStatus.INVALID, busyStatus: busyStatus.IDLE },
+        schema
+      ));
+    }
   },
   [CREATE_ERROR]: (action, data, dispatch) => {
     // Change collection status to idle and invalid to fetch again.
     const schema = action.meta.schema;
-    dispatch(makeIndexAction(
-      action,
-      REFERENCE_STATUS,
-      {
-        validationStatus: validationStatus.INVALID,
-        busyStatus: busyStatus.IDLE,
-      },
-      schema
-    ));
+    const invalidate = _.get(action.meta, 'options.invalidate');
+
+    if (invalidate !== false) {
+      dispatch(makeIndexAction(
+        action,
+        REFERENCE_STATUS,
+        {
+          validationStatus: validationStatus.INVALID,
+          busyStatus: busyStatus.IDLE,
+        },
+        schema
+      ));
+    }
   },
   [UPDATE_REQUEST]: (action, data, dispatch) => {
     // Change collection status to busy and invalid to prevent fetching and because of

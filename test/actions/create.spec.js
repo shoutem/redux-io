@@ -455,4 +455,88 @@ describe('Create action creator', () => {
         expect(successAction.payload).to.deep.equal(expectedPayload);
       }).then(done).catch(done);
   });
+
+  it('produces valid storage without invalidating collections', done => {
+    const schema = 'schema_test';
+    const expectedPayload = {
+      data: {
+        schema,
+        id: '1',
+        type: schema,
+        attributes: {
+          name: 'Test1',
+        },
+      },
+    };
+
+    const item = {
+      schema,
+      attributes: {
+        name: 'Test1',
+      },
+    };
+    nock('http://api.server.local')
+      .post('/apps')
+      .reply(200, expectedPayload, { 'Content-Type': 'vnd.api+json' });
+
+    const config = {
+      headers: {
+        'Content-Type': 'application/vnd.api+json',
+      },
+      endpoint: 'http://api.server.local/apps',
+    };
+
+    const schemaConfig = {
+      schema,
+      request: config,
+    };
+
+    const options = { invalidate: false };
+
+    const expectedMeta = {
+      source: JSON_API_SOURCE,
+      endpoint: config.endpoint,
+      params: {},
+      options,
+      schema,
+    };
+    const expectedResponseMeta = {
+      ...expectedMeta,
+      response: {
+        status: 200,
+        headers: {
+          "content-type": "vnd.api+json"
+        },
+      },
+    };
+
+    const action = create(schemaConfig, item, {}, options);
+    const store = mockStore({});
+    store.dispatch(action)
+      .then(() => {
+        const performedActions = store.getActions();
+        expect(performedActions).to.have.length(3);
+
+        expect(performedActions[0].type).to.equal(CREATE_REQUEST);
+
+        const batchedActionsSuccess = performedActions[1].payload;
+
+        const actionObjCreated = batchedActionsSuccess[0];
+        expect(actionObjCreated.type).to.equal(OBJECT_CREATED);
+        expect(actionObjCreated.meta).to.deep.equal({
+          ...expectedResponseMeta,
+          transformation: {},
+          timestamp: actionObjCreated.meta.timestamp,
+        });
+        expect(actionObjCreated.payload).to.deep.equal(expectedPayload.data);
+
+        const successAction = performedActions[2];
+        expect(successAction.type).to.equal(CREATE_SUCCESS);
+        expect(successAction.meta).to.deep.equal({
+          ...expectedResponseMeta,
+          timestamp: successAction.meta.timestamp,
+        });
+        expect(successAction.payload).to.deep.equal(expectedPayload);
+      }).then(done).catch(done);
+  });
 });
