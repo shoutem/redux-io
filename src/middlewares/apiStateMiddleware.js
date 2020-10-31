@@ -274,37 +274,48 @@ const actionHandlers = {
     // Change collection status to busy and invalid to prevent fetching and because of
     // local changes in storage state with updated item.
     const schema = action.meta.schema;
-    dispatch(makeIndexAction(
-      action,
-      REFERENCE_STATUS,
-      { validationStatus: validationStatus.INVALID, busyStatus: busyStatus.BUSY },
-      schema
-    ));
+    const invalidate = _.get(action.meta, 'options.invalidate');
+
+    if (invalidate !== false) {
+      dispatch(makeIndexAction(
+        action,
+        REFERENCE_STATUS,
+        { validationStatus: validationStatus.INVALID, busyStatus: busyStatus.BUSY },
+        schema
+      ));
+    }
+
     data.map(item => dispatch(makeObjectAction(action, OBJECT_UPDATING, item)));
   },
   [UPDATE_SUCCESS]: (action, data, dispatch) => {
     // Dispatch updated objects from and change collections status to idle & invalid
     data.map(item => dispatch(makeObjectAction(action, OBJECT_UPDATED, item)));
+
     const schema = action.meta.schema;
-    dispatch(makeIndexAction(
-      action,
-      REFERENCE_STATUS,
-      { validationStatus: validationStatus.INVALID, busyStatus: busyStatus.IDLE },
-      schema
-    ));
+    const invalidate = _.get(action.meta, 'options.invalidate');
+
+    if (invalidate !== false) {
+      dispatch(makeIndexAction(
+        action,
+        REFERENCE_STATUS,
+        { validationStatus: validationStatus.INVALID, busyStatus: busyStatus.IDLE },
+        schema
+      ));
+    }
   },
   [UPDATE_ERROR]: (action, data, dispatch) => {
     // Change collection status to idle and invalid
     const schema = action.meta.schema;
-    dispatch(makeIndexAction(
-      action,
-      REFERENCE_STATUS,
-      {
-        validationStatus: validationStatus.INVALID,
-        busyStatus: busyStatus.IDLE,
-      },
-      schema
-    ));
+    const invalidate = _.get(action.meta, 'options.invalidate');
+
+    if (invalidate !== false) {
+      dispatch(makeIndexAction(
+        action,
+        REFERENCE_STATUS,
+        { validationStatus: validationStatus.INVALID, busyStatus: busyStatus.IDLE },
+        schema
+      ));
+    }
   },
   [REMOVE_REQUEST]: (action, data, dispatch) => {
     // Change collections status to busy and invalid because of removing item in
