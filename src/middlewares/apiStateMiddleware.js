@@ -321,37 +321,51 @@ const actionHandlers = {
     // Change collections status to busy and invalid because of removing item in
     // local storage state
     const schema = action.meta.schema;
-    dispatch(makeIndexAction(
-      action,
-      REFERENCE_STATUS,
-      { validationStatus: validationStatus.INVALID, busyStatus: busyStatus.BUSY },
-      schema
-    ));
+    const invalidate = _.get(action.meta, 'options.invalidate');
+
+    if (invalidate !== false) {
+      dispatch(makeIndexAction(
+        action,
+        REFERENCE_STATUS,
+        { validationStatus: validationStatus.INVALID, busyStatus: busyStatus.BUSY },
+        schema
+      ));
+    }
+
     data.map(item => dispatch(makeObjectAction(action, OBJECT_REMOVING, item)));
   },
   [REMOVE_SUCCESS]: (action, data, dispatch) => {
     // Remove object if already not removed during request
     data.map(item => dispatch(makeObjectAction(action, OBJECT_REMOVED, item)));
+
     const schema = action.meta.schema;
-    dispatch(makeIndexAction(
-      action,
-      REFERENCE_STATUS,
-      { validationStatus: validationStatus.INVALID, busyStatus: busyStatus.IDLE },
-      schema
-    ));
+    const invalidate = _.get(action.meta, 'options.invalidate');
+
+    if (invalidate !== false) {
+      dispatch(makeIndexAction(
+        action,
+        REFERENCE_STATUS,
+        { validationStatus: validationStatus.INVALID, busyStatus: busyStatus.IDLE },
+        schema
+      ));
+    }
   },
   [REMOVE_ERROR]: (action, data, dispatch) => {
     // Change collections status to idle and invalid
     const schema = action.meta.schema;
-    dispatch(makeIndexAction(
-      action,
-      REFERENCE_STATUS,
-      {
-        validationStatus: validationStatus.INVALID,
-        busyStatus: busyStatus.IDLE,
-      },
-      schema
-    ));
+    const invalidate = _.get(action.meta, 'options.invalidate');
+
+    if (invalidate !== false) {
+      dispatch(makeIndexAction(
+        action,
+        REFERENCE_STATUS,
+        {
+          validationStatus: validationStatus.INVALID,
+          busyStatus: busyStatus.IDLE,
+        },
+        schema
+      ));
+    }
   },
 };
 

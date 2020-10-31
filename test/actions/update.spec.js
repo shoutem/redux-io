@@ -479,27 +479,25 @@ describe('Update action creator', () => {
       request: config,
     };
 
+    const options = { invalidate: false };
+    
     const expectedMeta = {
       source: JSON_API_SOURCE,
       schema,
       endpoint: config.endpoint,
       params: {},
-      options: {
-        invalidate: false,
-      },
+      options,
     };
 
-    const action = update(schemaConfig, item, {}, { invalidate: false });
+    const action = update(schemaConfig, item, {}, options);
 
     const store = mockStore({});
     store.dispatch(action)
       .then(() => {
         const performedActions = store.getActions();
-
         expect(performedActions).to.have.length(4);
 
         const batchedUpdatingActions = performedActions[0];
-
         const actionObjUpdating = batchedUpdatingActions.payload[0];
         expect(actionObjUpdating.type).to.equal(OBJECT_UPDATING);
         expect(actionObjUpdating.meta).to.deep.equal({
