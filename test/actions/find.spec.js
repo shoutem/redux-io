@@ -708,12 +708,6 @@ describe('Find action creator', () => {
         },
       },
     };
-    const metaResponse = [{}, {}, {
-      status: 200,
-      headers: {
-        "content-type": "vnd.api+json"
-      },
-    }];
 
     const action = find(schemaConfig, tag);
 
@@ -756,6 +750,92 @@ describe('Find action creator', () => {
         expect(actionCollFetched.payload).to.deep.equal(expectedPayload.data);
 
         const successAction = performedActions[3];
+        expect(successAction.type).to.equal(LOAD_SUCCESS);
+        expect(successAction.meta).to.deep.equal({
+          ...expectedResponseMeta,
+          timestamp: successAction.meta.timestamp,
+        });
+        expect(successAction.payload).to.deep.equal(expectedPayload);
+      }).then(done).catch(done);
+  });
+
+  it('produces valid storage without invalidating collections', done => {
+    const schema = 'schema_test';
+    const tag = 'collection_test';
+    const expectedPayload = {
+      data: [{
+        type: schema,
+        id: '1',
+        attributes: {
+          name: 'Test1',
+        },
+      }, {
+        type: schema,
+        id: '2',
+        attributes: {
+          name: 'Test2',
+        },
+      }],
+    };
+
+    nock('http://api.server.local')
+      .get('/apps')
+      .reply(200, expectedPayload, { 'Content-Type': 'vnd.api+json' });
+
+    const config = {
+      headers: {
+        'Content-Type': 'application/vnd.api+json',
+      },
+      endpoint: 'http://api.server.local/apps',
+    };
+
+    const schemaConfig = {
+      schema,
+      request: config,
+    };
+
+    const options = { invalidate: false };
+
+    const expectedMeta = {
+      source: JSON_API_SOURCE,
+      schema,
+      tag,
+      endpoint: config.endpoint,
+      params: {},
+      options,
+    };
+    const expectedResponseMeta = {
+      ...expectedMeta,
+      response: {
+        status: 200,
+        headers: {
+          "content-type": "vnd.api+json"
+        },
+      },
+    };
+
+    const action = find(schemaConfig, tag, {}, options);
+
+    const store = mockStore({});
+    store.dispatch(action)
+      .then(() => {
+        const performedActions = store.getActions();
+        expect(performedActions).to.have.length(3);
+
+        expect(performedActions[0].type).to.equal(LOAD_REQUEST);
+
+        const batchedActionsSuccess = performedActions[1].payload;
+
+        const actionObjFetched = batchedActionsSuccess[0];
+        expect(actionObjFetched.type).to.equal(OBJECT_FETCHED);
+        expect(actionObjFetched.meta).to.deep.equal({
+          ...expectedResponseMeta,
+          transformation: {},
+          timestamp: actionObjFetched.meta.timestamp,
+        });
+        expect(actionObjFetched.payload).to.deep.equal(expectedPayload.data[0]);
+
+        const successAction = performedActions[2];
         expect(successAction.type).to.equal(LOAD_SUCCESS);
         expect(successAction.meta).to.deep.equal({
           ...expectedResponseMeta,

@@ -201,22 +201,30 @@ const actionHandlers = {
   [LOAD_REQUEST]: (action, data, dispatch) => {
     // Make collection busy to prevent multiple requests
     const { schema, tag } = action.meta;
-    dispatch(makeIndexAction(
-      action,
-      REFERENCE_STATUS,
-      { busyStatus: busyStatus.BUSY },
-      schema,
-      tag
-    ));
+    const invalidate = _.get(action.meta, 'options.invalidate');
+
+    if (invalidate !== false) {
+      dispatch(makeIndexAction(
+        action,
+        REFERENCE_STATUS,
+        { busyStatus: busyStatus.BUSY },
+        schema,
+        tag
+      ));
+    }
   },
   [LOAD_SUCCESS]: (action, data, dispatch) => {
     // Dispatch objects to storages and collection with specific tag
     const { schema, tag } = action.meta;
+    const invalidate = _.get(action.meta, 'options.invalidate');
 
     data.map(item => dispatch(makeObjectAction(action, OBJECT_FETCHED, item)));
-    // TODO: once when we support findOne action and single reducer, REFERENCE_FETCHED
-    // should trigger only for collections
-    dispatch(makeIndexAction(action, REFERENCE_FETCHED, data, schema, tag));
+
+    if (invalidate !== false) {
+      // TODO: once when we support findOne action and single reducer, REFERENCE_FETCHED
+      // should trigger only for collections
+      dispatch(makeIndexAction(action, REFERENCE_FETCHED, data, schema, tag));
+    }
 
     saveMeta(action, dispatch);
     saveLinks(action, dispatch);
@@ -224,17 +232,21 @@ const actionHandlers = {
   [LOAD_ERROR]: (action, data, dispatch) => {
     // Invalidate and idle collection on error
     const { schema, tag } = action.meta;
-    dispatch(makeIndexAction(
-      action,
-      REFERENCE_STATUS,
-      {
-        busyStatus: busyStatus.IDLE,
-        validationStatus: validationStatus.INVALID,
-        error: true,
-      },
-      schema,
-      tag
-    ));
+    const invalidate = _.get(action.meta, 'options.invalidate');
+
+    if (invalidate !== false) {
+      dispatch(makeIndexAction(
+        action,
+        REFERENCE_STATUS,
+        {
+          busyStatus: busyStatus.IDLE,
+          validationStatus: validationStatus.INVALID,
+          error: true,
+        },
+        schema,
+        tag
+      ));
+    }
   },
   [CREATE_REQUEST]: (action, data, dispatch) => {
     // Change collection status to busy and invalid to prevent fetching.
