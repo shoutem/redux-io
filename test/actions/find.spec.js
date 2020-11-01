@@ -794,7 +794,7 @@ describe('Find action creator', () => {
       request: config,
     };
 
-    const options = { invalidate: false };
+    const options = { invalidateReferences: false };
 
     const expectedMeta = {
       source: JSON_API_SOURCE,

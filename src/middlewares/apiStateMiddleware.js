@@ -201,9 +201,9 @@ const actionHandlers = {
   [LOAD_REQUEST]: (action, data, dispatch) => {
     // Make collection busy to prevent multiple requests
     const { schema, tag } = action.meta;
-    const invalidate = _.get(action.meta, 'options.invalidate');
+    const invalidateReferences = _.get(action.meta, 'options.invalidateReferences');
 
-    if (invalidate !== false) {
+    if (invalidateReferences !== false) {
       dispatch(makeIndexAction(
         action,
         REFERENCE_STATUS,
@@ -216,11 +216,11 @@ const actionHandlers = {
   [LOAD_SUCCESS]: (action, data, dispatch) => {
     // Dispatch objects to storages and collection with specific tag
     const { schema, tag } = action.meta;
-    const invalidate = _.get(action.meta, 'options.invalidate');
+    const invalidateReferences = _.get(action.meta, 'options.invalidateReferences');
 
     data.map(item => dispatch(makeObjectAction(action, OBJECT_FETCHED, item)));
 
-    if (invalidate !== false) {
+    if (invalidateReferences !== false) {
       // TODO: once when we support findOne action and single reducer, REFERENCE_FETCHED
       // should trigger only for collections
       dispatch(makeIndexAction(action, REFERENCE_FETCHED, data, schema, tag));
@@ -232,9 +232,9 @@ const actionHandlers = {
   [LOAD_ERROR]: (action, data, dispatch) => {
     // Invalidate and idle collection on error
     const { schema, tag } = action.meta;
-    const invalidate = _.get(action.meta, 'options.invalidate');
+    const invalidateReferences = _.get(action.meta, 'options.invalidateReferences');
 
-    if (invalidate !== false) {
+    if (invalidateReferences !== false) {
       dispatch(makeIndexAction(
         action,
         REFERENCE_STATUS,
@@ -251,9 +251,9 @@ const actionHandlers = {
   [CREATE_REQUEST]: (action, data, dispatch) => {
     // Change collection status to busy and invalid to prevent fetching.
     const schema = action.meta.schema;
-    const invalidate = _.get(action.meta, 'options.invalidate');
+    const invalidateReferences = _.get(action.meta, 'options.invalidateReferences');
 
-    if (invalidate !== false) {
+    if (invalidateReferences !== false) {
       dispatch(makeIndexAction(
         action,
         REFERENCE_STATUS,
@@ -267,9 +267,9 @@ const actionHandlers = {
     data.map(item => dispatch(makeObjectAction(action, OBJECT_CREATED, item)));
 
     const schema = action.meta.schema;
-    const invalidate = _.get(action.meta, 'options.invalidate');
+    const invalidateReferences = _.get(action.meta, 'options.invalidateReferences');
 
-    if (invalidate !== false) {
+    if (invalidateReferences !== false) {
       dispatch(makeIndexAction(
         action,
         REFERENCE_STATUS,
@@ -281,9 +281,9 @@ const actionHandlers = {
   [CREATE_ERROR]: (action, data, dispatch) => {
     // Change collection status to idle and invalid to fetch again.
     const schema = action.meta.schema;
-    const invalidate = _.get(action.meta, 'options.invalidate');
+    const invalidateReferences = _.get(action.meta, 'options.invalidateReferences');
 
-    if (invalidate !== false) {
+    if (invalidateReferences !== false) {
       dispatch(makeIndexAction(
         action,
         REFERENCE_STATUS,
@@ -299,9 +299,9 @@ const actionHandlers = {
     // Change collection status to busy and invalid to prevent fetching and because of
     // local changes in storage state with updated item.
     const schema = action.meta.schema;
-    const invalidate = _.get(action.meta, 'options.invalidate');
+    const invalidateReferences = _.get(action.meta, 'options.invalidateReferences');
 
-    if (invalidate !== false) {
+    if (invalidateReferences !== false) {
       dispatch(makeIndexAction(
         action,
         REFERENCE_STATUS,
@@ -317,9 +317,9 @@ const actionHandlers = {
     data.map(item => dispatch(makeObjectAction(action, OBJECT_UPDATED, item)));
 
     const schema = action.meta.schema;
-    const invalidate = _.get(action.meta, 'options.invalidate');
+    const invalidateReferences = _.get(action.meta, 'options.invalidateReferences');
 
-    if (invalidate !== false) {
+    if (invalidateReferences !== false) {
       dispatch(makeIndexAction(
         action,
         REFERENCE_STATUS,
@@ -331,9 +331,9 @@ const actionHandlers = {
   [UPDATE_ERROR]: (action, data, dispatch) => {
     // Change collection status to idle and invalid
     const schema = action.meta.schema;
-    const invalidate = _.get(action.meta, 'options.invalidate');
+    const invalidateReferences = _.get(action.meta, 'options.invalidateReferences');
 
-    if (invalidate !== false) {
+    if (invalidateReferences !== false) {
       dispatch(makeIndexAction(
         action,
         REFERENCE_STATUS,
@@ -346,9 +346,9 @@ const actionHandlers = {
     // Change collections status to busy and invalid because of removing item in
     // local storage state
     const schema = action.meta.schema;
-    const invalidate = _.get(action.meta, 'options.invalidate');
+    const invalidateReferences = _.get(action.meta, 'options.invalidateReferences');
 
-    if (invalidate !== false) {
+    if (invalidateReferences !== false) {
       dispatch(makeIndexAction(
         action,
         REFERENCE_STATUS,
@@ -364,9 +364,9 @@ const actionHandlers = {
     data.map(item => dispatch(makeObjectAction(action, OBJECT_REMOVED, item)));
 
     const schema = action.meta.schema;
-    const invalidate = _.get(action.meta, 'options.invalidate');
+    const invalidateReferences = _.get(action.meta, 'options.invalidateReferences');
 
-    if (invalidate !== false) {
+    if (invalidateReferences !== false) {
       dispatch(makeIndexAction(
         action,
         REFERENCE_STATUS,
@@ -378,9 +378,9 @@ const actionHandlers = {
   [REMOVE_ERROR]: (action, data, dispatch) => {
     // Change collections status to idle and invalid
     const schema = action.meta.schema;
-    const invalidate = _.get(action.meta, 'options.invalidate');
+    const invalidateReferences = _.get(action.meta, 'options.invalidateReferences');
 
-    if (invalidate !== false) {
+    if (invalidateReferences !== false) {
       dispatch(makeIndexAction(
         action,
         REFERENCE_STATUS,
