@@ -456,7 +456,7 @@ describe('Create action creator', () => {
       }).then(done).catch(done);
   });
 
-  it('produces valid storage without invalidating collections', done => {
+  it('produces valid storage without invalidating references', done => {
     const schema = 'schema_test';
     const expectedPayload = {
       data: {

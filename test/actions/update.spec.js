@@ -456,7 +456,7 @@ describe('Update action creator', () => {
       }).then(done).catch(done);
   });
 
-  it('produces valid storage without invalidating collections', done => {
+  it('produces valid storage without invalidating references', done => {
     const schema = 'schema_test';
     const item = { id: 2, type: schema };
     const expectedPayload = {
@@ -480,7 +480,7 @@ describe('Update action creator', () => {
     };
 
     const options = { invalidate: false };
-    
+
     const expectedMeta = {
       source: JSON_API_SOURCE,
       schema,
