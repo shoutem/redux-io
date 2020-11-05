@@ -298,4 +298,83 @@ describe('Delete action creator', () => {
         });
       }).then(done).catch(done);
   });
+
+  it('produces valid storage without invalidating references', done => {
+    const schema = 'schema_test';
+    const item = { id: 1, type: schema };
+
+    nock('http://api.server.local')
+      .delete('/apps/1')
+      .reply(200, {}, { 'Content-Type': 'vnd.api+json' });
+
+    const config = {
+      headers: {
+        'Content-Type': 'application/vnd.api+json',
+      },
+      endpoint: 'http://api.server.local/apps/1',
+    };
+
+    const schemaConfig = {
+      schema,
+      request: config,
+    };
+
+    const options = { invalidateReferences: false };
+
+    const expectedMeta = {
+      source: JSON_API_SOURCE,
+      schema,
+      endpoint: config.endpoint,
+      params: {},
+      options,
+    };
+
+    const action = remove(schemaConfig, item, {}, options);
+
+    const store = mockStore({});
+    store.dispatch(action)
+      .then(() => {
+        const performedActions = store.getActions();
+        expect(performedActions).to.have.length(4);
+
+        const batchedRemovingActions = performedActions[0];
+        const actionObjDeleting = batchedRemovingActions.payload[0];
+        expect(actionObjDeleting.type).to.equal(OBJECT_REMOVING);
+        expect(actionObjDeleting.meta).to.deep.equal({
+          ...expectedMeta,
+          transformation: {},
+          timestamp: actionObjDeleting.meta.timestamp
+        });
+
+        expect(performedActions[1].type).to.equal(REMOVE_REQUEST);
+
+        const batchedRemovedActions = performedActions[2];
+        const actionObjRemoved = batchedRemovedActions.payload[0];
+        expect(actionObjRemoved.type).to.equal(OBJECT_REMOVED);
+        expect(actionObjRemoved.meta).to.deep.equal({
+          ...expectedMeta,
+          transformation: {},
+          timestamp: actionObjRemoved.meta.timestamp,
+          response: {
+            status: 200,
+            headers: {
+              "content-type": "vnd.api+json",
+            }
+          },
+        });
+
+        const successAction = performedActions[3];
+        expect(successAction.type).to.equal(REMOVE_SUCCESS);
+        expect(successAction.meta).to.deep.equal({
+          ...expectedMeta,
+          timestamp: successAction.meta.timestamp,
+          response: {
+            status: 200,
+            headers: {
+              "content-type": "vnd.api+json",
+            }
+          },
+        });
+      }).then(done).catch(done);
+  });
 });
