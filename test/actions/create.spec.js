@@ -539,4 +539,107 @@ describe('Create action creator', () => {
         expect(successAction.payload).to.deep.equal(expectedPayload);
       }).then(done).catch(done);
   });
+
+  it('produces valid collection actions without invalidating resources', done => {
+    const schema = 'schema_test';
+    const expectedPayload = {
+      data: {
+        schema,
+        id: '1',
+        type: schema,
+        attributes: {
+          name: 'Test1',
+        },
+      },
+    };
+
+    const item = {
+      schema,
+      attributes: {
+        name: 'Test1',
+      },
+    };
+    nock('http://api.server.local')
+      .post('/apps')
+      .reply(200, expectedPayload, { 'Content-Type': 'vnd.api+json' });
+
+    const config = {
+      headers: {
+        'Content-Type': 'application/vnd.api+json',
+      },
+      endpoint: 'http://api.server.local/apps',
+    };
+
+    const schemaConfig = {
+      schema,
+      request: config,
+    };
+
+    const options = { invalidateResources: false };
+
+    const expectedMeta = {
+      source: JSON_API_SOURCE,
+      endpoint: config.endpoint,
+      params: {},
+      options,
+      schema,
+    };
+    const expectedResponseMeta = {
+      ...expectedMeta,
+      response: {
+        status: 200,
+        headers: {
+          "content-type": "vnd.api+json"
+        },
+      },
+    };
+
+    const action = create(schemaConfig, item, {}, options);
+    const store = mockStore({});
+    store.dispatch(action)
+      .then(() => {
+        const performedActions = store.getActions();
+        expect(performedActions).to.have.length(4);
+
+        const batchedActionsRequest = performedActions[0].payload;
+
+        const actionCollStatusBusy = batchedActionsRequest[0];
+        expect(actionCollStatusBusy.type).to.equal(REFERENCE_STATUS);
+        expect(actionCollStatusBusy.meta).to.deep.equal({
+          ...expectedMeta,
+          tag: '*',
+          timestamp: actionCollStatusBusy.meta.timestamp,
+        });
+        const expectedCollStatusBusyPayload = {
+          busyStatus: busyStatus.BUSY,
+          validationStatus: validationStatus.INVALID,
+        };
+        expect(actionCollStatusBusy.payload).to.deep.equal(expectedCollStatusBusyPayload);
+
+        expect(performedActions[1].type).to.equal(CREATE_REQUEST);
+
+        const batchedActionsSuccess = performedActions[2].payload;
+
+        const actionCollStatus = batchedActionsSuccess[0];
+        expect(actionCollStatus.type).to.equal(REFERENCE_STATUS);
+        expect(actionCollStatus.meta).to.deep.equal({
+          ...expectedResponseMeta,
+          tag: '*',
+          timestamp: actionCollStatus.meta.timestamp,
+        });
+        const expectedCollStatusPayload = {
+          validationStatus: validationStatus.INVALID,
+          busyStatus: busyStatus.IDLE,
+        };
+        expect(actionCollStatus.payload).to.deep.equal(expectedCollStatusPayload);
+
+        const successAction = performedActions[3];
+        expect(successAction.type).to.equal(CREATE_SUCCESS);
+        expect(successAction.meta).to.deep.equal({
+          ...expectedResponseMeta,
+          timestamp: successAction.meta.timestamp,
+        });
+        expect(successAction.payload).to.deep.equal(expectedPayload);
+      }).then(done).catch(done);
+  });
 });
