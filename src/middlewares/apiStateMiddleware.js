@@ -216,9 +216,12 @@ const actionHandlers = {
   [LOAD_SUCCESS]: (action, data, dispatch) => {
     // Dispatch objects to storages and collection with specific tag
     const { schema, tag } = action.meta;
+    const invalidateResources = _.get(action.meta, 'options.invalidateResources');
     const invalidateReferences = _.get(action.meta, 'options.invalidateReferences');
 
-    data.map(item => dispatch(makeObjectAction(action, OBJECT_FETCHED, item)));
+    if (invalidateResources !== false) {
+      data.map(item => dispatch(makeObjectAction(action, OBJECT_FETCHED, item)));
+    }
 
     if (invalidateReferences !== false) {
       // TODO: once when we support findOne action and single reducer, REFERENCE_FETCHED
@@ -263,11 +266,14 @@ const actionHandlers = {
     }
   },
   [CREATE_SUCCESS]: (action, data, dispatch) => {
-    // Dispatch created objects to storage and change collection status to invalid, idle
-    data.map(item => dispatch(makeObjectAction(action, OBJECT_CREATED, item)));
-
     const schema = action.meta.schema;
+    const invalidateResources = _.get(action.meta, 'options.invalidateResources');
     const invalidateReferences = _.get(action.meta, 'options.invalidateReferences');
+
+    if (invalidateResources !== false) {
+      // Dispatch created objects to storage and change collection status to invalid, idle
+      data.map(item => dispatch(makeObjectAction(action, OBJECT_CREATED, item)));
+    }
 
     if (invalidateReferences !== false) {
       dispatch(makeIndexAction(
@@ -299,6 +305,7 @@ const actionHandlers = {
     // Change collection status to busy and invalid to prevent fetching and because of
     // local changes in storage state with updated item.
     const schema = action.meta.schema;
+    const invalidateResources = _.get(action.meta, 'options.invalidateResources');
     const invalidateReferences = _.get(action.meta, 'options.invalidateReferences');
 
     if (invalidateReferences !== false) {
@@ -310,14 +317,19 @@ const actionHandlers = {
       ));
     }
 
-    data.map(item => dispatch(makeObjectAction(action, OBJECT_UPDATING, item)));
+    if (invalidateResources !== false) {
+      data.map(item => dispatch(makeObjectAction(action, OBJECT_UPDATING, item)));
+    }
   },
   [UPDATE_SUCCESS]: (action, data, dispatch) => {
-    // Dispatch updated objects from and change collections status to idle & invalid
-    data.map(item => dispatch(makeObjectAction(action, OBJECT_UPDATED, item)));
-
     const schema = action.meta.schema;
+    const invalidateResources = _.get(action.meta, 'options.invalidateResources');
     const invalidateReferences = _.get(action.meta, 'options.invalidateReferences');
+
+    if (invalidateResources !== false) {
+    // Dispatch updated objects from and change collections status to idle & invalid
+      data.map(item => dispatch(makeObjectAction(action, OBJECT_UPDATED, item)));
+    }
 
     if (invalidateReferences !== false) {
       dispatch(makeIndexAction(
@@ -346,6 +358,7 @@ const actionHandlers = {
     // Change collections status to busy and invalid because of removing item in
     // local storage state
     const schema = action.meta.schema;
+    const invalidateResources = _.get(action.meta, 'options.invalidateResources');
     const invalidateReferences = _.get(action.meta, 'options.invalidateReferences');
 
     if (invalidateReferences !== false) {
@@ -357,14 +370,19 @@ const actionHandlers = {
       ));
     }
 
-    data.map(item => dispatch(makeObjectAction(action, OBJECT_REMOVING, item)));
+    if (invalidateResources !== false) {
+      data.map(item => dispatch(makeObjectAction(action, OBJECT_REMOVING, item)));
+    }
   },
   [REMOVE_SUCCESS]: (action, data, dispatch) => {
-    // Remove object if already not removed during request
-    data.map(item => dispatch(makeObjectAction(action, OBJECT_REMOVED, item)));
-
     const schema = action.meta.schema;
+    const invalidateResources = _.get(action.meta, 'options.invalidateResources');
     const invalidateReferences = _.get(action.meta, 'options.invalidateReferences');
+
+    if (invalidateResources !== false) {
+      // Remove object if already not removed during request
+      data.map(item => dispatch(makeObjectAction(action, OBJECT_REMOVED, item)));
+    }
 
     if (invalidateReferences !== false) {
       dispatch(makeIndexAction(

@@ -844,4 +844,100 @@ describe('Find action creator', () => {
         expect(successAction.payload).to.deep.equal(expectedPayload);
       }).then(done).catch(done);
   });
+
+  it('produces valid collection actions without invalidating resources', done => {
+    const schema = 'schema_test';
+    const tag = 'collection_test';
+    const expectedPayload = {
+      data: [{
+        type: schema,
+        id: '1',
+        attributes: {
+          name: 'Test1',
+        },
+      }, {
+        type: schema,
+        id: '2',
+        attributes: {
+          name: 'Test2',
+        },
+      }],
+    };
+
+    nock('http://api.server.local')
+      .get('/apps')
+      .reply(200, expectedPayload, { 'Content-Type': 'vnd.api+json' });
+
+    const config = {
+      headers: {
+        'Content-Type': 'application/vnd.api+json',
+      },
+      endpoint: 'http://api.server.local/apps',
+    };
+
+    const schemaConfig = {
+      schema,
+      request: config,
+    };
+
+    const options = { invalidateResources: false };
+
+    const expectedMeta = {
+      source: JSON_API_SOURCE,
+      schema,
+      tag,
+      endpoint: config.endpoint,
+      params: {},
+      options,
+    };
+    const expectedResponseMeta = {
+      ...expectedMeta,
+      response: {
+        status: 200,
+        headers: {
+          "content-type": "vnd.api+json"
+        },
+      },
+    };
+
+    const action = find(schemaConfig, tag, {}, options);
+
+    const store = mockStore({});
+    store.dispatch(action)
+      .then(() => {
+        const performedActions = store.getActions();
+        expect(performedActions).to.have.length(4);
+
+        const batchedActionsRequest = performedActions[0].payload;
+
+        const actionCollStatus = batchedActionsRequest[0];
+        expect(actionCollStatus.type).to.equal(REFERENCE_STATUS);
+        expect(actionCollStatus.meta).to.deep.equal({
+          ...expectedMeta,
+          timestamp: actionCollStatus.meta.timestamp,
+        });
+        const expectedCollStatusPayload = { busyStatus: busyStatus.BUSY };
+        expect(actionCollStatus.payload).to.deep.equal(expectedCollStatusPayload);
+
+        expect(performedActions[1].type).to.equal(LOAD_REQUEST);
+
+        const batchedActionsSuccess = performedActions[2].payload;
+
+        const actionCollFetched = batchedActionsSuccess[0];
+        expect(actionCollFetched.type).to.equal(REFERENCE_FETCHED);
+        expect(actionCollFetched.meta).to.deep.equal({
+          ...expectedResponseMeta,
+          timestamp: actionCollFetched.meta.timestamp,
+        });
+        expect(actionCollFetched.payload).to.deep.equal(expectedPayload.data);
+
+        const successAction = performedActions[3];
+        expect(successAction.type).to.equal(LOAD_SUCCESS);
+        expect(successAction.meta).to.deep.equal({
+          ...expectedResponseMeta,
+          timestamp: successAction.meta.timestamp,
+        });
+        expect(successAction.payload).to.deep.equal(expectedPayload);
+      }).then(done).catch(done);
+  });
 });
