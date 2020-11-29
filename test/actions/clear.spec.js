@@ -27,7 +27,7 @@ describe('Clear action creator', () => {
       type: REFERENCE_CLEAR,
       meta: {
         schema,
-        tag: '',
+        tag: '*',
       },
     });
   });
