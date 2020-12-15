@@ -32,6 +32,13 @@ function isValidAction(action, schema, tag) {
     if (action.type === REFERENCE_STATUS && _.get(action, 'meta.tag') === '*') {
       return true;
     }
+
+    // Every collection should be cleared if action is type of REFERENCE_CLEAR
+    // and action meta tag is broadcast
+    if (action.type === REFERENCE_CLEAR && _.get(action, 'meta.tag') === '*') {
+      return true;
+    }
+
     return false;
   }
 

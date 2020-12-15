@@ -3,7 +3,7 @@ import {
   REFERENCE_CLEAR,
 } from './../';
 
-export default function clear(schema, tag = '') {
+export default function clear(schema, tag = '*') {
   if (!_.isString(schema)) {
     throw new Error(`Invalid schema, "clear" expected a string but got: ${JSON.stringify(schema)}`);
   }
