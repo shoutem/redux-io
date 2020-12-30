@@ -77,7 +77,7 @@ export function remove(schema, item, params = {}, options = {}) {
         },
         {
           type: REMOVE_ERROR,
-          meta: extendMetaWithResponse(meta),
+          meta: extendMetaWithResponse({ ...meta, payload: { data: item } }),
         },
       ],
     },

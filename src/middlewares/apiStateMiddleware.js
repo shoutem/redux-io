@@ -326,11 +326,12 @@ const actionHandlers = {
     const invalidateResources = _.get(action.meta, 'options.invalidateResources');
     const invalidateReferences = _.get(action.meta, 'options.invalidateReferences');
 
+    // Dispatch updated objects
     if (invalidateResources !== false) {
-    // Dispatch updated objects from and change collections status to idle & invalid
       data.map(item => dispatch(makeObjectAction(action, OBJECT_UPDATED, item)));
     }
 
+    // Change collections status to idle & invalid
     if (invalidateReferences !== false) {
       dispatch(makeIndexAction(
         action,
@@ -341,10 +342,16 @@ const actionHandlers = {
     }
   },
   [UPDATE_ERROR]: (action, data, dispatch) => {
-    // Change collection status to idle and invalid
     const schema = action.meta.schema;
+    const invalidateResources = _.get(action.meta, 'options.invalidateResources');
     const invalidateReferences = _.get(action.meta, 'options.invalidateReferences');
 
+    //  Dispatch objects with error
+    if (invalidateResources !== false) {
+      data.map(item => dispatch(makeObjectAction(action, OBJECT_ERROR, item)));
+    }
+
+    // Change collection status to idle and invalid
     if (invalidateReferences !== false) {
       dispatch(makeIndexAction(
         action,
@@ -394,10 +401,16 @@ const actionHandlers = {
     }
   },
   [REMOVE_ERROR]: (action, data, dispatch) => {
-    // Change collections status to idle and invalid
     const schema = action.meta.schema;
+    const invalidateResources = _.get(action.meta, 'options.invalidateResources');
     const invalidateReferences = _.get(action.meta, 'options.invalidateReferences');
 
+     // Dispatch objects with error
+    if (invalidateResources !== false) {
+      data.map(item => dispatch(makeObjectAction(action, OBJECT_ERROR, item)));
+    }
+
+    // Change collections status to idle and invalid
     if (invalidateReferences !== false) {
       dispatch(makeIndexAction(
         action,
@@ -478,8 +491,9 @@ function handleFailedRequest(action, dispatch) {
     return;
   }
 
-  // Update reference status for corresponding error action
-  actionHandlers[errorAction](action, undefined, dispatch);
+  const data = getData(_.get(action, 'meta.payload'));
+  // Update reference and object status for corresponding error action
+  actionHandlers[errorAction](action, data, dispatch);
 }
 
 /**
