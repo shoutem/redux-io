@@ -10,6 +10,7 @@ import rio, {
   REMOVE_ERROR,
   OBJECT_REMOVING,
   OBJECT_REMOVED,
+  OBJECT_ERROR,
   REFERENCE_STATUS,
   apiStateMiddleware,
   JSON_API_SOURCE,
@@ -74,6 +75,14 @@ describe('Delete action creator', () => {
         headers: {}
       },
     };
+
+    const expectedErrorResponseMeta = {
+      payload: {
+        data: item,
+      },
+      ...expectedResponseMeta,
+    };
+
     const metaResponse = [{}, {}, new Response(null, {
       "status": 200,
       "headers": {},
@@ -84,7 +93,7 @@ describe('Delete action creator', () => {
     expect(types[1].type).to.equal(REMOVE_SUCCESS);
     expect(types[1].meta(...metaResponse)).to.deep.equal(expectedResponseMeta);
     expect(types[2].type).to.equal(REMOVE_ERROR);
-    expect(types[2].meta(...metaResponse)).to.deep.equal(expectedResponseMeta);
+    expect(types[2].meta(...metaResponse)).to.deep.equal(expectedErrorResponseMeta);
   });
 
   it('creates a valid action with valid endpoint with filled params', () => {
@@ -456,6 +465,118 @@ describe('Delete action creator', () => {
           timestamp: successAction.meta.timestamp,
           response: {
             status: 200,
+            headers: {
+              "content-type": "vnd.api+json",
+            }
+          },
+        });
+      }).then(done).catch(done);
+  });
+
+  it('produces valid storage and collection actions after error', done => {
+    const schema = 'schema_test';
+    const item = { id: 1, type: schema };
+    const expectedPayload = {
+      data: item,
+    };
+
+    nock('http://api.server.local')
+      .delete('/apps/1')
+      .reply(400, {}, { 'Content-Type': 'vnd.api+json' });
+
+    const config = {
+      headers: {
+        'Content-Type': 'application/vnd.api+json',
+      },
+      endpoint: 'http://api.server.local/apps/1',
+    };
+
+    const schemaConfig = {
+      schema,
+      request: config,
+    };
+
+    const expectedMeta = {
+      source: JSON_API_SOURCE,
+      schema,
+      endpoint: config.endpoint,
+      params: {},
+      options: {},
+    };
+
+    const action = remove(schemaConfig, item);
+
+    const store = mockStore({});
+    store.dispatch(action)
+      .then(() => {
+        const performedActions = store.getActions();
+        expect(performedActions).to.have.length(4);
+
+        const batchedRemovingActions = performedActions[0];
+        const actionCollBusyRequest = batchedRemovingActions.payload[0];
+        expect(actionCollBusyRequest.type).to.equal(REFERENCE_STATUS);
+        expect(actionCollBusyRequest.meta)
+          .to.deep.equal({ ...expectedMeta, tag: '*', timestamp: actionCollBusyRequest.meta.timestamp });
+        const expectedCollBusyStatusPayload = {
+          validationStatus: validationStatus.INVALID,
+          busyStatus: busyStatus.BUSY,
+        };
+        expect(actionCollBusyRequest.payload).to.deep.equal(expectedCollBusyStatusPayload);
+
+        const actionObjDeleting = batchedRemovingActions.payload[1];
+        expect(actionObjDeleting.type).to.equal(OBJECT_REMOVING);
+        expect(actionObjDeleting.meta).to.deep.equal({
+          ...expectedMeta,
+          transformation: {},
+          timestamp: actionObjDeleting.meta.timestamp
+        });
+
+        expect(performedActions[1].type).to.equal(REMOVE_REQUEST);
+
+        const batchedErroredActions = performedActions[2];
+        const actionObjErrored = batchedErroredActions.payload[0];
+        expect(actionObjErrored.type).to.equal(OBJECT_ERROR);
+        expect(actionObjErrored.meta).to.deep.equal({
+          ...expectedMeta,
+          payload: expectedPayload,
+          transformation: {},
+          timestamp: actionObjErrored.meta.timestamp,
+          response: {
+            status: 400,
+            headers: {
+              "content-type": "vnd.api+json",
+            }
+          },
+        });
+
+        const actionCollStatus = batchedErroredActions.payload[1];
+        expect(actionCollStatus.type).to.equal(REFERENCE_STATUS);
+        expect(actionCollStatus.meta).to.deep.equal({
+          ...expectedMeta,
+          payload: expectedPayload,
+          tag: '*',
+          timestamp: actionCollStatus.meta.timestamp,
+          response: {
+            status: 400,
+            headers: {
+              "content-type": "vnd.api+json",
+            }
+          },
+        });
+        const expectedCollStatusPayload = {
+          validationStatus: validationStatus.INVALID,
+          busyStatus: busyStatus.IDLE,
+        };
+        expect(actionCollStatus.payload).to.deep.equal(expectedCollStatusPayload);
+
+        const errorAction = performedActions[3];
+        expect(errorAction.type).to.equal(REMOVE_ERROR);
+        expect(errorAction.meta).to.deep.equal({
+          ...expectedMeta,
+          payload: expectedPayload,
+          timestamp: errorAction.meta.timestamp,
+          response: {
+            status: 400,
             headers: {
               "content-type": "vnd.api+json",
             }

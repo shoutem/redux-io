@@ -10,6 +10,7 @@ import rio, {
   UPDATE_ERROR,
   OBJECT_UPDATING,
   OBJECT_UPDATED,
+  OBJECT_ERROR,
   REFERENCE_STATUS,
   apiStateMiddleware,
   JSON_API_SOURCE,
@@ -74,6 +75,14 @@ describe('Update action creator', () => {
         headers: {},
       },
     };
+
+    const expectedErrorResponseMeta = {
+      payload: {
+        data: item,
+      },
+      ...expectedResponseMeta,
+    };
+
     const metaResponse = [{}, {}, { status: 200 }];
 
     expect(types[0].type).to.equal(UPDATE_REQUEST);
@@ -82,7 +91,7 @@ describe('Update action creator', () => {
     expect(types[1].type).to.equal(UPDATE_SUCCESS);
     expect(types[1].meta(...metaResponse)).to.deep.equal(expectedResponseMeta);
     expect(types[2].type).to.equal(UPDATE_ERROR);
-    expect(types[2].meta(...metaResponse)).to.deep.equal(expectedResponseMeta);
+    expect(types[2].meta(...metaResponse)).to.deep.equal(expectedErrorResponseMeta);
   });
 
   it('creates a valid action with valid endpoint with filled params', () => {
@@ -643,6 +652,127 @@ describe('Update action creator', () => {
           },
         });
         expect(successAction.payload).to.deep.equal(expectedPayload);
+      }).then(done).catch(done);
+  });
+
+  it('produces valid storage and collection actions after error', done => {
+    const schema = 'schema_test';
+    const item = { id: 2, type: schema };
+    const expectedPayload = {
+      data: item,
+    };
+
+    nock('http://api.server.local')
+      .patch('/apps/1')
+      .reply(400, {}, { 'Content-Type': 'vnd.api+json' });
+
+    const config = {
+      headers: {
+        'Content-Type': 'application/vnd.api+json',
+      },
+      endpoint: 'http://api.server.local/apps/1',
+    };
+
+    const schemaConfig = {
+      schema,
+      request: config,
+    };
+
+    const expectedMeta = {
+      source: JSON_API_SOURCE,
+      schema,
+      endpoint: config.endpoint,
+      params: {},
+      options: {},
+    };
+
+    const action = update(schemaConfig, item);
+
+    const store = mockStore({});
+    store.dispatch(action)
+      .then(() => {
+        const performedActions = store.getActions();
+
+        expect(performedActions).to.have.length(4);
+
+        const batchedUpdatingActions = performedActions[0];
+        const actionCollStatusBusy = batchedUpdatingActions.payload[0];
+        expect(actionCollStatusBusy.type).to.equal(REFERENCE_STATUS);
+        expect(actionCollStatusBusy.meta)
+          .to.deep.equal({ ...expectedMeta, tag: '*', timestamp: actionCollStatusBusy.meta.timestamp });
+        const expectedCollStatusBusyPayload = {
+          busyStatus: busyStatus.BUSY,
+          validationStatus: validationStatus.INVALID,
+        };
+        expect(actionCollStatusBusy.payload).to.deep.equal(expectedCollStatusBusyPayload);
+
+        const actionObjUpdating = batchedUpdatingActions.payload[1];
+        expect(actionObjUpdating.type).to.equal(OBJECT_UPDATING);
+        expect(actionObjUpdating.meta).to.deep.equal({
+          ...expectedMeta,
+          transformation: {},
+          timestamp: actionObjUpdating.meta.timestamp
+        });
+        expect(actionObjUpdating.payload).to.deep.equal(item);
+
+        const actionUpdateRequest = performedActions[1];
+        expect(actionUpdateRequest.type).to.equal(UPDATE_REQUEST);
+        expect(actionUpdateRequest.meta).to.deep.equal({
+          ...expectedMeta,
+          timestamp: actionUpdateRequest.meta.timestamp,
+        });
+        expect(actionUpdateRequest.payload).to.deep.equal(expectedPayload);
+
+        const batchedErroredActions = performedActions[2];
+        const actionObjErrored = batchedErroredActions.payload[0];
+        expect(actionObjErrored.type).to.equal(OBJECT_ERROR);
+        expect(actionObjErrored.meta).to.deep.equal({
+          ...expectedMeta,
+          payload: expectedPayload,
+          transformation: {},
+          timestamp: actionObjErrored.meta.timestamp,
+          response: {
+            status: 400,
+            headers: {
+              'content-type': 'vnd.api+json'
+            },
+          },
+        });
+        expect(actionObjErrored.payload).to.deep.equal(expectedPayload.data);
+
+        const actionCollStatusIdle = batchedErroredActions.payload[1];
+        expect(actionCollStatusIdle.type).to.equal(REFERENCE_STATUS);
+        expect(actionCollStatusIdle.meta).to.deep.equal({
+          ...expectedMeta,
+          payload: expectedPayload,
+          tag: '*',
+          timestamp: actionObjErrored.meta.timestamp,
+          response: {
+            status: 400,
+            headers: {
+              'content-type': 'vnd.api+json'
+            },
+          },
+        });
+        const expectedCollStatusIdlePayload = {
+          busyStatus: busyStatus.IDLE,
+          validationStatus: validationStatus.INVALID,
+        };
+        expect(actionCollStatusIdle.payload).to.deep.equal(expectedCollStatusIdlePayload);
+
+        const errorAction = performedActions[3];
+        expect(errorAction.type).to.equal(UPDATE_ERROR);
+        expect(errorAction.meta).to.deep.equal({
+          ...expectedMeta,
+          payload: expectedPayload,
+          timestamp: errorAction.meta.timestamp,
+          response: {
+            status: 400,
+            headers: {
+              'content-type': 'vnd.api+json'
+            },
+          },
+        });
       }).then(done).catch(done);
   });
 });

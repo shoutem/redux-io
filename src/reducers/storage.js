@@ -7,6 +7,7 @@ import {
   OBJECT_UPDATED,
   OBJECT_REMOVING,
   OBJECT_REMOVED,
+  OBJECT_ERROR,
 } from './../consts';
 import {
   STATUS,
@@ -130,6 +131,19 @@ export default function storage(schema, initialState = {}) {
       case OBJECT_REMOVED: {
         const newState = { ...state };
         delete newState[item.id];
+        cloneStatus(state, newState);
+        return newState;
+      }
+      case OBJECT_ERROR: {
+        const newItem = { ...currentItem };
+        setStatus(newItem, mergeItemStatus(
+          currentItem,
+          {
+            validationStatus: validationStatus.INVALID,
+            busyStatus: busyStatus.IDLE,
+          }
+        ));
+        const newState = { ...state, [newItem.id]: newItem };
         cloneStatus(state, newState);
         return newState;
       }

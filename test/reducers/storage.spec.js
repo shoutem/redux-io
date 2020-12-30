@@ -11,6 +11,7 @@ import {
   OBJECT_REMOVED,
   OBJECT_UPDATING,
   OBJECT_UPDATED,
+  OBJECT_ERROR,
 } from '../../src';
 import {
   STATUS,
@@ -685,5 +686,41 @@ describe('Storage reducer', () => {
     expect(nextState).to.shallowDeepEqual({});
     expect(nextState[STATUS].schema).to.eql(schema);
     expect(nextState[STATUS].type).to.eql('@@redux-io/storage');
+  });
+
+  it('sets item status to invalid and idle on object after removing error', () => {
+    const itemToBeRemoved = { id: 1 };
+    const initialState = {
+      [itemToBeRemoved.id]: itemToBeRemoved,
+      2: { id: 2 },
+      3: { id: 3 },
+    };
+    const schema = 'schema_test';
+
+    const reducer = storage(schema, initialState);
+    deepFreeze(initialState);
+
+    const action = {
+      type: OBJECT_ERROR,
+      payload: { id: itemToBeRemoved.id },
+      meta: {
+        schema,
+      },
+    };
+
+    const nextState = reducer(initialState, action);
+    deepFreeze(nextState);
+
+    const nextStateInvalidItem = nextState[itemToBeRemoved.id];
+    expect(nextStateInvalidItem[STATUS].validationStatus).to.eql(validationStatus.INVALID);
+    expect(nextStateInvalidItem[STATUS].busyStatus).to.eql(busyStatus.IDLE);
+
+    const expectedState = {
+      [itemToBeRemoved.id]: { ...itemToBeRemoved, [STATUS]: nextStateInvalidItem[STATUS] },
+      2: { id: 2 },
+      3: { id: 3 },
+    };
+
+    expect(nextState).to.shallowDeepEqual(expectedState);
   });
 });
