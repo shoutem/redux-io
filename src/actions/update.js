@@ -83,7 +83,7 @@ export function update(schema, item = null, params = {}, options = {}) {
         },
         {
           type: UPDATE_ERROR,
-          meta: extendMetaWithResponse(meta),
+          meta: extendMetaWithResponse({ ...meta, payload: { data: item } }),
         },
       ],
     },
