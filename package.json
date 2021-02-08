@@ -1,6 +1,6 @@
 {
   "name": "@shoutem/redux-io",
-  "version": "3.2.4",
+  "version": "3.2.5-rc.0",
   "description": "Action creators, reducers and middleware for simple handling of normalized json api data in state",
   "main": "index.js",
   "scripts": {
