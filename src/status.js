@@ -26,7 +26,17 @@ export const createStatus = (description = {}) => (
 
 export const updateStatus = (status, update, markChange = true) => {
   const timestamp = markChange ? { modifiedTimestamp: Date.now() } : {};
-  return _.merge({}, status, update, timestamp);
+  const newStatus = _.merge({}, status, update, timestamp);
+
+  if (!_.has(newStatus, 'params')) {
+    return newStatus;
+  }
+
+  const statusParams = _.get(status, 'params');
+  const updateParams = _.get(update, 'params');
+  const newParams = { ...statusParams, ...updateParams };
+
+  return { ...newStatus, params: newParams };
 };
 
 export const setStatus = (obj, status) => {
