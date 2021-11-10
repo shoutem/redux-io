@@ -28,12 +28,9 @@ export function resolveSchema(config) {
 
 function resolveAction(config, action) {
   const actionConfig = _.get(config, ['actions', action], {});
+  const mergedConfig = _.merge({}, config, actionConfig);
 
-  return _
-    .chain({})
-    .merge(config, actionConfig)
-    .omit('actions')
-    .value();
+  return _.omit(mergedConfig, 'actions');
 }
 
 function resolveResource(config) {

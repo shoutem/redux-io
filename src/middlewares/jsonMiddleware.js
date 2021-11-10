@@ -1,9 +1,5 @@
 import _ from 'lodash';
-import {
-  LOAD_SUCCESS,
-  UPDATE_SUCCESS,
-  CREATE_SUCCESS,
-} from '../consts';
+import { LOAD_SUCCESS, UPDATE_SUCCESS, CREATE_SUCCESS } from '../consts';
 import rio from '../rio';
 import { JSON_API_SOURCE } from '../standardizers/json-api-standardizer';
 
@@ -73,23 +69,23 @@ export default () => next => action => {
   // data and included properties
   const { result, entities } = deserializedPayload;
   const isArray = _.isArray(result);
-  const data = !isArray ?
-    getItem(result, entities) :
-    _.map(result, (resultItem) => getItem(resultItem, entities));
+  const data = !isArray
+    ? getItem(result, entities)
+    : _.map(result, resultItem => getItem(resultItem, entities));
 
   const dataEntityReferences = [].concat(result);
   const included = _.reduce(
     entities,
     (acc, schemaEntities) => {
-      const nonDataEntities = _
-        .chain(schemaEntities)
-        .toArray()
-        .differenceWith(dataEntityReferences, (a, b) => a.id === b.id && a.type === b.type)
-        .value();
+      const nonDataEntities = _.differenceWith(
+        _.toArray(schemaEntities),
+        dataEntityReferences,
+        (a, b) => a.id === b.id && a.type === b.type,
+      );
       acc.push(...nonDataEntities);
       return acc;
     },
-    []
+    [],
   );
 
   const jsonApiPayload = {
