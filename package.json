@@ -1,6 +1,6 @@
 {
   "name": "@shoutem/redux-io",
-  "version": "3.2.5-rc.1",
+  "version": "3.2.5",
   "description": "Action creators, reducers and middleware for simple handling of normalized json api data in state",
   "main": "index.js",
   "scripts": {
@@ -56,7 +56,7 @@
     "sinon": "^9.0.1"
   },
   "dependencies": {
-    "@shoutem/json-api-denormalizer": "0.4.2-rc.0",
+    "@shoutem/json-api-denormalizer": "^0.4.2",
     "lodash": "^4.17.15",
     "memoize-one": "^5.1.1",
     "redux": "^4.0.5",
